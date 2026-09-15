@@ -1,0 +1,18 @@
+{
+    "name": "Convergence.Core.Puzzles",
+    "rootNamespace": "Convergence.Core.Puzzles",
+    "references": [
+        "Convergence.Core.Math",
+        "Convergence.Core.Neural",
+        "Convergence.Core.Training"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": true
+}

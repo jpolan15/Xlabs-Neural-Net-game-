@@ -1,0 +1,16 @@
+{
+    "name": "Convergence.Core.Neural",
+    "rootNamespace": "Convergence.Core.Neural",
+    "references": [
+        "Convergence.Core.Math"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": true
+}

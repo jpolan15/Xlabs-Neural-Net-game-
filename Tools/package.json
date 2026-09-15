@@ -1,0 +1,7 @@
+{
+  "name": "com.convergence.tools",
+  "version": "1.0.0",
+  "displayName": "Convergence Tools",
+  "description": "Development and editor tooling for Convergence",
+  "unity": "6000.0"
+}

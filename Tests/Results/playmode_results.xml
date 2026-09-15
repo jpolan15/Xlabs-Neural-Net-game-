@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="3" result="Passed" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-15 18:03:16Z" end-time="2026-09-15 18:03:16Z" duration="0.0660619">
+  <test-suite type="TestSuite" id="1013" name="My project (2)" fullname="My project (2)" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-09-15 18:03:16Z" end-time="2026-09-15 18:03:16Z" duration="0.066062" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <test-suite type="Assembly" id="1005" name="Convergence.Tests.PlayMode.dll" fullname="C:/Users/Panda/Downloads/neural game/Library/ScriptAssemblies/Convergence.Tests.PlayMode.dll" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-09-15 18:03:16Z" end-time="2026-09-15 18:03:16Z" duration="0.056580" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="23344" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <test-suite type="TestSuite" id="1006" name="Convergence" fullname="Convergence" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-09-15 18:03:16Z" end-time="2026-09-15 18:03:16Z" duration="0.055657" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1007" name="Tests" fullname="Convergence.Tests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-09-15 18:03:16Z" end-time="2026-09-15 18:03:16Z" duration="0.055358" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1008" name="PlayMode" fullname="Convergence.Tests.PlayMode" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-09-15 18:03:16Z" end-time="2026-09-15 18:03:16Z" duration="0.055113" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestSuite" id="1009" name="Gameplay" fullname="Convergence.Tests.PlayMode.Gameplay" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-09-15 18:03:16Z" end-time="2026-09-15 18:03:16Z" duration="0.054827" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-suite type="TestFixture" id="1001" name="Level01IntegrationTests" fullname="Convergence.Tests.PlayMode.Gameplay.Level01IntegrationTests" classname="Convergence.Tests.PlayMode.Gameplay.Level01IntegrationTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-09-15 18:03:16Z" end-time="2026-09-15 18:03:16Z" duration="0.053513" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="1004" name="Level01_DisconnectedConduit_PreventsCompletion" fullname="Convergence.Tests.PlayMode.Gameplay.Level01IntegrationTests.Level01_DisconnectedConduit_PreventsCompletion" methodname="Level01_DisconnectedConduit_PreventsCompletion" classname="Convergence.Tests.PlayMode.Gameplay.Level01IntegrationTests" runstate="Runnable" seed="945183856" result="Passed" start-time="2026-09-15 18:03:16Z" end-time="2026-09-15 18:03:16Z" duration="0.026754" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1002" name="Level01_FullPlayableLoop_VerifiesCanonicalSequence" fullname="Convergence.Tests.PlayMode.Gameplay.Level01IntegrationTests.Level01_FullPlayableLoop_VerifiesCanonicalSequence" methodname="Level01_FullPlayableLoop_VerifiesCanonicalSequence" classname="Convergence.Tests.PlayMode.Gameplay.Level01IntegrationTests" runstate="Runnable" seed="1443933239" result="Passed" start-time="2026-09-15 18:03:16Z" end-time="2026-09-15 18:03:16Z" duration="0.012279" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1003" name="Level01_ThreeOfFourCorrect_DoesNotOpenGateway" fullname="Convergence.Tests.PlayMode.Gameplay.Level01IntegrationTests.Level01_ThreeOfFourCorrect_DoesNotOpenGateway" methodname="Level01_ThreeOfFourCorrect_DoesNotOpenGateway" classname="Convergence.Tests.PlayMode.Gameplay.Level01IntegrationTests" runstate="Runnable" seed="726114308" result="Passed" start-time="2026-09-15 18:03:16Z" end-time="2026-09-15 18:03:16Z" duration="0.001042" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[Saving results to: C:/Users/Panda/AppData/LocalLow/DefaultCompany/My project (2)\TestResults.xml
+]]></output>
+                </test-case>
+              </test-suite>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

@@ -1,0 +1,20 @@
+{
+    "name": "Convergence.XR",
+    "rootNamespace": "Convergence.XR",
+    "references": [
+        "Convergence.Core.Neural",
+        "Convergence.Core.Puzzles",
+        "Convergence.Gameplay",
+        "Unity.XR.Interaction.Toolkit",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

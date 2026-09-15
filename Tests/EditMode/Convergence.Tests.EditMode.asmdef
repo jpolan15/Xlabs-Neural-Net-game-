@@ -1,0 +1,26 @@
+{
+    "name": "Convergence.Tests.EditMode",
+    "rootNamespace": "Convergence.Tests.EditMode",
+    "references": [
+        "Convergence.Core.Math",
+        "Convergence.Core.Neural",
+        "Convergence.Core.Training",
+        "Convergence.Core.Puzzles"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}
