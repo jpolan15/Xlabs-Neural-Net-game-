@@ -14,6 +14,7 @@ namespace Convergence.Presentation
     {
         [Header("State Listener")]
         [SerializeField] private ChamberController chamberController;
+        [SerializeField] private NeuralState neuralState;
 
         [Header("Gun Rig Transforms")]
         [SerializeField] private Transform gunChassis;
@@ -34,8 +35,10 @@ namespace Convergence.Presentation
         [SerializeField] private float recoilRecoverySpeed = 12.0f;
 
         [Header("Beam Colors")]
-        [SerializeField] private Color beamStartColor = new Color(0.2f, 0.95f, 1.0f, 1.0f);
-        [SerializeField] private Color beamEndColor = new Color(0.0f, 0.6f, 1.0f, 0.8f);
+        [SerializeField] private Color beamLinearColor = new Color(0.2f, 0.95f, 1.0f, 1.0f);   // Cyan
+        [SerializeField] private Color beamReluColor = new Color(1.0f, 0.7f, 0.0f, 1.0f);      // Amber
+        [SerializeField] private Color beamStepColor = new Color(0.0f, 1.0f, 0.45f, 1.0f);     // Emerald
+        [SerializeField] private Color beamSigmoidColor = new Color(0.85f, 0.0f, 1.0f, 1.0f);  // Violet
 
         private Vector3 _defaultChassisPos;
         private Quaternion _defaultChassisRot;
@@ -45,13 +48,13 @@ namespace Convergence.Presentation
 
         private float _beamTimer = 0.0f;
         private const float BeamDuration = 0.22f;
+        private Vector3 _activeBeamEndPos;
+        private bool _hasCustomBeamEnd;
 
         private void Awake()
         {
-            if (chamberController == null)
-            {
-                chamberController = FindAnyObjectByType<ChamberController>();
-            }
+            if (chamberController == null) chamberController = FindAnyObjectByType<ChamberController>();
+            if (neuralState == null) neuralState = FindAnyObjectByType<NeuralState>();
 
             if (gunChassis != null)
             {
@@ -76,6 +79,7 @@ namespace Convergence.Presentation
             if (chamberController != null)
             {
                 chamberController.OnForwardPassTriggered += HandleForwardPass;
+                chamberController.OnSingleCaseEvaluated += HandleSingleCaseEvaluated;
             }
         }
 
@@ -84,7 +88,22 @@ namespace Convergence.Presentation
             if (chamberController != null)
             {
                 chamberController.OnForwardPassTriggered -= HandleForwardPass;
+                chamberController.OnSingleCaseEvaluated -= HandleSingleCaseEvaluated;
             }
+        }
+
+        private void HandleSingleCaseEvaluated(int caseIndex, Convergence.Core.Puzzles.CaseDiagnostic diag, bool activationMatches)
+        {
+            if (chamberController != null && chamberController.TargetReceptors != null && caseIndex < chamberController.TargetReceptors.Count)
+            {
+                var target = chamberController.TargetReceptors[caseIndex];
+                if (target != null)
+                {
+                    FireAtTarget(target.transform.position);
+                    return;
+                }
+            }
+            HandleForwardPass();
         }
 
         private void Update()
@@ -114,62 +133,83 @@ namespace Convergence.Presentation
                 _beamTimer -= dt;
                 float progress = Mathf.Clamp01(_beamTimer / BeamDuration);
 
+                Color activeColor = GetActiveBeamColor();
+
                 if (muzzleLight != null)
                 {
+                    muzzleLight.color = activeColor;
                     muzzleLight.intensity = progress * 4.0f;
                 }
 
                 if (laserBeam != null && laserBeam.enabled)
                 {
                     Vector3 start = (muzzlePoint != null) ? muzzlePoint.position : transform.position;
-                    Vector3 end = (targetCore != null) ? targetCore.position : (start + transform.forward * 15.0f);
+                    Vector3 end;
+
+                    if (_hasCustomBeamEnd)
+                    {
+                        end = _activeBeamEndPos;
+                    }
+                    else
+                    {
+                        end = (targetCore != null) ? targetCore.position : (start + transform.forward * 15.0f);
+                    }
 
                     laserBeam.SetPosition(0, start);
                     laserBeam.SetPosition(1, end);
 
-                    Color cStart = new Color(beamStartColor.r, beamStartColor.g, beamStartColor.b, progress);
-                    Color cEnd = new Color(beamEndColor.r, beamEndColor.g, beamEndColor.b, progress * 0.8f);
+                    Color cStart = new Color(activeColor.r, activeColor.g, activeColor.b, progress);
+                    Color cEnd = new Color(activeColor.r, activeColor.g, activeColor.b, progress * 0.8f);
                     laserBeam.startColor = cStart;
                     laserBeam.endColor = cEnd;
                 }
 
                 if (_beamTimer <= 0.0f)
                 {
+                    _hasCustomBeamEnd = false;
                     if (laserBeam != null) laserBeam.enabled = false;
                     if (muzzleLight != null) muzzleLight.intensity = 0.0f;
                 }
             }
         }
 
+        private Color GetActiveBeamColor()
+        {
+            if (neuralState == null) return beamLinearColor;
+
+            return neuralState.Activation switch
+            {
+                Convergence.Core.Neural.ActivationType.ReLU => beamReluColor,
+                Convergence.Core.Neural.ActivationType.Step => beamStepColor,
+                Convergence.Core.Neural.ActivationType.Sigmoid => beamSigmoidColor,
+                _ => beamLinearColor
+            };
+        }
+
         private void HandleForwardPass()
         {
-            // Apply recoil kick
+            _hasCustomBeamEnd = false;
+            TriggerRecoilAndBeam();
+        }
+
+        private void TriggerRecoilAndBeam()
+        {
             _recoilOffset = new Vector3(0, 0.015f, recoilKickZ);
             _recoilPitch = recoilPitchDeg;
-
-            // Trigger beam
             _beamTimer = BeamDuration;
-            if (laserBeam != null)
-            {
-                laserBeam.enabled = true;
-            }
-            if (muzzleLight != null)
-            {
-                muzzleLight.intensity = 4.0f;
-            }
+
+            if (laserBeam != null) laserBeam.enabled = true;
+            if (muzzleLight != null) muzzleLight.intensity = 4.0f;
         }
 
         /// <summary>
-        /// Explicit trigger for custom aim targets if desired.
+        /// Fires laser beam directly at a custom world target position.
         /// </summary>
         public void FireAtTarget(Vector3 worldTarget)
         {
-            HandleForwardPass();
-            if (laserBeam != null && muzzlePoint != null)
-            {
-                laserBeam.SetPosition(0, muzzlePoint.position);
-                laserBeam.SetPosition(1, worldTarget);
-            }
+            _hasCustomBeamEnd = true;
+            _activeBeamEndPos = worldTarget;
+            TriggerRecoilAndBeam();
         }
     }
 }

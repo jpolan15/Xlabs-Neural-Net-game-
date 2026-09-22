@@ -18,11 +18,11 @@ namespace Convergence.Gameplay
         [Header("Starting Perceptron Parameters")]
         [SerializeField] private double initialW1 = 0.0;
         [SerializeField] private double initialW2 = 0.0;
-        [SerializeField] private double initialBias = -1.0;
-        [SerializeField] private ActivationType initialActivation = ActivationType.Linear;
+        [SerializeField] private double initialBias = 0.0;
+        [SerializeField] private ActivationType initialActivation = ActivationType.Step;
 
         [Header("Starting Hardware Disconnects")]
-        [SerializeField] private bool cable1Disconnected = true;
+        [SerializeField] private bool cable1Disconnected = false;
         [SerializeField] private bool cable2Disconnected = false;
 
         public string ConfigId => configId;

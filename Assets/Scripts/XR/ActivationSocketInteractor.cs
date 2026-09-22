@@ -19,6 +19,12 @@ namespace Convergence.XR
         [SerializeField] private bool hasCrystalInserted = true;
         [SerializeField] private ActivationType currentCrystalType = ActivationType.Linear;
 
+        [Header("Audio Settings")]
+        [SerializeField] private bool playAudio = true;
+
+        private AudioSource _audioSource;
+        private static AudioClip _cachedCrystalClip;
+
         public bool HasCrystal => hasCrystalInserted;
         public ActivationType CurrentCrystal => currentCrystalType;
 
@@ -31,6 +37,16 @@ namespace Convergence.XR
             {
                 neuralState = FindAnyObjectByType<NeuralState>();
             }
+
+            _audioSource = GetComponent<AudioSource>();
+            if (_audioSource == null && playAudio)
+            {
+                _audioSource = gameObject.AddComponent<AudioSource>();
+                _audioSource.playOnAwake = false;
+                _audioSource.spatialBlend = 1.0f;
+            }
+
+            if (_cachedCrystalClip == null) _cachedCrystalClip = CreateCrystalResonanceClip();
         }
 
         private void Start()
@@ -54,6 +70,20 @@ namespace Convergence.XR
             {
                 neuralState.SetActivation(type);
             }
+
+            if (playAudio && _audioSource != null && _cachedCrystalClip != null)
+            {
+                _audioSource.pitch = type switch
+                {
+                    ActivationType.Step => 1.25f,
+                    ActivationType.ReLU => 1.0f,
+                    ActivationType.Sigmoid => 1.1f,
+                    _ => 0.9f
+                };
+                _audioSource.PlayOneShot(_cachedCrystalClip, 0.7f);
+            }
+
+            SendHapticPulse(0.6f, 0.08f);
             OnCrystalInserted?.Invoke(type);
         }
 
@@ -68,11 +98,12 @@ namespace Convergence.XR
             {
                 neuralState.SetActivation(ActivationType.Linear);
             }
+            SendHapticPulse(0.3f, 0.04f);
             OnCrystalRemoved?.Invoke();
         }
 
         /// <summary>
-        /// Convenience cycle method for desktop keyboard fallback (Tab key).
+        /// Convenience cycle method for desktop keyboard fallback (Tab key) and XR interact.
         /// Cycles through Linear -> ReLU -> Step -> Sigmoid.
         /// </summary>
         public void CycleCrystal()
@@ -94,6 +125,39 @@ namespace Convergence.XR
                     break;
             }
             InsertCrystal(next);
+        }
+
+        public void OnXRInteract()
+        {
+            CycleCrystal();
+        }
+
+        private void SendHapticPulse(float amplitude, float duration)
+        {
+            var right = UnityEngine.XR.InputDevices.GetDeviceAtXRNode(UnityEngine.XR.XRNode.RightHand);
+            if (right.isValid) right.SendHapticImpulse(0u, amplitude, duration);
+
+            var left = UnityEngine.XR.InputDevices.GetDeviceAtXRNode(UnityEngine.XR.XRNode.LeftHand);
+            if (left.isValid) left.SendHapticImpulse(0u, amplitude, duration);
+        }
+
+        private static AudioClip CreateCrystalResonanceClip()
+        {
+            int sampleRate = 44100;
+            float dur = 0.25f;
+            int count = (int)(sampleRate * dur);
+            float[] data = new float[count];
+
+            for (int i = 0; i < count; i++)
+            {
+                float t = (float)i / sampleRate;
+                float env = Mathf.Exp(-10.0f * t);
+                data[i] = (Mathf.Sin(2f * Mathf.PI * 880f * t) + 0.5f * Mathf.Sin(2f * Mathf.PI * 1760f * t)) * env * 0.3f;
+            }
+
+            AudioClip clip = AudioClip.Create("CrystalResonance", count, 1, sampleRate, false);
+            clip.SetData(data, 0);
+            return clip;
         }
     }
 }

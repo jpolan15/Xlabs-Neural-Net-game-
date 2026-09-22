@@ -12,6 +12,9 @@ namespace Convergence.XR
     /// </summary>
     public class DesktopInputFallback : MonoBehaviour
     {
+        public static event Action OnManualNextPageRequested;
+        public static event Action OnManualPrevPageRequested;
+
         [Header("Scene References")]
         [SerializeField] private ChamberController chamberController;
         [SerializeField] private NeuralState neuralState;
@@ -27,7 +30,6 @@ namespace Convergence.XR
         [Header("HUD Display")]
         [SerializeField] private bool showHUD = false;
 
-        private int _selectedParameter = 0; // 0 = W1, 1 = W2, 2 = Bias
         private float _yaw;
         private float _pitch;
 
@@ -50,10 +52,53 @@ namespace Convergence.XR
 
         private void Update()
         {
-            HandleNavigation();
-            HandleSelection();
-            HandleAdjustments();
+            // If VR headset is active, disable mouse/keyboard look to avoid fighting headset tracking
+            bool isXRActive = UnityEngine.XR.XRSettings.isDeviceActive;
+            if (!isXRActive)
+            {
+                HandleNavigation();
+            }
+
+            HandleDirectParameterShortcuts();
             HandleActions();
+            HandleMouseWheelAdjustments();
+        }
+
+        private void HandleMouseWheelAdjustments()
+        {
+            float scroll = Input.GetAxis("Mouse ScrollWheel");
+            if (Mathf.Abs(scroll) < 0.01f) return;
+
+            int stepDelta = scroll > 0 ? 1 : -1;
+
+            Camera cam = Camera.main ?? GetComponent<Camera>();
+            Ray ray = cam != null
+                ? cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0))
+                : new Ray(transform.position, transform.forward);
+
+            if (Physics.Raycast(ray, out RaycastHit hit, 25.0f))
+            {
+                var slider = hit.collider.GetComponentInParent<KineticWeightSliderInteractor>();
+                if (slider != null)
+                {
+                    slider.StepAdjust(stepDelta);
+                    return;
+                }
+
+                var wReg = hit.collider.GetComponentInParent<WeightRegulatorInteractor>();
+                if (wReg != null)
+                {
+                    wReg.StepAdjust(stepDelta);
+                    return;
+                }
+
+                var biasDial = hit.collider.GetComponentInParent<BiasDialInteractor>();
+                if (biasDial != null)
+                {
+                    biasDial.StepAdjust(stepDelta);
+                    return;
+                }
+            }
         }
 
         private void HandleNavigation()
@@ -78,56 +123,55 @@ namespace Convergence.XR
             }
         }
 
-        private void HandleSelection()
+        private void HandleDirectParameterShortcuts()
         {
-            if (Input.GetKeyDown(KeyCode.Alpha1)) _selectedParameter = 0; // W1
-            if (Input.GetKeyDown(KeyCode.Alpha2)) _selectedParameter = 1; // W2
-            if (Input.GetKeyDown(KeyCode.Alpha3)) _selectedParameter = 2; // Bias
-        }
+            if (neuralState == null) return;
 
-        private void HandleAdjustments()
-        {
-            float scroll = Input.GetAxis("Mouse ScrollWheel");
-            int step = 0;
-
-            if (scroll > 0.05f || Input.GetKeyDown(KeyCode.Equals) || Input.GetKeyDown(KeyCode.KeypadPlus) || Input.GetKeyDown(KeyCode.RightArrow))
+            // [1] / [2] -> Weight 1 Down / Up
+            if (Input.GetKeyDown(KeyCode.Alpha1))
             {
-                step = 1;
+                double w1 = System.Math.Round((neuralState.Weight1 - 0.5) / 0.5) * 0.5;
+                neuralState.SetWeight(0, Mathf.Clamp((float)w1, -2.0f, 2.0f));
             }
-            else if (scroll < -0.05f || Input.GetKeyDown(KeyCode.Minus) || Input.GetKeyDown(KeyCode.KeypadMinus) || Input.GetKeyDown(KeyCode.LeftArrow))
+            if (Input.GetKeyDown(KeyCode.Alpha2))
             {
-                step = -1;
+                double w1 = System.Math.Round((neuralState.Weight1 + 0.5) / 0.5) * 0.5;
+                neuralState.SetWeight(0, Mathf.Clamp((float)w1, -2.0f, 2.0f));
             }
 
-            if (step != 0 && neuralState != null)
+            // [3] / [4] -> Weight 2 Down / Up
+            if (Input.GetKeyDown(KeyCode.Alpha3))
             {
-                if (_selectedParameter == 0)
-                {
-                    double w1 = System.Math.Round((neuralState.Weight1 + step * 0.5) / 0.5) * 0.5;
-                    neuralState.SetWeight(0, Mathf.Clamp((float)w1, -2.0f, 2.0f));
-                }
-                else if (_selectedParameter == 1)
-                {
-                    double w2 = System.Math.Round((neuralState.Weight2 + step * 0.5) / 0.5) * 0.5;
-                    neuralState.SetWeight(1, Mathf.Clamp((float)w2, -2.0f, 2.0f));
-                }
-                else if (_selectedParameter == 2)
-                {
-                    double b = System.Math.Round((neuralState.Bias + step * 0.5) / 0.5) * 0.5;
-                    neuralState.SetBias(Mathf.Clamp((float)b, -2.0f, 2.0f));
-                }
+                double w2 = System.Math.Round((neuralState.Weight2 - 0.5) / 0.5) * 0.5;
+                neuralState.SetWeight(1, Mathf.Clamp((float)w2, -2.0f, 2.0f));
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha4))
+            {
+                double w2 = System.Math.Round((neuralState.Weight2 + 0.5) / 0.5) * 0.5;
+                neuralState.SetWeight(1, Mathf.Clamp((float)w2, -2.0f, 2.0f));
             }
 
-            // Tab to cycle activation crystal
-            if (Input.GetKeyDown(KeyCode.Tab))
+            // [5] / [6] -> Bias Down / Up
+            if (Input.GetKeyDown(KeyCode.Alpha5))
+            {
+                double b = System.Math.Round((neuralState.Bias - 0.5) / 0.5) * 0.5;
+                neuralState.SetBias(Mathf.Clamp((float)b, -2.0f, 2.0f));
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha6))
+            {
+                double b = System.Math.Round((neuralState.Bias + 0.5) / 0.5) * 0.5;
+                neuralState.SetBias(Mathf.Clamp((float)b, -2.0f, 2.0f));
+            }
+
+            // [X] or [Tab] -> Cycle Activation Crystal
+            if (Input.GetKeyDown(KeyCode.X) || Input.GetKeyDown(KeyCode.Tab))
             {
                 if (activationSocket != null)
                 {
                     activationSocket.CycleCrystal();
                 }
-                else if (neuralState != null)
+                else
                 {
-                    // Direct cycle if socket not placed
                     ActivationType next = neuralState.Activation == ActivationType.Step
                         ? ActivationType.Linear
                         : (neuralState.Activation == ActivationType.Linear ? ActivationType.ReLU : ActivationType.Step);
@@ -135,16 +179,47 @@ namespace Convergence.XR
                 }
             }
 
-            // C to toggle Cable 1
-            if (Input.GetKeyDown(KeyCode.C) && neuralState != null)
+            // [C] -> Toggle Cable 1
+            if (Input.GetKeyDown(KeyCode.C))
             {
                 neuralState.SetCableConnected(0, !neuralState.Cable1Connected);
             }
 
-            // V to toggle Cable 2
-            if (Input.GetKeyDown(KeyCode.V) && neuralState != null)
+            // [V] -> Toggle Cable 2
+            if (Input.GetKeyDown(KeyCode.V))
             {
                 neuralState.SetCableConnected(1, !neuralState.Cable2Connected);
+            }
+
+            // [T] / [Q] -> Next / Previous Page on Field Manual
+            if (Input.GetKeyDown(KeyCode.T))
+            {
+                OnManualNextPageRequested?.Invoke();
+            }
+            if (Input.GetKeyDown(KeyCode.Q))
+            {
+                OnManualPrevPageRequested?.Invoke();
+            }
+
+            // [Q] / [W] -> Unified sensitivity down / up (moves both weights + auto-bias together)
+            // This is the primary simplified control for Level 1 guided sandbox mode
+            if (Input.GetKeyDown(KeyCode.Q))
+            {
+                double cur = neuralState.Weight1;
+                double next = System.Math.Round((cur - 0.5) / 0.5) * 0.5;
+                neuralState.SetUnifiedWeight(Mathf.Clamp((float)next, -2.0f, 2.0f));
+            }
+            if (Input.GetKeyDown(KeyCode.W))
+            {
+                double cur = neuralState.Weight1;
+                double next = System.Math.Round((cur + 0.5) / 0.5) * 0.5;
+                neuralState.SetUnifiedWeight(Mathf.Clamp((float)next, -2.0f, 2.0f));
+            }
+
+            // [R] -> Reset Chamber
+            if (Input.GetKeyDown(KeyCode.R) && levelResetter != null)
+            {
+                levelResetter.ResetToActivePreset();
             }
         }
 
@@ -154,13 +229,13 @@ namespace Convergence.XR
             bool interactKey = Input.GetKeyDown(KeyCode.E);
             bool leftClick = Input.GetMouseButtonDown(0) && !Input.GetMouseButton(1);
 
-            // Ignore clicks if mouse is over top-left HUD area
+            // Ignore clicks if mouse is over top-left HUD area or bottom-left manual area
             if (leftClick)
             {
                 Vector2 mPos = Input.mousePosition; // (0,0) is bottom-left
-                if (mPos.x < 450 && mPos.y > Screen.height - 420)
+                if (mPos.x < 480 && (mPos.y > Screen.height - 420 || mPos.y < 300))
                 {
-                    leftClick = false; // Mouse click reserved for HUD buttons
+                    leftClick = false; // Reserved for HUD / Manual UI buttons
                 }
             }
 
@@ -173,125 +248,70 @@ namespace Convergence.XR
 
                 if (Physics.Raycast(ray, out RaycastHit hit, 25.0f))
                 {
+                    var receptor = hit.collider.GetComponentInParent<DataTargetReceptor>();
+                    if (receptor != null && chamberController != null)
+                    {
+                        chamberController.TriggerSingleCasePass(receptor.CaseIndex);
+                        return;
+                    }
+
+                    var slider = hit.collider.GetComponentInParent<KineticWeightSliderInteractor>();
+                    if (slider != null)
+                    {
+                        slider.OnXRInteract();
+                        return;
+                    }
+
+                    var terminal = hit.collider.GetComponentInParent<InputTerminalInteractor>();
+                    if (terminal != null)
+                    {
+                        terminal.ToggleValue();
+                        return;
+                    }
+
+                    var lever = hit.collider.GetComponentInParent<ClockPulseLeverInteractor>();
+                    if (lever != null)
+                    {
+                        lever.PullLever();
+                        return;
+                    }
+
                     var socket = hit.collider.GetComponentInParent<ActivationSocketInteractor>();
                     if (socket != null)
                     {
                         socket.CycleCrystal();
-                        return; // Successfully interacted: DO NOT fire pulse!
+                        return;
                     }
 
                     var wReg = hit.collider.GetComponentInParent<WeightRegulatorInteractor>();
-                    if (wReg != null && neuralState != null)
+                    if (wReg != null)
                     {
-                        int idx = wReg.SocketIndex;
-                        double curW = idx == 0 ? neuralState.Weight1 : neuralState.Weight2;
-                        double nextW = Math.Round((curW + 0.5) / 0.5) * 0.5;
-                        if (nextW > 2.0) nextW = -2.0;
-                        neuralState.SetWeight(idx, (float)nextW);
-                        return; // Successfully interacted: DO NOT fire pulse!
+                        wReg.StepAdjust(1);
+                        return;
                     }
 
                     var biasDial = hit.collider.GetComponentInParent<BiasDialInteractor>();
-                    if (biasDial != null && neuralState != null)
+                    if (biasDial != null)
                     {
-                        double curB = neuralState.Bias;
-                        double nextB = Math.Round((curB + 0.5) / 0.5) * 0.5;
-                        if (nextB > 2.0) nextB = -2.0;
-                        neuralState.SetBias((float)nextB);
-                        return; // Successfully interacted: DO NOT fire pulse!
+                        biasDial.StepAdjust(1);
+                        return;
                     }
 
                     var cable = hit.collider.GetComponentInParent<CableInteractable>();
-                    if (cable != null && neuralState != null)
+                    if (cable != null)
                     {
-                        int cIdx = cable.CableIndex;
-                        bool connected = cIdx == 0 ? neuralState.Cable1Connected : neuralState.Cable2Connected;
-                        neuralState.SetCableConnected(cIdx, !connected);
-                        return; // Successfully interacted: DO NOT fire pulse!
+                        cable.ToggleConnection();
+                        return;
                     }
                 }
             }
 
-            // Fire Neural Pulse Tool: Exclusively on [Space] or Left-Clicking while aiming directly at Convergence Core
-            bool fireAtCore = false;
-            if (leftClick)
+            // Pull Clock Cycle Lever / Execute Forward Pass on [Space] or [Return]
+            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
-                Camera cam = Camera.main ?? GetComponent<Camera>();
-                Ray ray = cam != null
-                    ? cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0))
-                    : new Ray(transform.position, transform.forward);
-                if (Physics.Raycast(ray, out RaycastHit hit, 30.0f))
-                {
-                    string hitName = hit.collider.gameObject.name.ToLower();
-                    if (hitName.Contains("core") || hitName.Contains("pulse") || hitName.Contains("convergence"))
-                    {
-                        fireAtCore = true;
-                    }
-                }
-            }
-
-            if (Input.GetKeyDown(KeyCode.Space) || fireAtCore)
-            {
-                if (pulseTool != null)
-                {
-                    pulseTool.FirePulse();
-                }
-                else if (chamberController != null)
+                if (chamberController != null)
                 {
                     chamberController.TriggerForwardPass();
-                }
-            }
-
-            // Strike with Arc Blade: F
-            if (Input.GetKeyDown(KeyCode.F) && arcBlade != null)
-            {
-                arcBlade.Strike();
-            }
-
-            // Reset Level: R (active preset), T (random preset)
-            if (Input.GetKeyDown(KeyCode.R) && levelResetter != null)
-            {
-                levelResetter.ResetToActivePreset();
-            }
-            if (Input.GetKeyDown(KeyCode.T) && levelResetter != null)
-            {
-                levelResetter.ResetRandom();
-            }
-        }
-
-        private void OnGUI()
-        {
-            // Plain legacy HUD disabled in favor of Presentation.SciFiEngineerHUD
-            if (!showHUD || neuralState == null) return;
-
-
-            GUI.Box(new Rect(10, 10, 380, 290), "CONVERGENCE — Desktop Simulation Controller");
-
-            string sel0 = _selectedParameter == 0 ? "> [1] Weight 1 (w1): " : "  [1] Weight 1 (w1): ";
-            string sel1 = _selectedParameter == 1 ? "> [2] Weight 2 (w2): " : "  [2] Weight 2 (w2): ";
-            string sel2 = _selectedParameter == 2 ? "> [3] Bias (b):     " : "  [3] Bias (b):     ";
-
-            GUI.Label(new Rect(20, 35, 360, 20), $"{sel0}{neuralState.Weight1:+0.0;-0.0;0.0}");
-            GUI.Label(new Rect(20, 55, 360, 20), $"{sel1}{neuralState.Weight2:+0.0;-0.0;0.0}");
-            GUI.Label(new Rect(20, 75, 360, 20), $"{sel2}{neuralState.Bias:+0.0;-0.0;0.0}");
-
-            GUI.Label(new Rect(20, 100, 360, 20), $"[Tab] Activation Module: {neuralState.Activation}");
-            GUI.Label(new Rect(20, 120, 360, 20), $"[C] Cable 1 (X1): {(neuralState.Cable1Connected ? "CONNECTED" : "DISCONNECTED")}");
-            GUI.Label(new Rect(20, 140, 360, 20), $"[V] Cable 2 (X2): {(neuralState.Cable2Connected ? "CONNECTED" : "DISCONNECTED")}");
-
-            GUI.Label(new Rect(20, 165, 360, 20), $"[Space / Left-Click] Fire Neural Pulse Tool");
-            GUI.Label(new Rect(20, 185, 360, 20), $"[R] Reset Active Preset  |  [T] Random Preset");
-            GUI.Label(new Rect(20, 205, 360, 20), $"[Right-Mouse + WASD] Free Camera Navigation");
-
-            if (chamberController != null)
-            {
-                GUI.Label(new Rect(20, 230, 360, 20), $"Chamber Phase: {chamberController.Phase}");
-                if (chamberController.LastEvaluation != null)
-                {
-                    var eval = chamberController.LastEvaluation;
-                    string statusColor = eval.Passed ? "SOLVED (100%)" : $"{eval.Accuracy * 100:F0}% ({eval.PassedCases}/{eval.TotalCases})";
-                    GUI.Label(new Rect(20, 250, 360, 20), $"Diagnostic Accuracy: {statusColor}");
-                    GUI.Label(new Rect(20, 270, 360, 20), $"{eval.Summary}");
                 }
             }
         }

@@ -85,6 +85,42 @@ namespace Convergence.Gameplay
         }
 
         /// <summary>
+        /// Sets both Weight1 and Weight2 to the same value simultaneously.
+        /// Used by the single-slider "Sensitivity" control in Level 1's simplified flow.
+        /// Bias is also auto-adjusted to -weight/2 so the OR gate stays solvable.
+        /// </summary>
+        public void SetUnifiedWeight(double value)
+        {
+            if (_network?.SingleNeuron == null) return;
+            _network.SingleNeuron.SetWeight(0, value);
+            _network.SingleNeuron.SetWeight(1, value);
+            // Auto-set bias to half the negative weight so Clean Room (0,0)→0 always holds
+            double autoBias = -(value / 2.0);
+            _network.SingleNeuron.Bias = autoBias;
+            OnWeightChanged?.Invoke(0, value);
+            OnWeightChanged?.Invoke(1, value);
+            OnBiasChanged?.Invoke(autoBias);
+            OnStateMutated?.Invoke();
+        }
+
+        /// <summary>
+        /// Pre-configures the network for the Level 1 simplified starting state:
+        /// both cables connected, Step activation installed, weights and bias zeroed.
+        /// Call this after BrokenConfigurationSO.ApplyTo() when using the guided sandbox mode.
+        /// </summary>
+        public void AutoConfigureForLevel1()
+        {
+            if (_network?.SingleNeuron == null) return;
+            _cablesConnected[0] = true;
+            _cablesConnected[1] = true;
+            _network.SingleNeuron.Activation = ActivationType.Step;
+            OnCableStateChanged?.Invoke(0, true);
+            OnCableStateChanged?.Invoke(1, true);
+            OnActivationChanged?.Invoke(ActivationType.Step);
+            OnStateMutated?.Invoke();
+        }
+
+        /// <summary>
         /// Reads effective input vector taking cable disconnections into account.
         /// Disconnected cable drops the corresponding input signal to 0.0.
         /// </summary>

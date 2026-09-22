@@ -7,19 +7,20 @@ using Convergence.Gameplay;
 namespace Convergence.Presentation
 {
     /// <summary>
-    /// Premium Astronaut Engineer Sci-Fi HUD for Level 1.
-    /// Provides unambiguous interactive controls for Activation modes, Weights, Bias, and Conduits,
-    /// complete with a center-screen reticle, dynamic aim tooltips, and real-time OR-gate diagnostic telemetry.
-    /// Decouples parameter adjustment from pulse submission to eliminate accidental goal triggers.
+    /// Tactical Sentry Defense HUD for Level 1 — The Sentry Intercept Crisis.
+    /// Displays live emergency purge countdown clock, containment shield integrity bar,
+    /// 4 target scenario badges with approach distance, calibration readouts, and handles screen shake on damage.
     /// </summary>
     public class SciFiEngineerHUD : MonoBehaviour
     {
         [Header("State Listeners")]
         [SerializeField] private NeuralState neuralState;
         [SerializeField] private ChamberController chamberController;
+        [SerializeField] private ChamberOnboardingController onboardingController;
 
         [Header("Display Settings")]
-        [SerializeField] private bool showHUD = true;
+        [SerializeField] private bool showHUD = false;
+        [SerializeField] private bool showNextActionStrip = true;
         [SerializeField] private KeyCode toggleHUDKey = KeyCode.H;
 
         [Header("Reticle Settings")]
@@ -27,14 +28,21 @@ namespace Convergence.Presentation
         [SerializeField] private float raycastDistance = 25.0f;
         [SerializeField] private LayerMask interactableMask = ~0;
 
-        // Colors
-        private readonly Color _panelBg = new Color(0.04f, 0.07f, 0.12f, 0.88f);
-        private readonly Color _panelBorder = new Color(0.0f, 0.8f, 1.0f, 0.9f);
+        // Visual Palette
+        private readonly Color _panelBg = new Color(0.02f, 0.05f, 0.09f, 0.94f);
+        private readonly Color _panelBorder = new Color(0.0f, 0.85f, 1.0f, 0.85f);
         private readonly Color _neonCyan = new Color(0.0f, 0.95f, 1.0f, 1.0f);
-        private readonly Color _neonEmerald = new Color(0.0f, 0.95f, 0.45f, 1.0f);
+        private readonly Color _neonEmerald = new Color(0.0f, 1.0f, 0.45f, 1.0f);
         private readonly Color _neonAmber = new Color(1.0f, 0.72f, 0.0f, 1.0f);
         private readonly Color _neonRed = new Color(1.0f, 0.25f, 0.25f, 1.0f);
-        private readonly Color _dimText = new Color(0.6f, 0.75f, 0.85f, 1.0f);
+        private readonly Color _dimText = new Color(0.7f, 0.82f, 0.92f, 1.0f);
+        private readonly Color _badgePassBg = new Color(0.0f, 0.5f, 0.25f, 0.65f);
+        private readonly Color _badgeFailBg = new Color(0.55f, 0.1f, 0.1f, 0.65f);
+
+        // Screen Shake & Damage Flash
+        private float _shakeIntensity = 0.0f;
+        private float _damageFlashAlpha = 0.0f;
+        private Vector3 _originalCamPos;
 
         // State caching
         private string _hoverTooltip = "";
@@ -43,10 +51,17 @@ namespace Convergence.Presentation
         private Rect _hudRect;
         private Texture2D _whiteTexture;
 
+        public bool ShowHUD
+        {
+            get => showHUD;
+            set => showHUD = value;
+        }
+
         private void Awake()
         {
             if (neuralState == null) neuralState = FindAnyObjectByType<NeuralState>();
             if (chamberController == null) chamberController = FindAnyObjectByType<ChamberController>();
+            if (onboardingController == null) onboardingController = FindAnyObjectByType<ChamberOnboardingController>();
             _mainCamera = Camera.main;
 
             _whiteTexture = new Texture2D(1, 1);
@@ -54,11 +69,51 @@ namespace Convergence.Presentation
             _whiteTexture.Apply();
         }
 
+        private void OnEnable()
+        {
+            if (chamberController != null)
+            {
+                chamberController.OnShieldDamaged += HandleShieldDamaged;
+                chamberController.OnEmergencyPurge += HandleEmergencyPurge;
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (chamberController != null)
+            {
+                chamberController.OnShieldDamaged -= HandleShieldDamaged;
+                chamberController.OnEmergencyPurge -= HandleEmergencyPurge;
+            }
+        }
+
+        private void HandleShieldDamaged(float damage)
+        {
+            _shakeIntensity = Mathf.Min(0.35f, damage * 0.015f);
+            _damageFlashAlpha = 0.45f;
+        }
+
+        private void HandleEmergencyPurge()
+        {
+            _shakeIntensity = 0.5f;
+            _damageFlashAlpha = 0.75f;
+        }
+
         private void Update()
         {
             if (Input.GetKeyDown(toggleHUDKey))
             {
                 showHUD = !showHUD;
+            }
+
+            // Decay screen shake & damage flash
+            if (_shakeIntensity > 0.001f)
+            {
+                _shakeIntensity = Mathf.Lerp(_shakeIntensity, 0f, Time.deltaTime * 6.0f);
+            }
+            if (_damageFlashAlpha > 0.001f)
+            {
+                _damageFlashAlpha = Mathf.Lerp(_damageFlashAlpha, 0f, Time.deltaTime * 4.0f);
             }
 
             UpdateRaycastTooltip();
@@ -72,41 +127,53 @@ namespace Convergence.Presentation
             Ray ray = _mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
             if (Physics.Raycast(ray, out RaycastHit hit, raycastDistance, interactableMask))
             {
+                var targetRec = hit.collider.GetComponentInParent<DataTargetReceptor>();
+                if (targetRec != null)
+                {
+                    _isHoveringInteractable = true;
+                    string stateStr = targetRec.IsHarmonized ? "SECURED ✓" : "BREACH / UNSTABLE ✗";
+                    _hoverTooltip = $"{targetRec.TargetTitle.ToUpper()} [{stateStr}] — Click to fire single-target diagnostic pulse";
+                    return;
+                }
+
                 string objName = hit.collider.gameObject.name.ToLower();
                 _isHoveringInteractable = true;
 
-                if (objName.Contains("crystal") || objName.Contains("socket"))
+                if (objName.Contains("crystal") || objName.Contains("socket") || objName.Contains("prism"))
                 {
-                    _hoverTooltip = "ACTIVATION CRYSTAL RECEPTACLE  [Tab / Click to Cycle]";
+                    string act = neuralState != null ? neuralState.Activation.ToString() : "Step";
+                    _hoverTooltip = $"Activation crystal [{act}] — click or [Tab] to swap crystal type";
                 }
-                else if (objName.Contains("w1") || objName.Contains("regulator_w1"))
+                else if (objName.Contains("w1") || objName.Contains("slider_w1"))
                 {
-                    _hoverTooltip = "WEIGHT 1 REGULATOR  [Click / Scroll to Tune]";
+                    _hoverTooltip = "Sensitivity dial — scroll up to increase, scroll down to decrease";
                 }
-                else if (objName.Contains("w2") || objName.Contains("regulator_w2"))
+                else if (objName.Contains("w2") || objName.Contains("slider_w2"))
                 {
-                    _hoverTooltip = "WEIGHT 2 REGULATOR  [Click / Scroll to Tune]";
+                    _hoverTooltip = "Sensitivity dial — scroll up to increase, scroll down to decrease";
                 }
-                else if (objName.Contains("bias"))
+                else if (objName.Contains("bias") || objName.Contains("valve"))
                 {
-                    _hoverTooltip = "BIAS VOLTAGE REGULATOR  [Click / Scroll to Tune]";
+                    double b = neuralState != null ? neuralState.Bias : 0.0;
+                    _hoverTooltip = $"Noise threshold (auto-tuned: {b:+0.0;-0.0;0.0}) — adjusts automatically with the dial";
                 }
-                else if (objName.Contains("cable") || objName.Contains("conduit"))
+                else if (objName.Contains("cable_1") || objName.Contains("conduit_1"))
                 {
-                    _hoverTooltip = "NEURAL CONDUIT  [Click / C / V to Toggle]";
+                    bool c = neuralState != null && neuralState.Cable1Connected;
+                    _hoverTooltip = c ? "Radiation sensor cable — connected ✓" : "Radiation sensor cable — click or [C] to plug in";
                 }
-                else if (objName.Contains("core") || objName.Contains("convergence"))
+                else if (objName.Contains("cable_2") || objName.Contains("conduit_2"))
                 {
-                    _hoverTooltip = "CONVERGENCE CORE  [Space / Click to Transmit Pulse]";
+                    bool c = neuralState != null && neuralState.Cable2Connected;
+                    _hoverTooltip = c ? "Bio-hazard sensor cable — connected ✓" : "Bio-hazard sensor cable — click or [V] to plug in";
                 }
-                else if (objName.Contains("gate") || objName.Contains("portal"))
+                else if (objName.Contains("lever"))
                 {
-                    _hoverTooltip = "THE AWAKENING GATE  [Achieve 100% Convergence to Unseal]";
+                    _hoverTooltip = "Pull the lever (or press Space) to run the test across all 4 scenarios";
                 }
-                else
+                else if (objName.Contains("sentry") || objName.Contains("turret"))
                 {
-                    _isHoveringInteractable = false;
-                    _hoverTooltip = "";
+                    _hoverTooltip = "Defense sentry — you're calibrating its ability to tell friend from foe";
                 }
             }
             else
@@ -119,17 +186,97 @@ namespace Convergence.Presentation
         public bool IsPointerOverHUD(Vector2 mousePosition)
         {
             if (!showHUD) return false;
-            // OnGUI coords have y=0 at top
             return _hudRect.Contains(mousePosition);
         }
 
         private void OnGUI()
         {
+            // Red Damage Flash Overlay
+            if (_damageFlashAlpha > 0.01f)
+            {
+                DrawRect(new Rect(0, 0, Screen.width, Screen.height), new Color(1f, 0.05f, 0.05f, _damageFlashAlpha));
+            }
+
             DrawReticle();
+
+            // Only show purge bar when timer is actually running (not sandbox mode)
+            if (chamberController != null && chamberController.PurgeTimer < chamberController.MaxPurgeTime - 1f)
+            {
+                DrawEmergencyPurgeStatusBar();
+            }
+
+            if (showNextActionStrip)
+            {
+                DrawNextActionStrip();
+            }
 
             if (!showHUD || neuralState == null) return;
 
-            DrawEngineerHUD();
+            DrawTacticalHUD();
+        }
+
+        private void DrawEmergencyPurgeStatusBar()
+        {
+            float barW = 540f;
+            float barH = 32f;
+            Rect topRect = new Rect((Screen.width - barW) * 0.5f, 10f, barW, barH);
+
+            float pTime = chamberController != null ? chamberController.PurgeTimer : 90f;
+            float sHealth = chamberController != null ? chamberController.ShieldIntegrity : 100f;
+            int minutes = Mathf.FloorToInt(pTime / 60f);
+            int seconds = Mathf.FloorToInt(pTime % 60f);
+
+            bool isUrgent = pTime < 30f;
+            Color timerCol = isUrgent ? (Mathf.Sin(Time.time * 8.0f) > 0 ? _neonRed : _neonAmber) : _neonCyan;
+            Color shieldCol = sHealth > 50f ? _neonEmerald : (sHealth > 25f ? _neonAmber : _neonRed);
+
+            DrawRect(topRect, new Color(0.02f, 0.05f, 0.10f, 0.92f));
+            DrawBorder(topRect, isUrgent ? _neonRed : _neonCyan, 2);
+
+            GUIStyle timeStyle = new GUIStyle(GUI.skin.label)
+            {
+                alignment = TextAnchor.MiddleLeft,
+                fontSize = 12,
+                fontStyle = FontStyle.Bold,
+                normal = { textColor = timerCol }
+            };
+            GUI.Label(new Rect(topRect.x + 12, topRect.y + 6, 200, 20), $"⏱ PURGE: {minutes:00}:{seconds:00}", timeStyle);
+
+            GUIStyle shieldStyle = new GUIStyle(GUI.skin.label)
+            {
+                alignment = TextAnchor.MiddleRight,
+                fontSize = 12,
+                fontStyle = FontStyle.Bold,
+                normal = { textColor = shieldCol }
+            };
+            GUI.Label(new Rect(topRect.x + topRect.width - 240, topRect.y + 6, 226, 20), $"🛡 SHIELD: {sHealth:F0}%", shieldStyle);
+        }
+
+        private void DrawNextActionStrip()
+        {
+            float stripW = 680f;
+            float stripH = 38f;
+            Rect stripRect = new Rect((Screen.width - stripW) * 0.5f, Screen.height - stripH - 16f, stripW, stripH);
+
+            string prompt = onboardingController != null
+                ? onboardingController.GetCurrentStepPrompt()
+                : "Calibrate the sentry to protect against all four scenarios.";
+
+            bool isComplete = onboardingController != null && onboardingController.CurrentStep == OnboardingStep.Completed;
+            Color accentColor = isComplete ? _neonEmerald : _neonCyan;
+
+            DrawRect(stripRect, new Color(0.02f, 0.05f, 0.10f, 0.90f));
+            DrawBorder(stripRect, accentColor, 2);
+
+            GUIStyle stripStyle = new GUIStyle(GUI.skin.label)
+            {
+                alignment = TextAnchor.MiddleCenter,
+                fontSize = 12,
+                fontStyle = FontStyle.Bold,
+                normal = { textColor = accentColor }
+            };
+
+            GUI.Label(stripRect, $"  {prompt}  |  [H] for details", stripStyle);
         }
 
         private void DrawReticle()
@@ -138,6 +285,12 @@ namespace Convergence.Presentation
 
             float cx = Screen.width * 0.5f;
             float cy = Screen.height * 0.5f;
+
+            if (_shakeIntensity > 0.001f)
+            {
+                cx += UnityEngine.Random.Range(-12f, 12f) * _shakeIntensity;
+                cy += UnityEngine.Random.Range(-12f, 12f) * _shakeIntensity;
+            }
 
             Color reticleColor = _isHoveringInteractable ? _neonCyan : new Color(1f, 1f, 1f, 0.45f);
 
@@ -152,42 +305,43 @@ namespace Convergence.Presentation
             DrawRect(new Rect(cx - 1, cy - offset - tickLen, 2, tickLen), reticleColor);
             DrawRect(new Rect(cx - 1, cy + offset, 2, tickLen), reticleColor);
 
-            // Tooltip label
             if (!string.IsNullOrEmpty(_hoverTooltip))
             {
                 GUIStyle tipStyle = new GUIStyle(GUI.skin.label)
                 {
                     alignment = TextAnchor.MiddleCenter,
-                    fontSize = 12,
+                    fontSize = 11,
                     fontStyle = FontStyle.Bold,
                     normal = { textColor = _neonCyan }
                 };
 
-                Rect tipRect = new Rect(cx - 250, cy + 25, 500, 24);
-                DrawRect(new Rect(tipRect.x + 30, tipRect.y, tipRect.width - 60, tipRect.height), new Color(0.02f, 0.05f, 0.1f, 0.75f));
+                Rect tipRect = new Rect(cx - 300, cy + 28, 600, 24);
+                DrawRect(new Rect(tipRect.x + 20, tipRect.y, tipRect.width - 40, tipRect.height), new Color(0.02f, 0.05f, 0.1f, 0.88f));
+                DrawBorder(new Rect(tipRect.x + 20, tipRect.y, tipRect.width - 40, tipRect.height), _neonCyan * 0.5f, 1);
                 GUI.Label(tipRect, _hoverTooltip, tipStyle);
             }
         }
 
-        private void DrawEngineerHUD()
+        private void DrawTacticalHUD()
         {
-            float hudW = 420f;
-            float hudH = 390f;
-            _hudRect = new Rect(16, 16, hudW, hudH);
+            float hudW = 620f;
+            float hudH = 162f;
+            _hudRect = new Rect((Screen.width - hudW) * 0.5f, 48f, hudW, hudH);
 
-            // Background & border
             DrawRect(_hudRect, _panelBg);
             DrawBorder(_hudRect, _panelBorder, 2);
+
+            float y = _hudRect.y + 8;
 
             // Header
             GUIStyle headerStyle = new GUIStyle(GUI.skin.label)
             {
                 alignment = TextAnchor.MiddleLeft,
-                fontSize = 13,
+                fontSize = 12,
                 fontStyle = FontStyle.Bold,
                 normal = { textColor = _neonCyan }
             };
-            GUI.Label(new Rect(_hudRect.x + 14, _hudRect.y + 8, hudW - 28, 22), "CONVERGENCE // NEURAL REPAIR CONSOLE", headerStyle);
+            GUI.Label(new Rect(_hudRect.x + 14, y, 460, 20), "🛡 SENTRY INTERCEPT STATUS // SECTOR 01 CONTAINMENT GRID", headerStyle);
 
             GUIStyle subHeader = new GUIStyle(GUI.skin.label)
             {
@@ -195,61 +349,102 @@ namespace Convergence.Presentation
                 fontSize = 10,
                 normal = { textColor = _dimText }
             };
-            GUI.Label(new Rect(_hudRect.x + 14, _hudRect.y + 8, hudW - 28, 22), "[H] Toggle HUD", subHeader);
+            GUI.Label(new Rect(_hudRect.x + hudW - 130, y, 116, 20), "[H] Hide HUD", subHeader);
+            y += 20;
 
-            DrawRect(new Rect(_hudRect.x + 12, _hudRect.y + 32, hudW - 24, 1), new Color(0.0f, 0.8f, 1.0f, 0.35f));
-
-            float y = _hudRect.y + 38;
-
-            // --- 1. ACTIVATION MODE SELECTOR ---
-            GUIStyle sectionStyle = new GUIStyle(GUI.skin.label)
+            // Objective
+            GUIStyle objStyle = new GUIStyle(GUI.skin.label)
             {
+                alignment = TextAnchor.MiddleLeft,
                 fontSize = 11,
-                fontStyle = FontStyle.Bold,
                 normal = { textColor = Color.white }
             };
-            GUI.Label(new Rect(_hudRect.x + 14, y, 180, 20), "ACTIVATION MODULE", sectionStyle);
-            y += 20;
+            GUI.Label(new Rect(_hudRect.x + 14, y, hudW - 28, 18), "Objective: Calibrate Sentry Perceptron to Spare Friendly Drone (Y=0) and Intercept All Hazards (Y=1).", objStyle);
+            y += 22;
 
-            ActivationType currentAct = neuralState.Activation;
-            float btnW = (hudW - 40) / 4f;
+            // 4 Target Badges — friendly names, no math notation
+            bool hasEvaluated = chamberController != null && chamberController.LastEvaluation != null;
+            PuzzleEvaluation lastEval = hasEvaluated ? chamberController.LastEvaluation : null;
+            int passedCount = lastEval != null ? lastEval.PassedCases : 0;
+            bool allPassed = lastEval != null && lastEval.Passed;
 
-            DrawActivationButton(new Rect(_hudRect.x + 14, y, btnW, 28), "Linear", ActivationType.Linear, currentAct);
-            DrawActivationButton(new Rect(_hudRect.x + 14 + btnW + 4, y, btnW, 28), "ReLU", ActivationType.ReLU, currentAct);
-            DrawActivationButton(new Rect(_hudRect.x + 14 + (btnW + 4) * 2, y, btnW, 28), "Step", ActivationType.Step, currentAct);
-            DrawActivationButton(new Rect(_hudRect.x + 14 + (btnW + 4) * 3, y, btnW, 28), "Sigmoid", ActivationType.Sigmoid, currentAct);
-            y += 36;
+            float badgeW = 110f;
+            float badgeH = 28f;
+            float startX = _hudRect.x + 14;
 
-            // --- 2. PARAMETER STEPPERS (W1, W2, BIAS) ---
-            GUI.Label(new Rect(_hudRect.x + 14, y, 200, 20), "SYNAPSE & BIAS VOLTAGES", sectionStyle);
-            y += 20;
+            string[] targetLabels = { "Safe Room", "Bio Leak", "Rad Flare", "Dual Breach" };
 
-            DrawStepperRow(ref y, "Weight 1 (w1)", neuralState.Weight1, val => neuralState.SetWeight(0, val));
-            DrawStepperRow(ref y, "Weight 2 (w2)", neuralState.Weight2, val => neuralState.SetWeight(1, val));
-            DrawStepperRow(ref y, "Bias Voltage (b)", neuralState.Bias, val => neuralState.SetBias(val));
+            for (int i = 0; i < 4; i++)
+            {
+                bool pass = false;
+                if (hasEvaluated && lastEval.Diagnostics != null && i < lastEval.Diagnostics.Count)
+                {
+                    pass = lastEval.Diagnostics[i].IsCorrect && lastEval.ActivationMatches;
+                }
+
+                Rect badgeRect = new Rect(startX + (i * (badgeW + 6)), y, badgeW, badgeH);
+
+                Color bgCol     = !hasEvaluated ? new Color(0.05f, 0.15f, 0.25f, 0.55f) : (pass ? _badgePassBg : _badgeFailBg);
+                Color borderCol = !hasEvaluated ? _neonCyan * 0.6f : (pass ? _neonEmerald : _neonRed);
+                Color textCol   = !hasEvaluated ? _neonCyan : (pass ? _neonEmerald : _neonRed);
+
+                DrawRect(badgeRect, bgCol);
+                DrawBorder(badgeRect, borderCol, 1);
+
+                GUIStyle badgeStyle = new GUIStyle(GUI.skin.label)
+                {
+                    alignment = TextAnchor.MiddleCenter,
+                    fontSize = 10,
+                    fontStyle = FontStyle.Bold,
+                    normal = { textColor = textCol }
+                };
+                string statusText = !hasEvaluated ? "ready" : (pass ? "✓ correct" : "✗ wrong");
+                GUI.Label(badgeRect, $"{targetLabels[i]}\n{statusText}", badgeStyle);
+            }
+
+            // Summary Badge
+            Rect summaryRect = new Rect(startX + (4 * (badgeW + 6)) + 4, y, 154, badgeH);
+            Color sumBg = !hasEvaluated ? new Color(0.05f, 0.15f, 0.25f, 0.8f) : (allPassed ? new Color(0.0f, 0.4f, 0.2f, 0.8f) : new Color(0.35f, 0.15f, 0.0f, 0.8f));
+            Color sumBorder = !hasEvaluated ? _neonCyan : (allPassed ? _neonEmerald : _neonAmber);
+            Color sumTextCol = !hasEvaluated ? _neonCyan : (allPassed ? _neonEmerald : _neonAmber);
+
+            DrawRect(summaryRect, sumBg);
+            DrawBorder(summaryRect, sumBorder, 1);
+
+            GUIStyle sumStyle = new GUIStyle(GUI.skin.label)
+            {
+                alignment = TextAnchor.MiddleCenter,
+                fontSize = 10,
+                fontStyle = FontStyle.Bold,
+                normal = { textColor = sumTextCol }
+            };
+            int pulseCount = chamberController != null ? chamberController.PulseCount : 0;
+            string sumText = !hasEvaluated ? $"READY (TRIALS: {pulseCount})" : (allPassed ? $"ALL CLEAR! (TRIALS: {pulseCount}) ✓" : $"{passedCount}/4 (TRIALS: {pulseCount})");
+            GUI.Label(summaryRect, sumText, sumStyle);
+            y += 32;
+
+            // Divider line
+            DrawRect(new Rect(_hudRect.x + 14, y, hudW - 28, 1), new Color(0.0f, 0.85f, 1.0f, 0.25f));
             y += 6;
 
-            // --- 3. CONDUIT SWITCHES ---
-            float halfW = (hudW - 32) / 2f;
-            bool c1 = neuralState.Cable1Connected;
-            bool c2 = neuralState.Cable2Connected;
+            // Live Calibration Readout — simplified labels
+            double w1 = neuralState.Weight1;
+            double b  = neuralState.Bias;
+            string actStr = neuralState.Activation == ActivationType.Step ? "Step (binary)" : neuralState.Activation.ToString();
 
-            Color c1Color = c1 ? _neonCyan : _neonAmber;
-            if (GUI.Button(new Rect(_hudRect.x + 14, y, halfW, 26), $"X1 Conduit: {(c1 ? "ONLINE" : "CUT")}"))
+            GUIStyle readoutStyle = new GUIStyle(GUI.skin.label)
             {
-                neuralState.SetCableConnected(0, !c1);
-            }
+                alignment = TextAnchor.MiddleLeft,
+                fontSize = 11,
+                fontStyle = FontStyle.Bold,
+                normal = { textColor = _neonCyan }
+            };
+            GUI.Label(new Rect(_hudRect.x + 14, y, 360, 22), $"Sensitivity: {w1:0.0} | Auto-threshold: {b:+0.0;-0.0;0.0} | Crystal: {actStr}", readoutStyle);
 
-            Color c2Color = c2 ? _neonCyan : _neonAmber;
-            if (GUI.Button(new Rect(_hudRect.x + 18 + halfW, y, halfW, 26), $"X2 Conduit: {(c2 ? "ONLINE" : "CUT")}"))
-            {
-                neuralState.SetCableConnected(1, !c2);
-            }
-            y += 34;
-
-            // --- 4. PROMINENT PULSE TRANSMITTER BUTTON ---
-            GUI.backgroundColor = _neonCyan;
-            if (GUI.Button(new Rect(_hudRect.x + 14, y, hudW - 28, 36), "⚡ TRANSMIT NEURAL PULSE  [SPACE]"))
+            // Primary Action Button
+            GUI.backgroundColor = allPassed ? _neonEmerald : _neonCyan;
+            Rect btnRect = new Rect(_hudRect.x + hudW - 214, y - 2, 200, 26);
+            if (GUI.Button(btnRect, "⚡ Run Test  [Space]"))
             {
                 if (chamberController != null)
                 {
@@ -257,125 +452,16 @@ namespace Convergence.Presentation
                 }
             }
             GUI.backgroundColor = Color.white;
-            y += 44;
+            y += 24;
 
-            // --- 5. TELEMETRY TRUTH TABLE ---
-            DrawTelemetrySection(y, hudW);
-        }
-
-        private void DrawActivationButton(Rect r, string label, ActivationType type, ActivationType active)
-        {
-            bool isCurrent = (type == active);
-            if (isCurrent)
-            {
-                DrawRect(r, new Color(0.0f, 0.5f, 0.7f, 0.6f));
-                DrawBorder(r, _neonEmerald, 2);
-            }
-
-            if (GUI.Button(r, label))
-            {
-                neuralState.SetActivation(type);
-            }
-        }
-
-        private void DrawStepperRow(ref float y, string label, double currentValue, Action<float> onApply)
-        {
-            float rowX = _hudRect.x + 14;
-            float rowW = _hudRect.width - 28;
-
-            GUIStyle lblStyle = new GUIStyle(GUI.skin.label)
+            // Shortcuts
+            GUIStyle hintStyle = new GUIStyle(GUI.skin.label)
             {
                 alignment = TextAnchor.MiddleLeft,
-                fontSize = 11,
+                fontSize = 9,
                 normal = { textColor = _dimText }
             };
-            GUI.Label(new Rect(rowX, y, 130, 24), label, lblStyle);
-
-            // Minus button
-            if (GUI.Button(new Rect(rowX + 130, y, 34, 24), "–"))
-            {
-                float newVal = Mathf.Clamp((float)Math.Round((currentValue - 0.5) / 0.5) * 0.5f, -2.0f, 2.0f);
-                onApply(newVal);
-            }
-
-            // Current Value display
-            GUIStyle valStyle = new GUIStyle(GUI.skin.label)
-            {
-                alignment = TextAnchor.MiddleCenter,
-                fontSize = 12,
-                fontStyle = FontStyle.Bold,
-                normal = { textColor = _neonCyan }
-            };
-            GUI.Label(new Rect(rowX + 168, y, 64, 24), $"{currentValue:+0.0;-0.0;0.0}", valStyle);
-
-            // Plus button
-            if (GUI.Button(new Rect(rowX + 236, y, 34, 24), "+"))
-            {
-                float newVal = Mathf.Clamp((float)Math.Round((currentValue + 0.5) / 0.5) * 0.5f, -2.0f, 2.0f);
-                onApply(newVal);
-            }
-
-            y += 26;
-        }
-
-        private void DrawTelemetrySection(float y, float hudW)
-        {
-            DrawRect(new Rect(_hudRect.x + 12, y, hudW - 24, 1), new Color(0.0f, 0.8f, 1.0f, 0.35f));
-            y += 6;
-
-            if (chamberController == null) return;
-
-            var eval = chamberController.LastEvaluation;
-            GUIStyle statStyle = new GUIStyle(GUI.skin.label)
-            {
-                fontSize = 11,
-                fontStyle = FontStyle.Bold,
-                normal = { textColor = (eval != null && eval.Passed) ? _neonEmerald : _neonAmber }
-            };
-
-            string statusStr = eval == null
-                ? "OR GATE: AWAITING PULSE TRANSMISSION"
-                : (eval.Passed ? "CONVERGENCE ACHIEVED (100% ACCURACY) — GATE UNSEALED" : $"ACCURACY: {eval.PassedCases}/{eval.TotalCases} ({eval.Accuracy * 100:F0}%)");
-
-            GUI.Label(new Rect(_hudRect.x + 14, y, hudW - 28, 20), statusStr, statStyle);
-            y += 20;
-
-            GUIStyle tableHeader = new GUIStyle(GUI.skin.label)
-            {
-                fontSize = 10,
-                normal = { textColor = _dimText }
-            };
-            GUI.Label(new Rect(_hudRect.x + 14, y, hudW - 28, 16), "  (X1, X2)  |  Target  |  Calculated z  |  Output  |  Status", tableHeader);
-            y += 16;
-
-            if (eval != null && eval.Diagnostics != null)
-            {
-                for (int i = 0; i < eval.Diagnostics.Count && i < 4; i++)
-                {
-                    var d = eval.Diagnostics[i];
-                    Color rowColor = d.IsCorrect ? _neonEmerald : _neonRed;
-                    string passStr = d.IsCorrect ? "[PASS]" : "[FAIL]";
-
-                    GUIStyle rowStyle = new GUIStyle(GUI.skin.label)
-                    {
-                        fontSize = 10,
-                        normal = { textColor = rowColor }
-                    };
-
-                    string line = $"  {d.Label,-9} |    {d.ExpectedOutput:F0}   |     {d.CalculatedZ:+0.00;-0.00;0.00}     |    {d.ActualOutput:F0}     |  {passStr}";
-                    GUI.Label(new Rect(_hudRect.x + 14, y, hudW - 28, 16), line, rowStyle);
-                    y += 16;
-                }
-            }
-            else
-            {
-                GUIStyle tip = new GUIStyle(GUI.skin.label)
-                {
-                    fontSize = 10,
-                    normal = { textColor = _dimText }
-                };
-                GUI.Label(new Rect(_hudRect.x + 14, y, hudW - 28, 30), "Goal: Output 1 if X1=1 or X2=1; Output 0 if both 0.\nSolution Hint: w1=1.0, w2=1.0, b=-0.5, Step Crystal.", tip);
-            }
+            GUI.Label(new Rect(_hudRect.x + 14, y, hudW - 28, 16), "Controls: Scroll on dial | [C][V] cables | [Q][W] sensitivity | [Space] run test | [R] reset", hintStyle);
         }
 
         private void DrawRect(Rect rect, Color color)
@@ -388,10 +474,10 @@ namespace Convergence.Presentation
 
         private void DrawBorder(Rect rect, Color color, int width)
         {
-            DrawRect(new Rect(rect.x, rect.y, rect.width, width), color); // Top
-            DrawRect(new Rect(rect.x, rect.yMax - width, rect.width, width), color); // Bottom
-            DrawRect(new Rect(rect.x, rect.y, width, rect.height), color); // Left
-            DrawRect(new Rect(rect.xMax - width, rect.y, width, rect.height), color); // Right
+            DrawRect(new Rect(rect.x, rect.y, rect.width, width), color);
+            DrawRect(new Rect(rect.x, rect.yMax - width, rect.width, width), color);
+            DrawRect(new Rect(rect.x, rect.y, width, rect.height), color);
+            DrawRect(new Rect(rect.xMax - width, rect.y, width, rect.height), color);
         }
     }
 }

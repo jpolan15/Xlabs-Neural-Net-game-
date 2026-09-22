@@ -13,14 +13,18 @@ namespace Convergence.Gameplay
         private float _startTime;
         private bool _isTimerRunning;
         private float _finalTime;
+        private float _lastProgressTime;
+        private float _lastMetricsUpdateTime;
 
         public float ElapsedTime => _isTimerRunning ? Time.time - _startTime : _finalTime;
+        public float TimeSinceLastProgress => _isTimerRunning ? (Time.time - _lastProgressTime) : 0f;
         public int PulsesFired { get; private set; }
         public int IncorrectAttempts { get; private set; }
         public double BestAccuracy { get; private set; }
         public char Rank { get; private set; } = 'C';
 
         public event Action OnMetricsUpdated;
+        public event Action OnHintTriggered;
 
         private void Start()
         {
@@ -29,8 +33,9 @@ namespace Convergence.Gameplay
 
         private void Update()
         {
-            if (_isTimerRunning)
+            if (_isTimerRunning && Time.time - _lastMetricsUpdateTime >= 0.25f)
             {
+                _lastMetricsUpdateTime = Time.time;
                 OnMetricsUpdated?.Invoke();
             }
         }
@@ -38,6 +43,7 @@ namespace Convergence.Gameplay
         public void StartTimer()
         {
             _startTime = Time.time;
+            _lastProgressTime = Time.time;
             _isTimerRunning = true;
         }
 
@@ -68,6 +74,7 @@ namespace Convergence.Gameplay
             if (evaluation.Accuracy > BestAccuracy)
             {
                 BestAccuracy = evaluation.Accuracy;
+                _lastProgressTime = Time.time;
             }
 
             if (!evaluation.Passed)

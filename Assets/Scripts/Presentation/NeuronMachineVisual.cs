@@ -8,6 +8,7 @@ namespace Convergence.Presentation
     /// Visual observer for the central alien neuron machine.
     /// Drives physical dial rotations, conduit emissive glow, and core energy pulsing.
     /// </summary>
+    [ExecuteAlways]
     public class NeuronMachineVisual : MonoBehaviour
     {
         [Header("State Source")]
@@ -25,9 +26,9 @@ namespace Convergence.Presentation
 
         [Header("Core Energy")]
         [SerializeField] private Light corePulseLight;
-        [SerializeField] private Color activeColor = new Color(0.0f, 0.95f, 1.0f);        // Cyan
-        [SerializeField] private Color awakenedColor = new Color(0.0f, 1.0f, 0.5f);       // Emerald
-        [SerializeField] private Color disconnectedColor = new Color(1.0f, 0.65f, 0.0f);  // Caution Amber
+        [SerializeField] private Color activeColor = new Color(0.20f, 0.75f, 0.98f);        // Soft Cyan
+        [SerializeField] private Color awakenedColor = new Color(0.10f, 0.90f, 0.50f);       // Mint Emerald
+        [SerializeField] private Color disconnectedColor = new Color(0.95f, 0.60f, 0.10f);  // Warm Amber
 
         private void Awake()
         {

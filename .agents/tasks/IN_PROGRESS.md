@@ -1,5 +1,7 @@
-# Tasks In Progress
+# In-Progress Tasks
 
-## Active Tasks
+Active tasks currently being executed:
 
-*None currently.*
+| Task File | Owner | Target Component |
+|---|---|---|
+| *(None currently active)* | — | — |

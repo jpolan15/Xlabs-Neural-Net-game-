@@ -1,4 +1,4 @@
-﻿# Unity .gitignore Template
+# Unity .gitignore Template
 # Source: https://github.com/github/gitignore/blob/main/Unity.gitignore
 
 .utmp/
@@ -72,3 +72,6 @@ InitTestScene*.unity*
 /My project (1)/
 /My project (2)/
 /Neural Game/
+/[Aa]ssets/_Recovery/
+/[Aa]ssets/_Recovery.meta
+

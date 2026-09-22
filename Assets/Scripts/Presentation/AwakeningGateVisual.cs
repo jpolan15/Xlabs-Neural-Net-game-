@@ -9,6 +9,7 @@ namespace Convergence.Presentation
     /// Smoothly transitions doors/portals between sealed and unsealed states,
     /// driving emissive intensity, colors, and gate lighting.
     /// </summary>
+    [ExecuteAlways]
     public class AwakeningGateVisual : MonoBehaviour
     {
         [Header("Controller Reference")]
@@ -23,8 +24,8 @@ namespace Convergence.Presentation
 
         [Header("Lighting & Atmosphere")]
         [SerializeField] private Light gateAuraLight;
-        [SerializeField] private Color lockedColor = new Color(0.9f, 0.2f, 0.1f);
-        [SerializeField] private Color openColor = new Color(0.1f, 1.0f, 0.6f);
+        [SerializeField] private Color lockedColor = new Color(0.90f, 0.45f, 0.12f);
+        [SerializeField] private Color openColor = new Color(0.10f, 0.90f, 0.50f);
 
         private Vector3 _leftClosedPos;
         private Vector3 _rightClosedPos;
@@ -76,7 +77,7 @@ namespace Convergence.Presentation
             if (gateAuraLight != null)
             {
                 gateAuraLight.color = Color.Lerp(lockedColor, openColor, _openProgress);
-                gateAuraLight.intensity = Mathf.Lerp(1.5f, 5.0f, _openProgress);
+                gateAuraLight.intensity = Mathf.Lerp(0.35f, 2.5f, _openProgress);
             }
         }
 

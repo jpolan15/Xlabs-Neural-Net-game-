@@ -4,58 +4,86 @@
 
 - **Level Identifier**: `Level01_AwakeningGate`
 - **Scene File**: `Assets/Scenes/Level01_AwakeningGate.unity`
-- **Core Concept**: Single-neuron binary classification (OR-gate perceptron)
+- **Core Concept**: Single-neuron binary classification (Hazard Classifier OR-gate Perceptron)
 - **Target Platform**: Meta Quest 2 (OpenXR + XR Interaction Toolkit 3.x) with complete Desktop Keyboard/Mouse Fallback
 
 ---
 
-## Narrative & Thematic Setting
+## Narrative & Thematic Setting: *Preventing the Synapse-GPT Cognitive Collapse*
 
-The player arrives on an isolated observation platform floating in deep space amidst a dormant alien computation megastructure. Before them stands the **Awakening Gate** — a colossal sealed portal pulsing with faint amber warning lights.
+Deep within the quantum research mainframe `CONVERGENCE-01`, humanity hosts the master synaptic matrix of **SYNAPSE-GPT (The Global Foundation AI)** — the synthetic multi-modal intelligence that coordinates planetary healthcare, electrical power grids, orbital life support, and autonomous robotics worldwide.
 
-Between the player and the gate sits the **Neuron Machine**, an ancient cybernetic structure housing a living neural processing unit. The machine is damaged: its synaptic regulators are misaligned, its conduits are severed, and its activation socket holds an incompatible linear module. To awaken the machine and unlock the gateway, the player must physically repair and calibrate the circuit to solve the fundamental logic of an **OR gate**.
+A catastrophic cosmic electromagnetic storm has triggered a cascade of **Synaptic Drift and Perceptual Hallucinations** across the AI's core matrix.
 
----
+In **Chamber 01 (The Sensory Gateway)**, the foundational **Perception Perceptron** has collapsed:
+1. The AI can no longer distinguish between baseline sensory silence ($x_1=0, x_2=0$) and lethal radiation/bio-hazard alerts ($x_1=1, x_2=1$).
+2. Blinded by corrupted sensory inputs, the AI is hallucinating phantom catastrophes, initiating emergency failsafe blackouts across Earth and sealing the **Sector 01 Blast Doors** (The Awakening Gate).
+3. If the foundational perception neuron is not calibrated immediately, **SYNAPSE-GPT will suffer permanent cognitive meltdown**, bricking worldwide infrastructure and trapping the engineer forever!
 
-## Puzzle Mathematics
-
-The neural unit simulates a single artificial neuron evaluating the Heaviside Step activation:
-
-$$z = w_1 x_1 + w_2 x_2 + b$$
-$$y = \text{step}(z) = \begin{cases} 1.0 & \text{if } z \ge 0.0 \\ 0.0 & \text{if } z < 0.0 \end{cases}$$
-
-### The OR Truth Table
-
-| Case | Input $x_1$ | Input $x_2$ | Target Output $y$ | Canonical Margin ($w_1=1.0, w_2=1.0, b=-0.5$) |
-|:---:|:---:|:---:|:---:|:---:|
-| 1 | 0.0 | 0.0 | 0.0 | $z = 0(1) + 0(1) - 0.5 = -0.50 \to \text{step}(z) = 0$ |
-| 2 | 0.0 | 1.0 | 1.0 | $z = 0(1) + 1(1) - 0.5 = +0.50 \to \text{step}(z) = 1$ |
-| 3 | 1.0 | 0.0 | 1.0 | $z = 1(1) + 0(1) - 0.5 = +0.50 \to \text{step}(z) = 1$ |
-| 4 | 1.0 | 1.0 | 1.0 | $z = 1(1) + 1(1) - 0.5 = +1.50 \to \text{step}(z) = 1$ |
-
-### Strict Evaluation Constraints
-
-1. **100% Binary Accuracy Threshold**: The gate opens **only** when all 4 cases are simultaneously correct ($Accuracy = 1.0$).
-2. **Negative Gate Protection**: A configuration with 3 out of 4 correct cases (e.g. $w_1=0, w_2=0, b=0$) produces $Accuracy = 0.75$ and strictly keeps the gateway sealed.
-3. **Step Activation Requirement**: The evaluator checks that `ActivationType.Step` is physically active. Linear, ReLU, or Sigmoid modules will fail calibration even if numerical values align.
-4. **Physical Conduit Continuity**: Disconnecting a conduit sets that input to zero ($x_i = 0$), forcing the player to physically reconnect broken cables.
+As the Chief Neural Architect, you must physically reconnect the sensory feeds, tune the synaptic sensitivity weights, set the noise rejection threshold, slot the step activation crystal, and run diagnostic test pulses across 4 real-world facility scenarios to stabilize planetary AI consciousness.
 
 ---
 
-## Player Equipment & Interactors
+## Experiential & Visual Mechanics (Not Just Walls of Text!)
 
-1. **Neural Pulse Tool (`NeuralPulseToolInteractor`)**:
-   - Handheld calibration tool.
-   - Pointing and pulling the trigger fires an energy beam into the neuron machine, triggering forward propagation and live diagnostic evaluation.
-2. **Arc Blade (`ArcBladeInteractor`)**:
-   - Radiant energy blade.
-   - Striking broken conduits or tap nodes reconnects severed connections and adjusts detents.
-3. **Synaptic Weight Regulators (`WeightRegulatorInteractor`)**:
-   - Two rotary dials governing $w_1$ and $w_2$ with physical detents ($0.5$ step increments, range $[-2.0, 2.0]$).
-4. **Bias Calibration Ring (`BiasDialInteractor`)**:
-   - Central dial governing threshold offset $b$ with physical detents ($0.5$ step increments, range $[-2.0, 2.0]$).
-5. **Activation Crystal Socket (`ActivationSocketInteractor`)**:
-   - Receptacle accepting physical crystals. Inserting the Step crystal activates step thresholding.
+### 1. Planetary AI Consciousness Holosphere (`PlanetaryAICoreHologram.cs`)
+- A majestic floating planetary hologram projecting Earth and the AI Neural Mesh high above the gate.
+- **Live Planetary AI Integrity Bar**: Starts at `18% [CRITICAL COGNITIVE DRIFT]`.
+- **Dynamic Stabilization**: Reconnecting cables, inserting the Step crystal, and balancing weights physically calms the red error distortion into radiant cyber-emerald orbital rings, raising integrity to `100% [SYNAPSE-GPT STABILIZED]`.
+
+### 2. Visualized 3D Forward Pass & Particle Packet Simulation (`ClassicNeuralNetwork3DVisualizer.cs`)
+- When the player pulls the **Master Clock Lever** (or presses `Space`):
+  - Physical glowing energy data packets surge from the 4 scenario projectors into the Input Nodes ($x_1, x_2$).
+  - Synaptic lines illuminate with high-speed pulse particles displaying the weighted transfer $(w_1 x_1, w_2 x_2)$.
+  - The energy sums in the central core $(z = w_1 x_1 + w_2 x_2 + b)$ and refracts through the glowing Decision Crystal.
+  - On a correct classification, a targeted laser beam strikes the corresponding door receptor, turning it emerald green with a resonant chime.
+
+---
+
+## Puzzle Scenarios & Sensor Grounding
+
+### Real-World Sensor Inputs:
+- **Sensor 1 ($x_1$)**: **Radiation Spike Detector** ($0.0$ = Normal/Safe, $1.0$ = Radiation Detected)
+- **Sensor 2 ($x_2$)**: **Bio-Hazard Leak Detector** ($0.0$ = Normal/Safe, $1.0$ = Toxin Leak Detected)
+
+### The 4 Hazard Scenarios (Truth Table):
+
+| Case | Scenario Name | Sensor 1 ($x_1$) [Radiation] | Sensor 2 ($x_2$) [BioLeak] | Required AI Decision | Target Output ($y$) | Canonical Margin ($w_1=1.0, w_2=1.0, b=-0.5$) |
+|:---:|:---|:---:|:---:|:---|:---:|:---:|
+| **1** | **Clean Room** | $0.0$ | $0.0$ | **ALL CLEAR / SAFE** (Keep doors open) | $0.0$ | $z = 0(1) + 0(1) - 0.5 = -0.50 \to \text{step}(z) = 0$ |
+| **2** | **Bio-Hazard Leak** | $0.0$ | $1.0$ | **TRIGGER QUARANTINE** (Seal blast doors!) | $1.0$ | $z = 0(1) + 1(1) - 0.5 = +0.50 \to \text{step}(z) = 1$ |
+| **3** | **Radiation Flare** | $1.0$ | $0.0$ | **TRIGGER QUARANTINE** (Seal blast doors!) | $1.0$ | $z = 1(1) + 0(1) - 0.5 = +0.50 \to \text{step}(z) = 1$ |
+| **4** | **Dual Breach** | $1.0$ | $1.0$ | **TRIGGER QUARANTINE** (Seal blast doors!) | $1.0$ | $z = 1(1) + 1(1) - 0.5 = +1.50 \to \text{step}(z) = 1$ |
+
+---
+
+## Beginner Pedagogical Foundations
+
+1. **Why do we upload/transmit test data packets?**
+   - A neural network without data is just blank mathematical equations. We transmit recorded sensor packets representing all 4 facility conditions to verify the AI makes the correct decision in production.
+2. **Why do we tune Sensitivity Weights ($w_1, w_2$)?**
+   - Weights act as synaptic amplifiers (volume knobs). Setting $w_1 = 1.0$ instructs the AI that an alert from the Radiation sensor is critical enough by itself to overcome baseline resistance and trigger quarantine.
+3. **Why do we tune Noise Bias ($b$)?**
+   - Bias acts as a background noise filter / sensitivity threshold. Setting $b = -0.5$ creates a negative baseline buffer ($0+0-0.5 = -0.5 < 0$) so background static in a Clean Room does not trigger false alarms.
+4. **Why do we need an Activation Function (Step Crystal)?**
+   - Raw linear math generates continuous energy values (e.g. $-0.5$ or $+1.5$). The blast door quarantine mechanism requires a decisive binary switch ($0$ or $1$). The **Step Crystal** evaluates whether total energy $z \ge 0.0$ (Output $1.0 = \text{ALARM}$) or $z < 0.0$ (Output $0.0 = \text{SAFE}$).
+
+---
+
+## Equipment & Tactile Interactors
+
+1. **Radiation & Bio-Hazard Conduits (`CableInteractable`)**:
+   - Patch cables streaming live sensory data into inputs $x_1$ and $x_2$.
+2. **Radiation Sensitivity Regulator (`WeightRegulatorInteractor` $w_1$)**:
+   - Rotary dial governing $w_1$ with detents ($0.5$ step increments, range $[-2.0, 2.0]$).
+3. **Bio-Hazard Sensitivity Regulator (`WeightRegulatorInteractor` $w_2$)**:
+   - Rotary dial governing $w_2$ with detents ($0.5$ step increments, range $[-2.0, 2.0]$).
+4. **Noise Filter Bias Ring (`BiasDialInteractor` $b$)**:
+   - Central dial governing threshold offset $b$ with detents ($0.5$ step increments, range $[-2.0, 2.0]$).
+5. **Decision Crystal Socket (`ActivationSocketInteractor`)**:
+   - Receptacle accepting physical activation crystals. Inserting the Step crystal enables the binary threshold switch.
+6. **Master Clock Cycle Lever (`ClockPulseLeverInteractor`)**:
+   - Transmits the 4 test scenario packets through the circuit and triggers diagnostic verification.
 
 ---
 
@@ -65,8 +93,8 @@ Six distinct broken configurations provide high replayability and test generaliz
 
 | Preset | $w_1$ | $w_2$ | $b$ | Activation | Cable Status | Diagnostic State |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---|
-| **A** | 0.0 | 0.0 | -1.0 | Linear | Cable 1 disconnected | Cold startup; missing signal input |
-| **B** | -0.5 | 1.0 | 0.0 | Step | Cable 2 disconnected | Inhibitory weight error; missing input 2 |
+| **A** | 0.0 | 0.0 | -1.0 | Linear | Cable 1 disconnected | Cold startup; missing radiation line |
+| **B** | -0.5 | 1.0 | 0.0 | Step | Cable 2 disconnected | Inhibitory weight error; missing bio line |
 | **C** | 1.0 | 1.0 | -2.0 | ReLU | All connected | Severe negative bias; incorrect ReLU crystal |
 | **D** | 0.5 | 0.5 | 0.0 | Linear | Both disconnected | Double severed conduit; weak synaptic weights |
 | **E** | -1.0 | -1.0 | 1.0 | Step | Cable 1 disconnected | Inverted negative weights with positive bias |
@@ -90,17 +118,17 @@ Six distinct broken configurations provide high replayability and test generaliz
 ## Playable Loop
 
 ```text
-Enter alien world
-→ discover sealed Awakening Gate
-→ explore damaged alien neuron machine
-→ inspect floating diagnostic hologram
-→ use Arc Blade to reconnect severed conduits
-→ cycle/socket Step activation crystal
-→ tune synaptic regulators: w1 = 1.0, w2 = 1.0, b = -0.5
-→ fire Neural Pulse Tool to test circuit
-→ verify 100% binary accuracy on all 4 truth table cases
-→ Convergence achieved! Alien intelligence awakens
-→ Awakening Gate unseals with radiant energy wave
-→ score rank revealed
-→ reset crystal allows instant re-randomization and replay
+Awaken in Stasis Pod
+→ Station AI announces Synapse-GPT cognitive drift emergency
+→ Discover sealed Awakening Gate and glitching Planetary AI Holosphere (18% integrity)
+→ Approach Hazard Classifier Workstation
+→ Read In-World Field Manual Tablet (Mission & Sensor Guide)
+→ Plug in Radiation & Bio-Hazard Conduits (Integrity rises)
+→ Socket Step Decision Crystal (Sharp threshold established)
+→ Calibrate Sensitivity Knobs: W1 = 1.0, W2 = 1.0, Bias = -0.5
+→ Pull Clock Cycle Lever to transmit 4 sensor test packets
+→ Watch 3D forward pass energy wave packets illuminate each door receptor
+→ Planetary AI Holosphere reaches 100% Harmonic Convergence
+→ Blast Doors disengage quarantine and slide open with radiant aura
+→ Grade & Telemetry rank revealed
 ```

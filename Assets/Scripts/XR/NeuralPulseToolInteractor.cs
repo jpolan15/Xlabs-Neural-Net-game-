@@ -33,7 +33,9 @@ namespace Convergence.XR
         }
 
         /// <summary>
-        /// Fires an energy pulse along the forward aim vector and triggers circuit evaluation.
+        /// Fires an energy pulse along the forward aim vector.
+        /// If aimed at a specific DataTargetReceptor, triggers a single-case diagnostic pass.
+        /// Otherwise triggers a full circuit forward pass.
         /// </summary>
         public void FirePulse()
         {
@@ -44,6 +46,14 @@ namespace Convergence.XR
             if (Physics.Raycast(origin, direction, out RaycastHit hit, rayDistance, interactableLayers))
             {
                 hitPoint = hit.point;
+
+                var target = hit.collider.GetComponentInParent<DataTargetReceptor>();
+                if (target != null && chamberController != null)
+                {
+                    OnPulseFired?.Invoke(origin, hitPoint);
+                    chamberController.TriggerSingleCasePass(target.CaseIndex);
+                    return;
+                }
             }
 
             OnPulseFired?.Invoke(origin, hitPoint);
