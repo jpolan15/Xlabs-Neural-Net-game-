@@ -100,6 +100,8 @@ Last updated: 2026-09-14 (Phase 5 + 6 complete)
 | `Tools/Validation/` | PowerShell validators for boundaries and repository layout |
 | `Tools/AgentBridge/` | MCP / XR Operator integration; NOT a runtime dependency |
 
+> Unity MCP (`unityMCP` server, package `com.coplaydev.unity-mcp`) is external development tooling configured in `.cursor/mcp.json` once installed; it is not under `Tools/`. See root `AGENTS.md`.
+
 ---
 
 ## Assembly graph

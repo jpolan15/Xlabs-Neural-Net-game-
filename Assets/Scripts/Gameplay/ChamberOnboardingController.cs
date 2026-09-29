@@ -12,7 +12,7 @@ namespace Convergence.Gameplay
     /// Steps:
     ///   0. Awakening      — stasis pod opens, you wake up
     ///   1. ConnectSensors — snap both cables in (crystal auto-inserts when done)
-    ///   2. TuneSensitivity — turn the dial until the sentry can tell friend from foe
+    ///   2. TuneSensitivity — turn the dials until either beacon wakes the array
     ///   3. FireTest       — pull the lever to run the diagnostic
     ///   4. Completed      — all clear!
     ///
@@ -75,11 +75,11 @@ namespace Convergence.Gameplay
         {
             return currentStep switch
             {
-                OnboardingStep.Awakening      => "Waking up… the facility AI is calling for help.",
-                OnboardingStep.ConnectSensors => "Step 1 of 3 — Grab both sensor cables and plug them in.",
-                OnboardingStep.TuneSensitivity => "Step 2 of 3 — Turn the sensitivity dial until all targets show green.",
-                OnboardingStep.FireTest       => "Step 3 of 3 — Pull the lever to run the final test!",
-                OnboardingStep.Completed      => "✓ All clear! The sentry is calibrated. Great work.",
+                OnboardingStep.Awakening      => "Sensor array dark. Either beacon should wake it.",
+                OnboardingStep.ConnectSensors => "Plug in the radio beacon and the light signature.",
+                OnboardingStep.TuneSensitivity => "Turn W1, W2, and bias. They are three different numbers.",
+                OnboardingStep.FireTest       => "Pull the lever. Each sensor ping should light from the test.",
+                OnboardingStep.Completed      => "Array awake. The aft door is open. We cannot jump yet.",
                 _                             => ""
             };
         }
@@ -157,21 +157,21 @@ namespace Convergence.Gameplay
             switch (currentStep)
             {
                 case OnboardingStep.ConnectSensors:
-                    OnAnnouncerVoicePrompt?.Invoke("Hint: walk up to the two glowing cables and click / grab each one to plug them in.");
+                    OnAnnouncerVoicePrompt?.Invoke("Hint: each cable is one beacon. A disconnected cable is a beacon that never arrives.");
                     break;
 
                 case OnboardingStep.TuneSensitivity:
                     if (hintLevel == 1)
-                        OnAnnouncerVoicePrompt?.Invoke("Hint: turn the sensitivity dial clockwise. You need it high enough that a single alert triggers the sentry.");
+                        OnAnnouncerVoicePrompt?.Invoke("Hint: W1 only changes the radio beacon. W2 only changes the light. Bias moves every case together.");
                     else
-                        OnAnnouncerVoicePrompt?.Invoke("Hint: try setting sensitivity to around 1.0. The hologram will go green when all four scenarios are correct.");
+                        OnAnnouncerVoicePrompt?.Invoke("Hint: quiet sensors should stay off. Either beacon by itself should be enough to fire.");
                     break;
 
                 case OnboardingStep.FireTest:
                     if (hintLevel == 1)
-                        OnAnnouncerVoicePrompt?.Invoke("Hint: grab the big lever on the right and pull it down, or just press Space.");
+                        OnAnnouncerVoicePrompt?.Invoke("Hint: pull the lever. The four pings are the four rows of the sensor table.");
                     else
-                        OnAnnouncerVoicePrompt?.Invoke("Hint: check the target pods — the friendly drone (no hazard) should be safe, the other three should be intercepted.");
+                        OnAnnouncerVoicePrompt?.Invoke("Hint: a red ping is a row the neuron got wrong. Read which way the sum missed, then change one dial.");
                     break;
             }
         }
@@ -287,7 +287,7 @@ namespace Convergence.Gameplay
                     break;
 
                 case OnboardingStep.Completed:
-                    OnAnnouncerVoicePrompt?.Invoke("Coordinates locked. Navigation restored. Blasting off to Earth!");
+                    OnAnnouncerVoicePrompt?.Invoke("Sensor array is awake. Walk through the aft door. The ship cannot jump yet.");
                     break;
             }
         }

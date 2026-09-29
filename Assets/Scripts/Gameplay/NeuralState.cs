@@ -12,13 +12,21 @@ namespace Convergence.Gameplay
     {
         private NetworkModel _network;
         private bool[] _cablesConnected = new bool[] { true, true };
+        private int _editLayer;
+        private int _editNeuron;
 
         public NetworkModel Network => _network;
 
-        public double Weight1 => _network?.SingleNeuron?.GetWeight(0) ?? 0.0;
-        public double Weight2 => _network?.SingleNeuron?.GetWeight(1) ?? 0.0;
-        public double Bias => _network?.SingleNeuron?.Bias ?? 0.0;
-        public ActivationType Activation => _network?.SingleNeuron?.Activation ?? ActivationType.Linear;
+        public double Weight1 => ReadWeight(0);
+        public double Weight2 => ReadWeight(1);
+        public double Bias => EditableNeuron?.Bias ?? 0.0;
+        public ActivationType Activation => EditableNeuron?.Activation ?? ActivationType.Linear;
+
+        /// <summary>Layer whose weights the dials currently edit. A single neuron is always layer 0.</summary>
+        public int EditLayer => _editLayer;
+
+        /// <summary>Neuron inside <see cref="EditLayer"/> that the dials currently edit.</summary>
+        public int EditNeuron => _editNeuron;
 
         public bool Cable1Connected => _cablesConnected[0];
         public bool Cable2Connected => _cablesConnected[1];
@@ -47,30 +55,46 @@ namespace Convergence.Gameplay
             OnStateMutated?.Invoke();
         }
 
+        /// <summary>
+        /// Points the dials at one neuron. Ignored when the index is outside the live network.
+        /// </summary>
+        public void SelectEditableNeuron(int layer, int neuron)
+        {
+            if (_network == null) return;
+            if (layer < 0 || layer >= _network.Layers.Count) return;
+            if (neuron < 0 || neuron >= _network.Layers[layer].NeuronCount) return;
+            _editLayer = layer;
+            _editNeuron = neuron;
+            OnStateMutated?.Invoke();
+        }
+
         public void SetWeight(int index, double value)
         {
-            if (_network?.SingleNeuron == null) return;
-            if (index < 0 || index >= _network.SingleNeuron.WeightCount) return;
+            NeuronModel neuron = EditableNeuron;
+            if (neuron == null) return;
+            if (index < 0 || index >= neuron.WeightCount) return;
 
-            _network.SingleNeuron.SetWeight(index, value);
+            neuron.SetWeight(index, value);
             OnWeightChanged?.Invoke(index, value);
             OnStateMutated?.Invoke();
         }
 
         public void SetBias(double value)
         {
-            if (_network?.SingleNeuron == null) return;
+            NeuronModel neuron = EditableNeuron;
+            if (neuron == null) return;
 
-            _network.SingleNeuron.Bias = value;
+            neuron.Bias = value;
             OnBiasChanged?.Invoke(value);
             OnStateMutated?.Invoke();
         }
 
         public void SetActivation(ActivationType activation)
         {
-            if (_network?.SingleNeuron == null) return;
+            NeuronModel neuron = EditableNeuron;
+            if (neuron == null) return;
 
-            _network.SingleNeuron.Activation = activation;
+            neuron.Activation = activation;
             OnActivationChanged?.Invoke(activation);
             OnStateMutated?.Invoke();
         }
@@ -85,22 +109,39 @@ namespace Convergence.Gameplay
         }
 
         /// <summary>
-        /// Sets both Weight1 and Weight2 to the same value simultaneously.
-        /// Used by the single-slider "Sensitivity" control in Level 1's simplified flow.
-        /// Bias is also auto-adjusted to -weight/2 so the OR gate stays solvable.
+        /// Sets weight 0 and weight 1 to the same value. Bias is left alone.
         /// </summary>
         public void SetUnifiedWeight(double value)
         {
-            if (_network?.SingleNeuron == null) return;
-            _network.SingleNeuron.SetWeight(0, value);
-            _network.SingleNeuron.SetWeight(1, value);
-            // Auto-set bias to half the negative weight so Clean Room (0,0)→0 always holds
-            double autoBias = -(value / 2.0);
-            _network.SingleNeuron.Bias = autoBias;
-            OnWeightChanged?.Invoke(0, value);
-            OnWeightChanged?.Invoke(1, value);
-            OnBiasChanged?.Invoke(autoBias);
+            NeuronModel neuron = EditableNeuron;
+            if (neuron == null) return;
+            if (neuron.WeightCount > 0) neuron.SetWeight(0, value);
+            if (neuron.WeightCount > 1) neuron.SetWeight(1, value);
+            if (neuron.WeightCount > 0) OnWeightChanged?.Invoke(0, value);
+            if (neuron.WeightCount > 1) OnWeightChanged?.Invoke(1, value);
             OnStateMutated?.Invoke();
+        }
+
+        private NeuronModel EditableNeuron
+        {
+            get
+            {
+                if (_network == null || _network.Layers.Count == 0) return null;
+                if (_network.SingleNeuron != null) return _network.SingleNeuron;
+                int layer = _editLayer;
+                int neuron = _editNeuron;
+                if (layer < 0 || layer >= _network.Layers.Count) return _network.Layers[0].Neurons[0];
+                var neurons = _network.Layers[layer].Neurons;
+                if (neuron < 0 || neuron >= neurons.Count) return neurons[0];
+                return neurons[neuron];
+            }
+        }
+
+        private double ReadWeight(int index)
+        {
+            NeuronModel neuron = EditableNeuron;
+            if (neuron == null || index < 0 || index >= neuron.WeightCount) return 0.0;
+            return neuron.GetWeight(index);
         }
 
         /// <summary>

@@ -133,6 +133,64 @@ namespace Convergence.Core.Neural
         }
 
         /// <summary>
+        /// Zeros every neuron gradient in the network.
+        /// </summary>
+        public void ClearGradients()
+        {
+            for (int layer = 0; layer < _layers.Count; layer++)
+            {
+                var neurons = _layers[layer].Neurons;
+                for (int n = 0; n < neurons.Count; n++)
+                {
+                    neurons[n].ClearGradients();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Backpropagates output-activation gradients to every weight and bias.
+        /// Call <see cref="Forward"/> first so each neuron has cached inputs and activations.
+        /// </summary>
+        public void Backward(double[] dLossDOutputs)
+        {
+            if (dLossDOutputs == null)
+            {
+                throw new ArgumentNullException(nameof(dLossDOutputs));
+            }
+            if (dLossDOutputs.Length != OutputCount)
+            {
+                throw new ArgumentException(
+                    $"Expected {OutputCount} output gradients, received {dLossDOutputs.Length}.",
+                    nameof(dLossDOutputs));
+            }
+
+            ClearGradients();
+            double[] upstream = dLossDOutputs;
+            for (int layer = _layers.Count - 1; layer >= 0; layer--)
+            {
+                var current = _layers[layer];
+                double[] downstream = new double[current.InputCount];
+                current.Backward(upstream, downstream);
+                upstream = downstream;
+            }
+        }
+
+        /// <summary>
+        /// Applies the gradient step w ← w − η ∂L/∂w on every neuron, then clears gradients.
+        /// </summary>
+        public void ApplyGradients(double learningRate)
+        {
+            for (int layer = 0; layer < _layers.Count; layer++)
+            {
+                var neurons = _layers[layer].Neurons;
+                for (int n = 0; n < neurons.Count; n++)
+                {
+                    neurons[n].ApplyGradients(learningRate);
+                }
+            }
+        }
+
+        /// <summary>
         /// Creates an independent deep copy of this network and all underlying layers and neurons.
         /// </summary>
         public NetworkModel DeepCopy()

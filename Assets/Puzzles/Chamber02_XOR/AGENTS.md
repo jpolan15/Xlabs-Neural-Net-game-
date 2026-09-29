@@ -2,7 +2,7 @@
 
 ## Mission
 
-Teach why a single linear neuron cannot solve XOR and how hidden non-linear features make it solvable.
+Teach why a single linear neuron cannot solve XOR and how hidden non-linear features make it solvable. On the ship this is the spectrum filter. Solving it is what powers the telescope. The math below does not change.
 
 ## Required mathematical behavior
 

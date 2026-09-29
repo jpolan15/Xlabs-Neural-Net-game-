@@ -11,12 +11,12 @@ $$\text{Attention}(Q, K, V) = \text{Softmax}\left(\frac{Q K^T}{\sqrt{d_k}}\right
 
 ## The Puzzle Scenario: The Corrupted Context Window
 
-The facility's automated emergency core is hallucinating because corrupted and misleading log tokens are hijacking the AI's attention. The system is mispredicting the emergency response action.
+A.U.R.A.'s nav log is mis-predicting the jump because a corrupted token is taking the attention weight. Masking that token is what lets the circuit predict JUMP_HOME. This is a small attention circuit, not a language model.
 
 ### Context Sequences Under Investigation:
-1. `[OVERHEAT] [CONTAINMENT] [STATUS]` $\longrightarrow$ Expected: `SEAL_DOOR`
-2. `[POWER] [CONTAINMENT] [STATUS]` $\longrightarrow$ Expected: `ROUTE_POWER`
-3. `[OVERHEAT] [CORRUPTED_NOISE] [CONTAINMENT]` $\longrightarrow$ Failing because noise token attracts attention!
+1. `[EARTH_LOCK] [FUEL_OK]` $\longrightarrow$ Expected: `JUMP_HOME`
+2. `[EARTH_LOCK] [FUEL_OK] [NOISE]` $\longrightarrow$ Failing because the corrupted token takes the attention weight
+3. The same window with `NOISE` masked $\longrightarrow$ Expected: `JUMP_HOME`
 
 ## Player Actions & Mechanics
 

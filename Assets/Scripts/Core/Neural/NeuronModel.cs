@@ -53,6 +53,32 @@ namespace Convergence.Core.Neural
         /// </summary>
         public double LastOutput { get; private set; }
 
+        private double[] _lastInputs = Array.Empty<double>();
+        private double[] _weightGradients = Array.Empty<double>();
+
+        /// <summary>
+        /// Partial derivative of the loss with respect to the bias, accumulated since the last clear.
+        /// </summary>
+        public double BiasGradient { get; private set; }
+
+        /// <summary>
+        /// Inputs cached by the most recent pre-activation. Returns a defensive clone.
+        /// </summary>
+        public double[] LastInputs => (double[])_lastInputs.Clone();
+
+        /// <summary>
+        /// Reads one accumulated weight gradient without copying the array.
+        /// </summary>
+        public double GetWeightGradient(int index)
+        {
+            if (index < 0 || index >= _weights.Length)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index));
+            }
+
+            return index < _weightGradients.Length ? _weightGradients[index] : 0.0;
+        }
+
         /// <summary>
         /// Initializes a new neuron with the given weights, bias, and activation type.
         /// </summary>
@@ -124,6 +150,13 @@ namespace Convergence.Core.Neural
                 );
             }
 
+            if (_lastInputs.Length != inputs.Length)
+            {
+                _lastInputs = new double[inputs.Length];
+            }
+
+            Array.Copy(inputs, _lastInputs, inputs.Length);
+
             double z = Bias;
             for (int i = 0; i < _weights.Length; i++)
             {
@@ -132,6 +165,75 @@ namespace Convergence.Core.Neural
 
             LastZ = z;
             return z;
+        }
+
+        /// <summary>
+        /// Zeros accumulated weight and bias gradients.
+        /// </summary>
+        public void ClearGradients()
+        {
+            BiasGradient = 0.0;
+            if (_weightGradients.Length != _weights.Length)
+            {
+                _weightGradients = new double[_weights.Length];
+                return;
+            }
+
+            Array.Clear(_weightGradients, 0, _weightGradients.Length);
+        }
+
+        /// <summary>
+        /// Accumulates dL/dw and dL/db from dL/da, and adds dL/dx into <paramref name="dLossDInputs"/>.
+        /// </summary>
+        public void AccumulateOutputGradient(double dLossDActivation, double[] dLossDInputs)
+        {
+            double dZ = dLossDActivation * ScalarDerivative(LastZ, Activation);
+            AccumulatePreActivationGradient(dZ, dLossDInputs);
+        }
+
+        /// <summary>
+        /// Accumulates gradients from a pre-activation derivative. Used when the layer activation
+        /// (for example Softmax) already converted dL/da into dL/dz.
+        /// </summary>
+        public void AccumulatePreActivationGradient(double dZ, double[] dLossDInputs)
+        {
+            if (_weightGradients.Length != _weights.Length)
+            {
+                _weightGradients = new double[_weights.Length];
+            }
+
+            BiasGradient += dZ;
+            for (int i = 0; i < _weights.Length; i++)
+            {
+                double input = i < _lastInputs.Length ? _lastInputs[i] : 0.0;
+                _weightGradients[i] += dZ * input;
+                if (dLossDInputs != null)
+                {
+                    dLossDInputs[i] += dZ * _weights[i];
+                }
+            }
+        }
+
+        /// <summary>
+        /// Applies w ← w − η ∂L/∂w and b ← b − η ∂L/∂b, then clears the accumulated gradients.
+        /// </summary>
+        public void ApplyGradients(double learningRate)
+        {
+            if (learningRate < 0.0 || double.IsNaN(learningRate) || double.IsInfinity(learningRate))
+            {
+                throw new ArgumentOutOfRangeException(nameof(learningRate), "Learning rate must be finite and >= 0.");
+            }
+
+            if (_weightGradients.Length == _weights.Length)
+            {
+                for (int i = 0; i < _weights.Length; i++)
+                {
+                    _weights[i] -= learningRate * _weightGradients[i];
+                }
+            }
+
+            Bias -= learningRate * BiasGradient;
+            ClearGradients();
         }
 
         /// <summary>
@@ -190,6 +292,25 @@ namespace Convergence.Core.Neural
                     return ActivationFunctions.Sigmoid(z);
                 case ActivationType.Tanh:
                     return ActivationFunctions.Tanh(z);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(activation), $"Unsupported activation type: {activation}");
+            }
+        }
+
+        private static double ScalarDerivative(double z, ActivationType activation)
+        {
+            switch (activation)
+            {
+                case ActivationType.Step:
+                    return ActivationFunctions.StepDerivative(z);
+                case ActivationType.Linear:
+                    return ActivationFunctions.LinearDerivative(z);
+                case ActivationType.ReLU:
+                    return ActivationFunctions.ReLUDerivative(z);
+                case ActivationType.Sigmoid:
+                    return ActivationFunctions.SigmoidDerivative(z);
+                case ActivationType.Tanh:
+                    return ActivationFunctions.TanhDerivative(z);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(activation), $"Unsupported activation type: {activation}");
             }

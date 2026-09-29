@@ -14,6 +14,9 @@ Canonical decisions live in `Documentation/Architecture/ADRs/`.
 | ADR-004 | Task-appropriate loss functions per chamber type | Accepted | [`ADR-004-loss-functions.md`](../Documentation/Architecture/ADRs/ADR-004-loss-functions.md) |
 | ADR-005 | XR Interaction Toolkit is the sole interaction authority | Accepted | [`ADR-005-xr-stack.md`](../Documentation/Architecture/ADRs/ADR-005-xr-stack.md) |
 | ADR-006 | Align package versions with Unity 6000.6.0f1 built-in distributions | Accepted | [`ADR-006-package-versions-unity6.md`](../Documentation/Architecture/ADRs/ADR-006-package-versions-unity6.md) |
+| ADR-007 | XRI Starter Assets rig replaces the custom pointer rig | Accepted | [`ADR-007-xri-starter-rig.md`](../Documentation/Architecture/ADRs/ADR-007-xri-starter-rig.md) |
+| ADR-008 | Lost-in-space premise; sentry, gun, and Synapse-GPT leave the live game | Accepted | [`ADR-008-premise-lost-in-space.md`](../Documentation/Architecture/ADRs/ADR-008-premise-lost-in-space.md) |
+| ADR-009 | MCP for Unity added as Editor-only development tooling | Accepted | [`ADR-009-unity-mcp-tooling.md`](../Documentation/Architecture/ADRs/ADR-009-unity-mcp-tooling.md) |
 
 ---
 

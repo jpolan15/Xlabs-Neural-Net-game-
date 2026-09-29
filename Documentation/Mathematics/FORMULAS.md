@@ -61,11 +61,23 @@ Where $y_i \in \{0, 1\}$ are binary targets. For Step activation, $\hat{y}_i \in
 
 $$\text{MSE} = \frac{1}{n} \sum_{i=1}^n (\hat{y}_i - y_i)^2$$
 
+Partial derivative used by backpropagation:
+
+$$\frac{\partial \text{MSE}}{\partial \hat{y}_i} = \frac{2}{n}(\hat{y}_i - y_i)$$
+
+### Binary Cross-Entropy gradient
+
+With \(\hat{y}\) clamped to \([\epsilon, 1-\epsilon]\) and \(\epsilon = 10^{-15}\) (`LossFunctions.DefaultEpsilon`):
+
+$$\frac{\partial \text{BCE}}{\partial \hat{y}_i} = -\frac{1}{n}\left(\frac{y_i}{\hat{y}_i} - \frac{1-y_i}{1-\hat{y}_i}\right)$$
+
+The parameter step is \(w \leftarrow w - \eta \partial L / \partial w\), with \(\partial L / \partial w_i = (\partial L / \partial a) f'(z) x_i\). Step's derivative is the compatibility stub 0, so training steps use Sigmoid or ReLU.
+
 ### Binary Cross-Entropy (BCE)
 
 $$\text{BCE} = -\frac{1}{n} \sum_{i=1}^n \left[ y_i \log(\hat{y}_i + \epsilon) + (1 - y_i) \log(1 - \hat{y}_i + \epsilon) \right]$$
 
-Clamp $\hat{y}$ to avoid $\log(0)$: use $\epsilon = 10^{-7}$.
+Clamp $\hat{y}$ to avoid $\log(0)$: `LossFunctions.DefaultEpsilon` is $10^{-15}$.
 
 ### Categorical Cross-Entropy (CCE)
 
@@ -88,7 +100,7 @@ Gradients must be computed from real mathematics — not approximated or faked.
 
 $$\text{Attention}(Q, K, V) = \text{Softmax}\left(\frac{Q K^T}{\sqrt{d_k}}\right) V$$
 
-Where $Q$, $K$, $V$ are query, key, and value matrices and $d_k$ is the key dimension scaling factor.
+Where $Q$ is \([\text{queryCount}, d_k]\), $K$ is \([\text{keyCount}, d_k]\), and $V$ is \([\text{keyCount}, d_v]\). A false mask entry replaces that logit with \(-\infty\) before softmax. Each attention row sums to 1 within \(10^{-6}\). Implementation: `Attention.ScaledDotProduct`.
 
 Full Chamber 04 implementation spec: `Assets/Puzzles/Chamber04_Attention/`.
 

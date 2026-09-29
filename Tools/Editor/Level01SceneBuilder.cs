@@ -295,8 +295,10 @@ namespace Convergence.EditorTools
             fillLight.intensity = 0.45f;
             fillLightGo.transform.rotation = Quaternion.Euler(55f, 30f, 0f);
 
-            // 1. Authentic Chamfered Spaceship Bridge Hull with Heavy Arch Ribs & Hazard Markings
-            CreateSpaceshipBridgeHull(envRoot.transform, mats);
+            // Hull is a Kenney-module prefab. The scene only instantiates it.
+            PlaceShip(envRoot.transform, mats);
+            AssignStarfield();
+            CreateBloomVolume(envRoot.transform);
 
             // 2. Panoramic Forward Observation Viewport & Deep Space Vista (Starfield, Ringed Gas Giant, Asteroids)
             CreateForwardObservationViewportAndSpaceVista(envRoot.transform, mats);
@@ -308,7 +310,7 @@ namespace Convergence.EditorTools
             CreateBusTraces(envRoot.transform, mats.BusTraceGlow);
 
             // Perimeter Auxiliary Computing Banks & Heat Sink Fin Columns
-            var memoryChipLeds = CreatePerimeterHardware(envRoot.transform, mats);
+            CreatePerimeterHardware(envRoot.transform, mats);
 
             // Ambient Data Stream Particles
             CreateDataParticles(envRoot.transform, mats.BusTraceGlow);
@@ -316,20 +318,6 @@ namespace Convergence.EditorTools
             // Emergency System Spark Particles (Signaling Ship Breakdown Crisis)
             CreateSparkParticles(envRoot.transform, mats.WarningAmber);
 
-            // Motherboard Environment Animation Driver
-            var mbEnvGo = new GameObject("MotherboardEnvironmentVisual");
-            mbEnvGo.transform.SetParent(envRoot.transform);
-            var mbVisual = mbEnvGo.AddComponent<MotherboardEnvironmentVisual>();
-            var mbSO = new SerializedObject(mbVisual);
-            mbSO.FindProperty("busTraceMaterial").objectReferenceValue = mats.BusTraceGlow;
-            mbSO.FindProperty("cpuSubstrateMaterial").objectReferenceValue = mats.CpuSubstrate;
-            var ledsArrayProp = mbSO.FindProperty("memoryChipLeds");
-            ledsArrayProp.arraySize = memoryChipLeds.Length;
-            for (int i = 0; i < memoryChipLeds.Length; i++)
-            {
-                ledsArrayProp.GetArrayElementAtIndex(i).objectReferenceValue = memoryChipLeds[i];
-            }
-            mbSO.ApplyModifiedProperties();
 
             // --- Gameplay Controllers Root ---
             var controllersGo = new GameObject("GameplayControllers");
@@ -363,27 +351,46 @@ namespace Convergence.EditorTools
 
             // --- 3D Floating & Rotating Neural Network Visualizer (Centerpiece, Elevated at Eye Level) ---
             var neuronMachineGo = new GameObject("ClassicNeuralNetwork_3D");
-            neuronMachineGo.transform.position = new Vector3(0, 1.70f, 1.45f);
+            neuronMachineGo.transform.position = new Vector3(0, 1.55f, 0.55f);
 
             // Dedicated subtle spotlight illuminating the neural network
             var netSpotGo = new GameObject("NeuralNetwork_Spotlight");
             netSpotGo.transform.SetParent(neuronMachineGo.transform, false);
-            netSpotGo.transform.position = new Vector3(0, 3.35f, 1.45f);
+            netSpotGo.transform.position = new Vector3(0, 3.15f, 0.55f);
             netSpotGo.transform.rotation = Quaternion.Euler(90f, 0, 0);
             var netSpot = netSpotGo.AddComponent<Light>();
             netSpot.type = LightType.Spot;
-            netSpot.range = 3.5f;
-            netSpot.spotAngle = 65f;
-            netSpot.intensity = 1.4f;
+            netSpot.range = 5.0f;
+            netSpot.spotAngle = 75f;
+            netSpot.intensity = 2.6f;
             netSpot.color = new Color(0.70f, 0.90f, 1.0f);
+
+            // Cyan aura so the network lights the surrounding bulkheads and reads as the focal point of the room
+            var netAuraGo = new GameObject("NeuralNetwork_Aura");
+            netAuraGo.transform.SetParent(neuronMachineGo.transform, false);
+            netAuraGo.transform.localPosition = Vector3.zero;
+            var netAura = netAuraGo.AddComponent<Light>();
+            netAura.type = LightType.Point;
+            netAura.range = 4.5f;
+            netAura.intensity = 1.9f;
+            netAura.color = new Color(0.30f, 0.80f, 1.0f);
+
+            // Dark holo-stage behind the network so it reads against the bright viewport
+            var netBackdropGo = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            netBackdropGo.name = "NeuralNetwork_Backdrop";
+            netBackdropGo.transform.SetParent(neuronMachineGo.transform, false);
+            netBackdropGo.transform.position = new Vector3(0, 1.55f, 1.85f);
+            netBackdropGo.transform.localScale = new Vector3(2.4f, 1.6f, 1f);
+            netBackdropGo.GetComponent<Renderer>().sharedMaterial = CreateOrUpdateMaterial("Mat_NeuralNetBackdrop", new Color(0.0f, 0.01f, 0.03f, 0.78f), 0.0f, 0.1f, isTransparent: true);
+            UnityEngine.Object.DestroyImmediate(netBackdropGo.GetComponent<Collider>());
 
             // Glowing floor projection ring directly beneath (Sample Torus model)
             var floorRing = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             floorRing.name = "FloorProjectionEmitter";
             SetMeshOrKeepPrimitive(floorRing, PathTorus, true);
-            floorRing.transform.position = new Vector3(0, 0.04f, 1.45f);
+            floorRing.transform.position = new Vector3(0, 0.04f, 0.55f);
             floorRing.transform.localScale = new Vector3(2.2f, 0.20f, 2.2f);
-            floorRing.GetComponent<Renderer>().sharedMaterial = mats.DarkPlating;
+            floorRing.GetComponent<Renderer>().sharedMaterial = mats.GlowCyan;
             CreatePlatformTrim(floorRing.transform, new Vector3(0, 0.52f, 0), new Vector3(1.01f, 0.02f, 1.01f), mats.GunMetal);
             UnityEngine.Object.DestroyImmediate(floorRing.GetComponent<Collider>());
 
@@ -391,235 +398,25 @@ namespace Convergence.EditorTools
             var rotationPivotGo = new GameObject("RotationPivot");
             rotationPivotGo.transform.SetParent(neuronMachineGo.transform, false);
             rotationPivotGo.transform.localPosition = Vector3.zero;
+            rotationPivotGo.transform.localScale = Vector3.one * 0.85f;
 
             // Dual Gyroscopic Orbital Rings (Smooth Torus Meshes framing the central network)
-            var gyroRing1 = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            gyroRing1.name = "OrbitalGyroRing_Pitch";
-            gyroRing1.transform.SetParent(rotationPivotGo.transform, false);
-            SetMeshOrKeepPrimitive(gyroRing1, PathTorus, true);
-            gyroRing1.transform.localScale = new Vector3(1.45f, 0.06f, 1.45f);
-            gyroRing1.transform.localRotation = Quaternion.Euler(45f, 0, 0);
-            gyroRing1.GetComponent<Renderer>().sharedMaterial = mats.GunAccent;
-            UnityEngine.Object.DestroyImmediate(gyroRing1.GetComponent<Collider>());
+            CreateOrbitRing("OrbitalGyroRing_Pitch", rotationPivotGo.transform, 0.58f, Quaternion.Euler(72f, 0f, 0f), mats.GlowViolet);
+            CreateOrbitRing("OrbitalGyroRing_Yaw", rotationPivotGo.transform, 0.66f, Quaternion.Euler(82f, 0f, 0f), mats.GlowCyan);
 
-            var gyroRing2 = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            gyroRing2.name = "OrbitalGyroRing_Yaw";
-            gyroRing2.transform.SetParent(rotationPivotGo.transform, false);
-            SetMeshOrKeepPrimitive(gyroRing2, PathTorusCut, true);
-            gyroRing2.transform.localScale = new Vector3(1.70f, 0.06f, 1.70f);
-            gyroRing2.transform.localRotation = Quaternion.Euler(0, 45f, 45f);
-            gyroRing2.GetComponent<Renderer>().sharedMaterial = mats.GlowCyan;
-            UnityEngine.Object.DestroyImmediate(gyroRing2.GetComponent<Collider>());
-
-            // 1. Input Layer (3 Neurons: X1, X2, Bias) - Ruby Coral / Solar Amber Glow
-            var inputNodes = new Transform[3];
-            var inputRenderers = new Renderer[3];
-            Vector3[] inputLocalOffsets = new Vector3[] {
-                new Vector3(-0.85f, 0.35f, 0.0f),
-                new Vector3(-0.85f, 0.0f, 0.0f),
-                new Vector3(-0.85f, -0.35f, 0.0f)
-            };
-            string[] inputNames = { "InputNeuron_X1", "InputNeuron_X2", "InputNeuron_Bias" };
-
-            for (int i = 0; i < 3; i++)
-            {
-                var nodeGo = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                nodeGo.name = inputNames[i];
-                nodeGo.transform.SetParent(rotationPivotGo.transform, false);
-                nodeGo.transform.localPosition = inputLocalOffsets[i];
-                nodeGo.transform.localScale = new Vector3(0.15f, 0.15f, 0.15f);
-                var rend = nodeGo.GetComponent<Renderer>();
-                rend.sharedMaterial = (i == 2) ? mats.GlowAmber : mats.GlowCoral;
-                inputNodes[i] = nodeGo.transform;
-                inputRenderers[i] = rend;
-            }
-
-            // Input Layer Floating Billboard Label
-            var inLabelGo = new GameObject("InputLayer_Label");
-            inLabelGo.transform.SetParent(rotationPivotGo.transform, false);
-            inLabelGo.transform.localPosition = new Vector3(-0.85f, 0.60f, 0.0f);
-            var inTextMesh = inLabelGo.AddComponent<TextMesh>();
-            inTextMesh.text = "● SENSORS";
-            inTextMesh.fontSize = 22;
-            inTextMesh.characterSize = 0.020f;
-            inTextMesh.fontStyle = FontStyle.Bold;
-            inTextMesh.alignment = TextAlignment.Center;
-            inTextMesh.anchor = TextAnchor.MiddleCenter;
-            inTextMesh.color = new Color(0.98f, 0.65f, 0.35f);
-
-            // 2. Hidden Layer (4 Neurons: H1, H2, H3, H4) - Deep Cyber Violet Glow
-            var hiddenNodes = new Transform[4];
-            var hiddenRenderers = new Renderer[4];
-            Vector3[] hiddenLocalOffsets = new Vector3[] {
-                new Vector3(0.0f, 0.45f, 0.0f),
-                new Vector3(0.0f, 0.15f, 0.0f),
-                new Vector3(0.0f, -0.15f, 0.0f),
-                new Vector3(0.0f, -0.45f, 0.0f)
-            };
-
-            for (int h = 0; h < 4; h++)
-            {
-                var hGo = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                hGo.name = $"HiddenNeuron_H{h + 1}";
-                hGo.transform.SetParent(rotationPivotGo.transform, false);
-                hGo.transform.localPosition = hiddenLocalOffsets[h];
-                hGo.transform.localScale = new Vector3(0.14f, 0.14f, 0.14f);
-                var rend = hGo.GetComponent<Renderer>();
-                rend.sharedMaterial = mats.GlowViolet;
-                hiddenNodes[h] = hGo.transform;
-                hiddenRenderers[h] = rend;
-            }
-
-            // Hidden Layer Floating Billboard Label
-            var hidLabelGo = new GameObject("HiddenLayer_Label");
-            hidLabelGo.transform.SetParent(rotationPivotGo.transform, false);
-            hidLabelGo.transform.localPosition = new Vector3(0.0f, 0.70f, 0.0f);
-            var hidTextMesh = hidLabelGo.AddComponent<TextMesh>();
-            hidTextMesh.text = "◆ FEATURES";
-            hidTextMesh.fontSize = 22;
-            hidTextMesh.characterSize = 0.020f;
-            hidTextMesh.fontStyle = FontStyle.Bold;
-            hidTextMesh.alignment = TextAlignment.Center;
-            hidTextMesh.anchor = TextAnchor.MiddleCenter;
-            hidTextMesh.color = new Color(0.75f, 0.50f, 1.0f);
-
-            // 3. Output Layer (2 Neurons: Y1, Y2) - Mint Emerald Glow
-            var outputNodes = new Transform[2];
-            var outputRenderers = new Renderer[2];
-            Vector3[] outputLocalOffsets = new Vector3[] {
-                new Vector3(0.85f, 0.22f, 0.0f),
-                new Vector3(0.85f, -0.22f, 0.0f)
-            };
-            string[] outputNames = { "OutputNeuron_Y1", "OutputNeuron_Y2" };
-
-            for (int o = 0; o < 2; o++)
-            {
-                var oGo = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                oGo.name = outputNames[o];
-                oGo.transform.SetParent(rotationPivotGo.transform, false);
-                oGo.transform.localPosition = outputLocalOffsets[o];
-                oGo.transform.localScale = new Vector3(0.16f, 0.16f, 0.16f);
-                var rend = oGo.GetComponent<Renderer>();
-                rend.sharedMaterial = mats.GlowEmerald;
-                outputNodes[o] = oGo.transform;
-                outputRenderers[o] = rend;
-            }
-
-            // Output Layer Floating Billboard Label
-            var outLabelGo = new GameObject("OutputLayer_Label");
-            outLabelGo.transform.SetParent(rotationPivotGo.transform, false);
-            outLabelGo.transform.localPosition = new Vector3(0.85f, 0.50f, 0.0f);
-            var outTextMesh = outLabelGo.AddComponent<TextMesh>();
-            outTextMesh.text = "▲ WARP LOCK";
-            outTextMesh.fontSize = 22;
-            outTextMesh.characterSize = 0.020f;
-            outTextMesh.fontStyle = FontStyle.Bold;
-            outTextMesh.alignment = TextAlignment.Center;
-            outTextMesh.anchor = TextAnchor.MiddleCenter;
-            outTextMesh.color = new Color(0.25f, 0.95f, 0.60f);
-
-            // 4. Synaptic Axons (20 LineRenderers connecting layers)
-            var inToHidLines = new LineRenderer[12];
-            int synIdx = 0;
-            for (int i = 0; i < 3; i++)
-            {
-                for (int h = 0; h < 4; h++)
-                {
-                    var synGo = new GameObject($"Synapse_I{i + 1}_H{h + 1}");
-                    synGo.transform.SetParent(rotationPivotGo.transform, false);
-                    var lr = synGo.AddComponent<LineRenderer>();
-                    lr.sharedMaterial = mats.AxonPositive;
-                    lr.useWorldSpace = true;
-                    lr.positionCount = 2;
-                    lr.startWidth = 0.010f;
-                    lr.endWidth = 0.012f;
-                    lr.SetPosition(0, inputNodes[i].position);
-                    lr.SetPosition(1, hiddenNodes[h].position);
-                    inToHidLines[synIdx++] = lr;
-                }
-            }
-
-            var hidToOutLines = new LineRenderer[8];
-            int hidOutIdx = 0;
-            for (int h = 0; h < 4; h++)
-            {
-                for (int o = 0; o < 2; o++)
-                {
-                    var synGo = new GameObject($"Synapse_H{h + 1}_O{o + 1}");
-                    synGo.transform.SetParent(rotationPivotGo.transform, false);
-                    var lr = synGo.AddComponent<LineRenderer>();
-                    lr.sharedMaterial = mats.AxonPositive;
-                    lr.useWorldSpace = true;
-                    lr.positionCount = 2;
-                    lr.startWidth = 0.010f;
-                    lr.endWidth = 0.012f;
-                    lr.SetPosition(0, hiddenNodes[h].position);
-                    lr.SetPosition(1, outputNodes[o].position);
-                    hidToOutLines[hidOutIdx++] = lr;
-                }
-            }
-
-            // Output Laser Beam to Gate
-            var beamGo = new GameObject("OutputGateBeam");
-            beamGo.transform.SetParent(neuronMachineGo.transform, false);
-            var beamLr = beamGo.AddComponent<LineRenderer>();
-            beamLr.sharedMaterial = mats.CorePlasma;
-            beamLr.useWorldSpace = true;
-            beamLr.positionCount = 2;
-            beamLr.SetPosition(0, new Vector3(0, 1.45f, 1.80f));
-            beamLr.SetPosition(1, new Vector3(0, 3.5f, 8.5f));
-            beamLr.startWidth = 0.04f;
-            beamLr.endWidth = 0.08f;
-            beamLr.enabled = false;
-
-            // Neural Network Visualizer Component
-            var visualizer = neuronMachineGo.AddComponent<ClassicNeuralNetwork3DVisualizer>();
+            var visualizer = neuronMachineGo.AddComponent<NeuronTopologyVisualizer>();
             var visSO = new SerializedObject(visualizer);
             visSO.FindProperty("neuralState").objectReferenceValue = neuralState;
             visSO.FindProperty("chamberController").objectReferenceValue = chamberController;
             visSO.FindProperty("networkPivot").objectReferenceValue = rotationPivotGo.transform;
-            visSO.FindProperty("autoRotate").boolValue = true;
-            visSO.FindProperty("rotationSpeed").floatValue = 8.0f;
-            visSO.FindProperty("levitationAmplitude").floatValue = 0.035f;
-            visSO.FindProperty("levitationFrequency").floatValue = 1.2f;
-
-            var inNodesProp = visSO.FindProperty("inputNodes");
-            inNodesProp.arraySize = 3;
-            for (int i = 0; i < 3; i++) inNodesProp.GetArrayElementAtIndex(i).objectReferenceValue = inputNodes[i];
-
-            var hidNodesProp = visSO.FindProperty("hiddenNodes");
-            hidNodesProp.arraySize = 4;
-            for (int h = 0; h < 4; h++) hidNodesProp.GetArrayElementAtIndex(h).objectReferenceValue = hiddenNodes[h];
-
-            var outNodesProp = visSO.FindProperty("outputNodes");
-            outNodesProp.arraySize = 2;
-            for (int o = 0; o < 2; o++) outNodesProp.GetArrayElementAtIndex(o).objectReferenceValue = outputNodes[o];
-
-            var inRendProp = visSO.FindProperty("inputRenderers");
-            inRendProp.arraySize = 3;
-            for (int i = 0; i < 3; i++) inRendProp.GetArrayElementAtIndex(i).objectReferenceValue = inputRenderers[i];
-
-            var hidRendProp = visSO.FindProperty("hiddenRenderers");
-            hidRendProp.arraySize = 4;
-            for (int h = 0; h < 4; h++) hidRendProp.GetArrayElementAtIndex(h).objectReferenceValue = hiddenRenderers[h];
-
-            var outRendProp = visSO.FindProperty("outputRenderers");
-            outRendProp.arraySize = 2;
-            for (int o = 0; o < 2; o++) outRendProp.GetArrayElementAtIndex(o).objectReferenceValue = outputRenderers[o];
-
-            var inToHidProp = visSO.FindProperty("inputToHiddenSynapses");
-            inToHidProp.arraySize = 12;
-            for (int i = 0; i < 12; i++) inToHidProp.GetArrayElementAtIndex(i).objectReferenceValue = inToHidLines[i];
-
-            var hidToOutProp = visSO.FindProperty("hiddenToOutputSynapses");
-            hidToOutProp.arraySize = 8;
-            for (int h = 0; h < 8; h++) hidToOutProp.GetArrayElementAtIndex(h).objectReferenceValue = hidToOutLines[h];
-
-            visSO.FindProperty("outputToGateBeam").objectReferenceValue = beamLr;
-            visSO.FindProperty("inputLayerLabel").objectReferenceValue = inLabelGo.transform;
-            visSO.FindProperty("hiddenLayerLabel").objectReferenceValue = hidLabelGo.transform;
-            visSO.FindProperty("outputLayerLabel").objectReferenceValue = outLabelGo.transform;
+            visSO.FindProperty("inputMaterial").objectReferenceValue = mats.GlowCoral;
+            visSO.FindProperty("biasMaterial").objectReferenceValue = mats.GlowAmber;
+            visSO.FindProperty("neuronMaterial").objectReferenceValue = mats.GlowViolet;
+            visSO.FindProperty("outputMaterial").objectReferenceValue = mats.GlowEmerald;
+            visSO.FindProperty("synapseMaterial").objectReferenceValue = mats.AxonPositive;
+            visSO.FindProperty("packetMaterial").objectReferenceValue = mats.CorePlasma;
             visSO.ApplyModifiedProperties();
+            visualizer.RebuildFromNetwork(NetworkModel.CreateSingleNeuronNetwork(2));
 
             // --- Ergonomic Tactile Engineering Workstation (VR Ready Height) ---
             var consoleGo = new GameObject("TactileEngineeringWorkstation");
@@ -1209,8 +1006,7 @@ namespace Convergence.EditorTools
             // --- Planetary AI Consciousness Holosphere (SYNAPSE-GPT Core) ---
             CreatePlanetaryAICoreHologram(envRoot.transform, mats, chamberController, neuralState);
 
-            // --- Automated Kinetic Defense Sentry & Hazard Turret ---
-            CreateDefenseSentryTurret(envRoot.transform, mats, chamberController, neuralState);
+            // Sentry turret removed: the neural network is the focal point of the room (Phase 1 premise lock).
 
             // --- The Awakening Blast Doors & Energy Portal Gateway ---
             var gateGo = new GameObject("AwakeningBlastDoors");
@@ -1471,121 +1267,73 @@ namespace Convergence.EditorTools
             annSO.FindProperty("worldSubtitleTextMesh").objectReferenceValue = subText;
             annSO.ApplyModifiedProperties();
 
-            // --- XR Origin Rig & Camera (VR & Desktop Ready, Option 3 Ergonomic Standpoint) ---
-            var xrOriginGo = new GameObject("XR Origin (VR Rig)");
-            xrOriginGo.transform.position = new Vector3(0, 0, -0.90f);
-
-            var cameraOffsetGo = new GameObject("Camera Offset");
-            cameraOffsetGo.transform.SetParent(xrOriginGo.transform, false);
-
-            var cameraGo = new GameObject("MainCamera");
-            cameraGo.tag = "MainCamera";
-            cameraGo.transform.SetParent(cameraOffsetGo.transform, false);
-            cameraGo.transform.localPosition = new Vector3(0, 1.65f, 0);
-            cameraGo.transform.localRotation = Quaternion.Euler(5.5f, 0, 0);
-            var cam = cameraGo.AddComponent<Camera>();
-            cam.clearFlags = CameraClearFlags.SolidColor;
-            cam.backgroundColor = new Color(0.012f, 0.016f, 0.030f);
-            cam.fieldOfView = 75f;
-            cam.nearClipPlane = 0.03f;
-            cam.farClipPlane = 500f;
-            cameraGo.AddComponent<AudioListener>();
-
-            // Controller Hand anchors for VR with Universal Controller models
-            var leftHandGo = new GameObject("Left Hand Controller");
-            leftHandGo.transform.SetParent(cameraOffsetGo.transform, false);
-            leftHandGo.transform.localPosition = new Vector3(-0.25f, 1.25f, 0.35f);
-            var leftCtrlModel = CreateModelInstance(PathController, "VisualController_Left", leftHandGo.transform);
-            if (leftCtrlModel != null)
+            // --- XRI Starter Assets rig, interaction services, bridges and world-space HUD (ADR-007) ---
+            InstantiateXrRig();
+            CreateXrInteractionServices();
+            var voyage = controllersGo.AddComponent<VoyageDirector>();
+            var voyageSO = new SerializedObject(voyage);
+            voyageSO.FindProperty("chamber").objectReferenceValue = chamberController;
+            voyageSO.FindProperty("neuralState").objectReferenceValue = neuralState;
+            voyageSO.ApplyModifiedProperties();
+            controllersGo.AddComponent<FailureHintDirector>();
+            var drift = controllersGo.AddComponent<AsteroidDrift>();
+            var driftSO = new SerializedObject(drift);
+            driftSO.FindProperty("chamberController").objectReferenceValue = chamberController;
+            var field = GameObject.Find("FloatingAsteroidField");
+            if (field != null) driftSO.FindProperty("asteroidField").objectReferenceValue = field.transform;
+            driftSO.ApplyModifiedProperties();
+            controllersGo.AddComponent<SkyPhotoCapture>();
+            var finale = controllersGo.AddComponent<FinaleSequence>();
+            var finaleSO = new SerializedObject(finale);
+            finaleSO.FindProperty("voyage").objectReferenceValue = voyage;
+            var earth = GameObject.Find("Celestial_FaintEarth");
+            if (earth != null) finaleSO.FindProperty("earth").objectReferenceValue = earth.transform;
+            var cinematicShip = GameObject.Find("CinematicShip");
+            if (cinematicShip != null) finaleSO.FindProperty("ship").objectReferenceValue = cinematicShip.transform;
+            var starfield = GameObject.Find("Starfield_Constellation");
+            if (starfield != null) finaleSO.FindProperty("starfield").objectReferenceValue = starfield.transform;
+            var giant = GameObject.Find("Celestial_GasGiantPlanet");
+            if (giant != null) finaleSO.FindProperty("gasGiant").objectReferenceValue = giant.transform;
+            if (field != null) finaleSO.FindProperty("asteroidField").objectReferenceValue = field.transform;
+            var engineLights = new Light[2];
+            if (cinematicShip != null)
             {
-                leftCtrlModel.transform.localPosition = Vector3.zero;
-                leftCtrlModel.transform.localRotation = Quaternion.identity;
-                leftCtrlModel.transform.localScale = Vector3.one;
-                ApplyMaterialRecursively(leftCtrlModel, mats.GunMetal);
+                var leftEngine = cinematicShip.transform.Find("Engine_L");
+                var rightEngine = cinematicShip.transform.Find("Engine_R");
+                if (leftEngine != null) engineLights[0] = leftEngine.GetComponent<Light>();
+                if (rightEngine != null) engineLights[1] = rightEngine.GetComponent<Light>();
             }
+            var enginesProp = finaleSO.FindProperty("engines");
+            enginesProp.arraySize = 2;
+            enginesProp.GetArrayElementAtIndex(0).objectReferenceValue = engineLights[0];
+            enginesProp.GetArrayElementAtIndex(1).objectReferenceValue = engineLights[1];
+            var creditsGo = new GameObject("DepartureCredits");
+            creditsGo.transform.position = new Vector3(0f, 1.72f, 1.55f);
+            creditsGo.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
+            var creditsMesh = creditsGo.AddComponent<TextMesh>();
+            creditsMesh.text = string.Empty;
+            creditsMesh.fontSize = 28;
+            creditsMesh.characterSize = 0.018f;
+            creditsMesh.fontStyle = FontStyle.Bold;
+            creditsMesh.alignment = TextAlignment.Center;
+            creditsMesh.anchor = TextAnchor.MiddleCenter;
+            creditsMesh.color = new Color(0.75f, 0.92f, 1f);
+            finaleSO.FindProperty("creditsMesh").objectReferenceValue = creditsMesh;
+            finaleSO.ApplyModifiedProperties();
+            var aura = subtitleHoloGo.AddComponent<AuraSubtitles>();
+            var auraSO = new SerializedObject(aura);
+            auraSO.FindProperty("onboarding").objectReferenceValue = onboardingController;
+            auraSO.FindProperty("legacyLine").objectReferenceValue = subText;
+            var voice = subtitleHoloGo.AddComponent<AudioSource>();
+            voice.spatialBlend = 1f;
+            voice.playOnAwake = false;
+            auraSO.FindProperty("voice").objectReferenceValue = voice;
+            auraSO.FindProperty("lineClip").objectReferenceValue = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/_Project/Audio/Kenney/confirmation_001.wav");
+            auraSO.ApplyModifiedProperties();
 
-            var rightHandGo = new GameObject("Right Hand Controller");
-            rightHandGo.transform.SetParent(cameraOffsetGo.transform, false);
-            rightHandGo.transform.localPosition = new Vector3(0.25f, 1.25f, 0.35f);
-            var rightCtrlModel = CreateModelInstance(PathController, "VisualController_Right", rightHandGo.transform);
-            if (rightCtrlModel != null)
-            {
-                rightCtrlModel.transform.localPosition = Vector3.zero;
-                rightCtrlModel.transform.localRotation = Quaternion.identity;
-                rightCtrlModel.transform.localScale = new Vector3(-1, 1, 1);
-                ApplyMaterialRecursively(rightCtrlModel, mats.GunMetal);
-            }
-
-            // --- First-Person Sci-Fi Neural Pulse Gun Viewmodel (Lowered to not occlude view) ---
-            var gunRootGo = new GameObject("NeuralPulseGunViewmodel");
-            gunRootGo.transform.SetParent(cameraGo.transform, false);
-            gunRootGo.transform.localPosition = new Vector3(0.32f, -0.38f, 0.50f);
-            gunRootGo.transform.localRotation = Quaternion.identity;
-
-            var gunModel = CreateModelInstance(PathBlaster, "GunChassis_Blaster", gunRootGo.transform);
-            if (gunModel == null)
-            {
-                gunModel = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                gunModel.transform.SetParent(gunRootGo.transform, false);
-                gunModel.transform.localScale = new Vector3(0.06f, 0.08f, 0.28f);
-                gunModel.GetComponent<Renderer>().sharedMaterial = mats.GunMetal;
-            }
-            else
-            {
-                gunModel.transform.localPosition = Vector3.zero;
-                gunModel.transform.localRotation = Quaternion.identity;
-                gunModel.transform.localScale = new Vector3(0.85f, 0.85f, 0.85f);
-                ApplyMaterialRecursively(gunModel, mats.GunMetal);
-            }
-
-            var muzzleGo = new GameObject("MuzzlePoint");
-            muzzleGo.transform.SetParent(gunRootGo.transform, false);
-            muzzleGo.transform.localPosition = new Vector3(0, 0.04f, 0.28f);
-
-            var muzzleLight = muzzleGo.AddComponent<Light>();
-            muzzleLight.type = LightType.Point;
-            muzzleLight.color = new Color(0.2f, 0.95f, 1.0f);
-            muzzleLight.range = 3.5f;
-            muzzleLight.intensity = 0f;
-
-            var muzzleBeamGo = new GameObject("MuzzleLaserBeam");
-            muzzleBeamGo.transform.SetParent(gunRootGo.transform, false);
-            var beamLr2 = muzzleBeamGo.AddComponent<LineRenderer>();
-            beamLr2.sharedMaterial = mats.CorePlasma;
-            beamLr2.useWorldSpace = true;
-            beamLr2.positionCount = 2;
-            beamLr2.startWidth = 0.015f;
-            beamLr2.endWidth = 0.025f;
-            beamLr2.enabled = false;
-
-            var gunViewmodel = gunRootGo.AddComponent<NeuralGunViewmodel>();
-            var gunSO = new SerializedObject(gunViewmodel);
-            gunSO.FindProperty("chamberController").objectReferenceValue = chamberController;
-            gunSO.FindProperty("neuralState").objectReferenceValue = neuralState;
-            gunSO.FindProperty("gunChassis").objectReferenceValue = gunModel.transform;
-            gunSO.FindProperty("muzzlePoint").objectReferenceValue = muzzleGo.transform;
-            gunSO.FindProperty("targetCore").objectReferenceValue = neuronMachineGo.transform;
-            gunSO.FindProperty("muzzleLight").objectReferenceValue = muzzleLight;
-            gunSO.FindProperty("laserBeam").objectReferenceValue = beamLr2;
-            gunSO.ApplyModifiedProperties();
-
-            // Astronaut Engineer HUD
-            var hudComponent = cameraGo.AddComponent<SciFiEngineerHUD>();
-            var hudSO = new SerializedObject(hudComponent);
-            hudSO.FindProperty("neuralState").objectReferenceValue = neuralState;
-            hudSO.FindProperty("chamberController").objectReferenceValue = chamberController;
-            hudSO.FindProperty("onboardingController").objectReferenceValue = onboardingController;
-            hudSO.ApplyModifiedProperties();
-
-            // Desktop Input Fallback
-            var desktopFallback = cameraGo.AddComponent<DesktopInputFallback>();
-            var dfSO = new SerializedObject(desktopFallback);
-            dfSO.FindProperty("chamberController").objectReferenceValue = chamberController;
-            dfSO.FindProperty("neuralState").objectReferenceValue = neuralState;
-            dfSO.FindProperty("levelResetter").objectReferenceValue = levelResetter;
-            dfSO.FindProperty("activationSocket").objectReferenceValue = socketInteractor;
-            dfSO.FindProperty("showHUD").boolValue = true;
-            dfSO.ApplyModifiedProperties();
+            AttachXriBridges();
+            CreateWorldSpaceHud(chamberController, neuralState, onboardingController);
+            BakeNonKeyLights();
 
             // Save Scene
             EditorSceneManager.SaveScene(scene, ScenePath);
@@ -1601,6 +1349,227 @@ namespace Convergence.EditorTools
             // Automatically capture bridge view
             CaptureBridgeView();
         }
+
+        private const string PathXrRigPrefab = "Assets/Samples/XR Interaction Toolkit/3.6.0/Starter Assets/Prefabs/XR Origin (XR Rig).prefab";
+
+        private static void CreateOrbitRing(string name, Transform parent, float radius, Quaternion rotation, Material material)
+        {
+            const int segments = 96;
+            var ringGo = new GameObject(name);
+            ringGo.transform.SetParent(parent, false);
+            ringGo.transform.localRotation = rotation;
+            var line = ringGo.AddComponent<LineRenderer>();
+            line.sharedMaterial = material;
+            line.useWorldSpace = false;
+            line.loop = true;
+            line.positionCount = segments;
+            line.widthMultiplier = 0.006f;
+            line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            for (int i = 0; i < segments; i++)
+            {
+                float a = (i / (float)segments) * Mathf.PI * 2f;
+                line.SetPosition(i, new Vector3(Mathf.Cos(a) * radius, 0f, Mathf.Sin(a) * radius));
+            }
+        }
+
+        private static GameObject InstantiateXrRig()
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PathXrRigPrefab);
+            if (prefab == null)
+            {
+                throw new InvalidOperationException(
+                    $"XRI Starter Assets rig prefab not found at '{PathXrRigPrefab}'. Import the Starter Assets sample from Package Manager > XR Interaction Toolkit > Samples.");
+            }
+
+            var rig = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+            rig.transform.position = new Vector3(0f, 0f, -0.90f);
+            rig.AddComponent<DesktopWalk>();
+
+            var origin = rig.GetComponent<Unity.XR.CoreUtils.XROrigin>();
+            if (origin != null)
+            {
+                origin.RequestedTrackingOriginMode = Unity.XR.CoreUtils.XROrigin.TrackingOriginMode.Floor;
+            }
+
+            var rigCamera = rig.GetComponentInChildren<Camera>();
+            if (rigCamera != null)
+            {
+                rigCamera.gameObject.tag = "MainCamera";
+                rigCamera.clearFlags = CameraClearFlags.SolidColor;
+                rigCamera.backgroundColor = new Color(0.012f, 0.016f, 0.030f);
+                rigCamera.nearClipPlane = 0.03f;
+                rigCamera.farClipPlane = 500f;
+                if (rigCamera.GetComponent<AudioListener>() == null)
+                {
+                    rigCamera.gameObject.AddComponent<AudioListener>();
+                }
+            }
+
+            return rig;
+        }
+
+        private static void CreateXrInteractionServices()
+        {
+            if (UnityEngine.Object.FindAnyObjectByType<UnityEngine.XR.Interaction.Toolkit.XRInteractionManager>() == null)
+            {
+                new GameObject("XR Interaction Manager").AddComponent<UnityEngine.XR.Interaction.Toolkit.XRInteractionManager>();
+            }
+
+            if (UnityEngine.Object.FindAnyObjectByType<UnityEngine.EventSystems.EventSystem>() == null)
+            {
+                var eventSystem = new GameObject("EventSystem");
+                eventSystem.AddComponent<UnityEngine.EventSystems.EventSystem>();
+                eventSystem.AddComponent<UnityEngine.XR.Interaction.Toolkit.UI.XRUIInputModule>();
+            }
+        }
+
+        private static void AttachXriBridges()
+        {
+            int count = 0;
+            count += BridgeAll<KineticWeightSliderInteractor>();
+            count += BridgeAll<WeightRegulatorInteractor>();
+            count += BridgeAll<BiasDialInteractor>();
+            count += BridgeAll<ClockPulseLeverInteractor>();
+            count += BridgeAll<ActivationSocketInteractor>();
+            count += BridgeAll<InputTerminalInteractor>();
+            count += BridgeAll<CableInteractable>();
+            count += BridgeAll<DataTargetReceptor>();
+            count += BridgeAll<PhotoRequest>();
+            count += BridgeAll<VoyageButton>();
+            Debug.Log($"[Level01SceneBuilder] Attached {count} XRI interactable bridge(s).");
+        }
+
+        private static int BridgeAll<T>() where T : Component
+        {
+            int added = 0;
+            foreach (var component in UnityEngine.Object.FindObjectsByType<T>())
+            {
+                GameObject go = component.gameObject;
+                if (go.GetComponent<XRInteractableBridge>() != null)
+                {
+                    continue;
+                }
+
+                EnsureComfortCollider(go);
+                go.AddComponent<XRInteractableBridge>();
+                added++;
+            }
+
+            return added;
+        }
+
+        // Quest ray targeting needs at least ~14 cm of solid collider; several console controls are 2-8 cm.
+        private static void EnsureComfortCollider(GameObject go)
+        {
+            const float minExtent = 0.14f;
+            var renderers = go.GetComponentsInChildren<Renderer>();
+            if (renderers.Length == 0)
+            {
+                return;
+            }
+
+            Bounds bounds = renderers[0].bounds;
+            for (int i = 1; i < renderers.Length; i++)
+            {
+                bounds.Encapsulate(renderers[i].bounds);
+            }
+
+            Vector3 world = new Vector3(
+                Mathf.Max(bounds.size.x, minExtent),
+                Mathf.Max(bounds.size.y, minExtent),
+                Mathf.Max(bounds.size.z, minExtent));
+
+            Vector3 scale = go.transform.lossyScale;
+            if (Mathf.Abs(scale.x) < 1e-4f || Mathf.Abs(scale.y) < 1e-4f || Mathf.Abs(scale.z) < 1e-4f)
+            {
+                return;
+            }
+
+            var pad = go.AddComponent<BoxCollider>();
+            pad.center = go.transform.InverseTransformPoint(bounds.center);
+            pad.size = new Vector3(world.x / Mathf.Abs(scale.x), world.y / Mathf.Abs(scale.y), world.z / Mathf.Abs(scale.z));
+        }
+
+        private static void CreateWorldSpaceHud(ChamberController chamberController, NeuralState neuralState, ChamberOnboardingController onboardingController)
+        {
+            var canvasGo = new GameObject("WorldSpaceHud");
+            canvasGo.transform.position = new Vector3(-1.05f, 1.40f, -0.10f);
+            canvasGo.transform.localScale = Vector3.one * 0.001f;
+
+            var canvas = canvasGo.AddComponent<Canvas>();
+            canvas.renderMode = RenderMode.WorldSpace;
+            canvasGo.AddComponent<UnityEngine.UI.CanvasScaler>().dynamicPixelsPerUnit = 6f;
+            canvasGo.AddComponent<UnityEngine.XR.Interaction.Toolkit.UI.TrackedDeviceGraphicRaycaster>();
+            canvasGo.GetComponent<RectTransform>().sizeDelta = new Vector2(900f, 420f);
+
+            var background = new GameObject("Background", typeof(RectTransform));
+            background.transform.SetParent(canvasGo.transform, false);
+            StretchRect(background.GetComponent<RectTransform>());
+            var backgroundImage = background.AddComponent<UnityEngine.UI.Image>();
+            backgroundImage.color = new Color(0.02f, 0.05f, 0.09f, 0.88f);
+            backgroundImage.raycastTarget = false;
+
+            Color cyan = new Color(0.0f, 0.95f, 1.0f, 1.0f);
+            var objective = CreateHudText(canvasGo.transform, "Objective", new Vector2(0.03f, 0.62f), new Vector2(0.97f, 0.97f), 34f, cyan, TMPro.TextAlignmentOptions.TopLeft);
+            var readout = CreateHudText(canvasGo.transform, "Readout", new Vector2(0.03f, 0.48f), new Vector2(0.97f, 0.62f), 28f, Color.white, TMPro.TextAlignmentOptions.Left);
+            var result = CreateHudText(canvasGo.transform, "Result", new Vector2(0.03f, 0.22f), new Vector2(0.97f, 0.48f), 26f, new Color(0.7f, 0.82f, 0.92f), TMPro.TextAlignmentOptions.TopLeft);
+
+            var buttonGo = new GameObject("RunTestButton", typeof(RectTransform));
+            buttonGo.transform.SetParent(canvasGo.transform, false);
+            var buttonRect = buttonGo.GetComponent<RectTransform>();
+            buttonRect.anchorMin = new Vector2(0.5f, 0.02f);
+            buttonRect.anchorMax = new Vector2(0.5f, 0.02f);
+            buttonRect.pivot = new Vector2(0.5f, 0f);
+            buttonRect.sizeDelta = new Vector2(360f, 80f);
+            var buttonImage = buttonGo.AddComponent<UnityEngine.UI.Image>();
+            buttonImage.color = new Color(0.0f, 0.45f, 0.6f, 0.95f);
+            var button = buttonGo.AddComponent<UnityEngine.UI.Button>();
+            button.targetGraphic = buttonImage;
+            CreateHudText(buttonGo.transform, "Label", new Vector2(0f, 0f), new Vector2(1f, 1f), 30f, Color.white, TMPro.TextAlignmentOptions.Center).text = "RUN TEST";
+            var relay = buttonGo.AddComponent<UiForwardPassRelay>();
+            var relaySO = new SerializedObject(relay);
+            relaySO.FindProperty("chamberController").objectReferenceValue = chamberController;
+            relaySO.ApplyModifiedProperties();
+            UnityEditor.Events.UnityEventTools.AddPersistentListener(
+                button.onClick, new UnityEngine.Events.UnityAction(relay.RequestForwardPass));
+
+            var hud = canvasGo.AddComponent<WorldSpaceHud>();
+            var hudSO = new SerializedObject(hud);
+            hudSO.FindProperty("neuralState").objectReferenceValue = neuralState;
+            hudSO.FindProperty("chamberController").objectReferenceValue = chamberController;
+            hudSO.FindProperty("onboardingController").objectReferenceValue = onboardingController;
+            hudSO.FindProperty("objectiveText").objectReferenceValue = objective;
+            hudSO.FindProperty("readoutText").objectReferenceValue = readout;
+            hudSO.FindProperty("resultText").objectReferenceValue = result;
+            hudSO.ApplyModifiedProperties();
+        }
+
+        private static TMPro.TextMeshProUGUI CreateHudText(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, float fontSize, Color color, TMPro.TextAlignmentOptions alignment)
+        {
+            var go = new GameObject(name, typeof(RectTransform));
+            go.transform.SetParent(parent, false);
+            var rect = go.GetComponent<RectTransform>();
+            rect.anchorMin = anchorMin;
+            rect.anchorMax = anchorMax;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+            var text = go.AddComponent<TMPro.TextMeshProUGUI>();
+            text.fontSize = fontSize;
+            text.color = color;
+            text.alignment = alignment;
+            text.textWrappingMode = TMPro.TextWrappingModes.Normal;
+            text.raycastTarget = false;
+            return text;
+        }
+
+        private static void StretchRect(RectTransform rect)
+        {
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+        }
+
 
         [MenuItem("Convergence/Capture Bridge View")]
         public static void CaptureBridgeView()
@@ -1808,12 +1777,19 @@ namespace Convergence.EditorTools
             collR.transform.localScale = new Vector3(0.2f, 4.0f, 8.0f);
             collR.GetComponent<Renderer>().enabled = false;
 
-            var collAft = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            collAft.name = "BackingCollider_Aft";
-            collAft.transform.SetParent(hullRoot.transform, false);
-            collAft.transform.position = new Vector3(0, 1.8f, -3.85f);
-            collAft.transform.localScale = new Vector3(8.0f, 4.0f, 0.2f);
-            collAft.GetComponent<Renderer>().enabled = false;
+            var collAftL = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            collAftL.name = "BackingCollider_AftLeft";
+            collAftL.transform.SetParent(hullRoot.transform, false);
+            collAftL.transform.position = new Vector3(-2.35f, 1.8f, -3.85f);
+            collAftL.transform.localScale = new Vector3(3.3f, 4.0f, 0.2f);
+            collAftL.GetComponent<Renderer>().enabled = false;
+
+            var collAftR = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            collAftR.name = "BackingCollider_AftRight";
+            collAftR.transform.SetParent(hullRoot.transform, false);
+            collAftR.transform.position = new Vector3(2.35f, 1.8f, -3.85f);
+            collAftR.transform.localScale = new Vector3(3.3f, 4.0f, 0.2f);
+            collAftR.GetComponent<Renderer>().enabled = false;
 
             // Horizontal Ceiling Span in Pristine White Composite
             var ceiling = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -2149,7 +2125,8 @@ namespace Convergence.EditorTools
             UnityEngine.Object.DestroyImmediate(ringsGo.GetComponent<Collider>());
 
             // Floating Asteroid Belt Cluster (Tumbling outside canopy)
-            var asteroidFieldGo = new GameObject("AsteroidBeltCluster");
+            var asteroidFieldGo = new GameObject("FloatingAsteroidField");
+            asteroidFieldGo.AddComponent<FloatingAsteroidField>();
             asteroidFieldGo.transform.SetParent(spaceVistaRoot.transform, false);
             Vector3[] astPositions = new Vector3[]
             {
@@ -2174,6 +2151,46 @@ namespace Convergence.EditorTools
                 SetMeshOrKeepPrimitive(ast, PathPyramid);
                 UnityEngine.Object.DestroyImmediate(ast.GetComponent<Collider>());
             }
+
+            var faintEarth = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            faintEarth.name = "Celestial_FaintEarth";
+            faintEarth.transform.SetParent(spaceVistaRoot.transform, false);
+            faintEarth.transform.position = new Vector3(8f, 3.2f, 40f);
+            faintEarth.transform.localScale = new Vector3(0.35f, 0.35f, 0.35f);
+            faintEarth.GetComponent<Renderer>().sharedMaterial = mats.EarthWater;
+            UnityEngine.Object.DestroyImmediate(faintEarth.GetComponent<Collider>());
+
+            CreateCinematicShip(spaceVistaRoot.transform, mats);
+
+            var nose = CreateModelInstance(PathKenneyStructure, "ShipNose", spaceVistaRoot.transform);
+            if (nose != null)
+            {
+                nose.transform.position = new Vector3(0f, 0.4f, 6.2f);
+                nose.transform.localScale = new Vector3(1.4f, 0.6f, 2.2f);
+                ApplyMaterialRecursively(nose, mats.SpaceshipHull);
+            }
+
+            var shutterRoot = new GameObject("CanopyShutters");
+            shutterRoot.transform.SetParent(spaceVistaRoot.transform, false);
+            var left = CreateModelInstance(PathKenneyWallWindowShutters, "ShutterLeft", shutterRoot.transform);
+            var right = CreateModelInstance(PathKenneyWallWindowShutters, "ShutterRight", shutterRoot.transform);
+            if (left != null)
+            {
+                left.transform.position = new Vector3(-0.7f, 1.7f, 3.15f);
+                left.transform.localScale = new Vector3(1.2f, 2.2f, 1f);
+            }
+            if (right != null)
+            {
+                right.transform.position = new Vector3(0.7f, 1.7f, 3.15f);
+                right.transform.localScale = new Vector3(1.2f, 2.2f, 1f);
+            }
+            var canopy = shutterRoot.AddComponent<CanopyShutters>();
+            var canopySO = new SerializedObject(canopy);
+            if (left != null) canopySO.FindProperty("leftShutter").objectReferenceValue = left.transform;
+            if (right != null) canopySO.FindProperty("rightShutter").objectReferenceValue = right.transform;
+            canopySO.ApplyModifiedProperties();
+
+            CreatePhotoBodies(spaceVistaRoot.transform, mats);
         }
 
         private static void CreateTactileCommandBridgeRail(Transform parent, LevelMaterials mats)
@@ -2315,6 +2332,20 @@ namespace Convergence.EditorTools
 
             var rend = partGo.GetComponent<ParticleSystemRenderer>();
             rend.sharedMaterial = sparkMat;
+
+            var breach = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            breach.name = "HullBreachPatch";
+            breach.transform.SetParent(partGo.transform, false);
+            breach.transform.localPosition = new Vector3(0f, 0.4f, 0.2f);
+            breach.transform.localScale = new Vector3(0.8f, 0.5f, 1f);
+            breach.GetComponent<Renderer>().sharedMaterial = sparkMat;
+            UnityEngine.Object.DestroyImmediate(breach.GetComponent<Collider>());
+
+            var damage = partGo.AddComponent<ShipDamageVisual>();
+            var damageSO = new SerializedObject(damage);
+            damageSO.FindProperty("sparks").objectReferenceValue = ps;
+            damageSO.FindProperty("breachPatch").objectReferenceValue = breach;
+            damageSO.ApplyModifiedProperties();
         }
 
         private static void CreatePlatformTrim(Transform parent, Vector3 localPos, Vector3 localScale, Material mat)
@@ -2686,7 +2717,7 @@ namespace Convergence.EditorTools
             var pedestal = CreateModelInstance(PathKenneyTableDisplayPlanet, "PlanetaryCore_HoloPedestal", parent);
             if (pedestal != null)
             {
-                pedestal.transform.position = new Vector3(0, 0f, 1.90f);
+                pedestal.transform.position = new Vector3(-2.60f, 0f, 2.60f);
                 pedestal.transform.localScale = new Vector3(1.1f, 1.1f, 1.1f);
                 pedestal.transform.rotation = Quaternion.identity;
                 ApplyMaterialRecursively(pedestal, mats.KenneyStation);
@@ -2696,14 +2727,14 @@ namespace Convergence.EditorTools
             var beamGo = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             beamGo.name = "Pedestal_ProjectionBeam";
             beamGo.transform.SetParent(parent, false);
-            beamGo.transform.position = new Vector3(0, 1.10f, 1.90f);
+            beamGo.transform.position = new Vector3(-2.60f, 1.10f, 2.60f);
             beamGo.transform.localScale = new Vector3(0.25f, 1.10f, 0.25f);
             beamGo.GetComponent<Renderer>().sharedMaterial = mats.GlassHologram;
             UnityEngine.Object.DestroyImmediate(beamGo.GetComponent<Collider>());
 
             var planetRoot = new GameObject("PlanetaryAICore_Hologram");
             planetRoot.transform.SetParent(parent, false);
-            planetRoot.transform.position = new Vector3(0, 2.25f, 1.90f);
+            planetRoot.transform.position = new Vector3(-2.60f, 2.25f, 2.60f);
 
             // 1. Central AI Mind Sphere (Photorealistic Earth Navigation Hologram)
             var sphereGo = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -2805,146 +2836,6 @@ namespace Convergence.EditorTools
             pSO.ApplyModifiedProperties();
         }
 
-        private static DefenseSentryVisual CreateDefenseSentryTurret(Transform parent, LevelMaterials mats, ChamberController chamberController, NeuralState neuralState)
-        {
-            var sentryRoot = new GameObject("AutomatedDefenseSentry");
-            sentryRoot.transform.SetParent(parent, false);
-            sentryRoot.transform.position = new Vector3(0, 0, 1.35f);
-
-            // 1. Heavy Base Pedestal (Sample Platform model)
-            var baseGo = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            baseGo.name = "SentryBase_Pedestal";
-            baseGo.transform.SetParent(sentryRoot.transform, false);
-            baseGo.transform.localPosition = new Vector3(0, 0.15f, 0);
-            baseGo.transform.localScale = new Vector3(0.65f, 0.18f, 0.65f);
-            baseGo.GetComponent<Renderer>().sharedMaterial = mats.DarkPlating;
-            SetMeshOrKeepPrimitive(baseGo, PathPlatform);
-            CreatePlatformTrim(baseGo.transform, new Vector3(0, 0.52f, 0), new Vector3(1.04f, 0.04f, 1.04f), mats.GunMetal);
-
-            // 2. Swivel Yaw Head (Torso)
-            var yawHeadGo = new GameObject("Sentry_YawHead");
-            yawHeadGo.transform.SetParent(sentryRoot.transform, false);
-            yawHeadGo.transform.localPosition = new Vector3(0, 0.40f, 0);
-
-            var headArmor = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            headArmor.name = "ArmorChassis";
-            headArmor.transform.SetParent(yawHeadGo.transform, false);
-            headArmor.transform.localPosition = Vector3.zero;
-            headArmor.transform.localScale = new Vector3(0.32f, 0.30f, 0.35f);
-            headArmor.GetComponent<Renderer>().sharedMaterial = mats.GunMetal;
-
-            // 3. Central Core Plasma Sphere (Decision Engine)
-            var corePlasma = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            corePlasma.name = "SentryCore_Plasma";
-            corePlasma.transform.SetParent(yawHeadGo.transform, false);
-            corePlasma.transform.localPosition = new Vector3(0, 0.04f, -0.16f);
-            corePlasma.transform.localScale = new Vector3(0.14f, 0.14f, 0.14f);
-            var corePlasmaRend = corePlasma.GetComponent<Renderer>();
-            corePlasmaRend.sharedMaterial = mats.CorePlasma;
-            UnityEngine.Object.DestroyImmediate(corePlasma.GetComponent<Collider>());
-
-            // Status Strobe on Head
-            var strobe = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            strobe.name = "StatusStrobe";
-            strobe.transform.SetParent(yawHeadGo.transform, false);
-            strobe.transform.localPosition = new Vector3(0, 0.18f, 0);
-            strobe.transform.localScale = new Vector3(0.10f, 0.03f, 0.10f);
-            var strobeRend = strobe.GetComponent<Renderer>();
-            strobeRend.sharedMaterial = mats.GlowCoral;
-            UnityEngine.Object.DestroyImmediate(strobe.GetComponent<Collider>());
-
-            // 4. Pitch Gimbal & Dual Heavy Plasma Cannons (Sample Blaster Long Models)
-            var pitchGimbalGo = new GameObject("Sentry_PitchGimbal");
-            pitchGimbalGo.transform.SetParent(yawHeadGo.transform, false);
-            pitchGimbalGo.transform.localPosition = new Vector3(0, 0.10f, 0.14f);
-
-            var leftBarrel = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            leftBarrel.name = "LeftBarrel";
-            leftBarrel.transform.SetParent(pitchGimbalGo.transform, false);
-            leftBarrel.transform.localPosition = new Vector3(-0.14f, 0, 0.16f);
-            leftBarrel.transform.localScale = new Vector3(0.14f, 0.14f, 0.14f);
-            leftBarrel.transform.localRotation = Quaternion.identity;
-            leftBarrel.GetComponent<Renderer>().sharedMaterial = mats.GunAccent;
-            SetMeshOrKeepPrimitive(leftBarrel, PathBlasterLong);
-
-            var rightBarrel = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            rightBarrel.name = "RightBarrel";
-            rightBarrel.transform.SetParent(pitchGimbalGo.transform, false);
-            rightBarrel.transform.localPosition = new Vector3(0.14f, 0, 0.16f);
-            rightBarrel.transform.localScale = new Vector3(0.14f, 0.14f, 0.14f);
-            rightBarrel.transform.localRotation = Quaternion.identity;
-            rightBarrel.GetComponent<Renderer>().sharedMaterial = mats.GunAccent;
-            SetMeshOrKeepPrimitive(rightBarrel, PathBlasterLong);
-
-            var leftMuzzleGo = new GameObject("LeftMuzzle");
-            leftMuzzleGo.transform.SetParent(leftBarrel.transform, false);
-            leftMuzzleGo.transform.localPosition = new Vector3(0, 0, 1.2f);
-
-            var rightMuzzleGo = new GameObject("RightMuzzle");
-            rightMuzzleGo.transform.SetParent(rightBarrel.transform, false);
-            rightMuzzleGo.transform.localPosition = new Vector3(0, 0, 1.2f);
-
-            // 5. Targeting LineRenderers
-            var laserGo = new GameObject("TargetingLaserBeam");
-            laserGo.transform.SetParent(sentryRoot.transform, false);
-            var laserLr = laserGo.AddComponent<LineRenderer>();
-            laserLr.sharedMaterial = mats.CorePlasma;
-            laserLr.useWorldSpace = true;
-            laserLr.positionCount = 2;
-            laserLr.startWidth = 0.06f;
-            laserLr.endWidth = 0.08f;
-            laserLr.enabled = false;
-
-            var scanGo = new GameObject("ScanConeBeam");
-            scanGo.transform.SetParent(sentryRoot.transform, false);
-            var scanLr = scanGo.AddComponent<LineRenderer>();
-            scanLr.sharedMaterial = mats.GlassHologram;
-            scanLr.useWorldSpace = true;
-            scanLr.positionCount = 2;
-            scanLr.startWidth = 0.03f;
-            scanLr.endWidth = 0.35f;
-            scanLr.enabled = false;
-
-            // 6. Lights
-            var sentryLightGo = new GameObject("SentrySpotlight");
-            sentryLightGo.transform.SetParent(yawHeadGo.transform, false);
-            sentryLightGo.transform.localPosition = new Vector3(0, 0.2f, 0.25f);
-            var sentrySpot = sentryLightGo.AddComponent<Light>();
-            sentrySpot.type = LightType.Spot;
-            sentrySpot.range = 10f;
-            sentrySpot.spotAngle = 45f;
-            sentrySpot.intensity = 2.0f;
-            sentrySpot.color = new Color(1.0f, 0.25f, 0.25f);
-
-            var muzzleFlashGo = new GameObject("MuzzleFlashLight");
-            muzzleFlashGo.transform.SetParent(pitchGimbalGo.transform, false);
-            muzzleFlashGo.transform.localPosition = new Vector3(0, 0, 0.45f);
-            var muzzleFlash = muzzleFlashGo.AddComponent<Light>();
-            muzzleFlash.type = LightType.Point;
-            muzzleFlash.range = 4.0f;
-            muzzleFlash.intensity = 0f;
-            muzzleFlash.enabled = false;
-
-            // 7. Sentry Visual Component
-            var sentryVisual = sentryRoot.AddComponent<DefenseSentryVisual>();
-            var svSO = new SerializedObject(sentryVisual);
-            svSO.FindProperty("chamberController").objectReferenceValue = chamberController;
-            svSO.FindProperty("neuralState").objectReferenceValue = neuralState;
-            svSO.FindProperty("turretBase").objectReferenceValue = sentryRoot.transform;
-            svSO.FindProperty("turretYawHead").objectReferenceValue = yawHeadGo.transform;
-            svSO.FindProperty("turretPitchGimbal").objectReferenceValue = pitchGimbalGo.transform;
-            svSO.FindProperty("leftMuzzle").objectReferenceValue = leftMuzzleGo.transform;
-            svSO.FindProperty("rightMuzzle").objectReferenceValue = rightMuzzleGo.transform;
-            svSO.FindProperty("sentryCorePlasma").objectReferenceValue = corePlasmaRend;
-            svSO.FindProperty("statusStrobeRenderer").objectReferenceValue = strobeRend;
-            svSO.FindProperty("targetingLaser").objectReferenceValue = laserLr;
-            svSO.FindProperty("scanConeBeam").objectReferenceValue = scanLr;
-            svSO.FindProperty("sentrySpotlight").objectReferenceValue = sentrySpot;
-            svSO.FindProperty("muzzleFlashLight").objectReferenceValue = muzzleFlash;
-            svSO.ApplyModifiedProperties();
-
-            return sentryVisual;
-        }
 
         private static List<DataTargetReceptor> CreateDataTargetPods(Transform parent, LevelMaterials mats)
         {
@@ -2955,10 +2846,10 @@ namespace Convergence.EditorTools
 
             var cases = new[]
             {
-                new { Index = 0, Label = "Deep Space Void (0,0)",       Title = "Cosmic Void / Asteroid Noise",       Role = "NON-PLANETARY NOISE (REJECT Y=0)", X1 = 0.0, X2 = 0.0, Expected = 0.0, Spawn = new Vector3(-2.2f, 1.2f, 2.6f), Perimeter = new Vector3(-2.2f, 1.2f, 1.6f) },
-                new { Index = 1, Label = "Earth Atmosphere (0,1)",     Title = "Atmospheric O2/N2 Spectrum",         Role = "EARTH SIGNATURE (LOCK VECTOR Y=1)", X1 = 0.0, X2 = 1.0, Expected = 1.0, Spawn = new Vector3(-0.75f, 1.2f, 2.8f), Perimeter = new Vector3(-0.75f, 1.2f, 1.7f) },
-                new { Index = 2, Label = "Earth Landmass (1,0)",       Title = "Continental Albedo Signature",       Role = "EARTH SIGNATURE (LOCK VECTOR Y=1)", X1 = 1.0, X2 = 0.0, Expected = 1.0, Spawn = new Vector3(0.75f, 1.2f, 2.8f), Perimeter = new Vector3(0.75f, 1.2f, 1.7f) },
-                new { Index = 3, Label = "Earth Orbit Vector (1,1)",   Title = "Confirmed Earth Orbital Telemetry",   Role = "CONFIRMED EARTH HOME (LOCK Y=1)",   X1 = 1.0, X2 = 1.0, Expected = 1.0, Spawn = new Vector3(2.2f, 1.2f, 2.6f), Perimeter = new Vector3(2.2f, 1.2f, 1.6f) }
+                new { Index = 0, Label = "Quiet (0,0)",       Title = "No beacon",       Role = "STAY DARK", X1 = 0.0, X2 = 0.0, Expected = 0.0, Spawn = new Vector3(-2.2f, 1.2f, 2.6f), Perimeter = new Vector3(-2.2f, 1.2f, 1.6f) },
+                new { Index = 1, Label = "Radio (0,1)",     Title = "Radio beacon",         Role = "WAKE THE ARRAY", X1 = 0.0, X2 = 1.0, Expected = 1.0, Spawn = new Vector3(-0.75f, 1.2f, 2.8f), Perimeter = new Vector3(-0.75f, 1.2f, 1.7f) },
+                new { Index = 2, Label = "Light (1,0)",       Title = "Light signature",       Role = "WAKE THE ARRAY", X1 = 1.0, X2 = 0.0, Expected = 1.0, Spawn = new Vector3(0.75f, 1.2f, 2.8f), Perimeter = new Vector3(0.75f, 1.2f, 1.7f) },
+                new { Index = 3, Label = "Both (1,1)",   Title = "Radio and light",   Role = "WAKE THE ARRAY",   X1 = 1.0, X2 = 1.0, Expected = 1.0, Spawn = new Vector3(2.2f, 1.2f, 2.6f), Perimeter = new Vector3(2.2f, 1.2f, 1.6f) }
             };
 
             foreach (var c in cases)
@@ -3180,6 +3071,303 @@ namespace Convergence.EditorTools
             }
 
             return receptors;
+        }
+
+        private static void PlaceShip(Transform parent, LevelMaterials mats)
+        {
+            var temp = new GameObject("PF_Ship_Hull");
+            CreateSpaceshipBridgeHull(temp.transform, mats);
+            CreateAftShip(temp.transform, mats);
+            string folder = "Assets/_Project/Prefabs/Ship";
+            if (!AssetDatabase.IsValidFolder("Assets/_Project/Prefabs"))
+            {
+                AssetDatabase.CreateFolder("Assets/_Project", "Prefabs");
+            }
+            if (!AssetDatabase.IsValidFolder(folder))
+            {
+                AssetDatabase.CreateFolder("Assets/_Project/Prefabs", "Ship");
+            }
+
+            string path = folder + "/PF_Ship_Hull.prefab";
+            PrefabUtility.SaveAsPrefabAsset(temp, path);
+            UnityEngine.Object.DestroyImmediate(temp);
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+            var instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+            instance.transform.SetParent(parent, false);
+            foreach (var filter in instance.GetComponentsInChildren<MeshRenderer>())
+            {
+                GameObjectUtility.SetStaticEditorFlags(filter.gameObject, StaticEditorFlags.ContributeGI | StaticEditorFlags.BatchingStatic);
+            }
+        }
+
+        private static void CreateAftShip(Transform parent, LevelMaterials mats)
+        {
+            var root = new GameObject("AftShip");
+            root.transform.SetParent(parent, false);
+
+            MakeDoor(root.transform, "Door_SensorBay", "SensorBay", new Vector3(0f, 1.1f, -3.85f), mats);
+            for (int i = 0; i < 4; i++)
+            {
+                float z = -5.2f - i * 1.6f;
+                var left = CreateModelInstance(PathKenneyWall, "CorridorWall_L_" + i, root.transform);
+                var right = CreateModelInstance(PathKenneyWall, "CorridorWall_R_" + i, root.transform);
+                var floor = CreateModelInstance(PathKenneyFloor, "CorridorFloor_" + i, root.transform);
+                PlaceModule(left, new Vector3(-1.6f, 0f, z), Quaternion.Euler(0f, 90f, 0f), mats.SpaceshipHull);
+                PlaceModule(right, new Vector3(1.6f, 0f, z), Quaternion.Euler(0f, -90f, 0f), mats.SpaceshipHull);
+                PlaceModule(floor, new Vector3(0f, 0f, z), Quaternion.identity, mats.KenneyStation);
+            }
+
+            var observatory = CreateModelInstance(PathKenneyWallDoorWide, "ObservatoryDoorFrame", root.transform);
+            PlaceModule(observatory, new Vector3(1.6f, 0f, -7.2f), Quaternion.Euler(0f, -90f, 0f), mats.SpaceshipHull);
+            MakeDoor(root.transform, "Door_Observatory", "Observatory", new Vector3(2.4f, 1.1f, -7.2f), mats);
+            var telescope = CreateModelInstance(PathKenneyComputerSystem, "Telescope", root.transform);
+            PlaceModule(telescope, new Vector3(4.2f, 0f, -7.2f), Quaternion.Euler(0f, -90f, 0f), mats.DarkPlating);
+            MakeVoyageButton(root.transform, "InstallHiddenLayer", VoyageButton.Kind.InstallHiddenLayer, new Vector3(3.4f, 1.05f, -6.6f), mats);
+            MakeVoyageButton(root.transform, "CycleNeuron", VoyageButton.Kind.CycleNeuron, new Vector3(3.4f, 1.05f, -7.8f), mats);
+            MakePhotoButton(root.transform, "Tray_Earth", true, new Vector3(4.6f, 1.05f, -6.4f), mats);
+            MakePhotoButton(root.transform, "Tray_NotEarth", false, new Vector3(4.6f, 1.05f, -8.0f), mats);
+            MakeVoyageButton(root.transform, "TrainEarth", VoyageButton.Kind.TrainEarth, new Vector3(4.6f, 1.05f, -7.2f), mats);
+
+            var engineFrame = CreateModelInstance(PathKenneyWallDoorWide, "EngineDoorFrame", root.transform);
+            PlaceModule(engineFrame, new Vector3(0f, 0f, -11.2f), Quaternion.identity, mats.SpaceshipHull);
+            MakeDoor(root.transform, "Door_Engine", "Engine", new Vector3(0f, 1.1f, -11.2f), mats);
+            var drive = CreateModelInstance(PathKenneyStructure, "JumpDrive", root.transform);
+            PlaceModule(drive, new Vector3(0f, 0.2f, -13.2f), Quaternion.identity, mats.SpaceshipHull);
+            MakeVoyageButton(root.transform, "MaskNoise", VoyageButton.Kind.MaskNoise, new Vector3(0f, 1.15f, -12.4f), mats);
+
+            var corridorCollider = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            corridorCollider.name = "CorridorDeckCollider";
+            corridorCollider.transform.SetParent(root.transform, false);
+            corridorCollider.transform.position = new Vector3(0f, -0.2f, -8f);
+            corridorCollider.transform.localScale = new Vector3(3f, 0.4f, 10f);
+            corridorCollider.GetComponent<Renderer>().enabled = false;
+        }
+
+        private static void PlaceModule(GameObject module, Vector3 position, Quaternion rotation, Material material)
+        {
+            if (module == null) return;
+            module.transform.position = position;
+            module.transform.rotation = rotation;
+            ApplyMaterialRecursively(module, material);
+        }
+
+        private static void MakeDoor(Transform parent, string name, string id, Vector3 position, LevelMaterials mats)
+        {
+            var root = new GameObject(name);
+            root.transform.SetParent(parent, false);
+            root.transform.position = position;
+            var panel = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            panel.name = "DoorPanel";
+            panel.transform.SetParent(root.transform, false);
+            panel.transform.localScale = new Vector3(1.3f, 2.2f, 0.12f);
+            panel.GetComponent<Renderer>().sharedMaterial = mats.SpaceshipHull;
+            var door = root.AddComponent<ShipDoor>();
+            var so = new SerializedObject(door);
+            so.FindProperty("doorId").stringValue = id;
+            so.FindProperty("blocker").objectReferenceValue = panel.GetComponent<Collider>();
+            so.FindProperty("panel").objectReferenceValue = panel.transform;
+            so.ApplyModifiedProperties();
+
+            if (id != "SensorBay") return;
+
+            var beaconGo = new GameObject("AftBeacon");
+            beaconGo.transform.SetParent(root.transform, false);
+            beaconGo.transform.localPosition = new Vector3(0f, 1.35f, 0.2f);
+            var beaconLight = beaconGo.AddComponent<Light>();
+            beaconLight.type = LightType.Point;
+            beaconLight.range = 4.5f;
+            beaconLight.intensity = 0.08f;
+            beaconLight.color = new Color(0.35f, 0.85f, 1f);
+            var beacon = root.AddComponent<DoorUnlockBeacon>();
+            var beaconSO = new SerializedObject(beacon);
+            beaconSO.FindProperty("door").objectReferenceValue = door;
+            beaconSO.FindProperty("beacon").objectReferenceValue = beaconLight;
+            beaconSO.ApplyModifiedProperties();
+        }
+
+        private static void CreateCinematicShip(Transform parent, LevelMaterials mats)
+        {
+            var ship = new GameObject("CinematicShip");
+            ship.transform.SetParent(parent, false);
+            ship.transform.position = new Vector3(0f, 1.45f, 8.6f);
+            ship.transform.localScale = new Vector3(0.55f, 0.55f, 0.55f);
+
+            var hull = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            hull.name = "Hull";
+            hull.transform.SetParent(ship.transform, false);
+            hull.transform.localScale = new Vector3(1.15f, 0.36f, 2.6f);
+            hull.GetComponent<Renderer>().sharedMaterial = mats.SpaceshipHull;
+            UnityEngine.Object.DestroyImmediate(hull.GetComponent<Collider>());
+
+            var nose = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            nose.name = "Nose";
+            nose.transform.SetParent(ship.transform, false);
+            nose.transform.localPosition = new Vector3(0f, 0.02f, 1.55f);
+            nose.transform.localScale = new Vector3(0.48f, 0.26f, 0.72f);
+            nose.GetComponent<Renderer>().sharedMaterial = mats.SpaceshipHull;
+            UnityEngine.Object.DestroyImmediate(nose.GetComponent<Collider>());
+
+            var canopy = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            canopy.name = "Canopy";
+            canopy.transform.SetParent(ship.transform, false);
+            canopy.transform.localPosition = new Vector3(0f, 0.28f, 0.35f);
+            canopy.transform.localScale = new Vector3(0.46f, 0.22f, 0.7f);
+            canopy.GetComponent<Renderer>().sharedMaterial = mats.GlowCyan;
+            UnityEngine.Object.DestroyImmediate(canopy.GetComponent<Collider>());
+
+            CreateWing(ship.transform, "Wing_L", -0.95f, mats.SpaceshipHull);
+            CreateWing(ship.transform, "Wing_R", 0.95f, mats.SpaceshipHull);
+            CreateEngine(ship.transform, "Engine_L", -0.38f, mats.GlowAmber);
+            CreateEngine(ship.transform, "Engine_R", 0.38f, mats.GlowAmber);
+        }
+
+        private static void CreateWing(Transform ship, string name, float x, Material material)
+        {
+            var wing = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            wing.name = name;
+            wing.transform.SetParent(ship, false);
+            wing.transform.localPosition = new Vector3(x, -0.02f, -0.15f);
+            wing.transform.localScale = new Vector3(0.9f, 0.08f, 1.1f);
+            wing.GetComponent<Renderer>().sharedMaterial = material;
+            UnityEngine.Object.DestroyImmediate(wing.GetComponent<Collider>());
+        }
+
+        private static void CreateEngine(Transform ship, string name, float x, Material material)
+        {
+            var engine = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            engine.name = name;
+            engine.transform.SetParent(ship, false);
+            engine.transform.localPosition = new Vector3(x, 0f, -1.25f);
+            engine.transform.localScale = new Vector3(0.28f, 0.28f, 0.42f);
+            engine.GetComponent<Renderer>().sharedMaterial = material;
+            UnityEngine.Object.DestroyImmediate(engine.GetComponent<Collider>());
+            var engineLight = engine.AddComponent<Light>();
+            engineLight.type = LightType.Point;
+            engineLight.range = 3.2f;
+            engineLight.intensity = 0.35f;
+            engineLight.color = new Color(1f, 0.55f, 0.15f);
+        }
+
+        private static void MakeVoyageButton(Transform parent, string name, VoyageButton.Kind kind, Vector3 position, LevelMaterials mats)
+        {
+            var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            go.name = name;
+            go.transform.SetParent(parent, false);
+            go.transform.position = position;
+            go.transform.localScale = new Vector3(0.22f, 0.22f, 0.22f);
+            go.GetComponent<Renderer>().sharedMaterial = mats.GlowAmber;
+            var button = go.AddComponent<VoyageButton>();
+            var so = new SerializedObject(button);
+            so.FindProperty("kind").enumValueIndex = (int)kind;
+            so.ApplyModifiedProperties();
+        }
+
+        private static void MakePhotoButton(Transform parent, string name, bool earth, Vector3 position, LevelMaterials mats)
+        {
+            var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            go.name = name;
+            go.transform.SetParent(parent, false);
+            go.transform.position = position;
+            go.transform.localScale = new Vector3(0.28f, 0.12f, 0.28f);
+            go.GetComponent<Renderer>().sharedMaterial = earth ? mats.EarthLand : mats.GlowCoral;
+            var request = go.AddComponent<PhotoRequest>();
+            var so = new SerializedObject(request);
+            so.FindProperty("fileAsEarth").boolValue = earth;
+            so.ApplyModifiedProperties();
+        }
+
+        private static void CreatePhotoBodies(Transform parent, LevelMaterials mats)
+        {
+            MakeBody(parent, "PhotoBody_Earth", new Vector3(-2.2f, 2.4f, 14f), 0.8f, mats.EarthWater);
+            MakeBody(parent, "PhotoBody_IceGiant", new Vector3(0f, 3.1f, 16f), 1.1f, mats.GlowCyan);
+            MakeBody(parent, "PhotoBody_Rust", new Vector3(2.4f, 2.2f, 13f), 0.7f, mats.GlowCoral);
+        }
+
+        private static void MakeBody(Transform parent, string name, Vector3 position, float scale, Material material)
+        {
+            var body = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            body.name = name;
+            body.transform.SetParent(parent, false);
+            body.transform.position = position;
+            body.transform.localScale = Vector3.one * scale;
+            body.GetComponent<Renderer>().sharedMaterial = material;
+        }
+
+        private static void AssignStarfield()
+        {
+            const string cubePath = "Assets/Materials/Sky_Starfield.cubemap";
+            const string matPath = "Assets/Materials/Sky_Starfield.mat";
+            if (AssetDatabase.LoadAssetAtPath<Cubemap>(cubePath) != null) AssetDatabase.DeleteAsset(cubePath);
+            if (AssetDatabase.LoadAssetAtPath<Material>(matPath) != null) AssetDatabase.DeleteAsset(matPath);
+
+            const int size = 128;
+            var cube = new Cubemap(size, TextureFormat.RGB24, false);
+            var rng = new System.Random(7);
+            for (int face = 0; face < 6; face++)
+            {
+                var colors = new Color[size * size];
+                for (int i = 0; i < colors.Length; i++)
+                {
+                    colors[i] = new Color(0.008f, 0.01f, 0.02f);
+                    double roll = rng.NextDouble();
+                    if (roll > 0.996)
+                    {
+                        float v = 0.55f + (float)rng.NextDouble() * 0.45f;
+                        colors[i] = new Color(v, v, Mathf.Lerp(v, 1f, 0.2f));
+                    }
+                }
+                cube.SetPixels(colors, (CubemapFace)face);
+            }
+            cube.Apply();
+            AssetDatabase.CreateAsset(cube, cubePath);
+
+            var shader = Shader.Find("Skybox/Cubemap");
+            var sky = new Material(shader);
+            sky.SetTexture("_Tex", cube);
+            AssetDatabase.CreateAsset(sky, matPath);
+            RenderSettings.skybox = sky;
+        }
+
+        private static void CreateBloomVolume(Transform parent)
+        {
+            const string path = "Assets/Materials/Volume_Bloom.asset";
+            var profile = AssetDatabase.LoadAssetAtPath<UnityEngine.Rendering.VolumeProfile>(path);
+            if (profile == null)
+            {
+                profile = ScriptableObject.CreateInstance<UnityEngine.Rendering.VolumeProfile>();
+                AssetDatabase.CreateAsset(profile, path);
+            }
+
+            if (!profile.TryGet(out UnityEngine.Rendering.Universal.Bloom bloom))
+            {
+                bloom = profile.Add<UnityEngine.Rendering.Universal.Bloom>(true);
+            }
+            bloom.intensity.Override(0.35f);
+            bloom.threshold.Override(1.15f);
+            EditorUtility.SetDirty(profile);
+
+            var go = new GameObject("GlobalVolume");
+            go.transform.SetParent(parent, false);
+            var volume = go.AddComponent<UnityEngine.Rendering.Volume>();
+            volume.isGlobal = true;
+            volume.sharedProfile = profile;
+        }
+
+        private static void BakeNonKeyLights()
+        {
+            foreach (var light in UnityEngine.Object.FindObjectsByType<Light>())
+            {
+                if (light.name == "DirectionalLight_StellarKey")
+                {
+                    light.lightmapBakeType = LightmapBakeType.Realtime;
+                }
+                else
+                {
+                    light.lightmapBakeType = LightmapBakeType.Baked;
+                }
+            }
+            // Lightmap bake is started by the owner from the Lighting window. Calling it here
+            // locks the Editor for the rest of the build, so the scene never reaches SaveScene.
         }
 
         private static void RegisterSceneInBuildSettings(string scenePath)

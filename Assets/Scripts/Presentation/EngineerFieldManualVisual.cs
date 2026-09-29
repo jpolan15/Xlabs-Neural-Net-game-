@@ -82,39 +82,38 @@ namespace Convergence.Presentation
             switch (page)
             {
                 case 0:
-                    return "CRITICAL EMERGENCY: USS CONVERGENCE WARP BREAKDOWN\n\n" +
+                    return "ASTEROID STRIKE. A.U.R.A. LOST HER WEIGHTS.\n\n" +
                            "SITUATION REPORT:\n" +
-                           "The starship's hyperspace coils have suffered catastrophic failure. We are adrift in uncharted deep space.\n" +
-                           "The ship's emergency warp navigation AI has lost starfield lock. To save the vessel and return home safely, we must feed the neural net images and telemetry of EARTH.\n\n" +
+                           "An asteroid knocked the ship out of hyperspace. You are alone with A.U.R.A.\n" +
+                           "The navigation weights are gone. This bay is the sensor array: one neuron, two beacons.\n\n" +
                            "YOUR OBJECTIVE:\n" +
-                           "Calibrate the single Artificial Neuron governing the hyperspace drive so it locks onto Earth telemetry:\n" +
-                           " • Deep Space Void [0,0] -> Output 0 (FILTER NOISE / Hold Jump)\n" +
-                           " • Earth Telemetry Detected -> Output 1 (WARP LOCK / Open Jump Corridor)\n\n" +
-                           "Press [T] to read Log 02: Why we feed Earth planetary telemetry.";
+                           "Wake the array when a radio beacon OR a light signature is present:\n" +
+                           " • Both quiet [0,0] -> Output 0\n" +
+                           " • Either beacon, or both -> Output 1\n\n" +
+                           "Later bays teach a hidden layer, photo labels, and attention. This one is only the OR neuron.";
 
                 case 1:
-                    return "WHY ARE WE FEEDING EARTH IMAGES TO THE NEURAL NET?\n\n" +
-                           "1. AN ARTIFICIAL NEURON CANNOT NAVIGATE WITHOUT TRAINING DATA:\n" +
-                           "   Without calibrated weights, the AI cannot differentiate between barren cosmic radiation and Earth's planetary signature.\n" +
-                           "   To ensure a safe jump home, we feed the network 4 diagnostic planetary sensor feeds.\n\n" +
-                           "2. THE 4 PLANETARY SENSOR FEEDS (TRUTH TABLE):\n" +
-                           "   • Case 1: [0, 0] Deep Space Void (Land=0, Atmos=0) -> Target = 0 (Filter noise!)\n" +
-                           "   • Case 2: [0, 1] Earth Atmosphere (Land=0, Atmos=1) -> Target = 1 (Lock jump vector!)\n" +
-                           "   • Case 3: [1, 0] Earth Continents (Land=1, Atmos=0) -> Target = 1 (Lock jump vector!)\n" +
-                           "   • Case 4: [1, 1] Earth Orbital Fix (Land=1, Atmos=1) -> Target = 1 (Lock jump vector!)\n\n" +
-                           "When you pull the JUMP LEVER, the system streams these 4 sensor feeds through the 3D synapses to verify the AI locks onto Earth!";
+                    return "THE FOUR SENSOR PINGS\n\n" +
+                           "1. A NEURON DOES NOTHING USEFUL UNTIL YOU TEST IT:\n" +
+                           "   The lever sends four pings. Each ping is one row of the OR table.\n\n" +
+                           "2. THE TABLE:\n" +
+                           "   • Quiet: radio 0, light 0 -> stay off\n" +
+                           "   • Radio only: radio 1, light 0 -> wake\n" +
+                           "   • Light only: radio 0, light 1 -> wake\n" +
+                           "   • Both beacons: radio 1, light 1 -> wake\n\n" +
+                           "A green ping matched. A red ping did not. The picture above the console is this same neuron.";
 
                 case 2:
                     return "PLANETARY SENSORS (x) & SENSITIVITY WEIGHTS (w)\n\n" +
                            "1. SENSOR CONDUITS (x1, x2):\n" +
-                           "   • Conduit 1 (x1): Continental Landmass Sensor (0 = Void, 1 = Continent Detected)\n" +
-                           "   • Conduit 2 (x2): Atmospheric O2/N2 Sensor (0 = Void, 1 = Atmosphere Detected)\n" +
-                           "   * Both conduits must be plugged into the console to stream planetary data.\n\n" +
-                           "2. WEIGHT REGULATORS (w1, w2) — SENSITIVITY MULTIPLIERS:\n" +
-                           "   Think of weights as AMPLIFIERS for planetary features:\n" +
-                           "   • Higher Weight: A detected Earth feature generates strong warp lock energy.\n" +
-                           "   • Zero Weight: Planetary sensor is ignored.\n" +
-                           "   • Negative Weight: Sensor signal dampens activation.\n\n" +
+                           "   • Conduit 1 (x1): Radio beacon (0 = silent, 1 = beacon)\n" +
+                           "   • Conduit 2 (x2): Light signature (0 = dark, 1 = signature)\n" +
+                           "   * A disconnected cable forces that beacon to 0.\n\n" +
+                           "2. WEIGHT REGULATORS (w1, w2) — SEPARATE NUMBERS:\n" +
+                           "   W1 does not write W2. Neither writes the bias.\n" +
+                           "   • Higher weight: that beacon counts for more.\n" +
+                           "   • Zero weight: that beacon is ignored.\n" +
+                           "   • Negative weight: that beacon pushes the sum down.\n\n" +
                            "COMBINED SENSOR SIGNAL:\n" +
                            "   Raw Warp Energy = (x1 × w1) + (x2 × w2)";
 
@@ -124,7 +123,7 @@ namespace Convergence.Presentation
                            "   Deep space is never silent; cosmic background radiation produces constant static.\n" +
                            "   A negative Bias sets a resistance barrier that filters out void noise so the ship doesn't blindly jump into the void.\n" +
                            "   - When looking at empty void (0, 0), energy stays below 0 (no jump).\n" +
-                           "   - When an Earth feature appears, sensor energy overcomes the barrier and triggers warp lock.\n\n" +
+                           "   - When either beacon is present, the sum has to be able to reach zero.\n\n" +
                            "2. THE ACTIVATION CRYSTAL — WARP LOCK GATE:\n" +
                            "   The hyperspace coils require a decisive binary engage switch:\n" +
                            "   • STEP CRYSTAL: Outputs 1 (Warp Lock) if Energy ≥ 0, and 0 (Hold) if Energy < 0.";
@@ -138,7 +137,7 @@ namespace Convergence.Presentation
 
                     _sb.Length = 0;
                     _sb.AppendLine("LIVE WARP NAVIGATION AI STATUS:");
-                    _sb.AppendLine($"W1 (Landmass): {w1:+0.0;-0.0;0.0} | W2 (Atmos): {w2:+0.0;-0.0;0.0} | Bias (Filter): {b:+0.0;-0.0;0.0} | Crystal: {actName}\n");
+                    _sb.AppendLine($"W1 (Radio): {w1:+0.0;-0.0;0.0} | W2 (Light): {w2:+0.0;-0.0;0.0} | Bias: {b:+0.0;-0.0;0.0} | Crystal: {actName}\n");
                     _sb.AppendLine("TELEMETRY ENERGY RESPONSE (z = w1·x1 + w2·x2 + b):");
 
                     double z1 = b;
@@ -146,12 +145,12 @@ namespace Convergence.Presentation
                     double z3 = w1 + b;
                     double z4 = w1 + w2 + b;
 
-                    _sb.AppendLine($" • [Deep Space Void  (0,0)]: Energy z = {z1:+0.0;-0.0;0.0} (Target: Void < 0)");
-                    _sb.AppendLine($" • [Earth Atmosphere (0,1)]: Energy z = {z2:+0.0;-0.0;0.0} (Target: Lock ≥ 0)");
-                    _sb.AppendLine($" • [Earth Continents (1,0)]: Energy z = {z3:+0.0;-0.0;0.0} (Target: Lock ≥ 0)");
-                    _sb.AppendLine($" • [Earth Orbital Fix(1,1)]: Energy z = {z4:+0.0;-0.0;0.0} (Target: Lock ≥ 0)");
+                    _sb.AppendLine($" • [Quiet (0,0)]: Energy z = {z1:+0.0;-0.0;0.0} (want the sum below 0)");
+                    _sb.AppendLine($" • [Radio (0,1)]: Energy z = {z2:+0.0;-0.0;0.0} (want the sum at 0 or above)");
+                    _sb.AppendLine($" • [Light (1,0)]: Energy z = {z3:+0.0;-0.0;0.0} (want the sum at 0 or above)");
+                    _sb.AppendLine($" • [Both  (1,1)]: Energy z = {z4:+0.0;-0.0;0.0} (want the sum at 0 or above)");
                     _sb.AppendLine();
-                    _sb.AppendLine("CALIBRATION GOAL: Tune Dials so Deep Space stays below 0 while all Earth telemetry reaches or exceeds 0. Pull Jump Lever to verify.");
+                    _sb.AppendLine("Pull the lever to send the four pings. The test, not this page, decides if the array is awake.");
                     return _sb.ToString();
 
                 default:

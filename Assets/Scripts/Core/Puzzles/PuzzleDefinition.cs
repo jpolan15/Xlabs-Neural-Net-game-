@@ -5,6 +5,18 @@ using Convergence.Core.Neural;
 namespace Convergence.Core.Puzzles
 {
     /// <summary>
+    /// How a case's outputs are marked correct.
+    /// </summary>
+    public enum ScoringMode
+    {
+        /// <summary>Each output is 1 when the prediction is at least 0.5, otherwise 0.</summary>
+        Binary,
+
+        /// <summary>Each output is correct when it lies within that output's absolute tolerance.</summary>
+        Continuous
+    }
+
+    /// <summary>
     /// Pure C# immutable definition of a puzzle, including required input/output dimensions,
     /// required activation type, accuracy threshold, and test cases.
     /// </summary>
@@ -42,13 +54,35 @@ namespace Convergence.Core.Puzzles
         /// </summary>
         public string ChamberTitle { get; }
 
+        /// <summary>
+        /// Binary classification or continuous targets.
+        /// </summary>
+        public ScoringMode Scoring { get; }
+
+        private readonly double[] _outputTolerances;
+
+        /// <summary>
+        /// Absolute tolerance for continuous output <paramref name="index"/>. Binary scoring ignores this.
+        /// </summary>
+        public double ToleranceFor(int index)
+        {
+            if (_outputTolerances == null || index < 0 || index >= _outputTolerances.Length)
+            {
+                return 0.05;
+            }
+
+            return _outputTolerances[index];
+        }
+
         public PuzzleDefinition(
             IEnumerable<TestCase> testCases,
             int requiredInputs,
             int requiredOutputs,
             ActivationType requiredActivation = ActivationType.Step,
             double accuracyThreshold = 1.0,
-            string chamberTitle = "The Awakening Gate")
+            string chamberTitle = "The Awakening Gate",
+            ScoringMode scoring = ScoringMode.Binary,
+            double[] outputTolerances = null)
         {
             if (testCases == null)
             {
@@ -94,12 +128,19 @@ namespace Convergence.Core.Puzzles
                 throw new ArgumentException("Puzzle must contain at least one test case.", nameof(testCases));
             }
 
+            if (outputTolerances != null && outputTolerances.Length != requiredOutputs)
+            {
+                throw new ArgumentException("Output tolerance count must match required outputs.", nameof(outputTolerances));
+            }
+
             _testCases = list.ToArray();
             RequiredInputs = requiredInputs;
             RequiredOutputs = requiredOutputs;
             RequiredActivation = requiredActivation;
             AccuracyThreshold = accuracyThreshold;
             ChamberTitle = chamberTitle ?? string.Empty;
+            Scoring = scoring;
+            _outputTolerances = outputTolerances == null ? null : (double[])outputTolerances.Clone();
         }
 
         /// <summary>
@@ -150,8 +191,57 @@ namespace Convergence.Core.Puzzles
                 requiredInputs: 16,
                 requiredOutputs: 2,
                 requiredActivation: ActivationType.Sigmoid,
-                accuracyThreshold: 0.9, // 90% accuracy required for continuous outputs
-                chamberTitle: "Navigation Repair"
+                accuracyThreshold: 0.9,
+                chamberTitle: "Navigation Repair",
+                scoring: ScoringMode.Continuous,
+                outputTolerances: new double[] { 0.15, 0.15 }
+            );
+        }
+
+        /// <summary>
+        /// Chamber 02. XOR is not linearly separable. A single neuron cannot pass.
+        /// </summary>
+        public static PuzzleDefinition CreateXorPuzzle()
+        {
+            var testCases = new TestCase[]
+            {
+                new TestCase(new double[] { 0.0, 0.0 }, new double[] { 0.0 }, "(0, 0) -> 0"),
+                new TestCase(new double[] { 0.0, 1.0 }, new double[] { 1.0 }, "(0, 1) -> 1"),
+                new TestCase(new double[] { 1.0, 0.0 }, new double[] { 1.0 }, "(1, 0) -> 1"),
+                new TestCase(new double[] { 1.0, 1.0 }, new double[] { 0.0 }, "(1, 1) -> 0")
+            };
+
+            return new PuzzleDefinition(
+                testCases: testCases,
+                requiredInputs: 2,
+                requiredOutputs: 1,
+                requiredActivation: ActivationType.Step,
+                accuracyThreshold: 1.0,
+                chamberTitle: "Spectrum Filter"
+            );
+        }
+
+        /// <summary>
+        /// Held-out Earth / not-Earth photos. Features are blue ratio, white-cloud ratio, and brightness.
+        /// A set that labels every blue body as Earth fails the ice giant.
+        /// </summary>
+        public static PuzzleDefinition CreateEarthPhotoPuzzle()
+        {
+            var testCases = new TestCase[]
+            {
+                new TestCase(new double[] { 0.45, 0.30, 0.55 }, new double[] { 1.0 }, "Earth"),
+                new TestCase(new double[] { 0.35, 0.40, 0.42 }, new double[] { 1.0 }, "Earth clouds"),
+                new TestCase(new double[] { 0.72, 0.08, 0.90 }, new double[] { 0.0 }, "Ice giant"),
+                new TestCase(new double[] { 0.08, 0.05, 0.40 }, new double[] { 0.0 }, "Rust world")
+            };
+
+            return new PuzzleDefinition(
+                testCases: testCases,
+                requiredInputs: 3,
+                requiredOutputs: 1,
+                requiredActivation: ActivationType.Sigmoid,
+                accuracyThreshold: 1.0,
+                chamberTitle: "Earth Recognizer"
             );
         }
     }

@@ -121,5 +121,65 @@ namespace Convergence.Core.Math
                 throw new ArgumentException("Input arrays cannot be empty.");
             }
         }
+
+        /// <summary>
+        /// Partial derivative of MSE with respect to each prediction.
+        /// dMSE/dŷ_i = (2 / n) (ŷ_i − y_i).
+        /// </summary>
+        public static void MeanSquaredErrorGradient(double[] predicted, double[] targets, double[] destination)
+        {
+            ValidateArrays(predicted, targets);
+            if (destination == null)
+            {
+                throw new ArgumentNullException(nameof(destination));
+            }
+            if (destination.Length != predicted.Length)
+            {
+                throw new ArgumentException("Destination length must match the prediction length.", nameof(destination));
+            }
+
+            double scale = 2.0 / predicted.Length;
+            for (int i = 0; i < predicted.Length; i++)
+            {
+                destination[i] = scale * (predicted[i] - targets[i]);
+            }
+        }
+
+        /// <summary>
+        /// Partial derivative of BCE with respect to each prediction, after epsilon clamping.
+        /// dBCE/dŷ_i = −(1 / n) (y_i / ŷ_i − (1 − y_i) / (1 − ŷ_i)).
+        /// </summary>
+        public static void BinaryCrossEntropyGradient(double[] predicted, double[] targets, double[] destination, double epsilon = DefaultEpsilon)
+        {
+            ValidateArrays(predicted, targets);
+            if (destination == null)
+            {
+                throw new ArgumentNullException(nameof(destination));
+            }
+            if (destination.Length != predicted.Length)
+            {
+                throw new ArgumentException("Destination length must match the prediction length.", nameof(destination));
+            }
+            if (epsilon <= 0.0 || epsilon >= 0.5)
+            {
+                throw new ArgumentOutOfRangeException(nameof(epsilon), "Epsilon must be between 0.0 and 0.5.");
+            }
+
+            double scale = -1.0 / predicted.Length;
+            for (int i = 0; i < predicted.Length; i++)
+            {
+                double y = targets[i];
+                if (y != 0.0 && y != 1.0)
+                {
+                    throw new ArgumentException($"Target at index {i} must be binary (0.0 or 1.0), found {y}.", nameof(targets));
+                }
+
+                double p = predicted[i];
+                if (p < epsilon) p = epsilon;
+                else if (p > 1.0 - epsilon) p = 1.0 - epsilon;
+
+                destination[i] = scale * ((y / p) - ((1.0 - y) / (1.0 - p)));
+            }
+        }
     }
 }

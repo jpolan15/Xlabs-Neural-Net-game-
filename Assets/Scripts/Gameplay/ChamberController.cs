@@ -148,14 +148,35 @@ namespace Convergence.Gameplay
         {
             if (neuralState == null) return null;
 
-            if (!neuralState.Cable1Connected || !neuralState.Cable2Connected)
+            if (neuralState.Network == null) return null;
+
+            if (neuralState.Cable1Connected && neuralState.Cable2Connected)
             {
-                // Disconnected conduit drops that input connection to zero
-                double w1 = neuralState.Cable1Connected ? neuralState.Weight1 : 0.0;
-                double w2 = neuralState.Cable2Connected ? neuralState.Weight2 : 0.0;
-                return NetworkModel.CreateSingleNeuronNetwork(2, new[] { w1, w2 }, neuralState.Bias, neuralState.Activation);
+                return neuralState.Network;
             }
-            return neuralState.Network;
+
+            NetworkModel copy = neuralState.Network.DeepCopy();
+            var first = copy.Layers[0];
+            for (int n = 0; n < first.NeuronCount; n++)
+            {
+                var neuron = first.Neurons[n];
+                if (!neuralState.Cable1Connected && neuron.WeightCount > 0) neuron.SetWeight(0, 0.0);
+                if (!neuralState.Cable2Connected && neuron.WeightCount > 1) neuron.SetWeight(1, 0.0);
+            }
+
+            return copy;
+        }
+
+        /// <summary>
+        /// Switches the live puzzle without pretending the previous one is still solved.
+        /// Does not reset the gateway.
+        /// </summary>
+        public void BeginPuzzle(PuzzleDefinition puzzle)
+        {
+            _puzzle = puzzle ?? throw new System.ArgumentNullException(nameof(puzzle));
+            _hasSolved = false;
+            LastEvaluation = null;
+            SetPhase(ChamberPhase.NeuralRepair);
         }
 
         /// <summary>
@@ -163,7 +184,6 @@ namespace Convergence.Gameplay
         /// </summary>
         public PuzzleEvaluation TriggerForwardPass()
         {
-            _puzzle ??= PuzzleDefinition.CreateEarthLocationPuzzle();
 
             if (Phase == ChamberPhase.Arrival)
             {
@@ -189,8 +209,7 @@ namespace Convergence.Gameplay
                 SetPhase(ChamberPhase.Awakening);
                 RestoreShield(35f);
                 OnPuzzleSolved?.Invoke();
-                // Space theme: Trigger blast off
-                UnityEngine.Debug.Log("ASTEROID IMPACT SURVIVED: Navigation repaired. Blasting off to Earth!");
+                UnityEngine.Debug.Log("Sensor array passed. The ship is not clear to jump.");
             }
 
             return evaluation;
@@ -198,7 +217,6 @@ namespace Convergence.Gameplay
 
         public CaseDiagnostic TriggerSingleCasePass(int caseIndex)
         {
-            _puzzle ??= PuzzleDefinition.CreateEarthLocationPuzzle();
 
             if (Phase == ChamberPhase.Arrival)
             {
@@ -268,7 +286,7 @@ namespace Convergence.Gameplay
                         // False Positive: Sentry shot the friendly drone!
                         r.NotifyVaporized();
                         ApplyShieldDamage(15.0f);
-                        OnFriendlyCasualty?.Invoke(0, "FRIENDLY FIRE: Friendly Maintenance Drone vaporized by sentry!");
+                        OnFriendlyCasualty?.Invoke(0, "FALSE ALARM: quiet sensors were marked as a hit.");
                     }
                     else
                     {

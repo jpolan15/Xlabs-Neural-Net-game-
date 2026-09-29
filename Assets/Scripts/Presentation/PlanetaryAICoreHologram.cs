@@ -8,7 +8,7 @@ using Convergence.Gameplay;
 namespace Convergence.Presentation
 {
     /// <summary>
-    /// Holographic Global AI Consciousness Visualizer (SYNAPSE-GPT Core).
+    /// Holographic navigation core for A.U.R.A. after the asteroid strike.
     /// Projects a floating planetary neural mesh with orbital gyroscopic rings high in the chamber.
     /// Visually communicates the story stakes and real-time global health of the foundation AI:
     /// - Corrupted/Glitched State: Red/Amber jittering error rings, glitching alert billboards, integrity ~18%.

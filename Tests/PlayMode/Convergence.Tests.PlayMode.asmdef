@@ -7,7 +7,8 @@
         "Convergence.Core.Training",
         "Convergence.Core.Puzzles",
         "Convergence.Gameplay",
-        "Convergence.XR"
+        "Convergence.XR",
+        "Unity.XR.Interaction.Toolkit"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

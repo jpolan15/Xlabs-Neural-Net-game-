@@ -85,6 +85,16 @@ Before reporting completion:
 4. Report every command run and its exact output.
 5. Do not claim a test passed if it was not run.
 
+## Development tooling: Unity MCP
+
+The third-party "MCP for Unity" package (`com.coplaydev.unity-mcp`, pinned v9.7.3) lets agents drive the open Unity Editor over MCP. The decision record lives in `Documentation/Architecture/ADRs/`.
+
+- Server name: `unityMCP`. Its tools appear in Cursor under that namespace, configured in the project's `.cursor/mcp.json` once installed.
+- Prerequisite: the Unity Editor must be open on this project with the MCP for Unity bridge started (Window > MCP for Unity > Start Server / connect). If the `unityMCP` tools are unavailable, report that instead of guessing.
+- Development-only tooling: it must never be referenced by Core, Gameplay, XR, or Presentation assemblies (see Dependency rules).
+- When the Editor is already open, prefer `unityMCP` over Unity batchmode for compiling and reading the console, running tests, and building scenes (menu `Convergence/Build Level 1 — The Awakening Gate`). Batchmode cannot open a project the Editor holds locked.
+- All ownership, allowed-path, and validation rules in this file still apply to anything done through MCP.
+
 ## Prohibited behavior
 
 Do not:

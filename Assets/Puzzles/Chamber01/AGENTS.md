@@ -2,7 +2,7 @@
 
 ## Mission
 
-Teach the single-neuron binary classification perceptron by repairing an alien computing core to unlock the Awakening Gate.
+Teach the single-neuron OR perceptron. An asteroid strike has knocked the ship out of hyperspace and A.U.R.A. has lost her weights. The sensor array wakes if a radio beacon or a light signature is present. The gate stays shut until every row passes.
 
 ## Learning Objective
 

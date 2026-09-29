@@ -1,5 +1,13 @@
 # Completed Tasks
 
+## Dropped by ADR-008
+
+These were built, then cut from the live game. They are not done.
+
+- Sentry defense, sentry waves, and the purge-as-death loop (`TASK_SENTRY_DEFENSE_AND_TACTICAL_PRESSURE_OVERHAUL.md`, `TASK_LIVE_WAVE_DEFENSE_AND_PURGE_COUNTDOWN.md`).
+- The neural gun viewmodel.
+- The motherboard room and Synapse-GPT copy.
+
 ## Finished Tasks
 
 - [x] **Project Alignment & Concept Pivot**: Redesigned core loop from tedious dial-hunting to hypothesis-driven discovery and multi-case failure diagnosis.

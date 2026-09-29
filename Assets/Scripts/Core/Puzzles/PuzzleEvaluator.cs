@@ -69,14 +69,14 @@ namespace Convergence.Core.Puzzles
 
                 double predicted = outputs[0];
                 double target = tc.GetExpectedOutput(0);
-                double z = network.SingleNeuron != null ? network.SingleNeuron.LastZ : 0.0;
+                double z = network.SingleNeuron != null
+                    ? network.SingleNeuron.LastZ
+                    : network.Layers[network.Layers.Count - 1].Neurons[0].LastZ;
 
                 predictions[i] = predicted;
                 targets[i] = target;
 
-                // Binary prediction semantics (threshold at 0.5)
-                double binaryPred = predicted >= 0.5 ? 1.0 : 0.0;
-                bool isCorrect = (binaryPred == target);
+                bool isCorrect = OutputsMatch(outputs, tc, puzzle);
 
                 if (isCorrect)
                 {
@@ -102,6 +102,10 @@ namespace Convergence.Core.Puzzles
                     {
                         explanation = $"Over-activated: z = {z:+0.00;-0.00;0.00} >= 0. Output is 1, expected 0. Decrease weights or bias.";
                     }
+                    else if (puzzle.Scoring == ScoringMode.Continuous)
+                    {
+                        explanation = DescribeContinuousMiss(outputs, tc, puzzle, z);
+                    }
                     else
                     {
                         explanation = $"Output {predicted:F2} did not classify to expected target {target:F0}.";
@@ -119,7 +123,9 @@ namespace Convergence.Core.Puzzles
                 ));
             }
 
-            double accuracy = LossFunctions.BinaryAccuracy(predictions, targets, threshold: 0.5);
+            double accuracy = puzzle.Scoring == ScoringMode.Binary && puzzle.RequiredOutputs == 1
+                ? LossFunctions.BinaryAccuracy(predictions, targets, threshold: 0.5)
+                : (double)correctCount / totalCases;
             bool passed = (accuracy >= puzzle.AccuracyThreshold) && activationMatches;
 
             string summary;
@@ -147,6 +153,47 @@ namespace Convergence.Core.Puzzles
                 diagnostics: diagnostics,
                 summary: summary
             );
+        }
+
+        private static bool OutputsMatch(double[] outputs, TestCase tc, PuzzleDefinition puzzle)
+        {
+            for (int o = 0; o < outputs.Length; o++)
+            {
+                double expected = tc.GetExpectedOutput(o);
+                if (puzzle.Scoring == ScoringMode.Continuous)
+                {
+                    if (System.Math.Abs(outputs[o] - expected) > puzzle.ToleranceFor(o))
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    double binary = outputs[o] >= 0.5 ? 1.0 : 0.0;
+                    if (binary != expected)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        private static string DescribeContinuousMiss(double[] outputs, TestCase tc, PuzzleDefinition puzzle, double z)
+        {
+            for (int o = 0; o < outputs.Length; o++)
+            {
+                double expected = tc.GetExpectedOutput(o);
+                double error = System.Math.Abs(outputs[o] - expected);
+                double tolerance = puzzle.ToleranceFor(o);
+                if (error > tolerance)
+                {
+                    return $"Output {o} is {outputs[o]:F2}, target {expected:F2}, tolerance {tolerance:F2}. z = {z:+0.00;-0.00;0.00}.";
+                }
+            }
+
+            return "Continuous outputs missed their tolerances.";
         }
     }
 }

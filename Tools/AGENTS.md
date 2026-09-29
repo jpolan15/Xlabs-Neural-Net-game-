@@ -14,6 +14,8 @@ This directory contains **development-only** tooling.
 | `Tools/AgentBridge/` | MCP server and XR Operator integration (not a runtime dependency) |
 | `Tools/AgentBridge/README.md` | Setup instructions for the MCP server |
 
+**Unity MCP (external, not in `Tools/`)**: the `unityMCP` server comes from the `com.coplaydev.unity-mcp` package in `Packages/manifest.json` and is configured in the project's `.cursor/mcp.json` once installed. It is external development tooling; nothing in `Tools/` depends on it. See the root `AGENTS.md` for usage.
+
 ## Rules
 
 - Nothing in `Tools/` is referenced by `Core`, `Gameplay`, `XR`, or `Presentation` assemblies.

@@ -227,5 +227,16 @@ namespace Convergence.Tests.PlayMode.Gameplay
             Assert.IsFalse(eval.Passed, "Disconnected conduit must prevent puzzle completion.");
             Assert.IsFalse(_gatewayController.IsOpen);
         }
+
+        [Test]
+        public void SetUnifiedWeight_DoesNotChangeBias()
+        {
+            _neuralState.SetBias(-0.25);
+            _neuralState.SetUnifiedWeight(1.0);
+
+            Assert.AreEqual(1.0, _neuralState.Weight1, 1e-5);
+            Assert.AreEqual(1.0, _neuralState.Weight2, 1e-5);
+            Assert.AreEqual(-0.25, _neuralState.Bias, 1e-5);
+        }
     }
 }

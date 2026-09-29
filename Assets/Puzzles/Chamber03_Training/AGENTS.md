@@ -6,7 +6,7 @@ Teach loss landscapes, gradient descent, hyperparameter tuning, and diagnostic d
 
 ## Learning Objective
 
-The player transitions from manual weight adjustment to training an automated security drone classifier by configuring hyperparameters and diagnosing why automated training fails.
+The player transitions from manual weight adjustment to training A.U.R.A.'s Earth recognizer. Photos supply blue ratio, white ratio, and brightness. A held-out set, including a blue ice giant that is not Earth, is the grade. The math below does not change: real gradient steps, and a bad set fails for a reason the player can read.
 
 ## Player Experience & The Core Loop
 

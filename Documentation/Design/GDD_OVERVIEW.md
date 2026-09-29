@@ -1,21 +1,28 @@
 # Game Design Document: Project Convergence
 
 ## Premise
-You are an engineering specialist inside an abandoned, locked-down AI research complex. The facility's central intelligence is malfunctioning and locking down sectors. You must physically inspect, wire, calibrate, and diagnose neural circuits to unlock doors and stabilize the core.
+
+An asteroid strike knocks the ship out of hyperspace. The navigation AI, A.U.R.A., has lost its trained weights. The player is alone with it. Each chamber teaches one real machine-learning concept and changes the ship. The decision record is ADR-008.
 
 ## Chamber Roadmap
-1. **Level 01 / Chamber 01: The Awakening Gate**
-   - Setting: Alien computation megastructure floating in deep space.
-   - Concept: Artificial neuron perceptron, weighted inputs, bias threshold offset, step activation function.
-   - Core Discovery: $y = \text{step}(w_1 x_1 + w_2 x_2 + b)$ must satisfy all four binary classification cases of the OR truth table simultaneously. Solution margin: $w_1 = 1.0, w_2 = 1.0, b = -0.5$.
-   - Tools: Neural Pulse Tool, Arc Blade, detented weight regulators, bias dial, activation crystal socket.
-   - Acceptance: 100% binary accuracy required to unlock the Awakening Gate; 3/4 solutions (75%) keep the gate sealed.
-2. **Chamber 02: The XOR Wall**
-   - Concept: Linear separability limits, hidden layers, non-linear activation (ReLU).
-   - Core Discovery: A straight line cannot separate diagonal classes; hidden units act as specialized region feature detectors.
-3. **Chamber 03: The Training Bay**
-   - Concept: Loss surfaces, gradient descent, hyperparameter tuning, debugging training failures.
-   - Core Discovery: Hyperparameters (learning rate, normalization, batch size) determine whether a model converges or diverges.
-4. **Chamber 04: The Attention Core**
-   - Concept: Transformers, Query-Key similarity, Softmax attention distributions, contextual prediction.
-   - Core Discovery: Attention dynamically determines which context tokens influence the next prediction.
+
+1. **Chamber 01, sensor array**
+   - Setting: the ship's sensor bay, power out, shutters closed.
+   - Concept: one neuron, two inputs, a bias, and a step activation.
+   - Core discovery: the array wakes if a radio beacon OR a light signature is present. Quiet sensors stay dark.
+   - Canonical margin: \(w_1 = 1\), \(w_2 = 1\), \(b = -0.5\), Step. Any weights that score every row pass. The displays do not print those numbers as the answer.
+   - Payoff: shutters open, lights steady, the door aft of the bay unlocks. The ship drifts toward the asteroids. Nothing kills the player.
+2. **Chamber 02, spectrum filter**
+   - Concept: XOR is not linearly separable. A hidden layer with a non-linear activation can separate it.
+   - Payoff: the telescope powers on.
+3. **Telescope, then Chamber 03**
+   - The player photographs sky bodies. Features are the blue ratio, white ratio, and brightness of the capture.
+   - Cards go in an EARTH tray or a NOT EARTH tray. Training is stochastic gradient descent. A held-out set, including a blue ice giant, grades the result. A tray that only teaches "blue means Earth" fails in words.
+4. **Chamber 04, nav computer**
+   - Attention over log tokens such as `[EARTH_LOCK]`, `[FUEL_OK]`, and `[NOISE]`.
+   - Masking the corrupted token is what predicts `JUMP_HOME`.
+   - Payoff: the jump, Earth in the canopy, a short credits card, and a journal of what the player actually taught A.U.R.A.
+
+## Cut from the live game
+
+Sentry defense, the neural gun, the motherboard room, and Synapse-GPT. Those tasks are dropped, not completed.

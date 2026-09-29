@@ -1,0 +1,4 @@
+Kenney Interface Sounds and Kenney Sci-fi Sounds.
+License: CC0 1.0 Universal (Public Domain Dedication).
+Source: https://kenney.nl/assets/interface-sounds and https://kenney.nl/assets/sci-fi-sounds.
+Credit is not required. The files in this folder are unmodified excerpts of those packs.

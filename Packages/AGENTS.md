@@ -22,6 +22,8 @@ Manage project dependencies, Package Manager manifests, and external tools requi
   - `com.unity.splines`
   - `com.unity.textmeshpro`
   - `com.unity.test-framework`
+- Approved third-party exception (editor/development-only):
+  - `com.coplaydev.unity-mcp` (MCP for Unity), git URL `https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity`, pinned to tag `v9.7.3`. Approved by the user on 2026-09-29 as an explicit exception to the "no third-party git URLs" rule. Do not unpin or upgrade without a new ADR in `Documentation/Architecture/ADRs/`.
 
 ## Forbidden Behavior
 

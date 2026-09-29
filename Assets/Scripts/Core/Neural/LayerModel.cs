@@ -141,6 +141,61 @@ namespace Convergence.Core.Neural
         }
 
         /// <summary>
+        /// Backpropagates dL/da for this layer into neuron gradients and writes dL/dx into <paramref name="dLossDInputs"/>.
+        /// The destination array is cleared first. Its length must equal <see cref="InputCount"/>.
+        /// </summary>
+        public void Backward(double[] dLossDOutputs, double[] dLossDInputs)
+        {
+            if (dLossDOutputs == null)
+            {
+                throw new ArgumentNullException(nameof(dLossDOutputs));
+            }
+            if (dLossDInputs == null)
+            {
+                throw new ArgumentNullException(nameof(dLossDInputs));
+            }
+            if (dLossDOutputs.Length != _neurons.Count)
+            {
+                throw new ArgumentException(
+                    $"Expected {_neurons.Count} output gradients, received {dLossDOutputs.Length}.",
+                    nameof(dLossDOutputs));
+            }
+            if (dLossDInputs.Length != InputCount)
+            {
+                throw new ArgumentException(
+                    $"Expected {InputCount} input-gradient slots, received {dLossDInputs.Length}.",
+                    nameof(dLossDInputs));
+            }
+
+            Array.Clear(dLossDInputs, 0, dLossDInputs.Length);
+
+            if (LayerActivationOverride == ActivationType.Softmax)
+            {
+                int n = _neurons.Count;
+                for (int i = 0; i < n; i++)
+                {
+                    double si = _neurons[i].LastOutput;
+                    double dZ = 0.0;
+                    for (int j = 0; j < n; j++)
+                    {
+                        double sj = _neurons[j].LastOutput;
+                        double dSjDzI = sj * ((i == j ? 1.0 : 0.0) - si);
+                        dZ += dLossDOutputs[j] * dSjDzI;
+                    }
+
+                    _neurons[i].AccumulatePreActivationGradient(dZ, dLossDInputs);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < _neurons.Count; i++)
+                {
+                    _neurons[i].AccumulateOutputGradient(dLossDOutputs[i], dLossDInputs);
+                }
+            }
+        }
+
+        /// <summary>
         /// Creates an independent deep copy of this layer and all its neurons.
         /// </summary>
         public LayerModel DeepCopy()

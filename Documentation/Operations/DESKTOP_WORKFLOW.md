@@ -76,3 +76,13 @@ Always confirm headset-required tests on a physical device before release. See `
 | Toggle manipulated device | Tab |
 
 These bindings apply when the XR Device Simulator (built into XRI) is active, as distinct from the Meta XR Simulator runtime.
+
+### Using the XR Device Simulator with the Level 01 scene (ADR-007)
+
+The scene has no desktop camera fallback. To test without a headset:
+
+1. Open `Assets/Scenes/Level01_AwakeningGate.unity`.
+2. Drag `Assets/Samples/XR Interaction Toolkit/3.6.0/XR Device Simulator/XR Device Simulator.prefab` into the open scene. Do not save the scene with it in place; it must never ship in a Quest build.
+3. Enter Play Mode. The simulator drives the rig's `TrackedPoseDriver` and controllers, so ray pointing, grab, snap turn and UI presses behave as on device.
+
+Regenerating the scene with `Convergence/Build Level 1 — The Awakening Gate` removes the simulator.
