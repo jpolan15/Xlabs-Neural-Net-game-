@@ -66,30 +66,37 @@ namespace Convergence.XR
         private Texture2D _btnBgTex;
         private Texture2D _btnActiveBgTex;
 
+        private static readonly List<XRDisplaySubsystem> DisplaySubsystems = new List<XRDisplaySubsystem>(4);
+
+        /// <summary>
+        /// True when an XR display is actually running. Headset pose application also
+        /// disables this component, because XRSettings.isDeviceActive can lag the first frames.
+        /// </summary>
+        public static bool IsXrSessionActive()
+        {
+            if (XRSettings.isDeviceActive)
+                return true;
+
+            DisplaySubsystems.Clear();
+            SubsystemManager.GetSubsystems(DisplaySubsystems);
+            for (int i = 0; i < DisplaySubsystems.Count; i++)
+            {
+                XRDisplaySubsystem display = DisplaySubsystems[i];
+                if (display != null && display.running)
+                    return true;
+            }
+
+            return false;
+        }
+
         private void Awake()
         {
-            // ── VR Guard ──────────────────────────────────────────────────────────
-            // If an XR device or headset is active, disable desktop fallback completely.
-            // Under OpenXR / Quest Link, XRSettings.isDeviceActive or XRDisplaySubsystem indicates VR.
-            if (UnityEngine.XR.XRSettings.isDeviceActive)
+            if (IsXrSessionActive())
             {
-                Debug.Log("[DesktopInputFallback] XRSettings device active — disabling desktop fallback.");
+                Debug.Log("[DesktopInputFallback] XR session active — desktop fallback disabled.");
                 enabled = false;
                 return;
             }
-
-            var displays = new List<XRDisplaySubsystem>();
-            SubsystemManager.GetSubsystems(displays);
-            foreach (var d in displays)
-            {
-                if (d.running)
-                {
-                    Debug.Log("[DesktopInputFallback] XR display active — desktop fallback disabled.");
-                    enabled = false;
-                    return;
-                }
-            }
-            // ─────────────────────────────────────────────────────────────────────
 
             if (chamberController == null) chamberController = FindAnyObjectByType<ChamberController>();
             if (neuralState == null) neuralState = FindAnyObjectByType<NeuralState>();
@@ -138,6 +145,13 @@ namespace Convergence.XR
 
         private void Update()
         {
+            if (IsXrSessionActive())
+            {
+                Debug.Log("[DesktopInputFallback] XR session became active — releasing the camera.");
+                enabled = false;
+                return;
+            }
+
             HandleNavigation();
             HandleDirectParameterShortcuts();
             HandleHoverDetection();

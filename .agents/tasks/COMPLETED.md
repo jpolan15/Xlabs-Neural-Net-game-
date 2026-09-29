@@ -2,6 +2,7 @@
 
 ## Finished Tasks
 
+- [x] **[TASK_VR_PLAYSPACE_AND_EARTH_LOOP.md](TASK_VR_PLAYSPACE_AND_EARTH_LOOP.md)**: Headset playspace collision, free look, controller rays, and the lost-in-space Earth-return readout.
 - [x] **Project Alignment & Concept Pivot**: Redesigned core loop from tedious dial-hunting to hypothesis-driven discovery and multi-case failure diagnosis.
 - [x] **Implementation Plan Approval**: Created and user-approved comprehensive architectural roadmap in `implementation_plan.md`.
 - [x] **Multi-Agent Governance Framework**: Created root `AGENTS.md` and specialized `AGENTS.md` contracts across all major directories.

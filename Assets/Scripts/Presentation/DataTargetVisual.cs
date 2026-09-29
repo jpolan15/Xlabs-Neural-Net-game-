@@ -341,7 +341,7 @@ namespace Convergence.Presentation
             if (receptor.LastDiagnostic != null && !receptor.IsHarmonized)
             {
                 string outcomeText = (receptor.LastActualOutput >= 0.5) ? "FIRED PLASMA" : "HOLD / MISSED";
-                string errStr = $"Sentry Decision: {outcomeText} (y={receptor.LastActualOutput:F0}) -> MISMATCH!";
+                string errStr = $"Navigation: {outcomeText} (y={receptor.LastActualOutput:F0}) -> MISMATCH!";
                 GUIStyle alertStyle = new GUIStyle(subStyle)
                 {
                     normal = { textColor = errorRed }
