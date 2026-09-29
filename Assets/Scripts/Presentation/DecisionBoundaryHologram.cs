@@ -19,7 +19,8 @@ namespace Convergence.Presentation
         [SerializeField] private ChamberController chamberController;
 
         [Header("Display Settings")]
-        [SerializeField] private bool showHologram = true;
+        [SerializeField] private bool showHologram = false;
+        [SerializeField] private KeyCode toggleKey = KeyCode.G;
         [SerializeField] private Vector2 screenPosition = new Vector2(20, 20);
 
         // Styling
@@ -41,6 +42,14 @@ namespace Convergence.Presentation
             _whiteTex = new Texture2D(1, 1);
             _whiteTex.SetPixel(0, 0, Color.white);
             _whiteTex.Apply();
+        }
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(toggleKey))
+            {
+                showHologram = !showHologram;
+            }
         }
 
         private void OnGUI()

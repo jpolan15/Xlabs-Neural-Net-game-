@@ -28,12 +28,12 @@ namespace Convergence.Presentation
         [SerializeField] private Vector3 perimeterPosition = new Vector3(0, 1.2f, 2.5f);
 
         [Header("Tactical Colors")]
-        [SerializeField] private Color friendlyAllyColor = new Color(0.1f, 0.95f, 0.55f, 1.0f);   // Mint Emerald
-        [SerializeField] private Color biohazardColor = new Color(0.95f, 0.75f, 0.05f, 1.0f);      // Toxic Amber
-        [SerializeField] private Color radiationColor = new Color(1.0f, 0.25f, 0.15f, 1.0f);       // Alert Red
-        [SerializeField] private Color dualBreachColor = new Color(0.85f, 0.1f, 0.95f, 1.0f);      // Overload Magenta
+        [SerializeField] private Color voidNoiseColor = new Color(0.40f, 0.50f, 0.65f, 1.0f);       // Deep Space Cosmic Void (Slate Blue)
+        [SerializeField] private Color atmosphereColor = new Color(0.20f, 0.75f, 1.0f, 1.0f);      // Earth Atmosphere (Cyan Sky)
+        [SerializeField] private Color landmassColor = new Color(0.15f, 0.90f, 0.45f, 1.0f);        // Continental Landmass (Verdant Green)
+        [SerializeField] private Color confirmedEarthColor = new Color(0.25f, 0.85f, 1.0f, 1.0f);  // Confirmed Earth Orbit (Orbital Aqua)
         [SerializeField] private Color harmonizedEmerald = new Color(0.05f, 1.0f, 0.45f, 1.0f);
-        [SerializeField] private Color errorRed = new Color(1.0f, 0.1f, 0.1f, 1.0f);
+        [SerializeField] private Color errorRed = new Color(1.0f, 0.15f, 0.15f, 1.0f);
 
         private float _impactTimer;
         private Camera _mainCam;
@@ -177,8 +177,11 @@ namespace Convergence.Presentation
             Color themeColor = GetBaseTargetColor();
             if (coreRenderer != null && coreRenderer.sharedMaterial != null)
             {
-                coreRenderer.sharedMaterial.color = themeColor;
-                coreRenderer.sharedMaterial.SetColor("_EmissionColor", themeColor * 1.2f);
+                if (coreRenderer.sharedMaterial.mainTexture == null)
+                {
+                    coreRenderer.sharedMaterial.color = themeColor;
+                }
+                coreRenderer.sharedMaterial.SetColor("_EmissionColor", themeColor * 0.8f);
             }
             if (auraLight != null)
             {
@@ -192,11 +195,11 @@ namespace Convergence.Presentation
             int idx = receptor != null ? receptor.CaseIndex : 0;
             return idx switch
             {
-                0 => friendlyAllyColor,
-                1 => biohazardColor,
-                2 => radiationColor,
-                3 => dualBreachColor,
-                _ => friendlyAllyColor
+                0 => voidNoiseColor,
+                1 => atmosphereColor,
+                2 => landmassColor,
+                3 => confirmedEarthColor,
+                _ => voidNoiseColor
             };
         }
 
@@ -245,8 +248,16 @@ namespace Convergence.Presentation
 
             if (coreRenderer != null && coreRenderer.material != null)
             {
-                coreRenderer.material.color = activeColor;
-                coreRenderer.material.SetColor("_EmissionColor", activeColor * (receptor.IsHarmonized ? 3.0f : 1.6f));
+                if (coreRenderer.material.mainTexture != null)
+                {
+                    coreRenderer.material.color = Color.white;
+                    coreRenderer.material.SetColor("_EmissionColor", activeColor * (receptor.IsHarmonized ? 1.4f : 0.35f));
+                }
+                else
+                {
+                    coreRenderer.material.color = activeColor;
+                    coreRenderer.material.SetColor("_EmissionColor", activeColor * (receptor.IsHarmonized ? 3.0f : 1.6f));
+                }
             }
 
             if (subRenderer != null && subRenderer.material != null)

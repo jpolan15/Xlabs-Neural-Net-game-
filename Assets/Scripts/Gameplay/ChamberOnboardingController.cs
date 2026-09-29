@@ -195,7 +195,7 @@ namespace Convergence.Gameplay
             _stepTimeElapsed = 0f;
             _progressiveHintIndex = 0;
             OnStepChanged?.Invoke(currentStep);
-            OnAnnouncerVoicePrompt?.Invoke("Emergency: the facility AI is losing its mind. We need your help to fix it before it's too late.");
+            OnAnnouncerVoicePrompt?.Invoke("Warning. Asteroid impact detected. Neural navigation offline. Manual repair required to return to Earth.");
 
             yield return new WaitForSeconds(awakeningDelay);
 
@@ -257,22 +257,12 @@ namespace Convergence.Gameplay
         /// </summary>
         private string BuildRetryAdvice(PuzzleEvaluation eval)
         {
-            if (eval == null) return "Something went wrong — try pulling the lever again.";
+            if (eval == null) return "Navigation failed. Try recalculating.";
 
             if (!eval.ActivationMatches)
-                return "The sentry needs a Step crystal to make binary decisions. Check the socket.";
+                return "The navigation computer requires a Sigmoid crystal for coordinate mapping. Check the socket.";
 
-            bool friendlyFired = eval.Diagnostics != null && eval.Diagnostics.Count > 0 && eval.Diagnostics[0].ActualOutput >= 0.5;
-            bool hazardMissed  = eval.Diagnostics != null && eval.PassedCases < eval.TotalCases - (friendlyFired ? 0 : 1);
-
-            if (friendlyFired && hazardMissed)
-                return "Close! The sensitivity is a bit off — try dialing it down slightly so the quiet room stays safe.";
-            if (friendlyFired)
-                return "The friendly drone was hit — the sensitivity is too high. Try turning it down a little.";
-            if (hazardMissed)
-                return "Some hazards slipped through — the sensitivity is too low. Turn the dial up a notch.";
-
-            return $"Almost there — {eval.PassedCases}/{eval.TotalCases} correct. Adjust the dial and try again.";
+            return $"Navigation error: {eval.PassedCases}/{eval.TotalCases} coordinates matched. Adjust the weights and try again.";
         }
 
         public void TransitionToStep(OnboardingStep newStep)
@@ -285,19 +275,19 @@ namespace Convergence.Gameplay
             switch (newStep)
             {
                 case OnboardingStep.ConnectSensors:
-                    OnAnnouncerVoicePrompt?.Invoke("The sensors are offline. Grab those two glowing cables and plug them into the console.");
+                    OnAnnouncerVoicePrompt?.Invoke("Navigation sensors offline. Plug the power cables into the main console to reboot the matrix.");
                     break;
 
                 case OnboardingStep.TuneSensitivity:
-                    OnAnnouncerVoicePrompt?.Invoke("Sensors live! Now turn the sensitivity dial. The sentry needs to react to real threats — but not to silence.");
+                    OnAnnouncerVoicePrompt?.Invoke("Power restored! Now adjust the neural matrix weights. We need to lock onto Earth's location.");
                     break;
 
                 case OnboardingStep.FireTest:
-                    OnAnnouncerVoicePrompt?.Invoke("Looks good. Pull the lever to run the diagnostic across all four scenarios.");
+                    OnAnnouncerVoicePrompt?.Invoke("Trajectory looks stable. Pull the lever to run the navigation diagnostic.");
                     break;
 
                 case OnboardingStep.Completed:
-                    OnAnnouncerVoicePrompt?.Invoke("Perfect calibration. The sentry is online and the blast doors are unsealing. You did it!");
+                    OnAnnouncerVoicePrompt?.Invoke("Coordinates locked. Navigation restored. Blasting off to Earth!");
                     break;
             }
         }

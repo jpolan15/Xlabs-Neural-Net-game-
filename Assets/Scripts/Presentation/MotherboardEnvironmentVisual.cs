@@ -32,11 +32,14 @@ namespace Convergence.Presentation
         private float _pulseIntensity = 0f;
         private Color _targetColor;
         private float _clockTimer = 0f;
+        private MaterialPropertyBlock _mpb;
+        private static readonly int EmissionColorId = Shader.PropertyToID("_EmissionColor");
 
         private void Awake()
         {
             if (chamberController == null) chamberController = FindAnyObjectByType<ChamberController>();
             _targetColor = normalBusColor;
+            _mpb = new MaterialPropertyBlock();
         }
 
         private void OnEnable()
@@ -92,13 +95,16 @@ namespace Convergence.Presentation
             // Flicker memory chip LEDs
             if (memoryChipLeds != null && memoryChipLeds.Length > 0)
             {
+                if (_mpb == null) _mpb = new MaterialPropertyBlock();
                 for (int i = 0; i < memoryChipLeds.Length; i++)
                 {
-                    if (memoryChipLeds[i] != null && memoryChipLeds[i].material != null)
+                    if (memoryChipLeds[i] != null)
                     {
                         bool activeLed = Mathf.PerlinNoise(Time.time * 6f, i * 1.7f) > 0.45f;
                         Color ledCol = activeLed ? normalBusColor * 2.0f : Color.black;
-                        memoryChipLeds[i].material.SetColor("_EmissionColor", ledCol);
+                        memoryChipLeds[i].GetPropertyBlock(_mpb);
+                        _mpb.SetColor(EmissionColorId, ledCol);
+                        memoryChipLeds[i].SetPropertyBlock(_mpb);
                     }
                 }
             }

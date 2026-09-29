@@ -103,7 +103,7 @@ namespace Convergence.Core.Puzzles
         }
 
         /// <summary>
-        /// Canonical factory for Level 1 — The Awakening Gate (OR-gate perceptron).
+        /// Level 1 - The Awakening Gate (OR-gate perceptron).
         /// Truth table:
         /// (0, 0) -> 0
         /// (0, 1) -> 1
@@ -128,6 +128,30 @@ namespace Convergence.Core.Puzzles
                 requiredActivation: ActivationType.Step,
                 accuracyThreshold: 1.0,
                 chamberTitle: "The Awakening Gate"
+            );
+        }
+
+        /// <summary>
+        /// Replaced Level 1: Earth Location Puzzle (Space Theme).
+        /// Requires a larger 16-input network (4x4 matrix representing an image of space)
+        /// and 2 outputs representing the (X,Y) coordinates of Earth to blast off.
+        /// </summary>
+        public static PuzzleDefinition CreateEarthLocationPuzzle()
+        {
+            var testCases = new TestCase[]
+            {
+                new TestCase(new double[] { 0,0,0,0, 0,1,1,0, 0,1,1,0, 0,0,0,0 }, new double[] { 0.5, 0.5 }, "Earth Center"),
+                new TestCase(new double[] { 1,1,0,0, 1,1,0,0, 0,0,0,0, 0,0,0,0 }, new double[] { 0.0, 1.0 }, "Earth Top Left"),
+                new TestCase(new double[] { 0,0,0,0, 0,0,0,0, 0,0,1,1, 0,0,1,1 }, new double[] { 1.0, 0.0 }, "Earth Bottom Right")
+            };
+
+            return new PuzzleDefinition(
+                testCases: testCases,
+                requiredInputs: 16,
+                requiredOutputs: 2,
+                requiredActivation: ActivationType.Sigmoid,
+                accuracyThreshold: 0.9, // 90% accuracy required for continuous outputs
+                chamberTitle: "Navigation Repair"
             );
         }
     }

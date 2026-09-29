@@ -84,6 +84,29 @@ namespace Convergence.Core.Neural
         }
 
         /// <summary>
+        /// Factory method to build a larger multi-layer network for the Earth Navigation puzzle.
+        /// 16 inputs -> 8 hidden neurons -> 2 output neurons.
+        /// </summary>
+        public static NetworkModel CreateNavigationNetwork()
+        {
+            var hiddenNeurons = new List<NeuronModel>();
+            for (int i = 0; i < 8; i++)
+            {
+                hiddenNeurons.Add(new NeuronModel(new double[16], 0.0, ActivationType.Sigmoid));
+            }
+            var hiddenLayer = new LayerModel(hiddenNeurons);
+
+            var outputNeurons = new List<NeuronModel>();
+            for (int i = 0; i < 2; i++)
+            {
+                outputNeurons.Add(new NeuronModel(new double[8], 0.0, ActivationType.Sigmoid));
+            }
+            var outputLayer = new LayerModel(outputNeurons);
+
+            return new NetworkModel(new[] { hiddenLayer, outputLayer });
+        }
+
+        /// <summary>
         /// Propagates input vector through all layers sequentially and returns final output vector.
         /// </summary>
         public double[] Forward(double[] inputs)

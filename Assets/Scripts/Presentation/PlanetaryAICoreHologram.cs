@@ -219,7 +219,7 @@ namespace Convergence.Presentation
             // Header Text
             if (headerTextMesh != null)
             {
-                headerTextMesh.text = "GLOBAL FOUNDATION AI // SYNAPSE-GPT CORE";
+                headerTextMesh.text = "EMERGENCY WARP NAVIGATION AI // USS CONVERGENCE";
                 headerTextMesh.color = activeColor;
             }
 
@@ -230,7 +230,7 @@ namespace Convergence.Presentation
                 int filledBlocks = Mathf.RoundToInt(_currentIntegrity * totalBlocks);
 
                 _barBuffer.Length = 0;
-                _barBuffer.Append("INTEGRITY: [");
+                _barBuffer.Append("WARP JUMP INTEGRITY: [");
                 for (int i = 0; i < totalBlocks; i++)
                 {
                     _barBuffer.Append(i < filledBlocks ? "█" : "░");
@@ -239,15 +239,15 @@ namespace Convergence.Presentation
 
                 if (_isHarmonized)
                 {
-                    _barBuffer.Append(" [COGNITIVE MATRIX STABILIZED]");
+                    _barBuffer.Append(" [WARP JUMP VECTOR LOCKED]");
                 }
                 else if (_currentIntegrity >= 0.65f)
                 {
-                    _barBuffer.Append(" [SYNAPTIC HARMONY NEAR]");
+                    _barBuffer.Append(" [EARTH LOCK SYNCHRONIZING]");
                 }
                 else
                 {
-                    _barBuffer.Append(" [CRITICAL HALLUCINATION DRIFT]");
+                    _barBuffer.Append(" [WARP DRIVE OFFLINE]");
                 }
 
                 integrityBarTextMesh.text = _barBuffer.ToString();
@@ -260,31 +260,31 @@ namespace Convergence.Presentation
                 _detailsBuffer.Length = 0;
                 if (_isHarmonized)
                 {
-                    _detailsBuffer.AppendLine("✔ Sector 01 Sensory Perceptron 100% Calibrated");
-                    _detailsBuffer.AppendLine("✔ Planetary life support and orbital power grids secure");
-                    _detailsBuffer.AppendLine("✔ Awakening Blast Doors Unsealed — Proceed to Chamber 02");
+                    _detailsBuffer.AppendLine("✔ Earth telemetry lock 100% verified across all 4 sensor feeds");
+                    _detailsBuffer.AppendLine("✔ Hyperspace jump vector calculated — heading home to Earth");
+                    _detailsBuffer.AppendLine("✔ Awakening Blast Doors Unsealed — Proceed to Command Airlock");
                 }
                 else
                 {
                     if (neuralState != null)
                     {
                         if (!neuralState.Cable1Connected)
-                            _detailsBuffer.AppendLine("⚠ RADIATION CONDUIT DISCONNECTED — Sensory channel offline");
+                            _detailsBuffer.AppendLine("⚠ CONTINENT SENSOR DISCONNECTED — Earth telemetry feed offline");
                         else
-                            _detailsBuffer.AppendLine("✔ Radiation line active");
+                            _detailsBuffer.AppendLine("✔ Earth continental sensor feed active");
 
                         if (!neuralState.Cable2Connected)
-                            _detailsBuffer.AppendLine("⚠ BIO-HAZARD CONDUIT DISCONNECTED — Sensory channel offline");
+                            _detailsBuffer.AppendLine("⚠ ATMOSPHERE SENSOR DISCONNECTED — Earth telemetry feed offline");
                         else
-                            _detailsBuffer.AppendLine("✔ Bio-hazard line active");
+                            _detailsBuffer.AppendLine("✔ Earth atmospheric sensor feed active");
 
                         if (neuralState.Activation != ActivationType.Step)
-                            _detailsBuffer.AppendLine($"⚠ INCOMPATIBLE ACTIVATION ({neuralState.Activation}) — Need Step Crystal for 0/1 gate");
+                            _detailsBuffer.AppendLine($"⚠ INCOMPATIBLE ACTIVATION ({neuralState.Activation}) — Need Step Crystal for binary Jump Lock");
                         else
                             _detailsBuffer.AppendLine("✔ Step decision crystal socketed");
 
                         if (neuralState.Bias >= 0.0)
-                            _detailsBuffer.AppendLine("⚠ NOISE BIAS OVER-THRESHOLD — Clean rooms will trigger false alarms!");
+                            _detailsBuffer.AppendLine("⚠ COSMIC NOISE FILTER TOO LOW — Deep space static will cause false warp jumps!");
                     }
                 }
 

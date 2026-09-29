@@ -67,21 +67,28 @@ namespace Convergence.Presentation
             }
         }
 
+        private MaterialPropertyBlock _cablePropBlock;
+
         private void UpdateConduits()
         {
             if (neuralState == null) return;
+            if (_cablePropBlock == null) _cablePropBlock = new MaterialPropertyBlock();
 
-            if (cable1Renderer != null && cable1Renderer.material != null)
+            if (cable1Renderer != null)
             {
                 Color c1 = neuralState.Cable1Connected ? activeColor : disconnectedColor;
-                cable1Renderer.material.color = c1;
-                cable1Renderer.material.SetColor("_EmissionColor", c1 * 2.0f);
+                cable1Renderer.GetPropertyBlock(_cablePropBlock);
+                _cablePropBlock.SetColor("_Color", c1);
+                _cablePropBlock.SetColor("_EmissionColor", c1 * 2.0f);
+                cable1Renderer.SetPropertyBlock(_cablePropBlock);
             }
-            if (cable2Renderer != null && cable2Renderer.material != null)
+            if (cable2Renderer != null)
             {
                 Color c2 = neuralState.Cable2Connected ? activeColor : disconnectedColor;
-                cable2Renderer.material.color = c2;
-                cable2Renderer.material.SetColor("_EmissionColor", c2 * 2.0f);
+                cable2Renderer.GetPropertyBlock(_cablePropBlock);
+                _cablePropBlock.SetColor("_Color", c2);
+                _cablePropBlock.SetColor("_EmissionColor", c2 * 2.0f);
+                cable2Renderer.SetPropertyBlock(_cablePropBlock);
             }
         }
 

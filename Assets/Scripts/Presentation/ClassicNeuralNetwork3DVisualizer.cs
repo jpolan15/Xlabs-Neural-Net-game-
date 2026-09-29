@@ -57,15 +57,17 @@ namespace Convergence.Presentation
         [SerializeField] private Transform outputLayerLabel;
 
         [Header("Color Palettes")]
-        [SerializeField] private Color inputCoral = new Color(0.98f, 0.40f, 0.30f, 1.0f);   // Ruby Coral (Inputs)
-        [SerializeField] private Color hiddenAzure = new Color(0.60f, 0.30f, 0.95f, 1.0f);  // Cyber Violet (Hidden)
-        [SerializeField] private Color outputEmerald = new Color(0.08f, 0.90f, 0.50f, 1.0f); // Mint Emerald (Output)
-        [SerializeField] private Color amberGlow = new Color(0.98f, 0.65f, 0.10f, 1.0f);
-        [SerializeField] private Color inactiveColor = new Color(0.18f, 0.22f, 0.30f, 0.35f);
+        [SerializeField] private Color inputCoral = new Color(1.0f, 0.35f, 0.35f, 1.0f);   // Ruby Coral (Inputs)
+        [SerializeField] private Color hiddenAzure = new Color(0.25f, 0.75f, 1.0f, 1.0f);  // Cyber Azure / Electric Violet (Hidden)
+        [SerializeField] private Color outputEmerald = new Color(0.10f, 0.98f, 0.55f, 1.0f); // Mint Emerald (Output)
+        [SerializeField] private Color amberGlow = new Color(1.0f, 0.70f, 0.15f, 1.0f);
+        [SerializeField] private Color dormantConduitColor = new Color(0.20f, 0.50f, 0.85f, 0.70f); // Glowing dormant cyber conduit
+        [SerializeField] private Color dormantInputColor = new Color(0.45f, 0.18f, 0.18f, 1.0f);   // Resting warm ember glow
 
         private Vector3 _initialPivotPosition;
         private bool _isPulsing = false;
         private Camera _mainCamera;
+        private MaterialPropertyBlock _propBlock;
 
         public bool AutoRotate
         {
@@ -80,6 +82,7 @@ namespace Convergence.Presentation
             if (networkPivot == null) networkPivot = transform;
             _initialPivotPosition = networkPivot.localPosition;
             _mainCamera = Camera.main;
+            _propBlock = new MaterialPropertyBlock();
         }
 
         private void OnEnable()
@@ -188,9 +191,9 @@ namespace Convergence.Presentation
             {
                 for (int i = 0; i < outputRenderers.Length; i++)
                 {
-                    if (outputRenderers[i] != null && outputRenderers[i].material != null)
+                    if (outputRenderers[i] != null)
                     {
-                        outputRenderers[i].material.SetColor("_EmissionColor", outputEmerald * 4.0f);
+                        SetRendererEmission(outputRenderers[i], outputEmerald * 4.0f);
                     }
                 }
             }
@@ -226,8 +229,8 @@ namespace Convergence.Presentation
                 double weight = inputWeights[i];
                 float absW = (float)Math.Abs(weight);
 
-                Color synColor = absW > 0.05f ? (weight >= 0 ? hiddenAzure : amberGlow) : inactiveColor;
-                float width = Mathf.Lerp(0.006f, 0.016f, absW / 2.0f);
+                Color synColor = absW > 0.05f ? (weight >= 0 ? hiddenAzure : amberGlow) : dormantConduitColor;
+                float width = absW > 0.05f ? Mathf.Lerp(0.012f, 0.024f, absW / 2.0f) : 0.009f;
 
                 // Add subtle ambient idle wave pulse
                 float idlePulse = Mathf.PingPong(Time.time * 1.8f + (i * 0.4f), 0.003f);
@@ -276,8 +279,8 @@ namespace Convergence.Presentation
                         lr.positionCount = 2;
                         lr.SetPosition(0, hidPos);
                         lr.SetPosition(1, outputNodes[o].position);
-                        lr.startWidth = 0.010f;
-                        lr.endWidth = 0.012f;
+                        lr.startWidth = 0.013f;
+                        lr.endWidth = 0.015f;
                         lr.startColor = actColor;
                         lr.endColor = actColor;
                     }
@@ -296,41 +299,55 @@ namespace Convergence.Presentation
         {
             if (neuralState == null) return;
 
-            // Input Nodes (Red/Coral glowing)
+            // Input Nodes (Ruby Coral / Resting Ember)
             if (inputRenderers != null)
             {
                 if (inputRenderers.Length > 0 && inputRenderers[0] != null)
-                    inputRenderers[0].sharedMaterial.SetColor("_EmissionColor", neuralState.Cable1Connected ? inputCoral * 1.3f : inactiveColor);
+                    SetRendererEmission(inputRenderers[0], neuralState.Cable1Connected ? inputCoral * 1.8f : dormantInputColor);
                 if (inputRenderers.Length > 1 && inputRenderers[1] != null)
-                    inputRenderers[1].sharedMaterial.SetColor("_EmissionColor", neuralState.Cable2Connected ? inputCoral * 1.3f : inactiveColor);
+                    SetRendererEmission(inputRenderers[1], neuralState.Cable2Connected ? inputCoral * 1.8f : dormantInputColor);
                 if (inputRenderers.Length > 2 && inputRenderers[2] != null)
-                    inputRenderers[2].sharedMaterial.SetColor("_EmissionColor", amberGlow * 1.3f);
+                    SetRendererEmission(inputRenderers[2], amberGlow * 1.8f);
             }
 
             // Hidden Nodes (Cyan/Azure glowing with subtle pulsation)
             if (hiddenRenderers != null)
             {
-                float pulse = 1.1f + Mathf.PingPong(Time.time * 1.8f, 0.3f);
+                float pulse = 1.3f + Mathf.PingPong(Time.time * 1.8f, 0.5f);
                 for (int h = 0; h < hiddenRenderers.Length; h++)
                 {
                     if (hiddenRenderers[h] != null)
                     {
-                        hiddenRenderers[h].sharedMaterial.SetColor("_EmissionColor", hiddenAzure * pulse);
+                        SetRendererEmission(hiddenRenderers[h], hiddenAzure * pulse);
                     }
                 }
             }
 
-            // Output Nodes (Emerald glowing)
+            // Output Nodes (Mint Emerald glowing)
             if (outputRenderers != null)
             {
-                float outPulse = 1.2f + Mathf.PingPong(Time.time * 2.0f, 0.4f);
+                float outPulse = 1.4f + Mathf.PingPong(Time.time * 2.0f, 0.5f);
                 for (int o = 0; o < outputRenderers.Length; o++)
                 {
                     if (outputRenderers[o] != null)
                     {
-                        outputRenderers[o].sharedMaterial.SetColor("_EmissionColor", outputEmerald * outPulse);
+                        SetRendererEmission(outputRenderers[o], outputEmerald * outPulse);
                     }
                 }
+            }
+        }
+
+        private void SetRendererEmission(Renderer rend, Color color)
+        {
+            if (rend == null) return;
+            if (_propBlock == null) _propBlock = new MaterialPropertyBlock();
+            rend.GetPropertyBlock(_propBlock);
+            _propBlock.SetColor("_EmissionColor", color);
+            rend.SetPropertyBlock(_propBlock);
+
+            if (rend.sharedMaterial != null && rend.sharedMaterial.HasProperty("_EmissionColor"))
+            {
+                rend.sharedMaterial.SetColor("_EmissionColor", color);
             }
         }
 

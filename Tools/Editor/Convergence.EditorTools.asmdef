@@ -8,7 +8,11 @@
         "Convergence.Core.Puzzles",
         "Convergence.Gameplay",
         "Convergence.XR",
-        "Convergence.Presentation"
+        "Convergence.Presentation",
+        "Unity.XR.CoreUtils",
+        "Unity.XR.Interaction.Toolkit",
+        "Unity.InputSystem",
+        "Unity.RenderPipelines.Universal.Runtime"
     ],
     "includePlatforms": [
         "Editor"

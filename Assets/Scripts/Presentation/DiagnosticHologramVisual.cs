@@ -9,11 +9,11 @@ namespace Convergence.Presentation
 {
     /// <summary>
     /// High-clarity 3D world-space and on-screen holographic telemetry matrix display for Level 1.
-    /// Presents real-time double-loop pedagogical feedback across the 4 facility hazard scenarios:
-    /// - Case 1: Clean Room (Radiation=0, BioLeak=0) -> Safe (0)
-    /// - Case 2: Bio-Hazard Leak (Radiation=0, BioLeak=1) -> Quarantine Alarm (1)
-    /// - Case 3: Radiation Spike (Radiation=1, BioLeak=0) -> Quarantine Alarm (1)
-    /// - Case 4: Dual Hazard Breach (Radiation=1, BioLeak=1) -> Quarantine Alarm (1)
+    /// Presents real-time double-loop pedagogical feedback across the 4 Earth recognition vectors:
+    /// - Case 1: Deep Space Void (Land=0, Atmos=0) -> Filtered / Standby (0)
+    /// - Case 2: Earth Atmosphere (Land=0, Atmos=1) -> Warp Vector Lock (1)
+    /// - Case 3: Earth Continents (Land=1, Atmos=0) -> Warp Vector Lock (1)
+    /// - Case 4: Earth Orbital Fix (Land=1, Atmos=1) -> Warp Vector Lock (1)
     /// Strictly observes ChamberController and NeuralState events. Never makes puzzle decisions.
     /// </summary>
     [ExecuteAlways]
@@ -42,18 +42,18 @@ namespace Convergence.Presentation
 
         private PuzzleEvaluation _latestEvaluation;
         private readonly string[] _caseRowTexts = new string[4];
-        private string _statusHeader = "SENSOR CHECK — run the test to see results";
-        private string _pedagogicalHint = "Turn the sensitivity dial until all four rows show green, then pull the lever.";
+        private string _statusHeader = "WARP VECTOR SCANNER — initiate scan pulse to verify";
+        private string _pedagogicalHint = "Adjust sensor sensitivity dials until all 4 telemetry vectors lock onto Earth, then initiate jump pulse.";
 
         private readonly StringBuilder _rowBuffer = new StringBuilder(256);
         private readonly StringBuilder _hintBuffer = new StringBuilder(512);
 
         private static readonly string[] CaseNames = new string[]
         {
-            "Safe Room    ",
-            "Bio Leak     ",
-            "Rad Flare    ",
-            "Dual Breach  "
+            "Deep Space Void ",
+            "Earth Atmosphere",
+            "Earth Continents",
+            "Earth Orbital Fix"
         };
 
         public PuzzleEvaluation LatestEvaluation => _latestEvaluation;
@@ -122,17 +122,17 @@ namespace Convergence.Presentation
             }
 
             _statusHeader = eval.Passed
-                ? "All 4 scenarios correct — sentry is calibrated!"
-                : $"{eval.PassedCases} of 4 correct — adjust the dial and try again";
+                ? "All 4 telemetry vectors locked — Warp AI stabilized!"
+                : $"{eval.PassedCases} of 4 vectors locked — adjust sensor weights and retry pulse";
 
             _hintBuffer.Length = 0;
             if (!eval.ActivationMatches)
             {
-                _hintBuffer.Append($"Wrong crystal type: '{eval.ActiveActivation}'. The sentry needs a Step crystal for binary (fire/hold) decisions.");
+                _hintBuffer.Append($"Incompatible matrix module: '{eval.ActiveActivation}'. Warp AI requires a Step module for decisive warp lock.");
             }
             else if (eval.Passed)
             {
-                _hintBuffer.Append("Perfect! All four scenarios verified. Blast doors are unsealing.");
+                _hintBuffer.Append("Hyperspace coordinates locked onto Earth! Emergency jump corridor open.");
             }
             else
             {
@@ -147,8 +147,8 @@ namespace Convergence.Presentation
         private void HandleChamberReset()
         {
             _latestEvaluation = null;
-            _statusHeader = "SENSOR CHECK — connect the cables and tune the dial";
-            _pedagogicalHint = "Turn the sensitivity dial until all four rows go green, then pull the lever.";
+            _statusHeader = "WARP VECTOR SCANNER — connect sensor conduits and tune sensitivity";
+            _pedagogicalHint = "Adjust sensor sensitivity dials until all 4 telemetry vectors lock onto Earth, then initiate jump pulse.";
 
             if (hologramBacklight != null)
             {
@@ -200,7 +200,7 @@ namespace Convergence.Presentation
                 if (pass) passedCases++;
 
                 _rowBuffer.Length = 0;
-                string targetLabel = target > 0.5 ? "ALARM" : "SAFE ";
+                string targetLabel = target > 0.5 ? "LOCK " : "VOID ";
                 
                 // Visual energy bar
                 string energyBar = FormatEnergyBar(z);
@@ -208,12 +208,12 @@ namespace Convergence.Presentation
                 if (_latestEvaluation != null && _latestEvaluation.Diagnostics != null && i < _latestEvaluation.Diagnostics.Count)
                 {
                     bool verifiedPass = _latestEvaluation.Diagnostics[i].IsCorrect && _latestEvaluation.ActivationMatches;
-                    _rowBuffer.Append($"{CaseNames[i]} | Expected: {targetLabel} | Energy: {energyBar} | {(verifiedPass ? "✓ VERIFIED" : "✗ MISMATCH")}");
+                    _rowBuffer.Append($"{CaseNames[i]} | Target: {targetLabel} | Energy: {energyBar} | {(verifiedPass ? "✓ LOCKED" : "✗ MISMATCH")}");
                 }
                 else
                 {
-                    string liveState = (z >= 0.0) ? "⚡ ALERT " : "○ QUIET ";
-                    _rowBuffer.Append($"{CaseNames[i]} | Expected: {targetLabel} | Energy: {energyBar} | {liveState}");
+                    string liveState = (z >= 0.0) ? "⚡ LOCK " : "○ VOID ";
+                    _rowBuffer.Append($"{CaseNames[i]} | Target: {targetLabel} | Energy: {energyBar} | {liveState}");
                 }
 
                 _caseRowTexts[i] = _rowBuffer.ToString();
@@ -221,7 +221,7 @@ namespace Convergence.Presentation
 
             if (_latestEvaluation == null)
             {
-                _statusHeader = "HAZARD MATRIX TELEMETRY (Pull Clock Lever [Space] to verify)";
+                _statusHeader = "WARP NAVIGATION MATRIX (Initiate Jump Pulse [Space] to verify)";
                 BuildDetailedDiagnosticHint();
             }
 
@@ -256,13 +256,13 @@ namespace Convergence.Presentation
 
             if (!neuralState.Cable1Connected || !neuralState.Cable2Connected)
             {
-                _hintBuffer.Append("Cable not plugged in! Grab the glowing cable and snap it into the console.");
+                _hintBuffer.Append("Sensor conduits unlinked! Plug both sensor conduits into the command console.");
                 return;
             }
 
             if (neuralState.Activation != ActivationType.Step)
             {
-                _hintBuffer.Append($"Wrong crystal type ('{neuralState.Activation}'). The sentry needs a Step crystal to make a clear fire/hold decision.");
+                _hintBuffer.Append($"Incompatible matrix module ('{neuralState.Activation}'). Warp AI requires a Step module for decisive warp lock.");
                 return;
             }
 
@@ -273,25 +273,25 @@ namespace Convergence.Presentation
             // Case 1: (0,0) -> Target 0 (Requires b < 0)
             if (b >= 0.0)
             {
-                _hintBuffer.Append("The sentry is triggering in a quiet room — try turning the sensitivity down a little.");
+                _hintBuffer.Append("Deep space noise triggering false warp lock — lower the cosmic noise filter (Bias < 0).");
                 return;
             }
 
             // Case 2: (0,1) -> Target 1 (Requires w2 + b >= 0)
             if (w2 + b < 0.0)
             {
-                _hintBuffer.Append("Bio-leak alarm not reaching the sentry — try turning the sensitivity up.");
+                _hintBuffer.Append("Atmospheric O2/N2 signature too faint — boost Atmosphere Sensitivity (W2).");
                 return;
             }
 
             // Case 3: (1,0) -> Target 1 (Requires w1 + b >= 0)
             if (w1 + b < 0.0)
             {
-                _hintBuffer.Append("Radiation alert not reaching the sentry — try turning the sensitivity up.");
+                _hintBuffer.Append("Continental landmass telemetry too weak — boost Landmass Sensitivity (W1).");
                 return;
             }
 
-            _hintBuffer.Append("Looks balanced — pull the lever to run the final test!");
+            _hintBuffer.Append("Warp vectors aligned with Earth! Pull the jump lever to initiate recovery jump.");
         }
 
         private void Update3DTextDisplays(bool allPassed)

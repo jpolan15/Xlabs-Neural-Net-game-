@@ -72,7 +72,7 @@ namespace Convergence.Presentation
             }
             if (chamberSubtitleText != null)
             {
-                chamberSubtitleText.text = "NEURAL CALIBRATION // OR GATE";
+                chamberSubtitleText.text = "BRIDGE DECK 01 // EMERGENCY WARP RECOVERY";
                 chamberSubtitleText.color = Color.white;
             }
 

@@ -150,6 +150,7 @@ namespace Convergence.Gameplay
 
             if (!neuralState.Cable1Connected || !neuralState.Cable2Connected)
             {
+                // Disconnected conduit drops that input connection to zero
                 double w1 = neuralState.Cable1Connected ? neuralState.Weight1 : 0.0;
                 double w2 = neuralState.Cable2Connected ? neuralState.Weight2 : 0.0;
                 return NetworkModel.CreateSingleNeuronNetwork(2, new[] { w1, w2 }, neuralState.Bias, neuralState.Activation);
@@ -158,11 +159,11 @@ namespace Convergence.Gameplay
         }
 
         /// <summary>
-        /// Command to fire sentry trial across all 4 approaching targets.
+        /// Command to fire sentry trial across all approaching targets. (Now Asteroid targets)
         /// </summary>
         public PuzzleEvaluation TriggerForwardPass()
         {
-            _puzzle ??= PuzzleDefinition.CreateORGatePuzzle();
+            _puzzle ??= PuzzleDefinition.CreateEarthLocationPuzzle();
 
             if (Phase == ChamberPhase.Arrival)
             {
@@ -188,6 +189,8 @@ namespace Convergence.Gameplay
                 SetPhase(ChamberPhase.Awakening);
                 RestoreShield(35f);
                 OnPuzzleSolved?.Invoke();
+                // Space theme: Trigger blast off
+                UnityEngine.Debug.Log("ASTEROID IMPACT SURVIVED: Navigation repaired. Blasting off to Earth!");
             }
 
             return evaluation;
@@ -195,7 +198,7 @@ namespace Convergence.Gameplay
 
         public CaseDiagnostic TriggerSingleCasePass(int caseIndex)
         {
-            _puzzle ??= PuzzleDefinition.CreateORGatePuzzle();
+            _puzzle ??= PuzzleDefinition.CreateEarthLocationPuzzle();
 
             if (Phase == ChamberPhase.Arrival)
             {

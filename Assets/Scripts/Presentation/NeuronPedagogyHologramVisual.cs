@@ -10,12 +10,12 @@ namespace Convergence.Presentation
     /// <summary>
     /// In-World Educational 3D Hologram Station for Level 1.
     /// Teaches the foundational architecture of the simplest Artificial Neuron (Perceptron)
-    /// through the concrete lens of the Sector 01 Hazard Classifier:
-    /// - Inputs: Radiation Detector (x1) & Bio-Leak Detector (x2)
-    /// - Synaptic Weights (w1, w2): Sensor Sensitivity / Volume Knobs
-    /// - Noise Bias (b): Background Noise Filter / Threshold Offset
-    /// - Summation Core: Total Hazard Energy z = (w1 × x1) + (w2 × x2) + b
-    /// - Activation Function: Step Decision Gate y = Step(z) [1 = Lockdown Alarm, 0 = Safe]
+    /// through the concrete lens of the Emergency Warp Navigation AI (Earth Recognition):
+    /// - Inputs: Landmass Sensor (x1) & Atmosphere Sensor (x2)
+    /// - Synaptic Weights (w1, w2): Telemetry Sensitivity Multipliers
+    /// - Noise Bias (b): Deep Space Cosmic Noise Filter / Decision Threshold
+    /// - Summation Core: Total Telemetry Energy z = (w1 × x1) + (w2 × x2) + b
+    /// - Activation Function: Step Decision Gate y = Step(z) [1 = Warp Lock, 0 = Void Noise]
     /// Strictly Presentation layer: observes state and never evaluates or decides puzzle correctness.
     /// </summary>
     [ExecuteAlways]
@@ -115,33 +115,32 @@ namespace Convergence.Presentation
             if (neuralState.Cable1Connected != _prevC1 || neuralState.Cable2Connected != _prevC2)
             {
                 _dynamicInsight = neuralState.Cable1Connected && neuralState.Cable2Connected
-                    ? "Both sensor lines active. Adjust sensitivity weights to respond to incoming hazards."
-                    : "Warning: Disconnected conduits zero out incoming sensor telemetry.";
+                    ? "Both sensor lines active. Adjust sensitivity weights to identify Earth telemetry."
+                    : "Warning: Disconnected conduits zero out incoming planetary telemetry.";
             }
             else if (Math.Abs(neuralState.Weight1 - _prevW1) > 0.01 || Math.Abs(neuralState.Weight2 - _prevW2) > 0.01)
             {
-                double maxW = Math.Max(neuralState.Weight1, neuralState.Weight2);
                 double minW = Math.Min(neuralState.Weight1, neuralState.Weight2);
                 if (minW <= 0.0)
                 {
-                    _dynamicInsight = "Low sensor sensitivity: Weak signals may fail to breach the lockdown threshold.";
+                    _dynamicInsight = "Low sensor sensitivity: Planetary features will fail to trigger warp lock.";
                 }
                 else
                 {
-                    _dynamicInsight = "Sensors amplified: Hazard detections will generate strong positive energy.";
+                    _dynamicInsight = "Sensors amplified: Earth features will generate strong warp lock energy.";
                 }
             }
             else if (Math.Abs(neuralState.Bias - _prevBias) > 0.01)
             {
                 _dynamicInsight = neuralState.Bias < 0
-                    ? "Noise barrier active: Suppresses false alarms during clean background states."
-                    : "Warning: Positive bias causes false alarms even when all rooms are safe.";
+                    ? "Noise barrier active: Suppresses false locks during deep space void."
+                    : "Warning: Positive bias triggers false warp lock on empty deep space.";
             }
             else if (neuralState.Activation != _prevActivation)
             {
                 _dynamicInsight = neuralState.Activation == ActivationType.Step
-                    ? "Step Crystal active: Outputs a decisive binary 0 (Safe) or 1 (Lockdown Alarm)."
-                    : $"Activation is {neuralState.Activation}. Requires a binary step switch for quarantine control.";
+                    ? "Step Crystal active: Outputs a decisive binary 0 (Void) or 1 (Warp Lock)."
+                    : $"Activation is {neuralState.Activation}. Requires a binary step crystal for decisive warp lock.";
             }
 
             CacheCurrentState();
@@ -155,7 +154,7 @@ namespace Convergence.Presentation
                 if (stationLight != null) stationLight.color = neonEmerald;
                 if (statusBadgeTextMesh != null)
                 {
-                    statusBadgeTextMesh.text = "★ 100% HARMONIZED — QUARANTINE PROTOCOL RESTORED ★";
+                    statusBadgeTextMesh.text = "★ 100% HARMONIZED — WARP DRIVE TRAJECTORY LOCKED ★";
                     statusBadgeTextMesh.color = neonEmerald;
                 }
             }
@@ -194,7 +193,7 @@ namespace Convergence.Presentation
             // Header
             if (headerTextMesh != null)
             {
-                headerTextMesh.text = "HAZARD CLASSIFIER NEURON";
+                headerTextMesh.text = "WARP NAVIGATION PERCEPTRON";
                 headerTextMesh.color = new Color(0.35f, 0.85f, 1.0f);
             }
 
@@ -202,11 +201,11 @@ namespace Convergence.Presentation
             if (formulaTextMesh != null)
             {
                 _formulaBuilder.Length = 0;
-                _formulaBuilder.AppendLine("1. SENSOR SUMMATION (Total Energy z):");
+                _formulaBuilder.AppendLine("1. SENSOR SUMMATION (Total Telemetry Energy z):");
                 _formulaBuilder.AppendLine($"   z = ({w1:+0.0;-0.0;0.0} × x1) + ({w2:+0.0;-0.0;0.0} × x2) + ({b:+0.0;-0.0;0.0})");
                 _formulaBuilder.AppendLine();
-                _formulaBuilder.AppendLine("2. ACTIVATION GATE (Quarantine Switch):");
-                _formulaBuilder.AppendLine($"   y = {actName}(z)  [Alarm=1 if z >= 0; Safe=0 if z < 0]");
+                _formulaBuilder.AppendLine("2. ACTIVATION GATE (Warp Lock Decision):");
+                _formulaBuilder.AppendLine($"   y = {actName}(z)  [Lock=1 if z >= 0; Void=0 if z < 0]");
                 formulaTextMesh.text = _formulaBuilder.ToString();
                 formulaTextMesh.color = Color.white;
             }
@@ -218,8 +217,8 @@ namespace Convergence.Presentation
                 _explanationBuilder.AppendLine(">> LIVE NEURAL DIAGNOSTIC:");
                 _explanationBuilder.AppendLine($"   {_dynamicInsight}");
                 _explanationBuilder.AppendLine();
-                _explanationBuilder.AppendLine("• ALLY RULE  : Friendly Drone (0,0) -> Total Energy z < 0 -> Hold Fire (0) [SPARE ALLY]");
-                _explanationBuilder.AppendLine("• THREAT RULE: Any Hazard (Rad OR Bio) -> Total Energy z >= 0 -> Plasma Intercept (1) [DESTROY THREAT]");
+                _explanationBuilder.AppendLine("• VOID RULE  : Deep Space Void (0,0) -> Total Energy z < 0 -> Standby (0) [FILTER NOISE]");
+                _explanationBuilder.AppendLine("• EARTH RULE : Earth Telemetry (Land OR Atmos) -> Total Energy z >= 0 -> Warp Lock (1) [SAVE THE SHIP]");
                 explanationTextMesh.text = _explanationBuilder.ToString();
                 explanationTextMesh.color = new Color(0.85f, 0.90f, 0.98f);
             }
