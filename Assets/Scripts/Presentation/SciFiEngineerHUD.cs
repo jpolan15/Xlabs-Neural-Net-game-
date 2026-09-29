@@ -132,7 +132,7 @@ namespace Convergence.Presentation
                 {
                     _isHoveringInteractable = true;
                     string stateStr = targetRec.IsHarmonized ? "SECURED ✓" : "BREACH / UNSTABLE ✗";
-                    _hoverTooltip = $"{targetRec.TargetTitle.ToUpper()} [{stateStr}] — Click to fire single-target diagnostic pulse";
+                    _hoverTooltip = $"{targetRec.TargetTitle.ToUpper()} [{stateStr}] — Trigger to test this Earth image";
                     return;
                 }
 
@@ -142,38 +142,38 @@ namespace Convergence.Presentation
                 if (objName.Contains("crystal") || objName.Contains("socket") || objName.Contains("prism"))
                 {
                     string act = neuralState != null ? neuralState.Activation.ToString() : "Step";
-                    _hoverTooltip = $"Activation crystal [{act}] — click or [Tab] to swap crystal type";
+                    _hoverTooltip = $"Decision crystal [{act}] — click to swap. Earth lock needs Step.";
                 }
                 else if (objName.Contains("w1") || objName.Contains("slider_w1"))
                 {
-                    _hoverTooltip = "Sensitivity dial — scroll up to increase, scroll down to decrease";
+                    _hoverTooltip = "Land weight — aim here and move the stick to tune how strongly continents count as Earth";
                 }
                 else if (objName.Contains("w2") || objName.Contains("slider_w2"))
                 {
-                    _hoverTooltip = "Sensitivity dial — scroll up to increase, scroll down to decrease";
+                    _hoverTooltip = "Atmosphere weight — aim here and move the stick to tune how strongly air counts as Earth";
                 }
                 else if (objName.Contains("bias") || objName.Contains("valve"))
                 {
                     double b = neuralState != null ? neuralState.Bias : 0.0;
-                    _hoverTooltip = $"Noise threshold (auto-tuned: {b:+0.0;-0.0;0.0}) — adjusts automatically with the dial";
+                    _hoverTooltip = $"Noise filter (bias {b:+0.0;-0.0;0.0}) — keeps empty space from counting as Earth";
                 }
                 else if (objName.Contains("cable_1") || objName.Contains("conduit_1"))
                 {
                     bool c = neuralState != null && neuralState.Cable1Connected;
-                    _hoverTooltip = c ? "Radiation sensor cable — connected ✓" : "Radiation sensor cable — click or [C] to plug in";
+                    _hoverTooltip = c ? "Earth land image — uploaded ✓" : "Earth land image — trigger to upload this feed";
                 }
                 else if (objName.Contains("cable_2") || objName.Contains("conduit_2"))
                 {
                     bool c = neuralState != null && neuralState.Cable2Connected;
-                    _hoverTooltip = c ? "Bio-hazard sensor cable — connected ✓" : "Bio-hazard sensor cable — click or [V] to plug in";
+                    _hoverTooltip = c ? "Earth atmosphere image — uploaded ✓" : "Earth atmosphere image — trigger to upload this feed";
                 }
                 else if (objName.Contains("lever"))
                 {
-                    _hoverTooltip = "Pull the lever (or press Space) to run the test across all 4 scenarios";
+                    _hoverTooltip = "Pull the lever to test every Earth image. A correct net locks the course home.";
                 }
                 else if (objName.Contains("sentry") || objName.Contains("turret"))
                 {
-                    _hoverTooltip = "Defense sentry — you're calibrating its ability to tell friend from foe";
+                    _hoverTooltip = "Navigation mast — it swings when an Earth image locks";
                 }
             }
             else
@@ -260,7 +260,7 @@ namespace Convergence.Presentation
 
             string prompt = onboardingController != null
                 ? onboardingController.GetCurrentStepPrompt()
-                : "Calibrate the sentry to protect against all four scenarios.";
+                : "Upload Earth images, tune the weights, and lock a course home.";
 
             bool isComplete = onboardingController != null && onboardingController.CurrentStep == OnboardingStep.Completed;
             Color accentColor = isComplete ? _neonEmerald : _neonCyan;
@@ -341,7 +341,7 @@ namespace Convergence.Presentation
                 fontStyle = FontStyle.Bold,
                 normal = { textColor = _neonCyan }
             };
-            GUI.Label(new Rect(_hudRect.x + 14, y, 460, 20), "🛡 SENTRY INTERCEPT STATUS // SECTOR 01 CONTAINMENT GRID", headerStyle);
+            GUI.Label(new Rect(_hudRect.x + 14, y, 460, 20), "USS CONVERGENCE  //  LOST IN SPACE  //  NAVIGATION", headerStyle);
 
             GUIStyle subHeader = new GUIStyle(GUI.skin.label)
             {
@@ -359,7 +359,7 @@ namespace Convergence.Presentation
                 fontSize = 11,
                 normal = { textColor = Color.white }
             };
-            GUI.Label(new Rect(_hudRect.x + 14, y, hudW - 28, 18), "Objective: Calibrate Sentry Perceptron to Spare Friendly Drone (Y=0) and Intercept All Hazards (Y=1).", objStyle);
+            GUI.Label(new Rect(_hudRect.x + 14, y, hudW - 28, 18), "Objective: Upload Earth images, tune weights, and jump home when the net locks Earth.", objStyle);
             y += 22;
 
             // 4 Target Badges — friendly names, no math notation
@@ -372,7 +372,7 @@ namespace Convergence.Presentation
             float badgeH = 28f;
             float startX = _hudRect.x + 14;
 
-            string[] targetLabels = { "Safe Room", "Bio Leak", "Rad Flare", "Dual Breach" };
+            string[] targetLabels = { "Empty Space", "Atmosphere", "Land", "Full Earth" };
 
             for (int i = 0; i < 4; i++)
             {

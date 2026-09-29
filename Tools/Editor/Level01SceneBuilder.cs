@@ -1453,7 +1453,7 @@ namespace Convergence.EditorTools
             // --- In-World Holographic VR Subtitle & Objective Banner ---
             var subtitleHoloGo = new GameObject("VR_Holographic_Subtitle_Banner");
             subtitleHoloGo.transform.position = new Vector3(0, 2.15f, 0.25f);
-            subtitleHoloGo.transform.rotation = Quaternion.Euler(12f, 0, 0);
+            subtitleHoloGo.transform.rotation = Quaternion.LookRotation(new Vector3(0f, 1.6f, -0.9f) - subtitleHoloGo.transform.position);
 
             var subText = subtitleHoloGo.AddComponent<TextMesh>();
             subText.text = "";
@@ -1515,6 +1515,14 @@ namespace Convergence.EditorTools
                 rightCtrlModel.transform.localScale = new Vector3(-1, 1, 1);
                 ApplyMaterialRecursively(rightCtrlModel, mats.GunMetal);
             }
+
+            WireControllerPointer(leftHandGo, VRControllerPointerInteractor.ControllerHand.LeftHand, xrOriginGo.transform, chamberController, neuralState, levelResetter);
+            WireControllerPointer(rightHandGo, VRControllerPointerInteractor.ControllerHand.RightHand, xrOriginGo.transform, chamberController, neuralState, levelResetter);
+
+            var missionBoard = new GameObject("LostInSpaceMissionBoard");
+            missionBoard.transform.position = new Vector3(-1.15f, 1.48f, 0.2f);
+            missionBoard.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
+            missionBoard.AddComponent<LostInSpaceMissionBoard>();
 
             // --- First-Person Sci-Fi Neural Pulse Gun Viewmodel (Lowered to not occlude view) ---
             var gunRootGo = new GameObject("NeuralPulseGunViewmodel");
@@ -1650,6 +1658,24 @@ namespace Convergence.EditorTools
             AssetDatabase.Refresh();
 
             Debug.Log($"[Level01SceneBuilder] Level 1 generated and saved successfully to '{ScenePath}'.");
+        }
+
+        private static void WireControllerPointer(
+            GameObject hand,
+            VRControllerPointerInteractor.ControllerHand whichHand,
+            Transform origin,
+            ChamberController chamber,
+            NeuralState state,
+            LevelResetter resetter)
+        {
+            var pointer = hand.AddComponent<VRControllerPointerInteractor>();
+            var serialized = new SerializedObject(pointer);
+            serialized.FindProperty("hand").enumValueIndex = (int)whichHand;
+            serialized.FindProperty("xrOriginRoot").objectReferenceValue = origin;
+            serialized.FindProperty("chamberController").objectReferenceValue = chamber;
+            serialized.FindProperty("neuralState").objectReferenceValue = state;
+            serialized.FindProperty("levelResetter").objectReferenceValue = resetter;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private static void CreateSpaceshipBridgeHull(Transform parent, LevelMaterials mats)

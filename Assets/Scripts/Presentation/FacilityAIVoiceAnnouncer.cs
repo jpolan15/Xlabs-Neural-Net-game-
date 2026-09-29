@@ -55,6 +55,28 @@ namespace Convergence.Presentation
             {
                 worldSubtitleTextMesh.text = "";
             }
+
+            if (FindAnyObjectByType<LostInSpaceMissionBoard>() == null)
+            {
+                var board = new GameObject("LostInSpaceMissionBoard");
+                board.AddComponent<LostInSpaceMissionBoard>();
+            }
+        }
+
+        private void LateUpdate()
+        {
+            if (worldSubtitleTextMesh == null)
+                return;
+
+            Camera camera = Camera.main;
+            if (camera == null)
+                return;
+
+            Vector3 toPlayer = camera.transform.position - worldSubtitleTextMesh.transform.position;
+            toPlayer.y = 0f;
+            if (toPlayer.sqrMagnitude < 0.001f)
+                return;
+            worldSubtitleTextMesh.transform.rotation = Quaternion.LookRotation(toPlayer.normalized, Vector3.up);
         }
 
         private void OnEnable()

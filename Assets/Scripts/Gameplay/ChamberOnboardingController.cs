@@ -75,11 +75,11 @@ namespace Convergence.Gameplay
         {
             return currentStep switch
             {
-                OnboardingStep.Awakening      => "Waking up… the facility AI is calling for help.",
-                OnboardingStep.ConnectSensors => "Step 1 of 3 — Grab both sensor cables and plug them in.",
-                OnboardingStep.TuneSensitivity => "Step 2 of 3 — Turn the sensitivity dial until all targets show green.",
-                OnboardingStep.FireTest       => "Step 3 of 3 — Pull the lever to run the final test!",
-                OnboardingStep.Completed      => "✓ All clear! The sentry is calibrated. Great work.",
+                OnboardingStep.Awakening      => "ALERT: The ship is lost in space. Navigation is dead.",
+                OnboardingStep.ConnectSensors => "Step 1 of 3 — Upload Earth images. Plug in both sensor cables.",
+                OnboardingStep.TuneSensitivity => "Step 2 of 3 — Tune the weights until Earth locks and empty space does not.",
+                OnboardingStep.FireTest       => "Step 3 of 3 — Pull the lever. Correct weights mean the ship finds Earth.",
+                OnboardingStep.Completed      => "Earth locked. Heading home.",
                 _                             => ""
             };
         }
@@ -157,21 +157,21 @@ namespace Convergence.Gameplay
             switch (currentStep)
             {
                 case OnboardingStep.ConnectSensors:
-                    OnAnnouncerVoicePrompt?.Invoke("Hint: walk up to the two glowing cables and click / grab each one to plug them in.");
+                    OnAnnouncerVoicePrompt?.Invoke("Hint: the two cables are the Earth image feeds. Click each one to upload land and atmosphere into the net.");
                     break;
 
                 case OnboardingStep.TuneSensitivity:
                     if (hintLevel == 1)
-                        OnAnnouncerVoicePrompt?.Invoke("Hint: turn the sensitivity dial clockwise. You need it high enough that a single alert triggers the sentry.");
+                        OnAnnouncerVoicePrompt?.Invoke("Hint: raise both weights. Empty space must stay dark. Any real Earth image must lock on.");
                     else
-                        OnAnnouncerVoicePrompt?.Invoke("Hint: try setting sensitivity to around 1.0. The hologram will go green when all four scenarios are correct.");
+                        OnAnnouncerVoicePrompt?.Invoke("Hint: try weights near 1.0 with the Step crystal. The board turns green when every Earth image matches.");
                     break;
 
                 case OnboardingStep.FireTest:
                     if (hintLevel == 1)
-                        OnAnnouncerVoicePrompt?.Invoke("Hint: grab the big lever on the right and pull it down, or just press Space.");
+                        OnAnnouncerVoicePrompt?.Invoke("Hint: aim the controller at the lever and pull the trigger, or press the top button.");
                     else
-                        OnAnnouncerVoicePrompt?.Invoke("Hint: check the target pods — the friendly drone (no hazard) should be safe, the other three should be intercepted.");
+                        OnAnnouncerVoicePrompt?.Invoke("Hint: empty space stays unlocked. Atmosphere, land, and the full Earth image must all lock.");
                     break;
             }
         }
@@ -195,7 +195,7 @@ namespace Convergence.Gameplay
             _stepTimeElapsed = 0f;
             _progressiveHintIndex = 0;
             OnStepChanged?.Invoke(currentStep);
-            OnAnnouncerVoicePrompt?.Invoke("Warning. Asteroid impact detected. Neural navigation offline. Manual repair required to return to Earth.");
+            OnAnnouncerVoicePrompt?.Invoke("Alert. The ship is lost in space. Navigation has failed. Upload Earth images and retune the net to find the way home.");
 
             yield return new WaitForSeconds(awakeningDelay);
 
@@ -260,9 +260,9 @@ namespace Convergence.Gameplay
             if (eval == null) return "Navigation failed. Try recalculating.";
 
             if (!eval.ActivationMatches)
-                return "The navigation computer requires a Sigmoid crystal for coordinate mapping. Check the socket.";
+                return "The navigation computer needs the Step crystal to decide Earth or empty space. Check the socket.";
 
-            return $"Navigation error: {eval.PassedCases}/{eval.TotalCases} coordinates matched. Adjust the weights and try again.";
+            return $"Navigation error: {eval.PassedCases}/{eval.TotalCases} Earth images matched. Adjust the weights and try again.";
         }
 
         public void TransitionToStep(OnboardingStep newStep)
@@ -275,19 +275,19 @@ namespace Convergence.Gameplay
             switch (newStep)
             {
                 case OnboardingStep.ConnectSensors:
-                    OnAnnouncerVoicePrompt?.Invoke("Navigation sensors offline. Plug the power cables into the main console to reboot the matrix.");
+                    OnAnnouncerVoicePrompt?.Invoke("Earth image feeds are offline. Plug both cables into the console to upload land and atmosphere.");
                     break;
 
                 case OnboardingStep.TuneSensitivity:
-                    OnAnnouncerVoicePrompt?.Invoke("Power restored! Now adjust the neural matrix weights. We need to lock onto Earth's location.");
+                    OnAnnouncerVoicePrompt?.Invoke("Images are in. Tune the weights until the net recognizes Earth and ignores empty space.");
                     break;
 
                 case OnboardingStep.FireTest:
-                    OnAnnouncerVoicePrompt?.Invoke("Trajectory looks stable. Pull the lever to run the navigation diagnostic.");
+                    OnAnnouncerVoicePrompt?.Invoke("Weights are live. Pull the lever. If the net is right, the ship locks Earth.");
                     break;
 
                 case OnboardingStep.Completed:
-                    OnAnnouncerVoicePrompt?.Invoke("Coordinates locked. Navigation restored. Blasting off to Earth!");
+                    OnAnnouncerVoicePrompt?.Invoke("Earth locked. Navigation restored. Heading home.");
                     break;
             }
         }

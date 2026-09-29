@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.XR;
 using Convergence.Gameplay;
 
@@ -58,11 +58,18 @@ namespace Convergence.XR
         private float _lastStickStepTime;
         private GameObject _lastHoveredObject;
 
-        // Locomotion
-        private Transform _headTransform;  // Camera / XR head
-        private float _footstepAccum;      // distance walked this cycle
+        // Locomotion and tracking
+        private Transform _headTransform;
+        private float _footstepAccum;
         private AudioSource _footstepSource;
-        private const float FootstepDistance = 1.4f; // metres per step sound
+        private AudioClip _footstepClip;
+        private const float FootstepDistance = 1.4f;
+        private OpenXrNodePose _headPose;
+        private OpenXrNodePose _handPose;
+        private InputAction _stickThumb;
+        private InputAction _stickAxis;
+        private bool _renderHooked;
+        private readonly RaycastHit[] _rayHits = new RaycastHit[16];
 
         private XRNode TargetXRNode => hand == ControllerHand.RightHand ? XRNode.RightHand : XRNode.LeftHand;
 
@@ -90,13 +97,74 @@ namespace Convergence.XR
                 _headTransform = Camera.main != null ? Camera.main.transform : transform;
             }
 
-            // Footstep audio source (2-D, no spatial blend needed â€” it's a body sound)
             _footstepSource = gameObject.AddComponent<AudioSource>();
             _footstepSource.playOnAwake = false;
             _footstepSource.spatialBlend = 0f;
             _footstepSource.volume = 0.25f;
+            _footstepClip = CreateFootstepClip();
+
+            _headPose = new OpenXrNodePose("<XRHMD>/centerEyePosition", "<XRHMD>/centerEyeRotation", XRNode.CenterEye);
+            string handRole = hand == ControllerHand.RightHand ? "RightHand" : "LeftHand";
+            _handPose = new OpenXrNodePose(
+                $"<XRController>{{{handRole}}}/devicePosition",
+                $"<XRController>{{{handRole}}}/deviceRotation",
+                TargetXRNode);
+
+            if (hand == ControllerHand.LeftHand)
+            {
+                _stickThumb = CreateStickAction("<XRController>{LeftHand}/thumbstick");
+                _stickAxis = CreateStickAction("<XRController>{LeftHand}/primary2DAxis");
+            }
 
             SetupVisuals();
+        }
+
+        private void OnEnable()
+        {
+            if (_renderHooked) return;
+            Application.onBeforeRender += ApplyHeadPoseBeforeRender;
+            _renderHooked = true;
+        }
+
+        private void OnDisable()
+        {
+            if (!_renderHooked) return;
+            Application.onBeforeRender -= ApplyHeadPoseBeforeRender;
+            _renderHooked = false;
+        }
+
+        private void OnDestroy()
+        {
+            _headPose?.Dispose();
+            _handPose?.Dispose();
+            DisposeAction(_stickThumb);
+            DisposeAction(_stickAxis);
+        }
+
+        private static InputAction CreateStickAction(string binding)
+        {
+            try
+            {
+                var action = new InputAction(
+                    name: binding,
+                    type: InputActionType.Value,
+                    binding: binding,
+                    expectedControlType: "Vector2");
+                action.Enable();
+                return action;
+            }
+            catch (Exception exception)
+            {
+                Debug.LogWarning($"[VRControllerPointerInteractor] Stick binding '{binding}' unavailable: {exception.Message}");
+                return null;
+            }
+        }
+
+        private static void DisposeAction(InputAction action)
+        {
+            if (action == null) return;
+            action.Disable();
+            action.Dispose();
         }
 
         private void Start()
@@ -105,27 +173,14 @@ namespace Convergence.XR
             _leftDevice = InputDevices.GetDeviceAtXRNode(XRNode.LeftHand);
         }
 
-        private void Update()
+        private void LateUpdate()
         {
             if (!_targetDevice.isValid)
-            {
                 RefreshInputDevice();
-            }
 
-            // Update physical transform from XR tracking if device has pose
-            if (_targetDevice.isValid)
-            {
-                if (_targetDevice.TryGetFeatureValue(CommonUsages.devicePosition, out Vector3 pos))
-                {
-                    transform.localPosition = pos;
-                }
-                if (_targetDevice.TryGetFeatureValue(CommonUsages.deviceRotation, out Quaternion rot))
-                {
-                    transform.localRotation = rot;
-                }
-            }
+            ApplyHeadPose();
+            ApplyHandPose();
 
-            // Left-hand controller always tracks for locomotion, regardless of which hand this instance is
             if (hand == ControllerHand.LeftHand)
             {
                 if (!_leftDevice.isValid)
@@ -134,6 +189,43 @@ namespace Convergence.XR
             }
 
             ProcessRaycastAndInteraction();
+        }
+
+        private void ApplyHeadPoseBeforeRender()
+        {
+            ApplyHeadPose();
+        }
+
+        /// <summary>
+        /// Writes the headset pose onto the camera. Nothing in this method recenters yaw.
+        /// A near-zero position means a head-relative tracking origin, so the authored eye height stays.
+        /// </summary>
+        private void ApplyHeadPose()
+        {
+            if (_headTransform == null && Camera.main != null)
+                _headTransform = Camera.main.transform;
+            if (_headTransform == null || _headPose == null)
+                return;
+            if (!_headPose.TryRead(out Vector3 position, out Quaternion rotation))
+                return;
+
+            _headTransform.localRotation = rotation;
+            if (position.sqrMagnitude > 0.01f)
+                _headTransform.localPosition = position;
+
+            DesktopInputFallback fallback = _headTransform.GetComponent<DesktopInputFallback>();
+            if (fallback != null && fallback.enabled)
+                fallback.enabled = false;
+        }
+
+        private void ApplyHandPose()
+        {
+            if (_handPose == null || !_handPose.TryRead(out Vector3 position, out Quaternion rotation))
+                return;
+
+            transform.localRotation = rotation;
+            if (position.sqrMagnitude > 0.0004f)
+                transform.localPosition = position;
         }
 
         private void RefreshInputDevice()
@@ -148,22 +240,28 @@ namespace Convergence.XR
         /// </summary>
         private void ProcessLocomotion()
         {
-            if (xrOriginRoot == null || _headTransform == null) return;
+            if (xrOriginRoot == null) return;
+            if (!TryReadMoveStick(out Vector2 stick) || stick.magnitude < moveDeadzone)
+            {
+                xrOriginRoot.position = PlayspaceMotor.Move(xrOriginRoot.position, Vector3.zero);
+                return;
+            }
 
-            Vector2 stick = Vector2.zero;
-            _leftDevice.TryGetFeatureValue(CommonUsages.primary2DAxis, out stick);
-
-            if (stick.magnitude < moveDeadzone) return;
-
-            // Head-relative horizontal direction (no pitch)
-            Vector3 forward = Vector3.ProjectOnPlane(_headTransform.forward, Vector3.up).normalized;
-            Vector3 right   = Vector3.ProjectOnPlane(_headTransform.right,   Vector3.up).normalized;
-            Vector3 moveDir = (forward * stick.y + right * stick.x).normalized;
+            Transform heading = _headTransform != null ? _headTransform : transform;
+            Vector3 forward = Vector3.ProjectOnPlane(heading.forward, Vector3.up);
+            if (forward.sqrMagnitude < 1e-4f)
+                forward = Vector3.ProjectOnPlane(transform.forward, Vector3.up);
+            if (forward.sqrMagnitude < 1e-4f)
+                forward = Vector3.forward;
+            forward.Normalize();
+            Vector3 right = Vector3.Cross(Vector3.up, forward);
+            Vector3 moveDir = (forward * stick.y) + (right * stick.x);
+            if (moveDir.sqrMagnitude < 1e-6f) return;
+            moveDir.Normalize();
 
             float distance = moveSpeed * stick.magnitude * Time.deltaTime;
-            xrOriginRoot.position += moveDir * distance;
+            xrOriginRoot.position = PlayspaceMotor.Move(xrOriginRoot.position, moveDir * distance);
 
-            // Footstep sound accumulator
             _footstepAccum += distance;
             if (_footstepAccum >= FootstepDistance)
             {
@@ -172,24 +270,46 @@ namespace Convergence.XR
             }
         }
 
+        private bool TryReadMoveStick(out Vector2 stick)
+        {
+            if (_stickThumb != null && _stickThumb.enabled && _stickThumb.activeControl != null)
+            {
+                stick = _stickThumb.ReadValue<Vector2>();
+                return true;
+            }
+
+            if (_stickAxis != null && _stickAxis.enabled && _stickAxis.activeControl != null)
+            {
+                stick = _stickAxis.ReadValue<Vector2>();
+                return true;
+            }
+
+            stick = Vector2.zero;
+            return _leftDevice.isValid && _leftDevice.TryGetFeatureValue(CommonUsages.primary2DAxis, out stick);
+        }
+
         private void PlayFootstep()
         {
-            if (_footstepSource == null) return;
+            if (_footstepSource == null || _footstepClip == null) return;
+            _footstepSource.PlayOneShot(_footstepClip, 0.25f);
+        }
 
-            // Procedural dull thud: low-frequency sine with fast decay
-            int rate = 44100;
-            float dur = 0.08f;
-            int count = (int)(rate * dur);
-            float[] s = new float[count];
+        private static AudioClip CreateFootstepClip()
+        {
+            const int rate = 44100;
+            const float duration = 0.08f;
+            int count = (int)(rate * duration);
+            float[] samples = new float[count];
             for (int i = 0; i < count; i++)
             {
                 float t = (float)i / rate;
-                float env = Mathf.Clamp01(1f - t / dur);
-                s[i] = Mathf.Sin(2f * Mathf.PI * 90f * t) * env * 0.6f;
+                float env = Mathf.Clamp01(1f - (t / duration));
+                samples[i] = Mathf.Sin(2f * Mathf.PI * 90f * t) * env * 0.6f;
             }
+
             AudioClip clip = AudioClip.Create("Footstep", count, 1, rate, false);
-            clip.SetData(s, 0);
-            _footstepSource.PlayOneShot(clip, 0.25f);
+            clip.SetData(samples, 0);
+            return clip;
         }
 
         private void SetupVisuals()
@@ -292,10 +412,49 @@ namespace Convergence.XR
             if (m.HasProperty("_BaseColor")) m.SetColor("_BaseColor", c);
         }
 
+        /// <summary>
+        /// Closest solid hit from the controller. Skips the rig itself so the body capsule
+        /// and controller mesh do not eat the beam. Walls and consoles still block it.
+        /// </summary>
+        private bool TryRaycast(Ray ray, out RaycastHit best)
+        {
+            best = default;
+            int count = Physics.RaycastNonAlloc(
+                ray,
+                _rayHits,
+                maxRayDistance,
+                Physics.DefaultRaycastLayers,
+                QueryTriggerInteraction.Ignore);
+
+            float bestDistance = float.PositiveInfinity;
+            bool found = false;
+            for (int i = 0; i < count; i++)
+            {
+                Collider collider = _rayHits[i].collider;
+                if (collider == null || collider.isTrigger)
+                    continue;
+                if (collider.transform == transform || collider.transform.IsChildOf(transform))
+                    continue;
+                if (xrOriginRoot != null &&
+                    collider.transform.IsChildOf(xrOriginRoot) &&
+                    !IsInteractable(collider))
+                    continue;
+
+                if (_rayHits[i].distance < bestDistance)
+                {
+                    bestDistance = _rayHits[i].distance;
+                    best = _rayHits[i];
+                    found = true;
+                }
+            }
+
+            return found;
+        }
+
         private void ProcessRaycastAndInteraction()
         {
             Ray ray = new Ray(transform.position, transform.forward);
-            bool hasHit = Physics.Raycast(ray, out RaycastHit hit, maxRayDistance);
+            bool hasHit = TryRaycast(ray, out RaycastHit hit);
 
             Vector3 endPos = hasHit ? hit.point : transform.position + (transform.forward * maxRayDistance);
 
