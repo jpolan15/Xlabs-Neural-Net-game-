@@ -48,6 +48,7 @@ namespace Convergence.Presentation
             if (chamberController == null) chamberController = FindAnyObjectByType<ChamberController>();
             if (live == null) live = FindAnyObjectByType<LiveEvaluationRelay>();
             _board = gameObject.AddComponent<ChamberPromptBoard>();
+            gameObject.AddComponent<PlaytestEventLog>();
             _board.Set("Targeting offline.");
             _audio = gameObject.AddComponent<AudioSource>();
             _audio.playOnAwake = false;
