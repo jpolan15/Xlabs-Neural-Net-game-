@@ -78,11 +78,11 @@ namespace Convergence.Gameplay
         {
             return currentStep switch
             {
-                OnboardingStep.Awakening      => "Two cables popped out. You will plug them back in.",
-                OnboardingStep.ConnectSensors => "Grab the ROCK cable and click it in. Then do the same for ICE.",
-                OnboardingStep.TuneSensitivity => "Left dial is ROCK. Right dial is ICE. The third dial moves every flier together.",
-                OnboardingStep.FireTest       => "Watch the lamps. ROCK or ICE should light FIRE. The drone should not.",
-                OnboardingStep.Completed      => "The laser learned the rule. The door opens when the swarm is done.",
+                OnboardingStep.Awakening      => "Targeting offline.",
+                OnboardingStep.ConnectSensors => "Plug in the ROCK wire.",
+                OnboardingStep.TuneSensitivity => "Now turn the dial.",
+                OnboardingStep.FireTest       => "Pull the lever.",
+                OnboardingStep.Completed      => "The gate is opening.",
                 _                             => ""
             };
         }

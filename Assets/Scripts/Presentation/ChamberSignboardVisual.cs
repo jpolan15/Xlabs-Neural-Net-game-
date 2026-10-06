@@ -72,7 +72,7 @@ namespace Convergence.Presentation
             }
             if (chamberSubtitleText != null)
             {
-                chamberSubtitleText.text = "BRIDGE DECK 01 // EMERGENCY WARP RECOVERY";
+                chamberSubtitleText.text = "Deck 01";
                 chamberSubtitleText.color = Color.white;
             }
 

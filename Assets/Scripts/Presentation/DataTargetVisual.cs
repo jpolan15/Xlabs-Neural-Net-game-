@@ -36,8 +36,6 @@ namespace Convergence.Presentation
         private TextMesh _callout;
         private Camera _billboardCamera;
 
-        static readonly string[] Callouts = { "DRONE", "ICE", "ROCK", "BOTH" };
-
         public DataTargetReceptor Receptor => receptor;
 
         private void Awake()
@@ -147,19 +145,7 @@ namespace Convergence.Presentation
 
         private void EnsureCallout()
         {
-            if (_callout != null || receptor == null) return;
-            var go = new GameObject("Callout");
-            go.transform.SetParent(transform, false);
-            go.transform.localPosition = new Vector3(0f, 1.35f, 0f);
-            _callout = go.AddComponent<TextMesh>();
-            int idx = receptor.CaseIndex;
-            _callout.text = idx >= 0 && idx < Callouts.Length ? Callouts[idx] : "FLIER";
-            _callout.characterSize = 0.55f;
-            _callout.fontSize = 0;
-            _callout.anchor = TextAnchor.MiddleCenter;
-            _callout.alignment = TextAlignment.Center;
-            _callout.fontStyle = FontStyle.Bold;
-            _callout.color = GetBaseTargetColor();
+            // Giant window words faced the wrong way. Icon tags arrive in a later package.
         }
 
         public void SetCorridorWaypoints(Vector3 spawn, Vector3 perimeter)

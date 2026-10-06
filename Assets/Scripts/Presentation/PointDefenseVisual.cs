@@ -176,7 +176,7 @@ namespace Convergence.Presentation
             mesh.anchor = TextAnchor.MiddleCenter;
             mesh.alignment = TextAlignment.Center;
             mesh.fontStyle = FontStyle.Bold;
-            mesh.color = lamp.color;
+            mesh.color = new Color(0.90f, 0.91f, 0.88f, 1f);
             return mesh;
         }
 
@@ -187,7 +187,11 @@ namespace Convergence.Presentation
             if (_tagCamera == null) return;
             Vector3 toHead = _tagCamera.transform.position - mesh.transform.position;
             if (toHead.sqrMagnitude < 0.01f) return;
-            mesh.transform.rotation = Quaternion.LookRotation(toHead, Vector3.up);
+            // Plan section 4.3: LookRotation(textPos - eye), not LookAt(camera).
+            mesh.transform.rotation = Quaternion.LookRotation(-toHead, Vector3.up);
+            float distance = toHead.magnitude;
+            mesh.characterSize = distance * Mathf.Tan(3f * Mathf.Deg2Rad);
+            mesh.color = new Color(0.90f, 0.91f, 0.88f, 1f);
         }
 
         void PulseHands()

@@ -74,10 +74,19 @@ namespace Convergence.Presentation
 
         void ShowNow(string line)
         {
-            if (subtitle != null) subtitle.text = line ?? string.Empty;
-            if (legacyLine != null) legacyLine.text = line ?? string.Empty;
+            string shown = FirstWords(line, 12);
+            if (subtitle != null) subtitle.text = shown;
+            if (legacyLine != null) legacyLine.text = shown;
             if (_clear != null) StopCoroutine(_clear);
             if (isActiveAndEnabled) _clear = StartCoroutine(ClearAfter());
+        }
+
+        static string FirstWords(string line, int max)
+        {
+            if (string.IsNullOrWhiteSpace(line)) return string.Empty;
+            string[] parts = line.Split(new[] { ' ', '\n', '\r', '\t' }, System.StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length <= max) return string.Join(" ", parts);
+            return string.Join(" ", parts, 0, max);
         }
 
         private IEnumerator ClearAfter()

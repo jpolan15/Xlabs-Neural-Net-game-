@@ -217,6 +217,7 @@ namespace Convergence.EditorTools
 
             // Spaceship Bridge & Deep Space Architecture Materials
             public Material SpaceshipHull;
+            public Material CeilingValue;
             public Material BulkheadRib;
             public Material ConduitPipe;
             public Material HazardYellow;
@@ -404,7 +405,7 @@ namespace Convergence.EditorTools
             rotationPivotGo.transform.localScale = Vector3.one * 0.85f;
 
             // Dual Gyroscopic Orbital Rings (Smooth Torus Meshes framing the central network)
-            CreateOrbitRing("OrbitalGyroRing_Pitch", rotationPivotGo.transform, 0.58f, Quaternion.Euler(72f, 0f, 0f), mats.GlowViolet);
+            CreateOrbitRing("OrbitalGyroRing_Pitch", rotationPivotGo.transform, 0.58f, Quaternion.Euler(72f, 0f, 0f), mats.AxonNeutral);
             CreateOrbitRing("OrbitalGyroRing_Yaw", rotationPivotGo.transform, 0.66f, Quaternion.Euler(82f, 0f, 0f), mats.GlowCyan);
 
             var visualizer = neuronMachineGo.AddComponent<NeuronTopologyVisualizer>();
@@ -414,8 +415,8 @@ namespace Convergence.EditorTools
             visSO.FindProperty("networkPivot").objectReferenceValue = rotationPivotGo.transform;
             visSO.FindProperty("inputMaterial").objectReferenceValue = mats.GlowCoral;
             visSO.FindProperty("biasMaterial").objectReferenceValue = mats.GlowAmber;
-            visSO.FindProperty("neuronMaterial").objectReferenceValue = mats.GlowViolet;
-            visSO.FindProperty("outputMaterial").objectReferenceValue = mats.GlowEmerald;
+            visSO.FindProperty("neuronMaterial").objectReferenceValue = mats.AxonNeutral;
+            visSO.FindProperty("outputMaterial").objectReferenceValue = mats.GlowCyan;
             visSO.FindProperty("synapseMaterial").objectReferenceValue = mats.AxonPositive;
             visSO.FindProperty("packetMaterial").objectReferenceValue = mats.CorePlasma;
             visSO.ApplyModifiedProperties();
@@ -670,7 +671,7 @@ namespace Convergence.EditorTools
             stepCry.transform.localPosition = Vector3.zero;
             stepCry.transform.localScale = new Vector3(0.14f, 0.18f, 0.14f);
             stepCry.transform.localRotation = Quaternion.Euler(0, 45f, 0);
-            stepCry.GetComponent<Renderer>().sharedMaterial = mats.GlowEmerald;
+            stepCry.GetComponent<Renderer>().sharedMaterial = mats.GlowCyan;
             SetMeshOrKeepPrimitive(stepCry, PathWedge);
             UnityEngine.Object.DestroyImmediate(stepCry.GetComponent<Collider>());
 
@@ -1173,6 +1174,10 @@ namespace Convergence.EditorTools
             AttachXriBridges();
             CreateWorldSpaceHud(chamberController, neuralState, onboardingController);
             BakeNonKeyLights();
+            Chamber01TextRules.Apply();
+
+            CreateChamber01CaptureMarkers();
+            Chamber01TextRules.WriteAudit();
 
             // Save Scene
             EditorSceneManager.SaveScene(scene, ScenePath);
@@ -1348,10 +1353,14 @@ namespace Convergence.EditorTools
             backgroundImage.color = new Color(0.02f, 0.05f, 0.09f, 0.88f);
             backgroundImage.raycastTarget = false;
 
-            Color cyan = new Color(0.0f, 0.95f, 1.0f, 1.0f);
-            var objective = CreateHudText(canvasGo.transform, "Objective", new Vector2(0.03f, 0.62f), new Vector2(0.97f, 0.97f), 34f, cyan, TMPro.TextAlignmentOptions.TopLeft);
-            var readout = CreateHudText(canvasGo.transform, "Readout", new Vector2(0.03f, 0.48f), new Vector2(0.97f, 0.62f), 28f, Color.white, TMPro.TextAlignmentOptions.Left);
-            var result = CreateHudText(canvasGo.transform, "Result", new Vector2(0.03f, 0.22f), new Vector2(0.97f, 0.48f), 26f, new Color(0.7f, 0.82f, 0.92f), TMPro.TextAlignmentOptions.TopLeft);
+            Color label = new Color(0.90f, 0.91f, 0.88f, 1f);
+            var objective = CreateHudText(canvasGo.transform, "Objective", new Vector2(0.03f, 0.62f), new Vector2(0.97f, 0.97f), 36f, label, TMPro.TextAlignmentOptions.TopLeft);
+            objective.text = "Plug in the ROCK wire.";
+            var readout = CreateHudText(canvasGo.transform, "Readout", new Vector2(0.03f, 0.48f), new Vector2(0.97f, 0.62f), 28f, label, TMPro.TextAlignmentOptions.Left);
+            readout.text = string.Empty;
+            readout.gameObject.SetActive(false);
+            var result = CreateHudText(canvasGo.transform, "Result", new Vector2(0.03f, 0.22f), new Vector2(0.97f, 0.48f), 28f, label, TMPro.TextAlignmentOptions.TopLeft);
+            result.text = "Not yet.";
 
             var buttonGo = new GameObject("RunTestButton", typeof(RectTransform));
             buttonGo.transform.SetParent(canvasGo.transform, false);
@@ -1361,10 +1370,23 @@ namespace Convergence.EditorTools
             buttonRect.pivot = new Vector2(0.5f, 0f);
             buttonRect.sizeDelta = new Vector2(360f, 80f);
             var buttonImage = buttonGo.AddComponent<UnityEngine.UI.Image>();
-            buttonImage.color = new Color(0.0f, 0.45f, 0.6f, 0.95f);
+            buttonImage.color = new Color(0.25f, 0.28f, 0.32f, 0.95f);
             var button = buttonGo.AddComponent<UnityEngine.UI.Button>();
             button.targetGraphic = buttonImage;
-            CreateHudText(buttonGo.transform, "Label", new Vector2(0f, 0f), new Vector2(1f, 1f), 30f, Color.white, TMPro.TextAlignmentOptions.Center).text = "SELF-TEST";
+            CreateHudText(buttonGo.transform, "Label", new Vector2(0f, 0f), new Vector2(1f, 1f), 30f, label, TMPro.TextAlignmentOptions.Center).text = "SELF-TEST";
+
+            var mathGo = new GameObject("MathButton", typeof(RectTransform));
+            mathGo.transform.SetParent(canvasGo.transform, false);
+            var mathRect = mathGo.GetComponent<RectTransform>();
+            mathRect.anchorMin = new Vector2(0.08f, 0.02f);
+            mathRect.anchorMax = new Vector2(0.08f, 0.02f);
+            mathRect.pivot = new Vector2(0f, 0f);
+            mathRect.sizeDelta = new Vector2(280f, 80f);
+            var mathImage = mathGo.AddComponent<UnityEngine.UI.Image>();
+            mathImage.color = new Color(0.25f, 0.28f, 0.32f, 0.95f);
+            var mathButton = mathGo.AddComponent<UnityEngine.UI.Button>();
+            mathButton.targetGraphic = mathImage;
+            CreateHudText(mathGo.transform, "Label", new Vector2(0f, 0f), new Vector2(1f, 1f), 28f, label, TMPro.TextAlignmentOptions.Center).text = "Show the math";
             var relay = buttonGo.AddComponent<UiForwardPassRelay>();
             var relaySO = new SerializedObject(relay);
             relaySO.FindProperty("chamberController").objectReferenceValue = chamberController;
@@ -1380,7 +1402,15 @@ namespace Convergence.EditorTools
             hudSO.FindProperty("objectiveText").objectReferenceValue = objective;
             hudSO.FindProperty("readoutText").objectReferenceValue = readout;
             hudSO.FindProperty("resultText").objectReferenceValue = result;
+            hudSO.FindProperty("showMath").boolValue = false;
             hudSO.ApplyModifiedProperties();
+
+            var mathToggle = mathGo.AddComponent<ShowMathToggle>();
+            var mathSO = new SerializedObject(mathToggle);
+            mathSO.FindProperty("hud").objectReferenceValue = hud;
+            mathSO.ApplyModifiedProperties();
+            UnityEditor.Events.UnityEventTools.AddPersistentListener(
+                mathButton.onClick, new UnityEngine.Events.UnityAction(mathToggle.Toggle));
         }
 
         private static TMPro.TextMeshProUGUI CreateHudText(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, float fontSize, Color color, TMPro.TextAlignmentOptions alignment)
@@ -1636,7 +1666,7 @@ namespace Convergence.EditorTools
             ceiling.transform.SetParent(hullRoot.transform, false);
             ceiling.transform.position = new Vector3(0, 3.65f, 0.0f);
             ceiling.transform.localScale = new Vector3(7.6f, 0.3f, 7.8f);
-            ceiling.GetComponent<Renderer>().sharedMaterial = mats.SpaceshipHull;
+            ceiling.GetComponent<Renderer>().sharedMaterial = mats.CeilingValue;
 
             // Recessed Ceiling Daylight Panels & Point Lights
             float[] ceilingZ = new float[] { -2.0f, -0.6f, 0.8f, 2.2f };
@@ -1743,7 +1773,7 @@ namespace Convergence.EditorTools
             strobeLeftGo.transform.localPosition = new Vector3(-3.35f, 2.6f, -0.22f);
             strobeLeftGo.transform.localScale = new Vector3(0.14f, 0.14f, 0.14f);
             var strobeLeftRend = strobeLeftGo.GetComponent<Renderer>();
-            strobeLeftRend.sharedMaterial = (index % 2 == 1) ? mats.WarningRed : mats.WarningAmber;
+            strobeLeftRend.sharedMaterial = mats.WarningAmber;
             UnityEngine.Object.DestroyImmediate(strobeLeftGo.GetComponent<Collider>());
 
             var strobeRightGo = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -1752,7 +1782,7 @@ namespace Convergence.EditorTools
             strobeRightGo.transform.localPosition = new Vector3(3.35f, 2.6f, -0.22f);
             strobeRightGo.transform.localScale = new Vector3(0.14f, 0.14f, 0.14f);
             var strobeRightRend = strobeRightGo.GetComponent<Renderer>();
-            strobeRightRend.sharedMaterial = (index % 2 == 1) ? mats.WarningRed : mats.WarningAmber;
+            strobeRightRend.sharedMaterial = mats.WarningAmber;
             UnityEngine.Object.DestroyImmediate(strobeRightGo.GetComponent<Collider>());
         }
 
@@ -1933,11 +1963,8 @@ namespace Convergence.EditorTools
                 star.transform.position = new Vector3(x, y, z);
                 star.transform.localScale = new Vector3(starSize, starSize, starSize);
 
-                int cChoice = rnd.Next(100);
                 var sRend = star.GetComponent<Renderer>();
-                if (cChoice < 65) sRend.sharedMaterial = mats.StarGlow;
-                else if (cChoice < 82) sRend.sharedMaterial = mats.GlowCyan;
-                else sRend.sharedMaterial = mats.GlowAmber;
+                sRend.sharedMaterial = mats.StarGlow;
 
                 UnityEngine.Object.DestroyImmediate(star.GetComponent<Collider>());
             }
@@ -2303,69 +2330,64 @@ namespace Convergence.EditorTools
             var kenneyTex = AssetDatabase.LoadAssetAtPath<Texture2D>(PathKenneyTexture);
 
             // 1. Kenney Space Station Master Material (Authentic UV-mapped modular sci-fi panels)
-            mats.KenneyStation = CreateOrUpdateMaterial("Mat_Kenney_SpaceStation", new Color(0.90f, 0.92f, 0.95f), 0.15f, 0.75f);
+            // Value order: ceiling darkest, floor, walls, then the console surround.
+            // Smoothness stays at or below 0.3 and metallic at or below 0.3 on these surfaces.
+            mats.KenneyStation = CreateOrUpdateMaterial("Mat_Kenney_SpaceStation", new Color(0.18f, 0.19f, 0.21f), 0.15f, 0.25f);
+            mats.SpaceshipHull = CreateOrUpdateMaterial("Mat_Spaceship_Hull", new Color(0.32f, 0.34f, 0.37f), 0.20f, 0.25f);
+            mats.CeilingValue = CreateOrUpdateMaterial("Mat_Chamber01_Ceiling", new Color(0.07f, 0.08f, 0.09f), 0.20f, 0.25f);
+            mats.DarkPlating = CreateOrUpdateMaterial("Mat_Mainframe_DarkPlating", new Color(0.50f, 0.52f, 0.55f), 0.30f, 0.25f);
+            mats.CpuSubstrate = CreateOrUpdateMaterial("Mat_Mainframe_Substrate", new Color(0.40f, 0.42f, 0.45f), 0.30f, 0.25f);
 
-            // 2. Modern Molded Composite Plating (Crisp pristine white spacecraft exterior/interior armor)
-            mats.SpaceshipHull = CreateOrUpdateMaterial("Mat_Spaceship_Hull", new Color(0.95f, 0.96f, 0.98f), 0.05f, 0.85f);
+            mats.HeatSinkFins = CreateOrUpdateMaterial("Mat_Mainframe_HeatSink", new Color(0.35f, 0.38f, 0.42f), 0.30f, 0.25f);
+            mats.MemoryChip = CreateOrUpdateMaterial("Mat_Mainframe_MemoryChip", new Color(0.28f, 0.30f, 0.33f), 0.30f, 0.25f);
 
-            // 3. High-Contrast Metallic Gunmetal Command Deck Plating (Reflective, Crisp)
-            mats.DarkPlating = CreateOrUpdateMaterial("Mat_Mainframe_DarkPlating", new Color(0.20f, 0.22f, 0.26f), 0.60f, 0.65f);
-            mats.CpuSubstrate = CreateOrUpdateMaterial("Mat_Mainframe_Substrate", new Color(0.22f, 0.24f, 0.28f), 0.50f, 0.60f);
+            // Deck traces are scenery. Saturated cyan stays on state, not on the floor.
+            mats.BusTraceGlow = CreateOrUpdateMaterial("Mat_Mainframe_BusTrace", new Color(0.28f, 0.32f, 0.36f), 0.20f, 0.25f);
+            mats.WallPillarAccent = CreateOrUpdateMaterial("Mat_Mainframe_WallPillar", new Color(0.34f, 0.36f, 0.40f), 0.20f, 0.25f);
 
-            // 4. Structural Hardware & Heat Sinks
-            mats.HeatSinkFins = CreateOrUpdateMaterial("Mat_Mainframe_HeatSink", new Color(0.35f, 0.40f, 0.48f), 0.80f, 0.75f);
-            mats.MemoryChip = CreateOrUpdateMaterial("Mat_Mainframe_MemoryChip", new Color(0.20f, 0.24f, 0.30f), 0.70f, 0.60f);
-
-            // 5. Vibrant Neon Cyan Bus-Traces & Guideline Runners
-            mats.BusTraceGlow = CreateOrUpdateMaterial("Mat_Mainframe_BusTrace", new Color(0.15f, 0.85f, 0.98f), 0.20f, 0.80f, new Color(0.15f, 0.85f, 0.98f) * 1.5f);
-            mats.WallPillarAccent = CreateOrUpdateMaterial("Mat_Mainframe_WallPillar", new Color(0.35f, 0.42f, 0.55f), 0.30f, 0.70f, new Color(0.15f, 0.75f, 0.95f) * 0.8f);
-
-            // 6. Synaptic Axons (Clean Luminous Axons)
             mats.AxonPositive = CreateOrUpdateUnlitMaterial("Mat_Axon_Positive", new Color(0.22f, 0.75f, 0.98f, 0.75f));
-            mats.AxonNegative = CreateOrUpdateUnlitMaterial("Mat_Axon_Negative", new Color(0.95f, 0.30f, 0.38f, 0.75f));
-            mats.AxonNeutral = CreateOrUpdateMaterial("Mat_Axon_Neutral", new Color(0.22f, 0.26f, 0.35f, 0.30f), 0.40f, 0.40f, isTransparent: true);
+            mats.AxonNegative = CreateOrUpdateUnlitMaterial("Mat_Axon_Negative", new Color(0.22f, 0.75f, 0.98f, 0.75f));
+            mats.AxonNeutral = CreateOrUpdateMaterial("Mat_Axon_Neutral", new Color(0.30f, 0.34f, 0.38f, 0.40f), 0.10f, 0.25f, isTransparent: true);
 
-            // 7. Rich Futuristic Node Glows (Warm Solar Amber, Cyber Violet, Laser Mint Emerald, Ruby Coral)
-            mats.GlowCyan = CreateOrUpdateMaterial("Mat_Glow_Cyan", new Color(0.20f, 0.75f, 0.98f), 0.20f, 0.90f, new Color(0.20f, 0.75f, 0.98f) * 1.4f);
-            mats.GlowAmber = CreateOrUpdateMaterial("Mat_Glow_Amber", new Color(0.98f, 0.62f, 0.08f), 0.20f, 0.90f, new Color(0.98f, 0.60f, 0.08f) * 1.4f);
-            mats.GlowEmerald = CreateOrUpdateMaterial("Mat_Glow_Emerald", new Color(0.08f, 0.90f, 0.50f), 0.20f, 0.90f, new Color(0.08f, 0.85f, 0.48f) * 1.4f);
-            mats.GlowViolet = CreateOrUpdateMaterial("Mat_Glow_Violet", new Color(0.60f, 0.30f, 0.95f), 0.20f, 0.90f, new Color(0.55f, 0.25f, 0.90f) * 1.4f);
-            mats.GlowCoral = CreateOrUpdateMaterial("Mat_Glow_Coral", new Color(0.95f, 0.35f, 0.35f), 0.20f, 0.90f, new Color(0.95f, 0.32f, 0.32f) * 1.4f);
+            // Cyan and amber are state. Former green, violet, and coral swatches are slate or off-white.
+            // Console-used glow emission is half of the previous 1.4 multiplier.
+            mats.GlowCyan = CreateOrUpdateMaterial("Mat_Glow_Cyan", new Color(0.20f, 0.75f, 0.98f), 0.20f, 0.30f, new Color(0.20f, 0.75f, 0.98f) * 0.7f);
+            mats.GlowAmber = CreateOrUpdateMaterial("Mat_Glow_Amber", new Color(0.98f, 0.62f, 0.08f), 0.20f, 0.30f, new Color(0.98f, 0.60f, 0.08f) * 0.7f);
+            mats.GlowEmerald = CreateOrUpdateMaterial("Mat_Glow_Emerald", new Color(0.42f, 0.46f, 0.50f), 0.10f, 0.25f);
+            mats.GlowViolet = CreateOrUpdateMaterial("Mat_Glow_Violet", new Color(0.40f, 0.42f, 0.46f), 0.10f, 0.25f);
+            mats.GlowCoral = CreateOrUpdateMaterial("Mat_Glow_Coral", new Color(0.82f, 0.83f, 0.80f), 0.05f, 0.25f);
 
-            // 8. Luminous Transparent Cyan Holographic Glass & Quantum Portal Aperture
-            mats.GlassHologram = CreateOrUpdateMaterial("Mat_Mainframe_GlassHologram", new Color(0.12f, 0.45f, 0.75f, 0.22f), 0.10f, 0.95f, emissionColor: new Color(0.15f, 0.60f, 0.90f) * 0.5f, isTransparent: true);
+            mats.GlassHologram = CreateOrUpdateMaterial("Mat_Mainframe_GlassHologram", new Color(0.45f, 0.50f, 0.55f, 0.18f), 0.05f, 0.30f, isTransparent: true);
             mats.CorePlasma = CreateOrUpdateUnlitMaterial("Mat_Mainframe_CorePlasma", new Color(0.20f, 0.75f, 0.98f, 0.85f));
-            mats.PortalCurtain = CreateOrUpdateMaterial("Mat_Mainframe_PortalCurtain", new Color(0.15f, 0.55f, 0.95f, 0.30f), 0.10f, 0.90f, emissionColor: new Color(0.20f, 0.70f, 1.0f) * 0.8f, isTransparent: true);
+            mats.PortalCurtain = CreateOrUpdateMaterial("Mat_Mainframe_PortalCurtain", new Color(0.55f, 0.40f, 0.16f, 0.30f), 0.05f, 0.30f, emissionColor: new Color(0.98f, 0.60f, 0.08f) * 0.25f, isTransparent: true);
 
-            mats.GunMetal = CreateOrUpdateMaterial("Mat_Mainframe_GunMetal", new Color(0.24f, 0.28f, 0.36f), 0.85f, 0.75f);
-            mats.GunAccent = CreateOrUpdateMaterial("Mat_Mainframe_GunAccent", new Color(0.35f, 0.42f, 0.55f), 0.70f, 0.70f, new Color(0.15f, 0.45f, 0.70f) * 0.4f);
-            mats.StanchionGlow = CreateOrUpdateMaterial("Mat_Mainframe_StanchionGlow", new Color(0.15f, 0.75f, 0.98f), 0.20f, 0.80f, new Color(0.15f, 0.75f, 0.98f) * 1.2f);
+            mats.GunMetal = CreateOrUpdateMaterial("Mat_Mainframe_GunMetal", new Color(0.36f, 0.38f, 0.42f), 0.30f, 0.25f);
+            mats.GunAccent = CreateOrUpdateMaterial("Mat_Mainframe_GunAccent", new Color(0.48f, 0.50f, 0.54f), 0.30f, 0.25f);
+            mats.StanchionGlow = CreateOrUpdateMaterial("Mat_Mainframe_StanchionGlow", new Color(0.40f, 0.43f, 0.47f), 0.20f, 0.25f);
 
-            // 9. Modern Spaceship Structural Components & Hazard Trim (Molded White Arches)
-            mats.BulkheadRib = CreateOrUpdateMaterial("Mat_Spaceship_BulkheadRib", new Color(0.90f, 0.92f, 0.96f), 0.15f, 0.80f);
-            mats.ConduitPipe = CreateOrUpdateMaterial("Mat_Spaceship_ConduitPipe", new Color(0.35f, 0.40f, 0.48f), 0.80f, 0.75f);
-            mats.HazardYellow = CreateOrUpdateMaterial("Mat_Spaceship_HazardYellow", new Color(1.0f, 0.85f, 0.0f), 0.10f, 0.85f, emissionColor: new Color(1.0f, 0.85f, 0.0f) * 0.8f);
-            mats.HazardDark = CreateOrUpdateMaterial("Mat_Spaceship_HazardDark", new Color(0.12f, 0.12f, 0.14f), 0.20f, 0.50f);
+            mats.BulkheadRib = CreateOrUpdateMaterial("Mat_Spaceship_BulkheadRib", new Color(0.09f, 0.10f, 0.11f), 0.20f, 0.25f);
+            mats.ConduitPipe = CreateOrUpdateMaterial("Mat_Spaceship_ConduitPipe", new Color(0.30f, 0.32f, 0.35f), 0.30f, 0.25f);
+            mats.HazardYellow = CreateOrUpdateMaterial("Mat_Spaceship_HazardYellow", new Color(0.42f, 0.40f, 0.36f), 0.10f, 0.25f);
+            mats.HazardDark = CreateOrUpdateMaterial("Mat_Spaceship_HazardDark", new Color(0.12f, 0.12f, 0.14f), 0.20f, 0.25f);
 
-            // 10. Emergency Status Lights & Ceiling Illumination
-            mats.WarningRed = CreateOrUpdateMaterial("Mat_Spaceship_WarningRed", new Color(0.95f, 0.15f, 0.15f), 0.20f, 0.90f, emissionColor: new Color(1.0f, 0.15f, 0.15f) * 1.8f);
-            mats.WarningAmber = CreateOrUpdateMaterial("Mat_Spaceship_WarningAmber", new Color(0.98f, 0.60f, 0.05f), 0.20f, 0.90f, emissionColor: new Color(1.0f, 0.60f, 0.05f) * 1.6f);
-            mats.CeilingLight = CreateOrUpdateMaterial("Mat_Spaceship_CeilingLight", new Color(0.96f, 0.98f, 1.0f), 0.05f, 0.95f, emissionColor: new Color(0.96f, 0.98f, 1.0f) * 3.0f);
+            // Red stays defined for overload. The room strobes use amber, which is the crisis state.
+            mats.WarningRed = CreateOrUpdateMaterial("Mat_Spaceship_WarningRed", new Color(0.95f, 0.15f, 0.15f), 0.20f, 0.30f, emissionColor: new Color(1.0f, 0.15f, 0.15f) * 0.6f);
+            mats.WarningAmber = CreateOrUpdateMaterial("Mat_Spaceship_WarningAmber", new Color(0.98f, 0.60f, 0.05f), 0.20f, 0.30f, emissionColor: new Color(1.0f, 0.60f, 0.05f) * 0.8f);
+            mats.CeilingLight = CreateOrUpdateMaterial("Mat_Spaceship_CeilingLight", new Color(0.55f, 0.58f, 0.62f), 0.05f, 0.25f, emissionColor: new Color(0.70f, 0.74f, 0.78f) * 0.2f);
 
             // 11. Earth Planetary Navigation & Deep Space Vista Materials
             var earthTex = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/_Project/Images/EarthTarget.jpg");
 
             mats.EarthWater = CreateOrUpdateMaterial("Mat_Earth_Water", Color.white, 0.05f, 0.85f, emissionColor: new Color(0.12f, 0.35f, 0.70f) * 0.15f, baseMap: earthTex);
             mats.EarthLand = CreateOrUpdateMaterial("Mat_Earth_Land", Color.white, 0.05f, 0.75f, emissionColor: new Color(0.10f, 0.50f, 0.25f) * 0.15f, baseMap: earthTex);
-            mats.EarthAtmosphere = CreateOrUpdateMaterial("Mat_Earth_Atmosphere", new Color(0.25f, 0.75f, 1.0f, 0.30f), 0.0f, 0.90f, emissionColor: new Color(0.20f, 0.65f, 0.95f) * 0.7f, isTransparent: true);
+            mats.EarthAtmosphere = CreateOrUpdateMaterial("Mat_Earth_Atmosphere", new Color(0.45f, 0.52f, 0.58f, 0.22f), 0.0f, 0.30f, isTransparent: true);
             mats.EarthPhotoDisplay = CreateOrUpdateUnlitMaterial("Mat_Earth_PhotoDisplay", Color.white, baseMap: earthTex);
             mats.SpaceAsteroid = CreateOrUpdateMaterial("Mat_Space_Asteroid", new Color(0.35f, 0.32f, 0.30f), 0.10f, 0.40f, normalMap: normalMap);
-            mats.StarGlow = CreateOrUpdateMaterial("Mat_Space_StarGlow", new Color(0.95f, 0.98f, 1.0f), 0.0f, 0.95f, emissionColor: new Color(0.95f, 0.98f, 1.0f) * 3.5f);
+            mats.StarGlow = CreateOrUpdateMaterial("Mat_Space_StarGlow", new Color(0.75f, 0.78f, 0.82f), 0.0f, 0.25f, emissionColor: new Color(0.75f, 0.78f, 0.82f) * 0.35f);
 
-            var samplePlanetMat = AssetDatabase.LoadAssetAtPath<Material>("Assets/Samples/Universal Render Pipeline/17.6.0/URP Package Samples/CameraStacking/3D Skybox/Materials/Planet 1.mat");
-            mats.PlanetGasGiant = samplePlanetMat != null ? samplePlanetMat : CreateOrUpdateMaterial("Mat_Space_GasGiant", new Color(0.85f, 0.55f, 0.30f), 0.10f, 0.75f, emissionColor: new Color(0.70f, 0.40f, 0.20f) * 0.4f);
-            mats.PlanetRings = CreateOrUpdateMaterial("Mat_Space_PlanetRings", new Color(0.85f, 0.75f, 0.55f, 0.65f), 0.10f, 0.80f, emissionColor: new Color(0.75f, 0.60f, 0.40f) * 0.5f, isTransparent: true);
-            mats.ViewportGlass = CreateOrUpdateMaterial("Mat_Spaceship_ViewportGlass", new Color(0.20f, 0.50f, 0.80f, 0.02f), 0.0f, 0.98f, isTransparent: true);
+            mats.PlanetGasGiant = CreateOrUpdateMaterial("Mat_Space_GasGiant", new Color(0.42f, 0.38f, 0.32f), 0.10f, 0.25f);
+            mats.PlanetRings = CreateOrUpdateMaterial("Mat_Space_PlanetRings", new Color(0.40f, 0.38f, 0.34f, 0.55f), 0.05f, 0.25f, isTransparent: true);
+            mats.ViewportGlass = CreateOrUpdateMaterial("Mat_Spaceship_ViewportGlass", new Color(0.55f, 0.60f, 0.64f, 0.04f), 0.0f, 0.30f, isTransparent: true);
 
             return mats;
         }
@@ -2925,6 +2947,8 @@ namespace Convergence.EditorTools
 
         private static void CreateBloomVolume(Transform parent)
         {
+            // WP2 keeps bloom off. RECON found an empty profile, and the glare bisect
+            // could not be measured from batchmode. Do not add a Bloom override.
             const string path = "Assets/Materials/Volume_Bloom.asset";
             var profile = AssetDatabase.LoadAssetAtPath<UnityEngine.Rendering.VolumeProfile>(path);
             if (profile == null)
@@ -2933,12 +2957,16 @@ namespace Convergence.EditorTools
                 AssetDatabase.CreateAsset(profile, path);
             }
 
-            if (!profile.TryGet(out UnityEngine.Rendering.Universal.Bloom bloom))
+            for (int i = profile.components.Count - 1; i >= 0; i--)
             {
-                bloom = profile.Add<UnityEngine.Rendering.Universal.Bloom>(true);
+                var component = profile.components[i];
+                if (component == null || component is UnityEngine.Rendering.Universal.Bloom)
+                {
+                    profile.components.RemoveAt(i);
+                    if (component != null) UnityEngine.Object.DestroyImmediate(component, true);
+                }
             }
-            bloom.intensity.Override(0.35f);
-            bloom.threshold.Override(1.15f);
+
             EditorUtility.SetDirty(profile);
 
             var go = new GameObject("GlobalVolume");
@@ -2952,17 +2980,233 @@ namespace Convergence.EditorTools
         {
             foreach (var light in UnityEngine.Object.FindObjectsByType<Light>())
             {
+                light.shadows = LightShadows.None;
                 if (light.name == "DirectionalLight_StellarKey")
                 {
+                    light.enabled = true;
                     light.lightmapBakeType = LightmapBakeType.Realtime;
                 }
                 else
                 {
+                    // WP2 glare step: non-key point, spot, and fill lights stay off.
+                    light.enabled = false;
+                    light.intensity = 0f;
                     light.lightmapBakeType = LightmapBakeType.Baked;
                 }
             }
             // Lightmap bake is started by the owner from the Lighting window. Calling it here
             // locks the Editor for the rest of the build, so the scene never reaches SaveScene.
+        }
+
+        /// <summary>
+        /// Invisible capture markers and the dev headset text strip.
+        /// Parents: ConsoleBounds under TactileEngineeringWorkstation, WindowBounds under
+        /// ForwardObservationViewportAndDeepSpaceVista (sized from PanoramicViewportGlass),
+        /// ValueProbe_Ceiling under Bulkhead_CeilingSpan, ValueProbe_Floor under DeckTile_0_0,
+        /// ValueProbe_Wall under Bulkhead_Port_00. Empty transforms only: no renderer, no collider.
+        /// BuildLevel01 opens a new empty scene, so a second build does not append duplicates.
+        /// The text strip is not the gameplay subtitle path. A human must read it in a headset
+        /// and write the result into the task file. This method does not record that result.
+        /// Tools/Editor does not compile into player builds, so the strip cannot be wrapped in a
+        /// player-only script. It is scene content produced by this editor builder.
+        /// </summary>
+        private static void CreateChamber01CaptureMarkers()
+        {
+            var console = GameObject.Find("TactileEngineeringWorkstation");
+            if (console == null)
+            {
+                Debug.LogError("[Level01SceneBuilder] TactileEngineeringWorkstation is missing. ConsoleBounds was not created.");
+            }
+            else
+            {
+                var consoleBounds = CreateEmptyChild(console.transform, "ConsoleBounds");
+                if (TryEncapsulateConsoleRenderers(console, out Bounds box))
+                {
+                    consoleBounds.transform.SetPositionAndRotation(box.center, Quaternion.identity);
+                    ApplyWorldSize(consoleBounds.transform, box.size);
+                }
+                else
+                {
+                    Debug.LogError("[Level01SceneBuilder] TactileEngineeringWorkstation has no renderers. ConsoleBounds has no size.");
+                }
+            }
+
+            var viewport = GameObject.Find("ForwardObservationViewportAndDeepSpaceVista");
+            var glass = GameObject.Find("PanoramicViewportGlass");
+            if (viewport == null || glass == null)
+            {
+                Debug.LogError("[Level01SceneBuilder] Viewport or PanoramicViewportGlass is missing. WindowBounds was not created.");
+            }
+            else
+            {
+                var windowBounds = CreateEmptyChild(viewport.transform, "WindowBounds");
+                windowBounds.transform.SetPositionAndRotation(glass.transform.position, glass.transform.rotation);
+                ApplyWorldSize(windowBounds.transform, glass.transform.lossyScale);
+            }
+
+            CreateValueProbe("ValueProbe_Ceiling", "Bulkhead_CeilingSpan");
+            CreateValueProbe("ValueProbe_Floor", "DeckTile_0_0");
+            CreateValueProbe("ValueProbe_Wall", "Bulkhead_Port_00");
+            CreateDevHeadsetTextStrip();
+        }
+
+        private static GameObject CreateEmptyChild(Transform parent, string name)
+        {
+            Transform existing = parent.Find(name);
+            if (existing != null)
+            {
+                UnityEngine.Object.DestroyImmediate(existing.gameObject);
+            }
+
+            var go = new GameObject(name);
+            go.transform.SetParent(parent, false);
+            return go;
+        }
+
+        private static void CreateValueProbe(string probeName, string parentName)
+        {
+            var parentGo = GameObject.Find(parentName);
+            if (parentGo == null)
+            {
+                Debug.LogError("[Level01SceneBuilder] Capture probe parent missing: " + parentName);
+                return;
+            }
+
+            var probe = CreateEmptyChild(parentGo.transform, probeName);
+            probe.transform.localPosition = Vector3.zero;
+            probe.transform.localRotation = Quaternion.identity;
+            probe.transform.localScale = Vector3.one;
+        }
+
+        private static bool TryEncapsulateConsoleRenderers(GameObject console, out Bounds box)
+        {
+            bool any = false;
+            box = new Bounds(console.transform.position, Vector3.zero);
+            foreach (var renderer in console.GetComponentsInChildren<Renderer>(true))
+            {
+                if (renderer == null || !renderer.enabled) continue;
+                if (renderer is ParticleSystemRenderer) continue;
+                if (renderer.gameObject.name.StartsWith("BridgeChair_", StringComparison.Ordinal)) continue;
+                if (!any)
+                {
+                    box = renderer.bounds;
+                    any = true;
+                }
+                else
+                {
+                    box.Encapsulate(renderer.bounds);
+                }
+            }
+
+            return any;
+        }
+
+        private static void ApplyWorldSize(Transform marker, Vector3 worldSize)
+        {
+            Vector3 parentScale = marker.parent != null ? marker.parent.lossyScale : Vector3.one;
+            marker.localScale = new Vector3(
+                DivideScale(worldSize.x, parentScale.x),
+                DivideScale(worldSize.y, parentScale.y),
+                DivideScale(worldSize.z, parentScale.z));
+        }
+
+        private static float DivideScale(float size, float parentScale)
+        {
+            if (Mathf.Abs(parentScale) < 0.000001f) return size;
+            return size / parentScale;
+        }
+
+        /// <summary>
+        /// One sample sentence at 1.0, 1.5, 2.0, 2.5 and 3.0 degrees.
+        /// height_m = distance_m * tan(angle), at the seated eye (rig floor + 1.2 m) to the console.
+        /// Facing follows section 4.3: Quaternion.LookRotation(textPos - eyePos).
+        /// A human reads this in the headset and writes the smallest comfortable angle, and the
+        /// angle where reading needs a head turn, into the task file. Do not invent that result.
+        /// </summary>
+        private static void CreateDevHeadsetTextStrip()
+        {
+            var existing = GameObject.Find("DevHeadsetTextStrip");
+            if (existing != null)
+            {
+                UnityEngine.Object.DestroyImmediate(existing);
+            }
+
+            var origin = UnityEngine.Object.FindAnyObjectByType<Unity.XR.CoreUtils.XROrigin>();
+            var console = GameObject.Find("TactileEngineeringWorkstation");
+            if (origin == null || console == null)
+            {
+                Debug.LogError("[Level01SceneBuilder] XR rig or console is missing. DevHeadsetTextStrip was not created.");
+                return;
+            }
+
+            const float seatedEyeMeters = 1.2f;
+            Vector3 eye = origin.transform.position + Vector3.up * seatedEyeMeters;
+            Vector3 anchor = new Vector3(console.transform.position.x, eye.y, console.transform.position.z);
+            float distance = Vector3.Distance(eye, anchor);
+            if (distance < 0.05f)
+            {
+                Debug.LogError("[Level01SceneBuilder] Seated eye and console are coincident. DevHeadsetTextStrip was not created.");
+                return;
+            }
+
+            var font = AssetDatabase.LoadAssetAtPath<TMPro.TMP_FontAsset>(
+                "Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF.asset");
+            if (font == null)
+            {
+                Debug.LogError("[Level01SceneBuilder] LiberationSans SDF is missing. DevHeadsetTextStrip was not created.");
+                return;
+            }
+
+            var root = new GameObject("DevHeadsetTextStrip");
+            float[] angles = { 1.0f, 1.5f, 2.0f, 2.5f, 3.0f };
+            float gap = distance * Mathf.Tan(0.35f * Mathf.Deg2Rad);
+            float total = 0f;
+            var heights = new float[angles.Length];
+            for (int i = 0; i < angles.Length; i++)
+            {
+                heights[i] = distance * Mathf.Tan(angles[i] * Mathf.Deg2Rad);
+                total += heights[i];
+            }
+
+            total += gap * (angles.Length - 1);
+            float cursor = anchor.y - (total * 0.5f);
+            for (int i = 0; i < angles.Length; i++)
+            {
+                float height = heights[i];
+                string angleLabel = angles[i].ToString("0.0", System.Globalization.CultureInfo.InvariantCulture);
+                var line = new GameObject("TextStrip_" + angleLabel);
+                line.transform.SetParent(root.transform, false);
+                Vector3 pos = new Vector3(anchor.x, cursor + (height * 0.5f), anchor.z);
+                line.transform.position = pos;
+                line.transform.rotation = Quaternion.LookRotation(pos - eye, Vector3.up);
+
+                var text = line.AddComponent<TMPro.TextMeshPro>();
+                text.font = font;
+                text.text = angleLabel + " degrees.";
+                text.fontSize = 36f;
+                text.alignment = TMPro.TextAlignmentOptions.Center;
+                text.color = Color.white;
+                text.raycastTarget = false;
+                text.textWrappingMode = TMPro.TextWrappingModes.NoWrap;
+                text.overflowMode = TMPro.TextOverflowModes.Overflow;
+                text.rectTransform.sizeDelta = new Vector2(20f, 4f);
+                text.ForceMeshUpdate();
+
+                float localHeight = text.textBounds.size.y;
+                if (localHeight < 0.0001f)
+                {
+                    Debug.LogError("[Level01SceneBuilder] Text strip mesh has no height at " + angleLabel + " degrees.");
+                }
+                else
+                {
+                    float scale = height / localHeight;
+                    line.transform.localScale = Vector3.one * scale;
+                    Vector3 centerOffset = line.transform.TransformVector(text.textBounds.center);
+                    line.transform.position = pos - centerOffset;
+                }
+
+                cursor += height + gap;
+            }
         }
 
         private static void RegisterSceneInBuildSettings(string scenePath)

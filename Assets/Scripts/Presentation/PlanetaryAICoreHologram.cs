@@ -1,5 +1,4 @@
 using System;
-using System.Text;
 using UnityEngine;
 using Convergence.Core.Neural;
 using Convergence.Core.Puzzles;
@@ -52,8 +51,6 @@ namespace Convergence.Presentation
         private float _currentIntegrity = 0.18f;
         private float _targetIntegrity = 0.18f;
         private Camera _mainCamera;
-        private readonly StringBuilder _barBuffer = new StringBuilder(64);
-        private readonly StringBuilder _detailsBuffer = new StringBuilder(256);
         private bool _isHarmonized = false;
 
         public float GlobalIntegrity => _currentIntegrity;
@@ -213,82 +210,26 @@ namespace Convergence.Presentation
             if (coreAuraLight != null)
             {
                 coreAuraLight.color = activeColor;
-                coreAuraLight.intensity = _isHarmonized ? 0.9f : (0.4f + Mathf.PingPong(Time.time * 2.0f, 0.25f));
+                coreAuraLight.intensity = _isHarmonized ? 0.7f : (0.45f + Mathf.PingPong(Time.time * 0.25f, 0.08f));
             }
 
             // Header Text
             if (headerTextMesh != null)
             {
-                headerTextMesh.text = "EMERGENCY WARP NAVIGATION AI // USS CONVERGENCE";
+                headerTextMesh.text = "Warp status";
                 headerTextMesh.color = activeColor;
             }
 
             // Integrity Bar Text
             if (integrityBarTextMesh != null)
             {
-                int totalBlocks = 20;
-                int filledBlocks = Mathf.RoundToInt(_currentIntegrity * totalBlocks);
-
-                _barBuffer.Length = 0;
-                _barBuffer.Append("WARP JUMP INTEGRITY: [");
-                for (int i = 0; i < totalBlocks; i++)
-                {
-                    _barBuffer.Append(i < filledBlocks ? "█" : "░");
-                }
-                _barBuffer.Append($"] {_currentIntegrity * 100:F0}%");
-
-                if (_isHarmonized)
-                {
-                    _barBuffer.Append(" [WARP JUMP VECTOR LOCKED]");
-                }
-                else if (_currentIntegrity >= 0.65f)
-                {
-                    _barBuffer.Append(" [EARTH LOCK SYNCHRONIZING]");
-                }
-                else
-                {
-                    _barBuffer.Append(" [WARP DRIVE OFFLINE]");
-                }
-
-                integrityBarTextMesh.text = _barBuffer.ToString();
+                integrityBarTextMesh.text = _isHarmonized ? "Online" : "Not yet";
                 integrityBarTextMesh.color = activeColor;
             }
 
-            // Status Details Text
             if (statusDetailsTextMesh != null)
             {
-                _detailsBuffer.Length = 0;
-                if (_isHarmonized)
-                {
-                    _detailsBuffer.AppendLine("✔ Earth telemetry lock 100% verified across all 4 sensor feeds");
-                    _detailsBuffer.AppendLine("✔ Hyperspace jump vector calculated — heading home to Earth");
-                    _detailsBuffer.AppendLine("✔ Awakening Blast Doors Unsealed — Proceed to Command Airlock");
-                }
-                else
-                {
-                    if (neuralState != null)
-                    {
-                        if (!neuralState.Cable1Connected)
-                            _detailsBuffer.AppendLine("⚠ CONTINENT SENSOR DISCONNECTED — Earth telemetry feed offline");
-                        else
-                            _detailsBuffer.AppendLine("✔ Earth continental sensor feed active");
-
-                        if (!neuralState.Cable2Connected)
-                            _detailsBuffer.AppendLine("⚠ ATMOSPHERE SENSOR DISCONNECTED — Earth telemetry feed offline");
-                        else
-                            _detailsBuffer.AppendLine("✔ Earth atmospheric sensor feed active");
-
-                        if (neuralState.Activation != ActivationType.Step)
-                            _detailsBuffer.AppendLine($"⚠ INCOMPATIBLE ACTIVATION ({neuralState.Activation}) — Need Step Crystal for binary Jump Lock");
-                        else
-                            _detailsBuffer.AppendLine("✔ Step decision crystal socketed");
-
-                        if (neuralState.Bias >= 0.0)
-                            _detailsBuffer.AppendLine("⚠ COSMIC NOISE FILTER TOO LOW — Deep space static will cause false warp jumps!");
-                    }
-                }
-
-                statusDetailsTextMesh.text = _detailsBuffer.ToString();
+                statusDetailsTextMesh.text = string.Empty;
                 statusDetailsTextMesh.color = Color.white;
             }
         }

@@ -1,0 +1,15 @@
+{
+  "calibrated": false,
+  "clippedLuminanceMin": 242,
+  "clippedConsolePctMax": 2.0,
+  "clippedCenterExclWindowPctMax": 2.0,
+  "windowPeakBelowConsolePeak": true,
+  "textAngleBodyMinDeg": 1.5,
+  "textAngleHeadingMinDeg": 2.5,
+  "iconAngleMinDeg": 3.0,
+  "textConeMaxDeg": 25,
+  "maxWordsPerPrompt": 12,
+  "trianglesMax": 100000,
+  "drawCallsMax": 150,
+  "flashHzMax": 3.0
+}

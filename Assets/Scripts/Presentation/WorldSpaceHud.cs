@@ -26,7 +26,7 @@ namespace Convergence.Presentation
         [Header("Behaviour")]
         [SerializeField] private float refreshInterval = 0.2f;
         [SerializeField] private bool yawTowardHead = true;
-        [SerializeField] private string[] caseLabels = { "Drone", "Comet", "Rock", "Both" };
+        [SerializeField] private bool showMath;
 
         private readonly StringBuilder _builder = new StringBuilder(160);
         private float _nextRefresh;
@@ -64,6 +64,13 @@ namespace Convergence.Presentation
             Refresh();
         }
 
+        /// <summary>Formula stays behind this toggle. Default is off.</summary>
+        public void ToggleMath()
+        {
+            showMath = !showMath;
+            Refresh();
+        }
+
         private void Refresh()
         {
             if (objectiveText != null && onboardingController != null)
@@ -71,19 +78,21 @@ namespace Convergence.Presentation
                 objectiveText.text = onboardingController.GetCurrentStepPrompt();
             }
 
-            if (readoutText != null && neuralState != null)
+            if (readoutText != null)
             {
-                _builder.Clear();
-                _builder.Append("FIRE = step(");
-                _builder.Append(neuralState.Weight1.ToString("0.0"));
-                _builder.Append("·ROCK + ");
-                _builder.Append(neuralState.Weight2.ToString("0.0"));
-                _builder.Append("·ICE + ");
-                _builder.Append(neuralState.Bias.ToString("0.0"));
-                _builder.Append(")  ");
-                _builder.Append(neuralState.Activation.ToString().ToUpperInvariant());
-                _builder.Append("\nFires when the sum reaches 0.");
-                readoutText.text = _builder.ToString();
+                readoutText.gameObject.SetActive(showMath);
+                if (showMath && neuralState != null)
+                {
+                    _builder.Clear();
+                    _builder.Append("FIRE = step(");
+                    _builder.Append(neuralState.Weight1.ToString("0.0"));
+                    _builder.Append("·ROCK + ");
+                    _builder.Append(neuralState.Weight2.ToString("0.0"));
+                    _builder.Append("·ICE + ");
+                    _builder.Append(neuralState.Bias.ToString("0.0"));
+                    _builder.Append(')');
+                    readoutText.text = _builder.ToString();
+                }
             }
 
             if (resultText != null)
@@ -95,26 +104,12 @@ namespace Convergence.Presentation
         private string BuildResultLine()
         {
             PuzzleEvaluation eval = chamberController != null ? chamberController.LastEvaluation : null;
-            if (eval == null || eval.Diagnostics == null)
+            if (eval == null || eval.Diagnostics == null || !eval.Passed)
             {
-                return "Drone slips past. Ice, rock, and both should burn.";
+                return "Not yet.";
             }
 
-            _builder.Clear();
-            int shown = caseLabels.Length < eval.Diagnostics.Count ? caseLabels.Length : eval.Diagnostics.Count;
-            for (int i = 0; i < shown; i++)
-            {
-                CaseDiagnostic diag = eval.Diagnostics[i];
-                bool pass = diag.IsCorrect && eval.ActivationMatches;
-                _builder.Append(caseLabels[i]).Append(' ');
-                if (!pass) _builder.Append("missed");
-                else if (diag.ExpectedOutput >= 0.5) _builder.Append("burned");
-                else _builder.Append("safe");
-                if (i < shown - 1) _builder.Append("   ");
-            }
-
-            _builder.Append(eval.Passed ? "\nThe rule holds." : "\nChange one dial.");
-            return _builder.ToString();
+            return "Handled.";
         }
     }
 }

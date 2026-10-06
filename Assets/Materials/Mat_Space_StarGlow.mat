@@ -100,7 +100,7 @@ Material:
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
     - _GlossMapScale: 0
-    - _Glossiness: 0.95
+    - _Glossiness: 0.25
     - _GlossyReflections: 0
     - _Metallic: 0
     - _OcclusionStrength: 1
@@ -109,7 +109,7 @@ Material:
     - _ReceiveShadows: 1
     - _ScreenSpaceReflections: 1
     - _ScreenSpaceReflectionsContributeTransparent: 1
-    - _Smoothness: 0.95
+    - _Smoothness: 0.25
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
@@ -119,9 +119,9 @@ Material:
     - _XRMotionVectorsPass: 1
     - _ZWrite: 1
     m_Colors:
-    - _BaseColor: {r: 0.95, g: 0.98, b: 1, a: 1}
-    - _Color: {r: 0.95, g: 0.98, b: 1, a: 1}
-    - _EmissionColor: {r: 3.325, g: 3.43, b: 3.5, a: 3.5}
+    - _BaseColor: {r: 0.75, g: 0.78, b: 0.82, a: 1}
+    - _Color: {r: 0.75, g: 0.78, b: 0.82, a: 1}
+    - _EmissionColor: {r: 0.2625, g: 0.27299997, b: 0.287, a: 0.35}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

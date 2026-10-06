@@ -91,7 +91,8 @@ namespace Convergence.Presentation
             if (show != _line)
             {
                 _line = show;
-                if (banner != null) banner.text = show >= 0 ? LineText[show] : string.Empty;
+                // The scrolling warning is replaced by the amber AlertGlyph. Audio still plays.
+                if (banner != null) banner.text = string.Empty;
             }
 
             if (_elapsed >= recordingLength)
