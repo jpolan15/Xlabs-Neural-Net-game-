@@ -1173,6 +1173,17 @@ namespace Convergence.EditorTools
 
             AttachXriBridges();
             controllersGo.AddComponent<SavedCircuitLibrary>();
+            var wall = controllersGo.AddComponent<XorWallDirector>();
+            var wallSO = new SerializedObject(wall);
+            wallSO.FindProperty("chamber").objectReferenceValue = chamberController;
+            wallSO.FindProperty("neuralState").objectReferenceValue = neuralState;
+            wallSO.FindProperty("unlockSeconds").floatValue = 90f;
+            wallSO.ApplyModifiedProperties();
+            var rack = controllersGo.AddComponent<CartridgeRack>();
+            var rackSO = new SerializedObject(rack);
+            rackSO.FindProperty("wall").objectReferenceValue = wall;
+            rackSO.FindProperty("chamber").objectReferenceValue = chamberController;
+            rackSO.ApplyModifiedProperties();
             var live = controllersGo.AddComponent<LiveEvaluationRelay>();
             var liveSO = new SerializedObject(live);
             liveSO.FindProperty("neuralState").objectReferenceValue = neuralState;
