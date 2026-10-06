@@ -513,6 +513,60 @@ function Invoke-V06($Thresholds) {
     }
 }
 
+function Invoke-V04 {
+    if ($dry) {
+        Add-CheckLine "[DRY] V-04 would read Temp/chamber01_scale_guard.txt written by the builder. Kenney roots must be scale (1,1,1) and Mat_Kenney_SpaceStation must use variation-a."
+        return
+    }
+
+    if (-not $script:V01Passed) {
+        Add-Skip "V-04 scale guard: scene was not rebuilt in this run"
+        return
+    }
+
+    $report = Join-Path $ProjectRoot "Temp/chamber01_scale_guard.txt"
+    if (-not (Test-Path -LiteralPath $report)) {
+        Add-Fail "V-04 scale guard report missing after the build"
+        return
+    }
+
+    $text = Get-Content -LiteralPath $report -Raw
+    if ($text.StartsWith("PASS")) {
+        Add-Pass "V-04 scale guard and variation-a atlas"
+        return
+    }
+
+    Add-Fail ("V-04 scale guard failed: " + (($text -split "`n")[0]))
+}
+
+function Invoke-V09 {
+    if ($dry) {
+        Add-CheckLine "[DRY] V-09 would read Documentation/Design/captures/device_numbers.json. A missing file is an operator skip."
+        return
+    }
+
+    $devicePath = Join-Path $ProjectRoot "Documentation/Design/captures/device_numbers.json"
+    if (-not (Test-Path -LiteralPath $devicePath)) {
+        Add-Skip "V-09 on-device numbers: file missing (operator step)"
+        return
+    }
+
+    $device = Get-Content -LiteralPath $devicePath -Raw | ConvertFrom-Json
+    if ($null -eq $thresholds) {
+        Add-Fail "V-09 on-device numbers: thresholds file missing"
+        return
+    }
+
+    $triangles = 0
+    if ($null -ne $device.PSObject.Properties["triangles"]) { $triangles = [double]$device.triangles }
+    if ($triangles -gt [double]$thresholds.trianglesMax) {
+        Add-Fail ("V-09 on-device triangles " + $triangles + " over " + $thresholds.trianglesMax)
+        return
+    }
+
+    Add-Pass ("V-09 on-device numbers within budget (triangles " + $triangles + ")")
+}
+
 function Invoke-V10([string[]]$Names, [bool]$NamesKnown) {
     if ($dry) {
         Add-CheckLine "[DRY] V-10 would run git diff --name-only, plus staged and untracked names, against Assets/ThirdParty/, Assets/Samples/, and Assets/Scripts/Core/."
@@ -571,6 +625,7 @@ Invoke-V02 -Names $names -NamesKnown:$namesKnown
 Invoke-V03
 Invoke-V07
 Invoke-V08
+Invoke-V04
 if ($dry) {
     Invoke-V05 -Thresholds $null
     Invoke-V06 -Thresholds $null
@@ -584,6 +639,7 @@ else {
     Invoke-V06 -Thresholds $thresholds
 }
 Invoke-V10 -Names $names -NamesKnown:$namesKnown
+Invoke-V09
 
 if ($dry) {
     Add-CheckLine "RESULT: DRY-RUN (Unity was not launched)"

@@ -81,6 +81,7 @@ namespace Convergence.EditorTools
             {
                 var instance = UnityEngine.Object.Instantiate(asset, parent);
                 instance.name = name;
+                if (path.Contains("/Kenney/")) KenneyKit.Mark(instance);
                 return instance;
             }
             return null;
@@ -431,9 +432,9 @@ namespace Convergence.EditorTools
             if (flightDeskModel != null)
             {
                 flightDeskModel.transform.localPosition = new Vector3(0, 0f, 0f);
-                flightDeskModel.transform.localScale = new Vector3(1.30f, 1.0f, 1.0f);
+                flightDeskModel.transform.localScale = Vector3.one;
                 flightDeskModel.transform.localRotation = Quaternion.Euler(0, 180f, 0);
-                ApplyMaterialRecursively(flightDeskModel, mats.DarkPlating);
+                ApplyMaterialRecursively(flightDeskModel, mats.KenneyStation);
             }
 
             // Solid backing desk collider so interactors and controllers don't fall through
@@ -449,7 +450,7 @@ namespace Convergence.EditorTools
             if (avionicsScreen != null)
             {
                 avionicsScreen.transform.localPosition = new Vector3(0.90f, 0.86f, 0.05f);
-                avionicsScreen.transform.localScale = new Vector3(0.85f, 0.85f, 0.85f);
+                avionicsScreen.transform.localScale = Vector3.one;
                 avionicsScreen.transform.localRotation = Quaternion.Euler(0, -32f, 0);
                 ApplyMaterialRecursively(avionicsScreen, mats.DarkPlating);
             }
@@ -459,7 +460,7 @@ namespace Convergence.EditorTools
             if (leftChair != null)
             {
                 leftChair.transform.localPosition = new Vector3(-1.85f, 0, 0.15f);
-                leftChair.transform.localScale = new Vector3(1.15f, 1.15f, 1.15f);
+                leftChair.transform.localScale = Vector3.one;
                 leftChair.transform.localRotation = Quaternion.Euler(0, 22f, 0);
                 ApplyMaterialRecursively(leftChair, mats.KenneyStation);
             }
@@ -468,7 +469,7 @@ namespace Convergence.EditorTools
             if (rightChair != null)
             {
                 rightChair.transform.localPosition = new Vector3(1.85f, 0, 0.15f);
-                rightChair.transform.localScale = new Vector3(1.15f, 1.15f, 1.15f);
+                rightChair.transform.localScale = Vector3.one;
                 rightChair.transform.localRotation = Quaternion.Euler(0, -22f, 0);
                 ApplyMaterialRecursively(rightChair, mats.KenneyStation);
             }
@@ -1202,6 +1203,9 @@ namespace Convergence.EditorTools
             BakeNonKeyLights();
             Chamber01Concept.Install(neuralState, chamberController);
             Chamber01TextRules.Apply();
+            Chamber01ShipFinish.Apply();
+            KenneyKit.ForceScaleOne();
+            KenneyKit.Run(new KenneyKit.SceneAssetRoot(scene.GetRootGameObjects()));
 
             CreateChamber01CaptureMarkers();
             Chamber01TextRules.WriteAudit();
@@ -1465,6 +1469,19 @@ namespace Convergence.EditorTools
             return text;
         }
 
+        private static void PlaceUniformModule(Transform parent, string path, string name, Vector3 basePosition, Quaternion rotation, Material material, int stacks)
+        {
+            for (int s = 0; s < stacks; s++)
+            {
+                string piece = s == 0 ? name : name + "_S" + s;
+                var go = CreateModelInstance(path, piece, parent);
+                if (go == null) continue;
+                go.transform.SetPositionAndRotation(basePosition + (Vector3.up * s), rotation);
+                go.transform.localScale = Vector3.one;
+                ApplyMaterialRecursively(go, material);
+            }
+        }
+
         private static void StretchRect(RectTransform rect)
         {
             rect.anchorMin = Vector2.zero;
@@ -1541,15 +1558,15 @@ namespace Convergence.EditorTools
             var deckTilesRoot = new GameObject("Kenney_DeckTiles");
             deckTilesRoot.transform.SetParent(hullRoot.transform, false);
 
-            for (int x = -2; x <= 2; x += 2)
+            for (int x = -3; x <= 3; x++)
             {
-                for (int z = -2; z <= 2; z += 2)
+                for (int z = -3; z <= 3; z++)
                 {
                     var tile = CreateModelInstance(PathKenneyFloorPanel, $"DeckTile_{x}_{z}", deckTilesRoot.transform);
                     if (tile != null)
                     {
                         tile.transform.position = new Vector3(x, 0.01f, z);
-                        tile.transform.localScale = new Vector3(2.0f, 1.0f, 2.0f);
+                        tile.transform.localScale = Vector3.one;
                         ApplyMaterialRecursively(tile, mats.KenneyStation);
                     }
                 }
@@ -1567,103 +1584,46 @@ namespace Convergence.EditorTools
             var bulkheadsRoot = new GameObject("Kenney_ModularBulkheads");
             bulkheadsRoot.transform.SetParent(hullRoot.transform, false);
 
-            // Port Bulkhead Modules (x = -3.55m, facing inward rot = 90 deg Y)
-            float[] portZ = new float[] { -2.6f, -0.9f, 0.8f, 2.5f };
-            for (int i = 0; i < portZ.Length; i++)
+            int portIndex = 0;
+            for (float z = -3f; z <= 3.01f; z += 1f)
             {
-                string mPath = (i == 1 || i == 2) ? PathKenneyWallWindowFrame : (i % 2 == 0 ? PathKenneyWall : PathKenneyWallDetail);
-                var wallMod = CreateModelInstance(mPath, $"Bulkhead_Port_{i:D2}", bulkheadsRoot.transform);
-                if (wallMod != null)
-                {
-                    wallMod.transform.position = new Vector3(-3.55f, 0f, portZ[i]);
-                    wallMod.transform.localScale = new Vector3(1.8f, 3.6f, 1.0f);
-                    wallMod.transform.rotation = Quaternion.Euler(0, 90f, 0);
-                    ApplyMaterialRecursively(wallMod, mats.SpaceshipHull);
-                }
-
-                if (i == 1 || i == 2)
+                string wallName = portIndex == 0 ? "Bulkhead_Port_00" : $"Bulkhead_Port_{portIndex:D2}";
+                PlaceUniformModule(bulkheadsRoot.transform, PathKenneyWall, wallName, new Vector3(-3.55f, 0f, z), Quaternion.Euler(0f, 90f, 0f), mats.KenneyStation, 3);
+                if (portIndex == 2 || portIndex == 4)
                 {
                     var pGlass = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    pGlass.name = $"WindowGlass_Port_{i:D2}";
+                    pGlass.name = $"WindowGlass_Port_{portIndex:D2}";
                     pGlass.transform.SetParent(bulkheadsRoot.transform, false);
-                    pGlass.transform.position = new Vector3(-3.55f, 1.8f, portZ[i]);
-                    pGlass.transform.localScale = new Vector3(0.04f, 2.2f, 1.7f);
+                    pGlass.transform.position = new Vector3(-3.55f, 1.5f, z);
+                    pGlass.transform.localScale = new Vector3(0.04f, 2.2f, 0.7f);
                     pGlass.GetComponent<Renderer>().sharedMaterial = mats.ViewportGlass;
                     UnityEngine.Object.DestroyImmediate(pGlass.GetComponent<Collider>());
                 }
 
-                if (i < portZ.Length - 1)
-                {
-                    var pillar = CreateModelInstance(PathKenneyWallPillar, $"Pillar_Port_{i:D2}", bulkheadsRoot.transform);
-                    if (pillar != null)
-                    {
-                        pillar.transform.position = new Vector3(-3.50f, 0f, (portZ[i] + portZ[i + 1]) * 0.5f);
-                        pillar.transform.localScale = new Vector3(1.2f, 3.6f, 1.2f);
-                        pillar.transform.rotation = Quaternion.Euler(0, 90f, 0);
-                        ApplyMaterialRecursively(pillar, mats.SpaceshipHull);
-                    }
-                }
+                portIndex++;
             }
 
-            // Starboard Bulkhead Modules (x = 3.55m, facing inward rot = -90 deg Y)
-            for (int i = 0; i < portZ.Length; i++)
+            for (float z = -2.5f; z <= 2.51f; z += 1f)
             {
-                string mPath = (i == 1 || i == 2) ? PathKenneyWallWindowFrame : (i % 2 == 0 ? PathKenneyWall : PathKenneyWallDetail);
-                var wallMod = CreateModelInstance(mPath, $"Bulkhead_Starboard_{i:D2}", bulkheadsRoot.transform);
-                if (wallMod != null)
-                {
-                    wallMod.transform.position = new Vector3(3.55f, 0f, portZ[i]);
-                    wallMod.transform.localScale = new Vector3(1.8f, 3.6f, 1.0f);
-                    wallMod.transform.rotation = Quaternion.Euler(0, -90f, 0);
-                    ApplyMaterialRecursively(wallMod, mats.SpaceshipHull);
-                }
-
-                if (i == 1 || i == 2)
-                {
-                    var sGlass = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    sGlass.name = $"WindowGlass_Starboard_{i:D2}";
-                    sGlass.transform.SetParent(bulkheadsRoot.transform, false);
-                    sGlass.transform.position = new Vector3(3.55f, 1.8f, portZ[i]);
-                    sGlass.transform.localScale = new Vector3(0.04f, 2.2f, 1.7f);
-                    sGlass.GetComponent<Renderer>().sharedMaterial = mats.ViewportGlass;
-                    UnityEngine.Object.DestroyImmediate(sGlass.GetComponent<Collider>());
-                }
-
-                if (i < portZ.Length - 1)
-                {
-                    var pillar = CreateModelInstance(PathKenneyWallPillar, $"Pillar_Starboard_{i:D2}", bulkheadsRoot.transform);
-                    if (pillar != null)
-                    {
-                        pillar.transform.position = new Vector3(3.50f, 0f, (portZ[i] + portZ[i + 1]) * 0.5f);
-                        pillar.transform.localScale = new Vector3(1.2f, 3.6f, 1.2f);
-                        pillar.transform.rotation = Quaternion.Euler(0, -90f, 0);
-                        ApplyMaterialRecursively(pillar, mats.SpaceshipHull);
-                    }
-                }
+                PlaceUniformModule(bulkheadsRoot.transform, PathKenneyWallPillar, "Pillar_Port", new Vector3(-3.50f, 0f, z), Quaternion.Euler(0f, 90f, 0f), mats.KenneyStation, 3);
             }
 
-            // Aft Bulkhead Wall (Behind Player: z = -3.75m) with Heavy Blast Door Airlock
-            var aftDoor = CreateModelInstance(PathKenneyWallDoorWide, "Bulkhead_Aft_BlastDoor", bulkheadsRoot.transform);
-            if (aftDoor != null)
+            int starIndex = 0;
+            for (float z = -3f; z <= 3.01f; z += 1f)
             {
-                aftDoor.transform.position = new Vector3(0, 0f, -3.75f);
-                aftDoor.transform.localScale = new Vector3(2.6f, 3.6f, 1.0f);
-                aftDoor.transform.rotation = Quaternion.identity;
-                ApplyMaterialRecursively(aftDoor, mats.SpaceshipHull);
+                string wallName = $"Bulkhead_Starboard_{starIndex:D2}";
+                PlaceUniformModule(bulkheadsRoot.transform, PathKenneyWall, wallName, new Vector3(3.55f, 0f, z), Quaternion.Euler(0f, -90f, 0f), mats.KenneyStation, 3);
+                starIndex++;
             }
 
-            float[] aftX = new float[] { -2.2f, 2.2f };
-            for (int a = 0; a < aftX.Length; a++)
+            for (float z = -2.5f; z <= 2.51f; z += 1f)
             {
-                var aftWall = CreateModelInstance(PathKenneyWall, $"Bulkhead_Aft_Panel_{a + 1}", bulkheadsRoot.transform);
-                if (aftWall != null)
-                {
-                    aftWall.transform.position = new Vector3(aftX[a], 0f, -3.75f);
-                    aftWall.transform.localScale = new Vector3(1.8f, 3.6f, 1.0f);
-                    aftWall.transform.rotation = Quaternion.identity;
-                    ApplyMaterialRecursively(aftWall, mats.SpaceshipHull);
-                }
+                PlaceUniformModule(bulkheadsRoot.transform, PathKenneyWallPillar, "Pillar_Starboard", new Vector3(3.50f, 0f, z), Quaternion.Euler(0f, -90f, 0f), mats.KenneyStation, 3);
             }
+
+            PlaceUniformModule(bulkheadsRoot.transform, PathKenneyWallDoorWide, "Bulkhead_Aft_BlastDoor", new Vector3(0f, 0f, -3.75f), Quaternion.identity, mats.KenneyStation, 3);
+            PlaceUniformModule(bulkheadsRoot.transform, PathKenneyWall, "Bulkhead_Aft_Panel_1", new Vector3(-1.1f, 0f, -3.75f), Quaternion.identity, mats.KenneyStation, 3);
+            PlaceUniformModule(bulkheadsRoot.transform, PathKenneyWall, "Bulkhead_Aft_Panel_2", new Vector3(1.1f, 0f, -3.75f), Quaternion.identity, mats.KenneyStation, 3);
 
             // Backing collision walls
             var collL = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -1760,17 +1720,17 @@ namespace Convergence.EditorTools
             var lStruct = CreateModelInstance(PathKenneyStructure, "Structure_Port", ribGo.transform);
             if (lStruct != null)
             {
-                lStruct.transform.localPosition = new Vector3(-3.45f, 1.8f, 0);
-                lStruct.transform.localScale = new Vector3(1.0f, 3.6f, 1.0f);
-                ApplyMaterialRecursively(lStruct, mats.SpaceshipHull);
+                lStruct.transform.localPosition = new Vector3(-3.45f, 0f, 0);
+                lStruct.transform.localScale = Vector3.one;
+                ApplyMaterialRecursively(lStruct, mats.KenneyStation);
             }
 
             var rStruct = CreateModelInstance(PathKenneyStructure, "Structure_Starboard", ribGo.transform);
             if (rStruct != null)
             {
-                rStruct.transform.localPosition = new Vector3(3.45f, 1.8f, 0);
-                rStruct.transform.localScale = new Vector3(1.0f, 3.6f, 1.0f);
-                ApplyMaterialRecursively(rStruct, mats.SpaceshipHull);
+                rStruct.transform.localPosition = new Vector3(3.45f, 0f, 0);
+                rStruct.transform.localScale = Vector3.one;
+                ApplyMaterialRecursively(rStruct, mats.KenneyStation);
             }
 
             // Overhead Cross-Girder Beam
@@ -1863,7 +1823,7 @@ namespace Convergence.EditorTools
             if (portStation != null)
             {
                 portStation.transform.position = new Vector3(-3.0f, 0.0f, -1.0f);
-                portStation.transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
+                portStation.transform.localScale = Vector3.one;
                 portStation.transform.rotation = Quaternion.Euler(0, 90f, 0);
                 ApplyMaterialRecursively(portStation, mats.KenneyStation);
             }
@@ -1872,7 +1832,7 @@ namespace Convergence.EditorTools
             if (portScreen != null)
             {
                 portScreen.transform.position = new Vector3(-3.0f, 0.85f, -1.0f);
-                portScreen.transform.localScale = new Vector3(0.85f, 0.85f, 0.85f);
+                portScreen.transform.localScale = Vector3.one;
                 portScreen.transform.rotation = Quaternion.Euler(0, 90f, 0);
                 ApplyMaterialRecursively(portScreen, mats.KenneyStation);
             }
@@ -1894,7 +1854,7 @@ namespace Convergence.EditorTools
             if (stbStation != null)
             {
                 stbStation.transform.position = new Vector3(3.0f, 0.0f, -1.0f);
-                stbStation.transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
+                stbStation.transform.localScale = Vector3.one;
                 stbStation.transform.rotation = Quaternion.Euler(0, -90f, 0);
                 ApplyMaterialRecursively(stbStation, mats.KenneyStation);
             }
@@ -1903,7 +1863,7 @@ namespace Convergence.EditorTools
             if (stbScreen != null)
             {
                 stbScreen.transform.position = new Vector3(3.0f, 0.85f, -1.0f);
-                stbScreen.transform.localScale = new Vector3(0.85f, 0.85f, 0.85f);
+                stbScreen.transform.localScale = Vector3.one;
                 stbScreen.transform.rotation = Quaternion.Euler(0, -90f, 0);
                 ApplyMaterialRecursively(stbScreen, mats.KenneyStation);
             }
@@ -2066,8 +2026,8 @@ namespace Convergence.EditorTools
             if (nose != null)
             {
                 nose.transform.position = new Vector3(0f, 0.85f, 5.4f);
-                nose.transform.localScale = new Vector3(1.4f, 0.6f, 2.2f);
-                ApplyMaterialRecursively(nose, mats.SpaceshipHull);
+                nose.transform.localScale = Vector3.one;
+                ApplyMaterialRecursively(nose, mats.KenneyStation);
             }
 
             var shutterRoot = new GameObject("CanopyShutters");
@@ -2077,12 +2037,14 @@ namespace Convergence.EditorTools
             if (left != null)
             {
                 left.transform.position = new Vector3(-2.85f, 1.7f, 3.35f);
-                left.transform.localScale = new Vector3(0.35f, 2.3f, 0.2f);
+                left.transform.localScale = Vector3.one;
+                ApplyMaterialRecursively(left, mats.KenneyStation);
             }
             if (right != null)
             {
                 right.transform.position = new Vector3(2.85f, 1.7f, 3.35f);
-                right.transform.localScale = new Vector3(0.35f, 2.3f, 0.2f);
+                right.transform.localScale = Vector3.one;
+                ApplyMaterialRecursively(right, mats.KenneyStation);
             }
             var canopy = shutterRoot.AddComponent<CanopyShutters>();
             var canopySO = new SerializedObject(canopy);
@@ -2108,7 +2070,7 @@ namespace Convergence.EditorTools
                     rail.transform.localPosition = new Vector3(i * 1.0f, 0, 0);
                     rail.transform.localScale = Vector3.one;
                     rail.transform.localRotation = Quaternion.identity;
-                    ApplyMaterialRecursively(rail, mats.SpaceshipHull);
+                    ApplyMaterialRecursively(rail, mats.KenneyStation);
                 }
             }
 
@@ -2119,7 +2081,7 @@ namespace Convergence.EditorTools
                 leftCorner.transform.localPosition = new Vector3(-2.5f, 0, 0);
                 leftCorner.transform.localScale = Vector3.one;
                 leftCorner.transform.localRotation = Quaternion.Euler(0, 90f, 0);
-                ApplyMaterialRecursively(leftCorner, mats.SpaceshipHull);
+                ApplyMaterialRecursively(leftCorner, mats.KenneyStation);
             }
 
             var rightCorner = CreateModelInstance(PathKenneyBalconyRailCorner, "BalconyRail_Corner_Right", railRoot.transform);
@@ -2128,7 +2090,7 @@ namespace Convergence.EditorTools
                 rightCorner.transform.localPosition = new Vector3(2.5f, 0, 0);
                 rightCorner.transform.localScale = Vector3.one;
                 rightCorner.transform.localRotation = Quaternion.identity;
-                ApplyMaterialRecursively(rightCorner, mats.SpaceshipHull);
+                ApplyMaterialRecursively(rightCorner, mats.KenneyStation);
             }
 
             // Backing collider so player cannot fall past command edge
@@ -2224,7 +2186,8 @@ namespace Convergence.EditorTools
             main.maxParticles = 25;
 
             var emission = ps.emission;
-            emission.rateOverTime = 4f;
+            emission.rateOverTime = 0f;
+            emission.SetBursts(new[] { new ParticleSystem.Burst(0f, (short)20, (short)20, 0, 1f) });
 
             var shape = ps.shape;
             shape.shapeType = ParticleSystemShapeType.Sphere;
@@ -2366,7 +2329,7 @@ namespace Convergence.EditorTools
             // 1. Kenney Space Station Master Material (Authentic UV-mapped modular sci-fi panels)
             // Value order: ceiling darkest, floor, walls, then the console surround.
             // Smoothness stays at or below 0.3 and metallic at or below 0.3 on these surfaces.
-            mats.KenneyStation = CreateOrUpdateMaterial("Mat_Kenney_SpaceStation", new Color(0.18f, 0.19f, 0.21f), 0.15f, 0.25f);
+            mats.KenneyStation = CreateOrUpdateMaterial("Mat_Kenney_SpaceStation", new Color(0.18f, 0.19f, 0.21f), 0.15f, 0.25f, baseMap: kenneyTex);
             mats.SpaceshipHull = CreateOrUpdateMaterial("Mat_Spaceship_Hull", new Color(0.32f, 0.34f, 0.37f), 0.20f, 0.25f);
             mats.CeilingValue = CreateOrUpdateMaterial("Mat_Chamber01_Ceiling", new Color(0.07f, 0.08f, 0.09f), 0.20f, 0.25f);
             mats.DarkPlating = CreateOrUpdateMaterial("Mat_Mainframe_DarkPlating", new Color(0.50f, 0.52f, 0.55f), 0.30f, 0.25f);
@@ -2605,7 +2568,7 @@ namespace Convergence.EditorTools
             if (pedestal != null)
             {
                 pedestal.transform.position = new Vector3(-2.60f, 0f, 2.60f);
-                pedestal.transform.localScale = new Vector3(1.1f, 1.1f, 1.1f);
+                pedestal.transform.localScale = Vector3.one;
                 pedestal.transform.rotation = Quaternion.identity;
                 ApplyMaterialRecursively(pedestal, mats.KenneyStation);
             }
@@ -2763,13 +2726,13 @@ namespace Convergence.EditorTools
                 var left = CreateModelInstance(PathKenneyWall, "CorridorWall_L_" + i, root.transform);
                 var right = CreateModelInstance(PathKenneyWall, "CorridorWall_R_" + i, root.transform);
                 var floor = CreateModelInstance(PathKenneyFloor, "CorridorFloor_" + i, root.transform);
-                PlaceModule(left, new Vector3(-1.6f, 0f, z), Quaternion.Euler(0f, 90f, 0f), mats.SpaceshipHull);
-                PlaceModule(right, new Vector3(1.6f, 0f, z), Quaternion.Euler(0f, -90f, 0f), mats.SpaceshipHull);
+                PlaceModule(left, new Vector3(-1.6f, 0f, z), Quaternion.Euler(0f, 90f, 0f), mats.KenneyStation);
+                PlaceModule(right, new Vector3(1.6f, 0f, z), Quaternion.Euler(0f, -90f, 0f), mats.KenneyStation);
                 PlaceModule(floor, new Vector3(0f, 0f, z), Quaternion.identity, mats.KenneyStation);
             }
 
             var observatory = CreateModelInstance(PathKenneyWallDoorWide, "ObservatoryDoorFrame", root.transform);
-            PlaceModule(observatory, new Vector3(1.6f, 0f, -7.2f), Quaternion.Euler(0f, -90f, 0f), mats.SpaceshipHull);
+            PlaceModule(observatory, new Vector3(1.6f, 0f, -7.2f), Quaternion.Euler(0f, -90f, 0f), mats.KenneyStation);
             MakeDoor(root.transform, "Door_Observatory", "Observatory", new Vector3(2.4f, 1.1f, -7.2f), mats);
             var telescope = CreateModelInstance(PathKenneyComputerSystem, "Telescope", root.transform);
             PlaceModule(telescope, new Vector3(4.2f, 0f, -7.2f), Quaternion.Euler(0f, -90f, 0f), mats.DarkPlating);
@@ -2780,10 +2743,10 @@ namespace Convergence.EditorTools
             MakeVoyageButton(root.transform, "TrainEarth", VoyageButton.Kind.TrainEarth, new Vector3(4.6f, 1.05f, -7.2f), mats);
 
             var engineFrame = CreateModelInstance(PathKenneyWallDoorWide, "EngineDoorFrame", root.transform);
-            PlaceModule(engineFrame, new Vector3(0f, 0f, -11.2f), Quaternion.identity, mats.SpaceshipHull);
+            PlaceModule(engineFrame, new Vector3(0f, 0f, -11.2f), Quaternion.identity, mats.KenneyStation);
             MakeDoor(root.transform, "Door_Engine", "Engine", new Vector3(0f, 1.1f, -11.2f), mats);
             var drive = CreateModelInstance(PathKenneyStructure, "JumpDrive", root.transform);
-            PlaceModule(drive, new Vector3(0f, 0.2f, -13.2f), Quaternion.identity, mats.SpaceshipHull);
+            PlaceModule(drive, new Vector3(0f, 0.2f, -13.2f), Quaternion.identity, mats.KenneyStation);
             MakeVoyageButton(root.transform, "MaskNoise", VoyageButton.Kind.MaskNoise, new Vector3(0f, 1.15f, -12.4f), mats);
 
             var corridorCollider = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -2799,6 +2762,7 @@ namespace Convergence.EditorTools
             if (module == null) return;
             module.transform.position = position;
             module.transform.rotation = rotation;
+            module.transform.localScale = Vector3.one;
             ApplyMaterialRecursively(module, material);
         }
 
@@ -2919,7 +2883,7 @@ namespace Convergence.EditorTools
             go.name = name;
             go.transform.SetParent(parent, false);
             go.transform.position = position;
-            go.transform.localScale = new Vector3(0.28f, 0.12f, 0.28f);
+            go.transform.localScale = Vector3.one * 0.22f;
             go.GetComponent<Renderer>().sharedMaterial = earth ? mats.EarthLand : mats.GlowCoral;
             var request = go.AddComponent<PhotoRequest>();
             var so = new SerializedObject(request);
@@ -3081,7 +3045,6 @@ namespace Convergence.EditorTools
             CreateValueProbe("ValueProbe_Ceiling", "Bulkhead_CeilingSpan");
             CreateValueProbe("ValueProbe_Floor", "DeckTile_0_0");
             CreateValueProbe("ValueProbe_Wall", "Bulkhead_Port_00");
-            CreateDevHeadsetTextStrip();
         }
 
         private static GameObject CreateEmptyChild(Transform parent, string name)
