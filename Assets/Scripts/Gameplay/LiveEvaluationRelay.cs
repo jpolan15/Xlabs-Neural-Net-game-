@@ -122,7 +122,7 @@ namespace Convergence.Gameplay
             {
                 best = score;
                 bestDelta = abs;
-                bestId = index == 0 ? "ROCK" : "ICE";
+                bestId = index == 0 ? "0" : "1";
             }
         }
 
@@ -145,7 +145,7 @@ namespace Convergence.Gameplay
             {
                 best = score;
                 bestDelta = abs;
-                bestId = "BIAS";
+                bestId = "2";
             }
         }
     }

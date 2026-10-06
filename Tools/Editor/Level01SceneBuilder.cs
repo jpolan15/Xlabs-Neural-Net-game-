@@ -1194,6 +1194,7 @@ namespace Convergence.EditorTools
             CreateChamber01CaptureMarkers();
             Chamber01TextRules.WriteAudit();
             Chamber01StateTest.Write();
+            Chamber01CurriculumAudit.Write();
 
             // Save Scene
             EditorSceneManager.SaveScene(scene, ScenePath);

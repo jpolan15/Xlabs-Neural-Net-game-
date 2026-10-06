@@ -91,11 +91,26 @@ namespace Convergence.Presentation
                 if (showMath && neuralState != null)
                 {
                     _builder.Clear();
-                    _builder.Append("FIRE = step(");
+                    string in1 = "In1";
+                    string in2 = "In2";
+                    string output = "Out";
+                    if (chamberController != null && chamberController.Curriculum != null)
+                    {
+                        in1 = chamberController.Curriculum.InputNames[0];
+                        in2 = chamberController.Curriculum.InputNames[1];
+                        output = chamberController.Curriculum.OutputName;
+                    }
+
+                    _builder.Append(output);
+                    _builder.Append(" = step(");
                     _builder.Append(neuralState.Weight1.ToString("0.0"));
-                    _builder.Append("·ROCK + ");
+                    _builder.Append("·");
+                    _builder.Append(in1);
+                    _builder.Append(" + ");
                     _builder.Append(neuralState.Weight2.ToString("0.0"));
-                    _builder.Append("·ICE + ");
+                    _builder.Append("·");
+                    _builder.Append(in2);
+                    _builder.Append(" + ");
                     _builder.Append(neuralState.Bias.ToString("0.0"));
                     _builder.Append(')');
                     readoutText.text = _builder.ToString();

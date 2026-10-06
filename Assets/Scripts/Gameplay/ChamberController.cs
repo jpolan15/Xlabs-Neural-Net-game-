@@ -45,12 +45,14 @@ namespace Convergence.Gameplay
         [SerializeField] private float rerouteRestoreFraction = 0.6f;
 
         private PuzzleDefinition _puzzle;
+        private CurriculumPuzzle _curriculum;
         private bool _hasSolved;
         private float _waveTimer;
         private bool _isPurged;
 
         public ChamberPhase Phase { get; private set; } = ChamberPhase.Arrival;
         public PuzzleDefinition Puzzle => _puzzle;
+        public CurriculumPuzzle Curriculum => _curriculum;
         public PuzzleEvaluation LastEvaluation { get; private set; }
         public bool HasSolved => _hasSolved;
         public IReadOnlyList<DataTargetReceptor> TargetReceptors => targetReceptors;
@@ -90,7 +92,8 @@ namespace Convergence.Gameplay
                 performanceTracker = GetComponent<PerformanceTracker>() ?? gameObject.AddComponent<PerformanceTracker>();
             }
 
-            _puzzle = PuzzleDefinition.CreateORGatePuzzle();
+            _curriculum = CurriculumCatalog.Chamber01();
+            _puzzle = _curriculum.Definition;
         }
 
         private void Start()
@@ -202,6 +205,13 @@ namespace Convergence.Gameplay
             _hasSolved = false;
             LastEvaluation = null;
             SetPhase(ChamberPhase.NeuralRepair);
+        }
+
+        /// <summary>Swaps the live curriculum row and its definition together.</summary>
+        public void BeginCurriculum(CurriculumPuzzle curriculum)
+        {
+            _curriculum = curriculum ?? throw new System.ArgumentNullException(nameof(curriculum));
+            BeginPuzzle(curriculum.Definition);
         }
 
         /// <summary>

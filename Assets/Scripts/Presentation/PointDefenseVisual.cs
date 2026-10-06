@@ -51,9 +51,24 @@ namespace Convergence.Presentation
                 beam.positionCount = 2;
                 beam.enabled = false;
             }
-            _rockTag = MakeTag(rockLamp, "ROCK");
-            _iceTag = MakeTag(iceLamp, "ICE");
-            _fireTag = MakeTag(fireLamp, "FIRE");
+        }
+
+        void Start()
+        {
+            if (chamber == null) chamber = FindAnyObjectByType<ChamberController>();
+            string rock = "In1";
+            string ice = "In2";
+            string fire = "Out";
+            if (chamber != null && chamber.Curriculum != null)
+            {
+                rock = chamber.Curriculum.InputNames[0];
+                ice = chamber.Curriculum.InputNames[1];
+                fire = chamber.Curriculum.OutputName;
+            }
+
+            _rockTag = MakeTag(rockLamp, rock);
+            _iceTag = MakeTag(iceLamp, ice);
+            _fireTag = MakeTag(fireLamp, fire);
         }
 
         void OnEnable()

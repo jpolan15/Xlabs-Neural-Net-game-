@@ -145,7 +145,10 @@ namespace Convergence.Presentation
             if (!_coldPlayed && neuralState != null && neuralState.Cable1Connected)
             {
                 _coldPlayed = true;
-                _board.Set("Now ICE.");
+                string ice = chamberController != null && chamberController.Curriculum != null
+                    ? chamberController.Curriculum.InputNames[1]
+                    : "input 2";
+                _board.Set("Now " + ice + ".");
             }
         }
 
@@ -191,7 +194,7 @@ namespace Convergence.Presentation
         {
             _hintId = id;
             _hintUntil = _time + 4f;
-            string name = id == "ROCK" ? "SliderTrack_W1" : id == "ICE" ? "SliderTrack_W2" : "ThresholdSquelchValve";
+            string name = id == "0" ? "SliderTrack_W1" : id == "1" ? "SliderTrack_W2" : "ThresholdSquelchValve";
             var go = GameObject.Find(name);
             _hintTarget = go != null ? go.transform : null;
             if (_hintTarget != null) _hintScale = _hintTarget.localScale;

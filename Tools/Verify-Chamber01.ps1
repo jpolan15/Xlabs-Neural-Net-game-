@@ -7,7 +7,7 @@
     Documentation/Design/captures/verify_{wp}.log.
     Exits non-zero when any check FAILs.
     WARN is an uncalibrated threshold miss. SKIP is a missing operator step.
-    This work package implements V-01, V-02, V-03, V-05, V-06, V-07, and V-10.
+    This work package implements V-01, V-02, V-03, V-05, V-06, V-07, V-08, and V-10.
 
 .PARAMETER Wp
     Capture set token. Default B0.
@@ -343,6 +343,36 @@ function Invoke-V07 {
     Add-Fail ("V-07 state test failed (passed " + $ok + ", flashHz " + $flash + ", damage elements " + $damage + ")")
 }
 
+function Invoke-V08 {
+    if ($dry) {
+        Add-CheckLine "[DRY] V-08 would read Documentation/Design/captures/puzzle_audit.json. Reference solutions must pass and XOR must stay unsolvable by one neuron."
+        return
+    }
+
+    if (-not $script:V01Passed) {
+        Add-Skip "V-08 puzzle data: scene was not rebuilt in this run"
+        return
+    }
+
+    $auditPath = Join-Path $ProjectRoot "Documentation/Design/captures/puzzle_audit.json"
+    if (-not (Test-Path -LiteralPath $auditPath)) {
+        Add-Fail "V-08 puzzle audit file missing after the build"
+        return
+    }
+
+    $audit = Get-Content -LiteralPath $auditPath -Raw | ConvertFrom-Json
+    $ok = $false
+    if ($null -ne $audit.PSObject.Properties["passed"]) { $ok = [bool]$audit.passed }
+    $error = ""
+    if ($null -ne $audit.PSObject.Properties["error"] -and $null -ne $audit.error) { $error = [string]$audit.error }
+    if ($ok) {
+        Add-Pass "V-08 puzzle references passed and XOR is unsolvable by one neuron"
+        return
+    }
+
+    Add-Fail ("V-08 puzzle data failed: " + $error)
+}
+
 function Invoke-V05($Thresholds) {
     if ($dry) {
         Add-CheckLine "[DRY] V-05 would compare Documentation/Design/captures/editor_numbers.json with Tools/chamber01-thresholds.json. trianglesMax is a fail. drawCallsMax is a warning while calibrated is false."
@@ -540,6 +570,7 @@ Invoke-V01
 Invoke-V02 -Names $names -NamesKnown:$namesKnown
 Invoke-V03
 Invoke-V07
+Invoke-V08
 if ($dry) {
     Invoke-V05 -Thresholds $null
     Invoke-V06 -Thresholds $null
