@@ -1,0 +1,4 @@
+﻿Source: AI synthesized, Windows OneCore voice 'Microsoft Zira', rate 0.95
+Speech: full clip
+
+Hand-tuning is slow. Real AI tunes itself. Pull LEARN.

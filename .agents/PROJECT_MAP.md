@@ -41,10 +41,10 @@ Last updated: 2026-09-14 (Phase 5 + 6 complete)
 | `Assets/_Project/` | First-party assets: Audio, Materials, Prefabs, Scenes, ScriptableObjects |
 | `Assets/_Project/Audio/` | **Canonical** audio assets location — see `Assets/_Project/Audio/AGENTS.md` |
 | `Assets/AudioAssets/` | **Deprecated** — redirect to `Assets/_Project/Audio/` (no files; only AGENTS.md) |
-| `Assets/Materials/` | Shared materials and shaders |
-| `Assets/Prefabs/` | Shared prefabs |
+| `Assets/Materials/` | Shared materials and shaders. `NeuralRide/` holds the ride's unlit materials |
+| `Assets/Prefabs/` | Shared prefabs. `NeuralRide/` holds Pod, Station, and Track (built by `Tools/Editor/NeuralRideBuilder.cs`) |
 | `Assets/Puzzles/` | Per-chamber puzzle data: test cases, rules, configuration |
-| `Assets/Scenes/` | Unity scene files |
+| `Assets/Scenes/` | Unity scene files. `NeuralRide.unity` is build scene 0 (ADR-011); `Level01_AwakeningGate.unity` is kept |
 | `Assets/ScriptableObjects/` | Shared ScriptableObject data |
 | `Assets/Samples/` | SDK sample imports (third-party; do not modify) |
 | `Assets/ThirdParty/` | Third-party plugin assets (do not modify) |
@@ -54,10 +54,11 @@ Last updated: 2026-09-14 (Phase 5 + 6 complete)
 | Path | Purpose |
 |---|---|
 | `Assets/Scripts/Core/` | Engine-independent C# — Math, Neural, Training, Puzzles |
-| `Assets/Scripts/Gameplay/` | MonoBehaviour orchestration — chamber state, blast doors, facility |
+| `Assets/Scripts/Gameplay/` | MonoBehaviour orchestration — chamber state, blast doors, facility. `Ride/` is the Neural Ride director and stations |
 | `Assets/Scripts/XR/` | XR input translation — converts interaction to gameplay commands |
+| `Assets/Scripts/XR/Ride/` | Pod lever, pod seat, and desktop mouse fallback (ADR-011) |
 | `Assets/Scripts/XR/Meta/` | Meta-specific adapters only (isolated from Core and Gameplay) |
-| `Assets/Scripts/Presentation/` | Visualization, audio, haptics — observes state, never decides it |
+| `Assets/Scripts/Presentation/` | Visualization, audio, haptics — observes state, never decides it. `Ride/` holds the ride views |
 | `Assets/Scripts/Infrastructure/` | Cross-cutting utilities: logging, events, telemetry contracts |
 
 > Note: `Assets/Scripts/Visualization/` and `Assets/Scripts/Audio/` are being consolidated into `Assets/Scripts/Presentation/` in a future migration task. Do not move files yet.

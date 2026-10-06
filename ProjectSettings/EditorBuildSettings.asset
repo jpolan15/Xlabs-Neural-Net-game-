@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/NeuralRide.unity
+    guid: 5a63b3f87ee08c94bb995a1cdc497d5c
+  - enabled: 1
     path: Assets/Scenes/Level01_AwakeningGate.unity
     guid: a979525b54e555e46bcfb4887e974bb1
   m_configObjects:

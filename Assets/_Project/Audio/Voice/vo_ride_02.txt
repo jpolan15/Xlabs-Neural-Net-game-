@@ -1,0 +1,4 @@
+﻿Source: AI synthesized, Windows OneCore voice 'Microsoft Zira', rate 0.95
+Speech: full clip
+
+This is a neuron. Signals go in. If enough energy builds up, it fires.

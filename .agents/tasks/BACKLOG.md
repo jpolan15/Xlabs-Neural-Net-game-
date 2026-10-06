@@ -2,6 +2,12 @@
 
 Reconciled 2026-09-29 with the code and with ADR-008.
 
+## Superseded by ADR-011 (2026-10-06)
+
+The Chamber 01 console tasks (bridge room, cables, activation crystal, SELF-TEST lever, planet hologram, Earth-photo leg, attention leg, hull and death loop) are out of the live game. The Neural Ride is the build's first scene.
+
+Open for the ride: ship intro and outro scenes with the 3-question quiz and credits, tunneling vignette and comfort settings, Quest Link run and frame numbers, stretch XOR stop (hidden layer), playtest with 3 to 5 classmates using `Documentation/Design/PLAYTEST.md`.
+
 ## Dropped by ADR-008
 
 Do not mark these done. They are out of the live game.

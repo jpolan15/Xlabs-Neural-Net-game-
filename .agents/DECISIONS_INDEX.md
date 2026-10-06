@@ -18,6 +18,7 @@ Canonical decisions live in `Documentation/Architecture/ADRs/`.
 | ADR-008 | Lost-in-space premise; sentry, gun, and Synapse-GPT leave the live game | Accepted | [`ADR-008-premise-lost-in-space.md`](../Documentation/Architecture/ADRs/ADR-008-premise-lost-in-space.md) |
 | ADR-009 | MCP for Unity added as Editor-only development tooling | Accepted | [`ADR-009-unity-mcp-tooling.md`](../Documentation/Architecture/ADRs/ADR-009-unity-mcp-tooling.md) |
 | ADR-010 | Chamber 01 neuron drives an automatic point-defense laser; OR table and Core unchanged | Accepted | [`ADR-010-automated-point-defense.md`](../Documentation/Architecture/ADRs/ADR-010-automated-point-defense.md) |
+| ADR-011 | The Neural Ride (pod on a rail through the AI core) replaces the Chamber 01 console as the live game | Accepted | [`ADR-011-neural-ride.md`](../Documentation/Architecture/ADRs/ADR-011-neural-ride.md) |
 
 ---
 

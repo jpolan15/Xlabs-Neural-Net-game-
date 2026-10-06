@@ -1,0 +1,4 @@
+﻿Source: AI synthesized, Windows OneCore voice 'Microsoft Zira', rate 0.95
+Speech: full clip
+
+Turn each pipe up or down. That number is called a weight.

@@ -51,7 +51,8 @@ namespace Convergence.Presentation
             mesh.normals = baseMesh.normals;
             mesh.uv = baseMesh.uv;
             
-            Destroy(primitive);
+            if (Application.isPlaying) Destroy(primitive);
+            else DestroyImmediate(primitive);
             
             for(int i = 0; i < mesh.vertices.Length; i++)
             {

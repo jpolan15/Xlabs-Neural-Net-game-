@@ -1,0 +1,4 @@
+﻿Source: AI synthesized, Windows OneCore voice 'Microsoft Zira', rate 0.95
+Speech: full clip
+
+Every case is right. You just built an OR gate out of multiplication and addition.

@@ -140,7 +140,7 @@ namespace Convergence.Core.Training
             return record;
         }
 
-        private static double ComputeLoss(double[] prediction, double[] targets, LossKind loss)
+        internal static double ComputeLoss(double[] prediction, double[] targets, LossKind loss)
         {
             switch (loss)
             {
@@ -153,7 +153,7 @@ namespace Convergence.Core.Training
             }
         }
 
-        private static void ComputeGradient(double[] prediction, double[] targets, LossKind loss, double[] destination)
+        internal static void ComputeGradient(double[] prediction, double[] targets, LossKind loss, double[] destination)
         {
             switch (loss)
             {

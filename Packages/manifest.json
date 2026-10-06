@@ -27,7 +27,8 @@
     "com.unity.modules.uielementsnative": "1.0.0",
     "com.unity.modules.unitywebrequest": "1.0.0",
     "com.unity.modules.unitywebrequestaudio": "1.0.0",
-    "com.unity.modules.xr": "1.0.0"
+    "com.unity.modules.xr": "1.0.0",
+    "com.unity.pipeline": "0.8.0-exp.1"
   },
   "testables": [
     "com.convergence.tests"

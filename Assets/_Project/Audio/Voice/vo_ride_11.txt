@@ -1,0 +1,4 @@
+﻿Source: AI synthesized, Windows OneCore voice 'Microsoft Zira', rate 0.95
+Speech: full clip
+
+That's gradient descent: measure the slope, step down it, repeat.

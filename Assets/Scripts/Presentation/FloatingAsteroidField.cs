@@ -69,13 +69,20 @@ namespace Convergence.Presentation
                     Mathf.Sin(angle) * radius
                 );
 
-                var asteroidGo = GameObject.CreatePrimitive(rng.Next(2) == 0 ? PrimitiveType.Sphere : PrimitiveType.Cube);
-                asteroidGo.name = $"Asteroid_{i:D2}";
+                var asteroidGo = new GameObject($"Asteroid_{i:D2}");
                 asteroidGo.transform.SetParent(transform);
                 asteroidGo.transform.position = pos;
 
+                // Add mesh generator to procedurally create asteroid
+                var meshGen = asteroidGo.AddComponent<AsteroidMeshGenerator>();
+                meshGen.radius = 1.0f;
+                meshGen.subdivisions = rng.Next(2, 4);
+                meshGen.noiseScale = Mathf.Lerp(1.5f, 3.5f, (float)rng.NextDouble());
+                meshGen.noiseAmount = Mathf.Lerp(0.15f, 0.4f, (float)rng.NextDouble());
+                meshGen.GenerateAsteroid();
+
                 // Random non-uniform scale for craggy asteroid silhouette
-                float baseScale = Mathf.Lerp(2.5f, 9.0f, (float)rng.NextDouble());
+                float baseScale = Mathf.Lerp(0.8f, 2.5f, (float)rng.NextDouble());
                 float sx = baseScale * Mathf.Lerp(0.7f, 1.3f, (float)rng.NextDouble());
                 float sy = baseScale * Mathf.Lerp(0.6f, 1.2f, (float)rng.NextDouble());
                 float sz = baseScale * Mathf.Lerp(0.7f, 1.4f, (float)rng.NextDouble());
