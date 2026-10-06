@@ -1174,6 +1174,7 @@ namespace Convergence.EditorTools
             AttachXriBridges();
             CreateWorldSpaceHud(chamberController, neuralState, onboardingController);
             BakeNonKeyLights();
+            Chamber01Concept.Install(neuralState, chamberController);
             Chamber01TextRules.Apply();
 
             CreateChamber01CaptureMarkers();

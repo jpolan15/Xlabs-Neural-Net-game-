@@ -4,5 +4,5 @@ Active tasks currently being executed:
 
 | Task File | Owner | Target Component |
 |---|---|---|
-| [`TASK_CHAMBER01_MASTER_PLAN.md`](TASK_CHAMBER01_MASTER_PLAN.md) | Presentation/Tools | WP2 readability is in. Next is WP3, the visible concept. |
+| [`TASK_CHAMBER01_MASTER_PLAN.md`](TASK_CHAMBER01_MASTER_PLAN.md) | Presentation/Tools | WP3 concept is in. Next is WP4 feedback. |
 | [`BACKLOG.md`](BACKLOG.md) | Playtest | A person still needs to play Chamber 01 over Quest Link. |
