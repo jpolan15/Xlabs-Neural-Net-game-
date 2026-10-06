@@ -71,6 +71,7 @@ namespace Convergence.Gameplay
         public event Action<int, CaseDiagnostic, bool> OnSingleCaseEvaluated;
         public event Action<PuzzleEvaluation> OnEvaluationComplete;
         public event Action OnPuzzleSolved;
+        public event Action<CurriculumPuzzle> OnCurriculumChanged;
         public event Action OnChamberReset;
 
         public event Action<float, float> OnTimerUpdated;
@@ -212,6 +213,7 @@ namespace Convergence.Gameplay
         {
             _curriculum = curriculum ?? throw new System.ArgumentNullException(nameof(curriculum));
             BeginPuzzle(curriculum.Definition);
+            OnCurriculumChanged?.Invoke(_curriculum);
         }
 
         /// <summary>

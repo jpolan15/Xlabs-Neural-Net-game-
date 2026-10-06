@@ -414,7 +414,7 @@ Puzzle data lives in `CurriculumPuzzle`: id, title, input names, output name, th
 CCP APPROVED by user order to complete the full plan on 2026-10-06
 
 - WP6: Data-driven puzzles after the proposal above. `CurriculumCatalog` holds chambers 01 to 04. `RunReferenceChecks` passes OR, AND, and rock-not-ice, reports XOR unsolvable on the -2..2 step 0.5 grid, and passes the hidden XOR network. NUnit coverage is `Tests/EditMode/Core/CurriculumPuzzleTests.cs`. `Validate-CoreBoundaries.ps1` exited 0 (14 files, 0 violations). Command: `powershell -NoProfile -File Tools\Verify-Chamber01.ps1 -Wp WP6`. Log: V-01 PASS (810 lines), V-02 PASS, V-03 PASS, V-07 PASS, V-08 PASS, V-05 SKIP, V-06 SKIP, V-10 FAIL on the Samples blit asset and the still-uncommitted `CurriculumPuzzle.cs`. RESULT FAIL (1 fail, 0 warn, 2 skip). The Core file is this WP and is committed with it. The Samples file is not. No GATE READY.
-- WP7:
+- WP7: Chambers 02 and 03. After chamber 01 the voyage loads chamber 02, then 03, then the XOR row, and resets the neuron to the crisis preset. Solved networks are stored on `SavedCircuitLibrary`. Term lines come from the catalog. Earth photos still follow a passed XOR. Command: `powershell -NoProfile -File Tools\Verify-Chamber01.ps1 -Wp WP7`. Log: V-01 PASS (810 lines), V-02 PASS, V-03 PASS, V-07 PASS, V-08 PASS, V-05 SKIP, V-06 SKIP, V-10 FAIL only on the pre-existing Samples blit asset. RESULT FAIL (1 fail, 0 warn, 2 skip). Play Mode of the three chambers is NOT MEASURED. No GATE READY.
 - WP8:
 - WP9:
 - WP10:

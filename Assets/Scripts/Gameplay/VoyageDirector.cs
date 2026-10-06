@@ -70,23 +70,49 @@ namespace Convergence.Gameplay
 
         private void HandlePuzzleSolved()
         {
-            if (_leg == Leg.SensorOr)
+            string id = chamber != null && chamber.Curriculum != null ? chamber.Curriculum.Id : string.Empty;
+            if (id == "chamber01" || id == "chamber02" || id == "chamber03")
             {
-                _leg = Leg.SpectrumXor;
-                _journal.Add("A single neuron can fire when either sensor beacon is on, and stay quiet when both are off.");
-                Unlock("SensorBay");
-                Unlock("Observatory");
-                chamber.BeginPuzzle(PuzzleDefinition.CreateXorPuzzle());
+                RememberSolvedNetwork();
+                CurriculumPuzzle next = id == "chamber01"
+                    ? CurriculumCatalog.Chamber02()
+                    : id == "chamber02" ? CurriculumCatalog.Chamber03() : CurriculumCatalog.Chamber04();
+                if (id == "chamber01")
+                {
+                    Unlock("SensorBay");
+                    Unlock("Observatory");
+                }
+
+                ResetToCrisis();
+                chamber.BeginCurriculum(next);
+                if (next.Id == "chamber04") _leg = Leg.SpectrumXor;
                 OnLegChanged?.Invoke(_leg);
-                OnAuraLine?.Invoke("Array awake. Drives are only warming up. One straight cut cannot separate the spectrum filter.");
+                string line = next.Prompts.Count > 0 ? next.Prompts[0] : next.Title;
+                OnAuraLine?.Invoke(line);
+                _journal.Add(line);
             }
-            else if (_leg == Leg.SpectrumXor)
+            else if (_leg == Leg.SpectrumXor || id == "chamber04")
             {
                 _leg = Leg.EarthPhotos;
                 _journal.Add("XOR needed a hidden layer. A single neuron left one of the four points on the wrong side.");
                 OnLegChanged?.Invoke(_leg);
-                OnAuraLine?.Invoke("Telescope online. Aim, take a photo, and file the card EARTH or NOT EARTH.");
+                OnAuraLine?.Invoke("Telescope online. File a card.");
             }
+        }
+
+        void RememberSolvedNetwork()
+        {
+            var library = GetComponent<SavedCircuitLibrary>();
+            if (library == null || neuralState == null || neuralState.Network == null || chamber.Curriculum == null) return;
+            library.Remember(chamber.Curriculum.Id, neuralState.Network);
+        }
+
+        void ResetToCrisis()
+        {
+            if (neuralState == null) return;
+            neuralState.Initialize(NetworkModel.CreateSingleNeuronNetwork(2, new[] { 0.0, 0.0 }, -1.0, ActivationType.Linear));
+            neuralState.SetCableConnected(0, false);
+            neuralState.SetCableConnected(1, false);
         }
 
         /// <summary>Installs a two-neuron hidden layer. Weights start at zero. The player still has to tune them.</summary>

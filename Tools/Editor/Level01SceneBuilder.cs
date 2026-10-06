@@ -1172,6 +1172,7 @@ namespace Convergence.EditorTools
             WirePointDefense(controllersGo, chamberController, gatewayController, neuralState, onboardingController, audioHookManager, subText, voice);
 
             AttachXriBridges();
+            controllersGo.AddComponent<SavedCircuitLibrary>();
             var live = controllersGo.AddComponent<LiveEvaluationRelay>();
             var liveSO = new SerializedObject(live);
             liveSO.FindProperty("neuralState").objectReferenceValue = neuralState;

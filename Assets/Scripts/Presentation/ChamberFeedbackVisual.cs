@@ -29,6 +29,7 @@ namespace Convergence.Presentation
         bool _revealed;
         float _revealTimer;
         int _revealStep;
+        System.Collections.Generic.IReadOnlyList<string> _reveals;
         string _hintId;
         float _hintUntil;
         bool _coldPlayed;
@@ -86,6 +87,7 @@ namespace Convergence.Presentation
         {
             if (neuralState != null) neuralState.OnStateMutated += HandleMutated;
             if (chamberController != null) chamberController.OnEvaluationComplete += HandleEvaluation;
+            if (chamberController != null) chamberController.OnCurriculumChanged += HandleCurriculum;
             if (live != null) live.OnHintControl += HandleHint;
         }
 
@@ -93,6 +95,7 @@ namespace Convergence.Presentation
         {
             if (neuralState != null) neuralState.OnStateMutated -= HandleMutated;
             if (chamberController != null) chamberController.OnEvaluationComplete -= HandleEvaluation;
+            if (chamberController != null) chamberController.OnCurriculumChanged -= HandleCurriculum;
             if (live != null) live.OnHintControl -= HandleHint;
         }
 
@@ -152,6 +155,13 @@ namespace Convergence.Presentation
             }
         }
 
+        void HandleCurriculum(CurriculumPuzzle puzzle)
+        {
+            _wasPassed = false;
+            _revealed = false;
+            if (puzzle != null && puzzle.Prompts.Count > 0) _board.Set(puzzle.Prompts[0]);
+        }
+
         void HandleEvaluation(PuzzleEvaluation eval)
         {
             if (eval == null) return;
@@ -163,9 +173,15 @@ namespace Convergence.Presentation
                 _revealed = true;
                 _revealStep = 0;
                 _revealTimer = 0f;
-                _board.Set("That wire strength is called a weight.");
+                _reveals = chamberController != null && chamberController.Curriculum != null
+                    ? chamberController.Curriculum.TermReveals
+                    : null;
+                if (_reveals != null && _reveals.Count > 0) _board.Set(_reveals[0]);
                 var hud = FindAnyObjectByType<WorldSpaceHud>();
-                if (hud != null) hud.SetShowMath(true);
+                if (hud != null && chamberController.Curriculum != null && chamberController.Curriculum.HiddenUnitCount == 0)
+                {
+                    hud.SetShowMath(true);
+                }
             }
             else if (!passed)
             {
@@ -177,14 +193,15 @@ namespace Convergence.Presentation
         void AdvanceReveal(float dt)
         {
             _revealTimer += dt;
-            if (_revealStep == 0 && _revealTimer > 2.5f)
+            if (_reveals == null) return;
+            int due = Mathf.FloorToInt(_revealTimer / 2.5f);
+            if (due > _revealStep && due < _reveals.Count)
             {
-                _revealStep = 1;
-                _board.Set("This dial is the bias.");
+                _revealStep = due;
+                _board.Set(_reveals[due]);
             }
-            else if (_revealStep == 1 && _revealTimer > 5f)
+            else if (due >= _reveals.Count && _revealed)
             {
-                _revealStep = 2;
                 _revealed = false;
                 _board.Set("The gate is opening.");
             }
