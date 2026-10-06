@@ -1,0 +1,14 @@
+Source: neural recording 1.m4a (player's own voice, no TTS)
+Plays: start of Level 1 (OnOpeningBriefing)
+Length: 18.24 s
+
+Warning, passengers of Neural. This is not a drill. Our ship has lost connection. It is your job to reconnect it, or we will be stuck in space forever. Warning, warning, warning, warning.
+
+Banner lines (show each until the next starts, clear at 16.72 s):
+0.00-2.70  Warning, passengers of Neural.
+3.06-4.62  This is not a drill.
+5.16-6.72  Our ship has lost connection.
+7.24-11.72 It is your job to reconnect it, or we will be stuck in space forever.
+12.48-16.72 Warning, warning, warning, warning.
+
+"Warning" word starts (alarm pulses): 12.48, 13.72, 14.92, 16.20

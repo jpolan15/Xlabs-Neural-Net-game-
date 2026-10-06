@@ -1,0 +1,5 @@
+Source: neural recording 9.m4a
+Plays: hull reaches 0, emergency reroute (no game over); interrupts other lines
+Speech: 0.00-6.74 s
+
+Warning, our hull is critical. Rerouting emergency power, you have one more chance.

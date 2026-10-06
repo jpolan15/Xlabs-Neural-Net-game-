@@ -1,0 +1,5 @@
+Source: neural recording 7.m4a, cut 2.90-4.60 s
+Plays: random later hull hit (6 s cooldown, dropped if another line is playing)
+Speech: 0.34-1.36 s
+
+Another hit.

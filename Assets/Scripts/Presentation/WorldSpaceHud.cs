@@ -26,7 +26,7 @@ namespace Convergence.Presentation
         [Header("Behaviour")]
         [SerializeField] private float refreshInterval = 0.2f;
         [SerializeField] private bool yawTowardHead = true;
-        [SerializeField] private string[] caseLabels = { "Quiet", "Radio", "Light", "Both" };
+        [SerializeField] private string[] caseLabels = { "Drone", "Comet", "Rock", "Both" };
 
         private readonly StringBuilder _builder = new StringBuilder(160);
         private float _nextRefresh;
@@ -74,10 +74,15 @@ namespace Convergence.Presentation
             if (readoutText != null && neuralState != null)
             {
                 _builder.Clear();
-                _builder.Append("W1 ").Append(neuralState.Weight1.ToString("+0.0;-0.0;0.0"));
-                _builder.Append("   W2 ").Append(neuralState.Weight2.ToString("+0.0;-0.0;0.0"));
-                _builder.Append("   BIAS ").Append(neuralState.Bias.ToString("+0.0;-0.0;0.0"));
-                _builder.Append("   CRYSTAL ").Append(neuralState.Activation.ToString().ToUpperInvariant());
+                _builder.Append("FIRE = step(");
+                _builder.Append(neuralState.Weight1.ToString("0.0"));
+                _builder.Append("·ROCK + ");
+                _builder.Append(neuralState.Weight2.ToString("0.0"));
+                _builder.Append("·ICE + ");
+                _builder.Append(neuralState.Bias.ToString("0.0"));
+                _builder.Append(")  ");
+                _builder.Append(neuralState.Activation.ToString().ToUpperInvariant());
+                _builder.Append("\nFires when the sum reaches 0.");
                 readoutText.text = _builder.ToString();
             }
 
@@ -90,21 +95,25 @@ namespace Convergence.Presentation
         private string BuildResultLine()
         {
             PuzzleEvaluation eval = chamberController != null ? chamberController.LastEvaluation : null;
-            if (eval == null)
+            if (eval == null || eval.Diagnostics == null)
             {
-                return "NO TEST RUN YET";
+                return "Drone slips past. Ice, rock, and both should burn.";
             }
 
             _builder.Clear();
-            for (int i = 0; i < caseLabels.Length; i++)
+            int shown = caseLabels.Length < eval.Diagnostics.Count ? caseLabels.Length : eval.Diagnostics.Count;
+            for (int i = 0; i < shown; i++)
             {
-                bool known = eval.Diagnostics != null && i < eval.Diagnostics.Count;
-                bool pass = known && eval.Diagnostics[i].IsCorrect && eval.ActivationMatches;
-                _builder.Append(caseLabels[i]).Append(pass ? " OK" : " X");
-                if (i < caseLabels.Length - 1) _builder.Append("   |   ");
+                CaseDiagnostic diag = eval.Diagnostics[i];
+                bool pass = diag.IsCorrect && eval.ActivationMatches;
+                _builder.Append(caseLabels[i]).Append(' ');
+                if (!pass) _builder.Append("missed");
+                else if (diag.ExpectedOutput >= 0.5) _builder.Append("burned");
+                else _builder.Append("safe");
+                if (i < shown - 1) _builder.Append("   ");
             }
 
-            _builder.Append(eval.Passed ? "\nALL CASES PASS" : "\n" + eval.PassedCases + "/" + caseLabels.Length + " PASS");
+            _builder.Append(eval.Passed ? "\nThe rule holds." : "\nChange one dial.");
             return _builder.ToString();
         }
     }

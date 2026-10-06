@@ -32,16 +32,17 @@ $mathRef = "/reference:" + (Join-Path $tempDir "Convergence.Core.Math.dll")
 $neuralSrc = (Get-ChildItem (Join-Path $workspace "Assets\Scripts\Core\Neural\*.cs")).FullName
 & $monoExe $cscExe "/target:library" $mathRef $neuralOut $neuralSrc
 if ($LASTEXITCODE -ne 0) { throw "Compilation failed for Core.Neural" }
+$neuralRef = "/reference:" + (Join-Path $tempDir "Convergence.Core.Neural.dll")
 
 # 3. Core.Training
 $trainingOut = "/out:" + (Join-Path $tempDir "Convergence.Core.Training.dll")
 $trainingSrc = (Get-ChildItem (Join-Path $workspace "Assets\Scripts\Core\Training\*.cs")).FullName
-& $monoExe $cscExe "/target:library" $trainingOut $trainingSrc
+& $monoExe $cscExe "/target:library" $mathRef $neuralRef $trainingOut $trainingSrc
 if ($LASTEXITCODE -ne 0) { throw "Compilation failed for Core.Training" }
+$trainingRef = "/reference:" + (Join-Path $tempDir "Convergence.Core.Training.dll")
 
 # 4. Core.Puzzles
 $puzzlesOut = "/out:" + (Join-Path $tempDir "Convergence.Core.Puzzles.dll")
-$neuralRef = "/reference:" + (Join-Path $tempDir "Convergence.Core.Neural.dll")
 $puzzlesSrc = (Get-ChildItem (Join-Path $workspace "Assets\Scripts\Core\Puzzles\*.cs")).FullName
 & $monoExe $cscExe "/target:library" $mathRef $neuralRef $puzzlesOut $puzzlesSrc
 if ($LASTEXITCODE -ne 0) { throw "Compilation failed for Core.Puzzles" }
@@ -51,13 +52,14 @@ $testsOut = "/out:" + (Join-Path $tempDir "Convergence.Tests.EditMode.dll")
 $puzzlesRef = "/reference:" + (Join-Path $tempDir "Convergence.Core.Puzzles.dll")
 $nunitRef = "/reference:$nunitDll"
 $testsSrc = (Get-ChildItem (Join-Path $workspace "Tests\EditMode\Core\*.cs")).FullName
-& $monoExe $cscExe "/target:library" $mathRef $neuralRef $puzzlesRef $nunitRef $testsOut $testsSrc
+& $monoExe $cscExe "/target:library" $mathRef $neuralRef $trainingRef $puzzlesRef $nunitRef $testsOut $testsSrc
 if ($LASTEXITCODE -ne 0) { throw "Compilation failed for EditMode tests" }
 
 Write-Host "Running EditMode Unit Tests..." -ForegroundColor Cyan
 
 [Reflection.Assembly]::LoadFrom((Resolve-Path (Join-Path $tempDir "Convergence.Core.Math.dll"))) | Out-Null
 [Reflection.Assembly]::LoadFrom((Resolve-Path (Join-Path $tempDir "Convergence.Core.Neural.dll"))) | Out-Null
+[Reflection.Assembly]::LoadFrom((Resolve-Path (Join-Path $tempDir "Convergence.Core.Training.dll"))) | Out-Null
 [Reflection.Assembly]::LoadFrom((Resolve-Path (Join-Path $tempDir "Convergence.Core.Puzzles.dll"))) | Out-Null
 [Reflection.Assembly]::LoadFrom($nunitDll) | Out-Null
 $testAsm = [Reflection.Assembly]::LoadFrom((Resolve-Path (Join-Path $tempDir "Convergence.Tests.EditMode.dll")))

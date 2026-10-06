@@ -49,32 +49,38 @@ namespace Convergence.Gameplay
         private static string BuildHint(PuzzleEvaluation eval, int hintNumber)
         {
             CaseDiagnostic failing = null;
+            if (!eval.ActivationMatches)
+            {
+                return "The crystal should be Step. The dials can be right and the laser still wrong.";
+            }
+
+            int missed = 0;
             if (eval.Diagnostics != null)
             {
                 for (int i = 0; i < eval.Diagnostics.Count; i++)
                 {
                     if (!eval.Diagnostics[i].IsCorrect)
                     {
+                        missed = i;
                         failing = eval.Diagnostics[i];
                         break;
                     }
                 }
             }
 
-            string label = failing != null && !string.IsNullOrEmpty(failing.Label) ? failing.Label : "one sensor case";
-            if (!eval.ActivationMatches)
-            {
-                return "The decision crystal does not match the one this array needs. The numbers can be right and the switch still wrong.";
-            }
-
             switch (hintNumber)
             {
                 case 1:
-                    return "Case " + label + " disagreed. Look at whether the sum was too weak to fire, or strong enough to fire when the sensors were quiet.";
+                    if (failing != null && failing.ActualOutput >= 0.5 && failing.ExpectedOutput < 0.5)
+                        return "The drone burned. It has no rock and no ice. Lower the third dial.";
+                    if (missed == 1) return "The icy comet got through. Turn the ICE dial up until the sum reaches zero.";
+                    if (missed == 2) return "The rocky asteroid got through. Turn the ROCK dial up until the sum reaches zero.";
+                    if (missed == 3) return "The rock-and-ice chunk got through. Turn either dial up until the sum reaches zero.";
+                    return "A flier got through. Rock alone should burn. Ice alone should burn.";
                 case 2:
-                    return "Either beacon alone should be enough. Quiet sensors, with neither beacon, should stay dark.";
+                    return "Rock alone should be enough. Ice alone should be enough. The drone, with neither, should dock.";
                 default:
-                    return "The step crystal cuts at zero. A negative sum stays off. A sum that reaches zero fires. Change one dial, then run the test again.";
+                    return "The step crystal cuts at zero. Below zero the laser stays dark. At zero it fires. Change one dial.";
             }
         }
     }

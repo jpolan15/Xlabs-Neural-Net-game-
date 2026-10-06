@@ -5,7 +5,7 @@
 
 ## Overview
 
-**Convergence** places the player as a systems engineer inside an abandoned AI research facility whose central control models are failing. Rather than tweaking arbitrary numbers on a spreadsheet, the player physically diagnoses failures, balances weighted signals, installs non-linear activation filters, configures gradient descent, and manages transformer attention context to repair the AI sectors and escape.
+**Convergence** puts the player on the bridge of the starship *Neural* after an asteroid strike tears out its neural cables. In Level 1 the player rewires a single neuron that is the brain of the ship's automatic point-defense laser: it must fire at rocks and ice and let the friendly repair drone dock. Later chambers teach hidden layers, gradient descent, and attention to get the ship home. Rather than tweaking arbitrary numbers on a spreadsheet, the player physically diagnoses failures, balances weighted signals, and installs non-linear activation filters.
 
 Built for **Meta Quest 2** using **Unity 6 (6000.6.0f1)** and the **XR Interaction Toolkit (XRI 3.x)**.
 
@@ -28,7 +28,7 @@ Built for **Meta Quest 2** using **Unity 6 (6000.6.0f1)** and the **XR Interacti
 - `Assets/Scripts/Gameplay/`: Facility state, blast doors, chamber progression.
 - `Assets/Scripts/Tests/`: Unit tests for mathematical rigor and puzzle evaluators.
 - `Assets/Puzzles/`: Authored puzzle specifications and test suites (Chambers 1–4).
-- `Documentation/AgentTasks/`: Collaborative multi-agent task tracking board.
+- `.agents/tasks/`: Active task tracking board.
 
 ---
 

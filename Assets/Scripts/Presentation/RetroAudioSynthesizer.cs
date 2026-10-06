@@ -16,6 +16,26 @@ namespace Convergence.Presentation
 
         private float phase = 0f;
         private float sampleRate = 48000f;
+        private float _pulseUntil;
+        private float _savedVolume;
+        private bool _pulsing;
+
+        public void Pulse(float frequency, float seconds)
+        {
+            if (!_pulsing) _savedVolume = volume;
+            _pulsing = true;
+            baseFrequency = frequency;
+            volume = 0.45f;
+            _pulseUntil = Time.unscaledTime + seconds;
+        }
+
+        void Update()
+        {
+            if (!_pulsing) return;
+            if (Time.unscaledTime < _pulseUntil) return;
+            volume = _savedVolume;
+            _pulsing = false;
+        }
 
         void Awake()
         {

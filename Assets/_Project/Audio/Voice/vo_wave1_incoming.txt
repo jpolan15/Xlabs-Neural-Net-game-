@@ -1,0 +1,5 @@
+Source: neural recording 2.m4a
+Plays: first asteroid wave launches, after the opening
+Speech: 0.00-5.78 s
+
+Incoming, the targeting computer isn't firing, it's lost its connection.

@@ -1,0 +1,5 @@
+Source: neural recording 13.m4a, leading 1.35 s trimmed
+Plays: after the victory swarm clears
+Speech: 0.23-6.31 s
+
+That's a neuron. Two inputs, two weights, one bias, one decision, you just built one.

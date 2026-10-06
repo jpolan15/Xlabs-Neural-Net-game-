@@ -21,7 +21,7 @@ namespace Convergence.EditorTools
     /// - Dual Holographic Telemetry Stations (Neuron Architecture breakdown on left, Diagnostic Truth Table on right).
     /// - Cinematic wide-angle framing with rich depth, refined contrast, and mature sci-fi aesthetics.
     /// </summary>
-    public static class Level01SceneBuilder
+    public static partial class Level01SceneBuilder
     {
         private const string ScenePath = "Assets/Scenes/Level01_AwakeningGate.unity";
         private const string PresetsFolder = "Assets/Puzzles/Chamber01";
@@ -347,11 +347,14 @@ namespace Convergence.EditorTools
             chamberSO.FindProperty("neuralState").objectReferenceValue = neuralState;
             chamberSO.FindProperty("performanceTracker").objectReferenceValue = performanceTracker;
             chamberSO.FindProperty("initialPreset").objectReferenceValue = presets[0];
+            chamberSO.FindProperty("externalWaveDirector").boolValue = true;
+            chamberSO.FindProperty("enableSandboxMode").boolValue = false;
+            chamberSO.FindProperty("enableSoftReroute").boolValue = true;
             chamberSO.ApplyModifiedProperties();
 
             // --- 3D Floating & Rotating Neural Network Visualizer (Centerpiece, Elevated at Eye Level) ---
             var neuronMachineGo = new GameObject("ClassicNeuralNetwork_3D");
-            neuronMachineGo.transform.position = new Vector3(0, 1.55f, 0.55f);
+            neuronMachineGo.transform.position = new Vector3(0, 1.12f, 0.22f);
 
             // Dedicated subtle spotlight illuminating the neural network
             var netSpotGo = new GameObject("NeuralNetwork_Spotlight");
@@ -379,8 +382,8 @@ namespace Convergence.EditorTools
             var netBackdropGo = GameObject.CreatePrimitive(PrimitiveType.Quad);
             netBackdropGo.name = "NeuralNetwork_Backdrop";
             netBackdropGo.transform.SetParent(neuronMachineGo.transform, false);
-            netBackdropGo.transform.position = new Vector3(0, 1.55f, 1.85f);
-            netBackdropGo.transform.localScale = new Vector3(2.4f, 1.6f, 1f);
+            netBackdropGo.transform.position = new Vector3(0, 1.12f, 0.55f);
+            netBackdropGo.transform.localScale = new Vector3(1.05f, 0.72f, 1f);
             netBackdropGo.GetComponent<Renderer>().sharedMaterial = CreateOrUpdateMaterial("Mat_NeuralNetBackdrop", new Color(0.0f, 0.01f, 0.03f, 0.78f), 0.0f, 0.1f, isTransparent: true);
             UnityEngine.Object.DestroyImmediate(netBackdropGo.GetComponent<Collider>());
 
@@ -523,7 +526,7 @@ namespace Convergence.EditorTools
             w1Label.transform.localPosition = new Vector3(-0.32f, 0.90f, -0.21f);
             w1Label.transform.localRotation = Quaternion.Euler(70f, 0, 0);
             var w1Txt = w1Label.AddComponent<TextMesh>();
-            w1Txt.text = "LANDMASS (W1)";
+            w1Txt.text = "W1";
             w1Txt.fontSize = 17;
             w1Txt.characterSize = 0.011f;
             w1Txt.fontStyle = FontStyle.Bold;
@@ -582,7 +585,7 @@ namespace Convergence.EditorTools
             w2Label.transform.localPosition = new Vector3(0.32f, 0.90f, -0.21f);
             w2Label.transform.localRotation = Quaternion.Euler(70f, 0, 0);
             var w2Txt = w2Label.AddComponent<TextMesh>();
-            w2Txt.text = "ATMOSPHERE (W2)";
+            w2Txt.text = "W2";
             w2Txt.fontSize = 17;
             w2Txt.characterSize = 0.011f;
             w2Txt.fontStyle = FontStyle.Bold;
@@ -617,7 +620,7 @@ namespace Convergence.EditorTools
             biasLabel.transform.localPosition = new Vector3(0.0f, 0.90f, 0.13f);
             biasLabel.transform.localRotation = Quaternion.Euler(70f, 0, 0);
             var biasTxt = biasLabel.AddComponent<TextMesh>();
-            biasTxt.text = "NOISE FILTER (BIAS)";
+            biasTxt.text = "TRIGGER BIAS";
             biasTxt.fontSize = 17;
             biasTxt.characterSize = 0.011f;
             biasTxt.fontStyle = FontStyle.Bold;
@@ -706,7 +709,7 @@ namespace Convergence.EditorTools
             socketLabel.transform.localPosition = new Vector3(0.0f, 0.90f, -0.24f);
             socketLabel.transform.localRotation = Quaternion.Euler(70f, 0, 0);
             var socketTxt = socketLabel.AddComponent<TextMesh>();
-            socketTxt.text = "WARP LOCK CORE";
+            socketTxt.text = "FIRE";
             socketTxt.fontSize = 18;
             socketTxt.characterSize = 0.012f;
             socketTxt.fontStyle = FontStyle.Bold;
@@ -734,7 +737,7 @@ namespace Convergence.EditorTools
             leverLabel.transform.localPosition = new Vector3(0.52f, 0.90f, -0.14f);
             leverLabel.transform.localRotation = Quaternion.Euler(70f, 0, 0);
             var leverTxt = leverLabel.AddComponent<TextMesh>();
-            leverTxt.text = "JUMP PULSE";
+            leverTxt.text = "SELF-TEST";
             leverTxt.fontSize = 18;
             leverTxt.characterSize = 0.012f;
             leverTxt.fontStyle = FontStyle.Bold;
@@ -790,7 +793,7 @@ namespace Convergence.EditorTools
             c1Label.transform.localPosition = new Vector3(-0.48f, 0.90f, 0.12f);
             c1Label.transform.localRotation = Quaternion.Euler(70f, 0, 0);
             var c1Txt = c1Label.AddComponent<TextMesh>();
-            c1Txt.text = "CONTINENT (X1)";
+            c1Txt.text = "ROCK SENSOR";
             c1Txt.fontSize = 15;
             c1Txt.characterSize = 0.010f;
             c1Txt.fontStyle = FontStyle.Bold;
@@ -821,7 +824,7 @@ namespace Convergence.EditorTools
             c2Label.transform.localPosition = new Vector3(0.48f, 0.90f, 0.12f);
             c2Label.transform.localRotation = Quaternion.Euler(70f, 0, 0);
             var c2Txt = c2Label.AddComponent<TextMesh>();
-            c2Txt.text = "ATMOSPHERE (X2)";
+            c2Txt.text = "ICE SENSOR";
             c2Txt.fontSize = 15;
             c2Txt.characterSize = 0.010f;
             c2Txt.fontStyle = FontStyle.Bold;
@@ -841,168 +844,6 @@ namespace Convergence.EditorTools
             mvSO.FindProperty("cable2Renderer").objectReferenceValue = cable2Go.GetComponent<Renderer>();
             mvSO.ApplyModifiedProperties();
 
-            // --- In-World Educational Station: Neuron Architecture Breakdown (Left Bulkhead) ---
-            var pedagogyGo = new GameObject("NeuronPedagogyStation");
-            pedagogyGo.transform.position = new Vector3(-2.50f, 1.45f, 0.60f);
-            pedagogyGo.transform.rotation = Quaternion.Euler(0, 36f, 0);
-
-            var pedBoard = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            pedBoard.name = "PedagogyFrame";
-            pedBoard.transform.SetParent(pedagogyGo.transform, false);
-            pedBoard.transform.localPosition = Vector3.zero;
-            pedBoard.transform.localScale = new Vector3(1.75f, 1.20f, 0.02f);
-            pedBoard.GetComponent<Renderer>().sharedMaterial = mats.GlassHologram;
-            CreatePlatformTrim(pedBoard.transform, new Vector3(0, 0, 0.52f), new Vector3(1.01f, 1.01f, 0.02f), mats.GunMetal);
-
-            var pedLight = pedagogyGo.AddComponent<Light>();
-            pedLight.type = LightType.Point;
-            pedLight.range = 3.0f;
-            pedLight.intensity = 0.30f;
-            pedLight.color = new Color(0.20f, 0.65f, 0.95f);
-
-            var pedHeaderGo = new GameObject("Pedagogy_Header");
-            pedHeaderGo.transform.SetParent(pedagogyGo.transform, false);
-            pedHeaderGo.transform.localPosition = new Vector3(-0.80f, 0.45f, -0.04f);
-            var pedHeaderTxt = pedHeaderGo.AddComponent<TextMesh>();
-            pedHeaderTxt.text = "WARP NAVIGATION PERCEPTRON";
-            pedHeaderTxt.fontSize = 26;
-            pedHeaderTxt.characterSize = 0.024f;
-            pedHeaderTxt.fontStyle = FontStyle.Bold;
-            pedHeaderTxt.color = new Color(0.35f, 0.85f, 1.0f);
-
-            var pedFormulaGo = new GameObject("Pedagogy_Formula");
-            pedFormulaGo.transform.SetParent(pedagogyGo.transform, false);
-            pedFormulaGo.transform.localPosition = new Vector3(-0.80f, 0.26f, -0.04f);
-            var pedFormulaTxt = pedFormulaGo.AddComponent<TextMesh>();
-            pedFormulaTxt.text = "1. SENSOR SUMMATION (Earth Signal Σ):\n   z = (w1 × Land) + (w2 × Atmos) + Filter\n   z = (0.0 × x1) + (0.0 × x2) + (-1.0)\n\n2. WARP JUMP LOCK:\n   y = Linear(z)  [Need Step Crystal for Lock]";
-            pedFormulaTxt.fontSize = 20;
-            pedFormulaTxt.characterSize = 0.021f;
-            pedFormulaTxt.color = Color.white;
-
-            var pedExplGo = new GameObject("Pedagogy_Explanation");
-            pedExplGo.transform.SetParent(pedagogyGo.transform, false);
-            pedExplGo.transform.localPosition = new Vector3(-0.80f, -0.08f, -0.04f);
-            var pedExplTxt = pedExplGo.AddComponent<TextMesh>();
-            pedExplTxt.text = "• SENSORS (x1, x2)  : Earth Land & Atmos feeds.\n• WEIGHTS (w1, w2) : Sensitivity sliders.\n• BIAS (b)         : Noise filter (-0.5).\n• OUTPUT (y)       : Warp Lock (0 = Reject, 1 = Jump).";
-            pedExplTxt.fontSize = 18;
-            pedExplTxt.characterSize = 0.019f;
-            pedExplTxt.color = new Color(0.88f, 0.92f, 1.0f);
-
-            var pedBadgeGo = new GameObject("Pedagogy_StatusBadge");
-            pedBadgeGo.transform.SetParent(pedagogyGo.transform, false);
-            pedBadgeGo.transform.localPosition = new Vector3(-0.80f, -0.42f, -0.04f);
-            var pedBadgeTxt = pedBadgeGo.AddComponent<TextMesh>();
-            pedBadgeTxt.text = "CRITICAL: SHIP ADRIFT — CALIBRATION REQUIRED";
-            pedBadgeTxt.fontSize = 20;
-            pedBadgeTxt.characterSize = 0.021f;
-            pedBadgeTxt.fontStyle = FontStyle.Bold;
-            pedBadgeTxt.color = new Color(0.98f, 0.75f, 0.15f);
-
-            var pedagogyVisual = pedagogyGo.AddComponent<NeuronPedagogyHologramVisual>();
-            var pedSO = new SerializedObject(pedagogyVisual);
-            pedSO.FindProperty("chamberController").objectReferenceValue = chamberController;
-            pedSO.FindProperty("neuralState").objectReferenceValue = neuralState;
-            pedSO.FindProperty("headerTextMesh").objectReferenceValue = pedHeaderTxt;
-            pedSO.FindProperty("formulaTextMesh").objectReferenceValue = pedFormulaTxt;
-            pedSO.FindProperty("explanationTextMesh").objectReferenceValue = pedExplTxt;
-            pedSO.FindProperty("statusBadgeTextMesh").objectReferenceValue = pedBadgeTxt;
-            pedSO.FindProperty("stationLight").objectReferenceValue = pedLight;
-            pedSO.FindProperty("panelRenderer").objectReferenceValue = pedBoard.GetComponent<Renderer>();
-            pedSO.ApplyModifiedProperties();
-
-            // --- In-World Engineer's Field Manual Tablet ---
-            var tabletGo = new GameObject("EngineerFieldManualTablet");
-            tabletGo.transform.position = new Vector3(-0.62f, 0.86f, -0.12f);
-            tabletGo.transform.rotation = Quaternion.Euler(20f, 20f, 0);
-
-            var tabletBody = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            tabletBody.name = "TabletFrame";
-            tabletBody.transform.SetParent(tabletGo.transform, false);
-            tabletBody.transform.localPosition = Vector3.zero;
-            tabletBody.transform.localScale = new Vector3(0.32f, 0.24f, 0.02f);
-            tabletBody.GetComponent<Renderer>().sharedMaterial = mats.DarkPlating;
-
-            var manualVisual = tabletGo.AddComponent<EngineerFieldManualVisual>();
-            var manSO = new SerializedObject(manualVisual);
-            manSO.FindProperty("chamberController").objectReferenceValue = chamberController;
-            manSO.FindProperty("neuralState").objectReferenceValue = neuralState;
-            manSO.FindProperty("tabletRoot").objectReferenceValue = tabletGo.transform;
-            manSO.FindProperty("showScreenOverlay").boolValue = false;
-            manSO.ApplyModifiedProperties();
-
-            // --- Eye-Level 3D Holographic Diagnostic Matrix Display (Right Bulkhead) ---
-            var hologramGo = new GameObject("DiagnosticHologramMatrix");
-            hologramGo.transform.position = new Vector3(2.50f, 1.45f, 0.60f);
-            hologramGo.transform.rotation = Quaternion.Euler(0, -36f, 0);
-
-            var holoBoard = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            holoBoard.name = "HologramPanel";
-            holoBoard.transform.SetParent(hologramGo.transform, false);
-            holoBoard.transform.localPosition = Vector3.zero;
-            holoBoard.transform.localScale = new Vector3(1.75f, 1.20f, 0.02f);
-            holoBoard.GetComponent<Renderer>().sharedMaterial = mats.GlassHologram;
-            CreatePlatformTrim(holoBoard.transform, new Vector3(0, 0, 0.52f), new Vector3(1.01f, 1.01f, 0.02f), mats.GunMetal);
-
-            var holoLight = hologramGo.AddComponent<Light>();
-            holoLight.type = LightType.Point;
-            holoLight.range = 3.0f;
-            holoLight.intensity = 0.30f;
-            holoLight.color = new Color(0.20f, 0.65f, 0.95f);
-
-            var holoHeaderGo = new GameObject("Diagnostic_Header");
-            holoHeaderGo.transform.SetParent(hologramGo.transform, false);
-            holoHeaderGo.transform.localPosition = new Vector3(-0.80f, 0.45f, -0.04f);
-            var holoHeaderTxt = holoHeaderGo.AddComponent<TextMesh>();
-            holoHeaderTxt.text = "WARP NAVIGATION — RECOGNITION MATRIX";
-            holoHeaderTxt.fontSize = 22;
-            holoHeaderTxt.characterSize = 0.021f;
-            holoHeaderTxt.fontStyle = FontStyle.Bold;
-            holoHeaderTxt.color = new Color(0.25f, 0.80f, 1.0f);
-
-            var holoRows = new TextMesh[4];
-            string[] initialRows = new string[] {
-                "[SPACE VOID  (0,0)] Target: REJECT(0) | z = -1.00 -> y = -1.0 [FAIL]",
-                "[ATMOSPHERE  (0,1)] Target: EARTH(1)  | z = -1.00 -> y = -1.0 [FAIL]",
-                "[LANDMASS    (1,0)] Target: EARTH(1)  | z = -1.00 -> y = -1.0 [FAIL]",
-                "[FULL EARTH  (1,1)] Target: EARTH(1)  | z = -1.00 -> y = -1.0 [FAIL]"
-            };
-            for (int r = 0; r < 4; r++)
-            {
-                var rowGo = new GameObject($"Diagnostic_Row_{r + 1}");
-                rowGo.transform.SetParent(hologramGo.transform, false);
-                rowGo.transform.localPosition = new Vector3(-0.80f, 0.26f - (r * 0.15f), -0.04f);
-                var rowTxt = rowGo.AddComponent<TextMesh>();
-                rowTxt.text = initialRows[r];
-                rowTxt.fontSize = 18;
-                rowTxt.characterSize = 0.019f;
-                rowTxt.color = new Color(0.95f, 0.35f, 0.35f);
-                holoRows[r] = rowTxt;
-            }
-
-            var holoHintGo = new GameObject("Diagnostic_Hint");
-            holoHintGo.transform.SetParent(hologramGo.transform, false);
-            holoHintGo.transform.localPosition = new Vector3(-0.80f, -0.42f, -0.04f);
-            var holoHintTxt = holoHintGo.AddComponent<TextMesh>();
-            holoHintTxt.text = "Tune sensitivity dials & insert Step Crystal to lock jump vector.";
-            holoHintTxt.fontSize = 17;
-            holoHintTxt.characterSize = 0.018f;
-            holoHintTxt.color = new Color(0.98f, 0.70f, 0.15f);
-
-            var hologramVisual = hologramGo.AddComponent<DiagnosticHologramVisual>();
-            var holoSO = new SerializedObject(hologramVisual);
-            holoSO.FindProperty("chamberController").objectReferenceValue = chamberController;
-            holoSO.FindProperty("neuralState").objectReferenceValue = neuralState;
-            holoSO.FindProperty("displayRoot").objectReferenceValue = hologramGo.transform;
-            holoSO.FindProperty("hologramBacklight").objectReferenceValue = holoLight;
-            holoSO.FindProperty("displayScreenRenderer").objectReferenceValue = holoBoard.GetComponent<Renderer>();
-            holoSO.FindProperty("headerTextMesh").objectReferenceValue = holoHeaderTxt;
-            var holoRowsProp = holoSO.FindProperty("rowTextMeshes");
-            holoRowsProp.arraySize = 4;
-            for (int r = 0; r < 4; r++) holoRowsProp.GetArrayElementAtIndex(r).objectReferenceValue = holoRows[r];
-            holoSO.FindProperty("diagnosticFeedbackTextMesh").objectReferenceValue = holoHintTxt;
-            holoSO.FindProperty("showScreenOverlay").boolValue = false;
-            holoSO.ApplyModifiedProperties();
-
             // --- Planetary AI Consciousness Holosphere (SYNAPSE-GPT Core) ---
             CreatePlanetaryAICoreHologram(envRoot.transform, mats, chamberController, neuralState);
 
@@ -1010,7 +851,8 @@ namespace Convergence.EditorTools
 
             // --- The Awakening Blast Doors & Energy Portal Gateway ---
             var gateGo = new GameObject("AwakeningBlastDoors");
-            gateGo.transform.position = new Vector3(0, 0, 3.20f);
+            gateGo.transform.position = new Vector3(0, 0, -3.45f);
+            gateGo.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
 
             var leftPortal = GameObject.CreatePrimitive(PrimitiveType.Cube);
             leftPortal.name = "BlastDoor_LeftWing";
@@ -1067,6 +909,7 @@ namespace Convergence.EditorTools
 
             var gcSO = new SerializedObject(gatewayController);
             gcSO.FindProperty("chamberController").objectReferenceValue = chamberController;
+            gcSO.FindProperty("deferOpenToDirector").boolValue = true;
             gcSO.ApplyModifiedProperties();
 
             resetterSO.Update();
@@ -1132,7 +975,7 @@ namespace Convergence.EditorTools
             signNumGo.transform.SetParent(signboardGo.transform);
             signNumGo.transform.localPosition = new Vector3(0, 0.28f, -0.04f);
             var numTextMesh = signNumGo.AddComponent<TextMesh>();
-            numTextMesh.text = "USS CONVERGENCE";
+            numTextMesh.text = "NEURAL";
             numTextMesh.fontSize = 22;
             numTextMesh.characterSize = 0.022f;
             numTextMesh.fontStyle = FontStyle.Bold;
@@ -1144,7 +987,7 @@ namespace Convergence.EditorTools
             signSubGo.transform.SetParent(signboardGo.transform);
             signSubGo.transform.localPosition = new Vector3(0, -0.05f, -0.04f);
             var subTextMesh = signSubGo.AddComponent<TextMesh>();
-            subTextMesh.text = "BRIDGE DECK 01 // WARP RECOVERY";
+            subTextMesh.text = "";
             subTextMesh.fontSize = 16;
             subTextMesh.characterSize = 0.018f;
             subTextMesh.alignment = TextAlignment.Center;
@@ -1231,6 +1074,7 @@ namespace Convergence.EditorTools
             obSO.FindProperty("chamberController").objectReferenceValue = chamberController;
             obSO.FindProperty("neuralState").objectReferenceValue = neuralState;
             obSO.FindProperty("gatewayController").objectReferenceValue = gatewayController;
+            obSO.FindProperty("awakeningDelay").floatValue = 1.2f;
             obSO.FindProperty("stasisDoorLeft").objectReferenceValue = doorLeft.transform;
             obSO.FindProperty("stasisDoorRight").objectReferenceValue = doorRight.transform;
             obSO.FindProperty("stasisPodLight").objectReferenceValue = podLight;
@@ -1248,24 +1092,19 @@ namespace Convergence.EditorTools
 
             // --- In-World Holographic VR Subtitle & Objective Banner ---
             var subtitleHoloGo = new GameObject("VR_Holographic_Subtitle_Banner");
-            subtitleHoloGo.transform.position = new Vector3(0, 2.15f, 0.25f);
-            subtitleHoloGo.transform.rotation = Quaternion.Euler(12f, 0, 0);
+            subtitleHoloGo.transform.position = new Vector3(0, 2.62f, 2.35f);
+            subtitleHoloGo.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
 
             var subText = subtitleHoloGo.AddComponent<TextMesh>();
             subText.text = "";
             subText.fontSize = 24;
-            subText.characterSize = 0.015f;
+            subText.characterSize = 0.028f;
             subText.fontStyle = FontStyle.Bold;
             subText.alignment = TextAlignment.Center;
             subText.anchor = TextAnchor.MiddleCenter;
             subText.color = new Color(0.2f, 0.95f, 1.0f, 1.0f);
 
-            // --- Facility AI Voice Announcer ---
-            var announcer = controllersGo.AddComponent<FacilityAIVoiceAnnouncer>();
-            var annSO = new SerializedObject(announcer);
-            annSO.FindProperty("onboardingController").objectReferenceValue = onboardingController;
-            annSO.FindProperty("worldSubtitleTextMesh").objectReferenceValue = subText;
-            annSO.ApplyModifiedProperties();
+            // AuraSubtitles owns the banner. FacilityAIVoiceAnnouncer is not added.
 
             // --- XRI Starter Assets rig, interaction services, bridges and world-space HUD (ADR-007) ---
             InstantiateXrRig();
@@ -1327,9 +1166,9 @@ namespace Convergence.EditorTools
             var voice = subtitleHoloGo.AddComponent<AudioSource>();
             voice.spatialBlend = 1f;
             voice.playOnAwake = false;
-            auraSO.FindProperty("voice").objectReferenceValue = voice;
-            auraSO.FindProperty("lineClip").objectReferenceValue = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/_Project/Audio/Kenney/confirmation_001.wav");
             auraSO.ApplyModifiedProperties();
+
+            WirePointDefense(controllersGo, chamberController, gatewayController, neuralState, onboardingController, audioHookManager, subText, voice);
 
             AttachXriBridges();
             CreateWorldSpaceHud(chamberController, neuralState, onboardingController);
@@ -1525,7 +1364,7 @@ namespace Convergence.EditorTools
             buttonImage.color = new Color(0.0f, 0.45f, 0.6f, 0.95f);
             var button = buttonGo.AddComponent<UnityEngine.UI.Button>();
             button.targetGraphic = buttonImage;
-            CreateHudText(buttonGo.transform, "Label", new Vector2(0f, 0f), new Vector2(1f, 1f), 30f, Color.white, TMPro.TextAlignmentOptions.Center).text = "RUN TEST";
+            CreateHudText(buttonGo.transform, "Label", new Vector2(0f, 0f), new Vector2(1f, 1f), 30f, Color.white, TMPro.TextAlignmentOptions.Center).text = "SELF-TEST";
             var relay = buttonGo.AddComponent<UiForwardPassRelay>();
             var relaySO = new SerializedObject(relay);
             relaySO.FindProperty("chamberController").objectReferenceValue = chamberController;
@@ -1979,7 +1818,7 @@ namespace Convergence.EditorTools
             port1TextGo.transform.position = new Vector3(-2.95f, 0.95f, -1.0f);
             port1TextGo.transform.rotation = Quaternion.Euler(0, 90f, 0);
             var p1Txt = port1TextGo.AddComponent<TextMesh>();
-            p1Txt.text = "WARP DAMPENER\n[OFFLINE]";
+            p1Txt.text = "";
             p1Txt.fontSize = 20;
             p1Txt.characterSize = 0.015f;
             p1Txt.alignment = TextAlignment.Center;
@@ -2010,7 +1849,7 @@ namespace Convergence.EditorTools
             stb1TextGo.transform.position = new Vector3(2.95f, 0.95f, -1.0f);
             stb1TextGo.transform.rotation = Quaternion.Euler(0, -90f, 0);
             var s1Txt = stb1TextGo.AddComponent<TextMesh>();
-            s1Txt.text = "HYPERSPACE COILS\n[INTEGRITY: 0%]";
+            s1Txt.text = "";
             s1Txt.fontSize = 20;
             s1Txt.characterSize = 0.015f;
             s1Txt.alignment = TextAlignment.Center;
@@ -2044,7 +1883,7 @@ namespace Convergence.EditorTools
             sill.GetComponent<Renderer>().sharedMaterial = mats.SpaceshipHull;
 
             // Vertical Canopy Mullions framing the panoramic glass
-            float[] mullionX = new float[] { -3.4f, -1.8f, 0.0f, 1.8f, 3.4f };
+            float[] mullionX = new float[] { -3.4f, 3.4f };
             for (int m = 0; m < mullionX.Length; m++)
             {
                 var mullion = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -2107,8 +1946,8 @@ namespace Convergence.EditorTools
             var planetGo = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             planetGo.name = "Celestial_GasGiantPlanet";
             planetGo.transform.SetParent(spaceVistaRoot.transform, false);
-            planetGo.transform.position = new Vector3(0.80f, 2.40f, 14.0f);
-            planetGo.transform.localScale = new Vector3(6.0f, 6.0f, 6.0f);
+            planetGo.transform.position = new Vector3(2.4f, 2.15f, 9.5f);
+            planetGo.transform.localScale = new Vector3(3.4f, 3.4f, 3.4f);
             planetGo.transform.rotation = Quaternion.Euler(18f, -25f, 10f);
             planetGo.GetComponent<Renderer>().sharedMaterial = mats.PlanetGasGiant;
             UnityEngine.Object.DestroyImmediate(planetGo.GetComponent<Collider>());
@@ -2165,7 +2004,7 @@ namespace Convergence.EditorTools
             var nose = CreateModelInstance(PathKenneyStructure, "ShipNose", spaceVistaRoot.transform);
             if (nose != null)
             {
-                nose.transform.position = new Vector3(0f, 0.4f, 6.2f);
+                nose.transform.position = new Vector3(0f, 0.85f, 5.4f);
                 nose.transform.localScale = new Vector3(1.4f, 0.6f, 2.2f);
                 ApplyMaterialRecursively(nose, mats.SpaceshipHull);
             }
@@ -2176,13 +2015,13 @@ namespace Convergence.EditorTools
             var right = CreateModelInstance(PathKenneyWallWindowShutters, "ShutterRight", shutterRoot.transform);
             if (left != null)
             {
-                left.transform.position = new Vector3(-0.7f, 1.7f, 3.15f);
-                left.transform.localScale = new Vector3(1.2f, 2.2f, 1f);
+                left.transform.position = new Vector3(-2.85f, 1.7f, 3.35f);
+                left.transform.localScale = new Vector3(0.35f, 2.3f, 0.2f);
             }
             if (right != null)
             {
-                right.transform.position = new Vector3(0.7f, 1.7f, 3.15f);
-                right.transform.localScale = new Vector3(1.2f, 2.2f, 1f);
+                right.transform.position = new Vector3(2.85f, 1.7f, 3.35f);
+                right.transform.localScale = new Vector3(0.35f, 2.3f, 0.2f);
             }
             var canopy = shutterRoot.AddComponent<CanopyShutters>();
             var canopySO = new SerializedObject(canopy);
@@ -2654,25 +2493,17 @@ namespace Convergence.EditorTools
 
         private static BrokenConfigurationSO[] GenerateBrokenPresets()
         {
-            var presets = new BrokenConfigurationSO[6];
+            var presets = new BrokenConfigurationSO[7];
 
-            // Preset A: w1=0, w2=0, b=-1, Linear, Cable 1 Disconnected
-            presets[0] = CreateOrUpdatePreset("BrokenConfig_A", "Preset A", 0.0, 0.0, -1.0, ActivationType.Linear, true, false, "Cold initial state with disconnected X1 conduit.");
+            // Opening strike: both sensor cables ripped out. This is presets[0], the level start.
+            presets[0] = CreateOrUpdatePreset("BrokenConfig_Opening", "Preset Opening", 0.0, 0.0, -1.0, ActivationType.Linear, true, true, "Opening strike. Both sensor cables ripped out. The laser cannot see rock or ice.");
 
-            // Preset B: w1=-0.5, w2=1.0, b=0, Step, Cable 2 Disconnected
-            presets[1] = CreateOrUpdatePreset("BrokenConfig_B", "Preset B", -0.5, 1.0, 0.0, ActivationType.Step, false, true, "Negative W1 corruption and disconnected X2 conduit.");
-
-            // Preset C: w1=1.0, w2=1.0, b=-2.0, ReLU, All Connected
-            presets[2] = CreateOrUpdatePreset("BrokenConfig_C", "Preset C", 1.0, 1.0, -2.0, ActivationType.ReLU, false, false, "Severe negative bias under-activation with incompatible ReLU module.");
-
-            // Preset D: w1=0.5, w2=0.5, b=0.0, Linear, Both Disconnected
-            presets[3] = CreateOrUpdatePreset("BrokenConfig_D", "Preset D", 0.5, 0.5, 0.0, ActivationType.Linear, true, true, "Weak synapses with both input conduits disconnected.");
-
-            // Preset E: w1=-1.0, w2=-1.0, b=1.0, Step, Cable 1 Disconnected
-            presets[4] = CreateOrUpdatePreset("BrokenConfig_E", "Preset E", -1.0, -1.0, 1.0, ActivationType.Step, true, false, "Inverted negative weights and high bias error.");
-
-            // Preset F: w1=0.0, w2=0.0, b=0.0, Step, All Connected
-            presets[5] = CreateOrUpdatePreset("BrokenConfig_F", "Preset F", 0.0, 0.0, 0.0, ActivationType.Step, false, false, "Zero-energy dormant state with Step activation socketed.");
+            presets[1] = CreateOrUpdatePreset("BrokenConfig_A", "Preset A", 0.0, 0.0, -1.0, ActivationType.Linear, true, false, "Cold initial state with disconnected X1 conduit.");
+            presets[2] = CreateOrUpdatePreset("BrokenConfig_B", "Preset B", -0.5, 1.0, 0.0, ActivationType.Step, false, true, "Negative W1 corruption and disconnected X2 conduit.");
+            presets[3] = CreateOrUpdatePreset("BrokenConfig_C", "Preset C", 1.0, 1.0, -2.0, ActivationType.ReLU, false, false, "Severe negative bias under-activation with incompatible ReLU module.");
+            presets[4] = CreateOrUpdatePreset("BrokenConfig_D", "Preset D", 0.5, 0.5, 0.0, ActivationType.Linear, true, true, "Weak synapses with both input conduits disconnected.");
+            presets[5] = CreateOrUpdatePreset("BrokenConfig_E", "Preset E", -1.0, -1.0, 1.0, ActivationType.Step, true, false, "Inverted negative weights and high bias error.");
+            presets[6] = CreateOrUpdatePreset("BrokenConfig_F", "Preset F", 0.0, 0.0, 0.0, ActivationType.Step, false, false, "Zero-energy dormant state with Step activation socketed.");
 
             return presets;
         }
@@ -2790,7 +2621,7 @@ namespace Convergence.EditorTools
             headerGo.transform.SetParent(textContainer.transform, false);
             headerGo.transform.localPosition = new Vector3(0, 0.22f, 0);
             var headerTxt = headerGo.AddComponent<TextMesh>();
-            headerTxt.text = "HYPERSPACE JUMP CORE // RESTORATION REQUIRED";
+            headerTxt.text = "";
             headerTxt.fontSize = 20;
             headerTxt.characterSize = 0.014f;
             headerTxt.fontStyle = FontStyle.Bold;
@@ -2802,7 +2633,7 @@ namespace Convergence.EditorTools
             barGo.transform.SetParent(textContainer.transform, false);
             barGo.transform.localPosition = new Vector3(0, 0.04f, 0);
             var barTxt = barGo.AddComponent<TextMesh>();
-            barTxt.text = "WARP DRIVE INTEGRITY: [████░░░░░░░░░░░░░░░░] 20% [OFFLINE]";
+            barTxt.text = "";
             barTxt.fontSize = 18;
             barTxt.characterSize = 0.012f;
             barTxt.fontStyle = FontStyle.Bold;
@@ -2814,7 +2645,7 @@ namespace Convergence.EditorTools
             detailsGo.transform.SetParent(textContainer.transform, false);
             detailsGo.transform.localPosition = new Vector3(0, -0.15f, 0);
             var detailsTxt = detailsGo.AddComponent<TextMesh>();
-            detailsTxt.text = "Navigation AI corrupted — Feed Earth sensor telemetry to restore jump vector";
+            detailsTxt.text = "";
             detailsTxt.fontSize = 15;
             detailsTxt.characterSize = 0.010f;
             detailsTxt.alignment = TextAlignment.Center;
@@ -2836,242 +2667,6 @@ namespace Convergence.EditorTools
             pSO.ApplyModifiedProperties();
         }
 
-
-        private static List<DataTargetReceptor> CreateDataTargetPods(Transform parent, LevelMaterials mats)
-        {
-            var podsRoot = new GameObject("DataTargetReceptorPods");
-            podsRoot.transform.SetParent(parent);
-
-            var receptors = new List<DataTargetReceptor>();
-
-            var cases = new[]
-            {
-                new { Index = 0, Label = "Quiet (0,0)",       Title = "No beacon",       Role = "STAY DARK", X1 = 0.0, X2 = 0.0, Expected = 0.0, Spawn = new Vector3(-2.2f, 1.2f, 2.6f), Perimeter = new Vector3(-2.2f, 1.2f, 1.6f) },
-                new { Index = 1, Label = "Radio (0,1)",     Title = "Radio beacon",         Role = "WAKE THE ARRAY", X1 = 0.0, X2 = 1.0, Expected = 1.0, Spawn = new Vector3(-0.75f, 1.2f, 2.8f), Perimeter = new Vector3(-0.75f, 1.2f, 1.7f) },
-                new { Index = 2, Label = "Light (1,0)",       Title = "Light signature",       Role = "WAKE THE ARRAY", X1 = 1.0, X2 = 0.0, Expected = 1.0, Spawn = new Vector3(0.75f, 1.2f, 2.8f), Perimeter = new Vector3(0.75f, 1.2f, 1.7f) },
-                new { Index = 3, Label = "Both (1,1)",   Title = "Radio and light",   Role = "WAKE THE ARRAY",   X1 = 1.0, X2 = 1.0, Expected = 1.0, Spawn = new Vector3(2.2f, 1.2f, 2.6f), Perimeter = new Vector3(2.2f, 1.2f, 1.6f) }
-            };
-
-            foreach (var c in cases)
-            {
-                var podGo = new GameObject($"DataTargetPod_Case{c.Index + 1}");
-                podGo.transform.SetParent(podsRoot.transform);
-                podGo.transform.position = c.Spawn;
-
-                // Floor approach corridor rail
-                var railGo = new GameObject($"CorridorRail_Case{c.Index + 1}");
-                railGo.transform.SetParent(podsRoot.transform);
-                var railLr = railGo.AddComponent<LineRenderer>();
-                railLr.sharedMaterial = mats.BusTraceGlow;
-                railLr.useWorldSpace = true;
-                railLr.positionCount = 2;
-                railLr.SetPosition(0, new Vector3(c.Spawn.x, 0.02f, c.Spawn.z));
-                railLr.SetPosition(1, new Vector3(c.Perimeter.x, 0.02f, c.Perimeter.z));
-                railLr.startWidth = 0.025f;
-                railLr.endWidth = 0.035f;
-
-                // Pedestal base at perimeter dock (Sample Platform model)
-                var pedestal = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                pedestal.name = "PerimeterDock";
-                pedestal.transform.SetParent(podsRoot.transform, false);
-                pedestal.transform.position = new Vector3(c.Perimeter.x, 0.18f, c.Perimeter.z);
-                pedestal.transform.localScale = new Vector3(0.38f, 0.18f, 0.38f);
-                pedestal.GetComponent<Renderer>().sharedMaterial = mats.DarkPlating;
-                SetMeshOrKeepPrimitive(pedestal, PathPlatform);
-                CreatePlatformTrim(pedestal.transform, new Vector3(0, 0.52f, 0), new Vector3(1.05f, 0.04f, 1.05f), mats.GunMetal);
-
-                // Floating Target 3D Object
-                var targetBodyRoot = new GameObject("FloatingTargetBody");
-                targetBodyRoot.transform.SetParent(podGo.transform, false);
-                targetBodyRoot.transform.localPosition = Vector3.zero;
-
-                Renderer coreRend = null;
-                Renderer subRend = null;
-                Color auraColor = new Color(0.20f, 0.75f, 0.98f);
-                float auraIntensity = 1.6f;
-
-                if (c.Index == 0)
-                {
-                    // Case 0: Cosmic Void Noise / Asteroid Rock Fragment
-                    var asteroidGo = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    asteroidGo.name = "VoidAsteroidBody";
-                    asteroidGo.transform.SetParent(targetBodyRoot.transform, false);
-                    asteroidGo.transform.localScale = new Vector3(0.26f, 0.24f, 0.28f);
-                    asteroidGo.transform.localRotation = Quaternion.Euler(32f, 45f, 15f);
-                    SetMeshOrKeepPrimitive(asteroidGo, PathPyramid);
-                    coreRend = asteroidGo.GetComponent<Renderer>();
-                    coreRend.sharedMaterial = mats.SpaceAsteroid;
-
-                    var staticHalo = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                    staticHalo.name = "CosmicStaticRing";
-                    staticHalo.transform.SetParent(targetBodyRoot.transform, false);
-                    staticHalo.transform.localScale = new Vector3(0.32f, 0.02f, 0.32f);
-                    SetMeshOrKeepPrimitive(staticHalo, PathTorusCut);
-                    subRend = staticHalo.GetComponent<Renderer>();
-                    subRend.sharedMaterial = mats.DarkPlating;
-                    UnityEngine.Object.DestroyImmediate(staticHalo.GetComponent<Collider>());
-
-                    auraColor = new Color(0.25f, 0.35f, 0.55f);
-                    auraIntensity = 0.8f;
-                }
-                else if (c.Index == 1)
-                {
-                    // Case 1: Earth Atmospheric / Ocean Blue Spectrum
-                    var oceanSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    oceanSphere.name = "EarthOceanSphere";
-                    oceanSphere.transform.SetParent(targetBodyRoot.transform, false);
-                    oceanSphere.transform.localScale = new Vector3(0.25f, 0.25f, 0.25f);
-                    coreRend = oceanSphere.GetComponent<Renderer>();
-                    coreRend.sharedMaterial = mats.EarthWater;
-
-                    var atmoShell = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    atmoShell.name = "AtmosphereShell";
-                    atmoShell.transform.SetParent(targetBodyRoot.transform, false);
-                    atmoShell.transform.localScale = new Vector3(0.30f, 0.30f, 0.30f);
-                    subRend = atmoShell.GetComponent<Renderer>();
-                    subRend.sharedMaterial = mats.EarthAtmosphere;
-                    UnityEngine.Object.DestroyImmediate(atmoShell.GetComponent<Collider>());
-
-                    auraColor = new Color(0.15f, 0.70f, 1.0f);
-                    auraIntensity = 1.6f;
-                }
-                else if (c.Index == 2)
-                {
-                    // Case 2: Earth Continental Landmass Signature
-                    var landSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    landSphere.name = "EarthLandmassGlobe";
-                    landSphere.transform.SetParent(targetBodyRoot.transform, false);
-                    landSphere.transform.localScale = new Vector3(0.25f, 0.25f, 0.25f);
-                    coreRend = landSphere.GetComponent<Renderer>();
-                    coreRend.sharedMaterial = mats.EarthLand;
-
-                    var orbitRing = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                    orbitRing.name = "ContinentalTelemetryRing";
-                    orbitRing.transform.SetParent(targetBodyRoot.transform, false);
-                    orbitRing.transform.localScale = new Vector3(0.34f, 0.025f, 0.34f);
-                    orbitRing.transform.localRotation = Quaternion.Euler(25f, 45f, 0);
-                    SetMeshOrKeepPrimitive(orbitRing, PathTorusCut);
-                    subRend = orbitRing.GetComponent<Renderer>();
-                    subRend.sharedMaterial = mats.GlowEmerald;
-                    UnityEngine.Object.DestroyImmediate(orbitRing.GetComponent<Collider>());
-
-                    auraColor = new Color(0.10f, 0.90f, 0.45f);
-                    auraIntensity = 1.6f;
-                }
-                else
-                {
-                    // Case 3: Confirmed High-Resolution Earth Home Vector
-                    var fullEarthGo = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    fullEarthGo.name = "EarthConfirmedCore";
-                    fullEarthGo.transform.SetParent(targetBodyRoot.transform, false);
-                    fullEarthGo.transform.localScale = new Vector3(0.26f, 0.26f, 0.26f);
-                    coreRend = fullEarthGo.GetComponent<Renderer>();
-                    coreRend.sharedMaterial = mats.EarthWater;
-
-                    var satRing = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                    satRing.name = "SatelliteNavigationRing";
-                    satRing.transform.SetParent(targetBodyRoot.transform, false);
-                    satRing.transform.localScale = new Vector3(0.38f, 0.025f, 0.38f);
-                    satRing.transform.localRotation = Quaternion.Euler(30f, 60f, 0);
-                    SetMeshOrKeepPrimitive(satRing, PathTorus);
-                    subRend = satRing.GetComponent<Renderer>();
-                    subRend.sharedMaterial = mats.GlowAmber;
-                    UnityEngine.Object.DestroyImmediate(satRing.GetComponent<Collider>());
-
-                    auraColor = new Color(0.30f, 0.90f, 1.0f);
-                    auraIntensity = 1.8f;
-                }
-
-                // Floating Holographic Telemetry Screen (Faces bridge, moves with pod along corridor)
-                var screenGo = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                screenGo.name = $"HoloPhotoScreen_Case{c.Index + 1}";
-                screenGo.transform.SetParent(podGo.transform, false);
-                screenGo.transform.localPosition = new Vector3(0, 0.58f, 0);
-                screenGo.transform.localScale = new Vector3(0.72f, 0.48f, 0.02f);
-                var screenRend = screenGo.GetComponent<Renderer>();
-                screenRend.sharedMaterial = (c.Index == 0) ? mats.GlassHologram : mats.EarthPhotoDisplay;
-                UnityEngine.Object.DestroyImmediate(screenGo.GetComponent<Collider>());
-
-                // Screen Bezel / Frame
-                var frameGo = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                frameGo.name = "ScreenBezel";
-                frameGo.transform.SetParent(screenGo.transform, false);
-                frameGo.transform.localPosition = new Vector3(0, 0, 0.005f);
-                frameGo.transform.localScale = new Vector3(1.06f, 1.10f, 0.8f);
-                frameGo.GetComponent<Renderer>().sharedMaterial = mats.DarkPlating;
-                UnityEngine.Object.DestroyImmediate(frameGo.GetComponent<Collider>());
-
-                // Top Header Text
-                var topTextGo = new GameObject("Screen_TopLabel");
-                topTextGo.transform.SetParent(screenGo.transform, false);
-                topTextGo.transform.localPosition = new Vector3(0, 0.60f, -0.02f);
-                var topTxt = topTextGo.AddComponent<TextMesh>();
-                string[] topLabels = new string[] {
-                    "DEEP SPACE VOID [NO EARTH SIGNAL]",
-                    "EARTH ATMOSPHERE SCAN [O2/N2 DETECTED]",
-                    "EARTH CONTINENTAL FIX [LANDMASS CONFIRMED]",
-                    "CONFIRMED ORBITAL FIX [HOME VECTOR READY]"
-                };
-                topTxt.text = topLabels[c.Index];
-                topTxt.fontSize = 20;
-                topTxt.characterSize = 0.014f;
-                topTxt.fontStyle = FontStyle.Bold;
-                topTxt.alignment = TextAlignment.Center;
-                topTxt.anchor = TextAnchor.MiddleCenter;
-                topTxt.color = (c.Index == 0) ? new Color(0.95f, 0.40f, 0.40f) : new Color(0.25f, 0.90f, 1.0f);
-
-                // Bottom Subtitle / Instruction Text
-                var btmTextGo = new GameObject("Screen_BottomLabel");
-                btmTextGo.transform.SetParent(screenGo.transform, false);
-                btmTextGo.transform.localPosition = new Vector3(0, -0.60f, -0.02f);
-                var btmTxt = btmTextGo.AddComponent<TextMesh>();
-                btmTxt.text = (c.Index == 0) ? "ACTION: SUPPRESS NOISE (y=0)" : "ACTION: LOCK WARP VECTOR (y=1)";
-                btmTxt.fontSize = 17;
-                btmTxt.characterSize = 0.012f;
-                btmTxt.fontStyle = FontStyle.Bold;
-                btmTxt.alignment = TextAlignment.Center;
-                btmTxt.anchor = TextAnchor.MiddleCenter;
-                btmTxt.color = (c.Index == 0) ? new Color(0.98f, 0.70f, 0.15f) : new Color(0.15f, 0.95f, 0.55f);
-
-                // Aura Point Light
-                var lightGo = new GameObject("AuraLight");
-                lightGo.transform.SetParent(podGo.transform, false);
-                lightGo.transform.localPosition = Vector3.zero;
-                var auraLight = lightGo.AddComponent<Light>();
-                auraLight.type = LightType.Point;
-                auraLight.range = 2.8f;
-                auraLight.intensity = auraIntensity;
-                auraLight.color = auraColor;
-
-                // Receptor Component
-                var receptor = podGo.AddComponent<DataTargetReceptor>();
-                var recSO = new SerializedObject(receptor);
-                recSO.FindProperty("caseIndex").intValue = c.Index;
-                recSO.FindProperty("caseLabel").stringValue = c.Label;
-                recSO.FindProperty("targetTitle").stringValue = c.Title;
-                recSO.FindProperty("threatRole").stringValue = c.Role;
-                recSO.FindProperty("inputX1").doubleValue = c.X1;
-                recSO.FindProperty("inputX2").doubleValue = c.X2;
-                recSO.FindProperty("expectedOutput").doubleValue = c.Expected;
-                recSO.ApplyModifiedProperties();
-
-                // Visual Component
-                var visual = podGo.AddComponent<DataTargetVisual>();
-                var visSO = new SerializedObject(visual);
-                visSO.FindProperty("receptor").objectReferenceValue = receptor;
-                visSO.FindProperty("floatingTargetBody").objectReferenceValue = targetBodyRoot.transform;
-                visSO.FindProperty("coreRenderer").objectReferenceValue = coreRend;
-                visSO.FindProperty("subRenderer").objectReferenceValue = subRend;
-                visSO.FindProperty("auraLight").objectReferenceValue = auraLight;
-                visSO.FindProperty("spawnPosition").vector3Value = c.Spawn;
-                visSO.FindProperty("perimeterPosition").vector3Value = c.Perimeter;
-                visSO.ApplyModifiedProperties();
-
-                receptors.Add(receptor);
-            }
-
-            return receptors;
-        }
 
         private static void PlaceShip(Transform parent, LevelMaterials mats)
         {

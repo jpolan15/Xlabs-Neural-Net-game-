@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="55" result="Passed" total="55" passed="55" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.1205774">
+  <test-suite type="TestSuite" id="1000" name="My project (2)" fullname="My project (2)" runstate="Runnable" testcasecount="55" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.120577" total="55" passed="55" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1062" name="Convergence.Tests.EditMode.dll" fullname="C:/Users/Panda/Downloads/neural game/Library/ScriptAssemblies/Convergence.Tests.EditMode.dll" runstate="Runnable" testcasecount="55" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.107898" total="55" passed="55" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="49828" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1063" name="Convergence" fullname="Convergence" runstate="Runnable" testcasecount="55" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.106297" total="55" passed="55" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1064" name="Tests" fullname="Convergence.Tests" runstate="Runnable" testcasecount="55" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.102168" total="55" passed="55" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1065" name="EditMode" fullname="Convergence.Tests.EditMode" runstate="Runnable" testcasecount="55" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.101193" total="55" passed="55" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestSuite" id="1066" name="Core" fullname="Convergence.Tests.EditMode.Core" runstate="Runnable" testcasecount="55" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.100322" total="55" passed="55" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-suite type="TestFixture" id="1001" name="ActivationFunctionsTests" fullname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests" classname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests" runstate="Runnable" testcasecount="18" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.054644" total="18" passed="18" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="1006" name="Linear_ReturnsInputValue" fullname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests.Linear_ReturnsInputValue" methodname="Linear_ReturnsInputValue" classname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests" runstate="Runnable" seed="2117772280" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.013802" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1007" name="LinearDerivative_ReturnsOne" fullname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests.LinearDerivative_ReturnsOne" methodname="LinearDerivative_ReturnsOne" classname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests" runstate="Runnable" seed="788304583" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000307" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1008" name="ReLU_NegativeInput_ReturnsZero" fullname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests.ReLU_NegativeInput_ReturnsZero" methodname="ReLU_NegativeInput_ReturnsZero" classname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests" runstate="Runnable" seed="265848995" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000265" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1010" name="ReLU_PositiveInput_ReturnsInput" fullname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests.ReLU_PositiveInput_ReturnsInput" methodname="ReLU_PositiveInput_ReturnsInput" classname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests" runstate="Runnable" seed="119130374" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000252" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1009" name="ReLU_ZeroInput_ReturnsZero" fullname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests.ReLU_ZeroInput_ReturnsZero" methodname="ReLU_ZeroInput_ReturnsZero" classname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests" runstate="Runnable" seed="1472195929" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000270" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1011" name="ReLUDerivative_BoundaryAndSignCheck" fullname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests.ReLUDerivative_BoundaryAndSignCheck" methodname="ReLUDerivative_BoundaryAndSignCheck" classname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests" runstate="Runnable" seed="1589901692" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000310" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1013" name="Sigmoid_ExtremeValues_ClampedGracefully" fullname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests.Sigmoid_ExtremeValues_ClampedGracefully" methodname="Sigmoid_ExtremeValues_ClampedGracefully" classname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests" runstate="Runnable" seed="1473014968" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.007236" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1012" name="Sigmoid_StandardValues" fullname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests.Sigmoid_StandardValues" methodname="Sigmoid_StandardValues" classname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests" runstate="Runnable" seed="373707829" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000462" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1014" name="SigmoidDerivative_AtZero_ReturnsQuarter" fullname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests.SigmoidDerivative_AtZero_ReturnsQuarter" methodname="SigmoidDerivative_AtZero_ReturnsQuarter" classname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests" runstate="Runnable" seed="607022171" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000185" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1018" name="Softmax_ExtremeValues_DoesNotOverflow" fullname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests.Softmax_ExtremeValues_DoesNotOverflow" methodname="Softmax_ExtremeValues_DoesNotOverflow" classname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests" runstate="Runnable" seed="2050101786" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000654" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1019" name="Softmax_NullOrEmpty_ThrowsException" fullname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests.Softmax_NullOrEmpty_ThrowsException" methodname="Softmax_NullOrEmpty_ThrowsException" classname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests" runstate="Runnable" seed="1870126034" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.002906" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1017" name="Softmax_SumsToOne" fullname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests.Softmax_SumsToOne" methodname="Softmax_SumsToOne" classname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests" runstate="Runnable" seed="138883844" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000722" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1002" name="Step_NegativeInput_ReturnsZero" fullname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests.Step_NegativeInput_ReturnsZero" methodname="Step_NegativeInput_ReturnsZero" classname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests" runstate="Runnable" seed="978192834" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000123" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1004" name="Step_PositiveInput_ReturnsOne" fullname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests.Step_PositiveInput_ReturnsOne" methodname="Step_PositiveInput_ReturnsOne" classname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests" runstate="Runnable" seed="306551719" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000087" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1003" name="Step_ZeroInput_ReturnsOne" fullname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests.Step_ZeroInput_ReturnsOne" methodname="Step_ZeroInput_ReturnsOne" classname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests" runstate="Runnable" seed="1704786389" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000059" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1005" name="StepDerivative_AlwaysReturnsZeroCompatibilityStub" fullname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests.StepDerivative_AlwaysReturnsZeroCompatibilityStub" methodname="StepDerivative_AlwaysReturnsZeroCompatibilityStub" classname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests" runstate="Runnable" seed="647689105" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000075" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1015" name="Tanh_StandardValues" fullname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests.Tanh_StandardValues" methodname="Tanh_StandardValues" classname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests" runstate="Runnable" seed="470682617" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000269" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1016" name="TanhDerivative_AtZero_ReturnsOne" fullname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests.TanhDerivative_AtZero_ReturnsOne" methodname="TanhDerivative_AtZero_ReturnsOne" classname="Convergence.Tests.EditMode.Core.ActivationFunctionsTests" runstate="Runnable" seed="1526536938" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000118" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+              </test-suite>
+              <test-suite type="TestFixture" id="1020" name="AttentionAndTrainingTests" fullname="Convergence.Tests.EditMode.Core.AttentionAndTrainingTests" classname="Convergence.Tests.EditMode.Core.AttentionAndTrainingTests" runstate="Runnable" testcasecount="14" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.025628" total="14" passed="14" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="1029" name="Backward_ReluHiddenLinearOutput_MatchesHandComputedGradient" fullname="Convergence.Tests.EditMode.Core.AttentionAndTrainingTests.Backward_ReluHiddenLinearOutput_MatchesHandComputedGradient" methodname="Backward_ReluHiddenLinearOutput_MatchesHandComputedGradient" classname="Convergence.Tests.EditMode.Core.AttentionAndTrainingTests" runstate="Runnable" seed="1500361405" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.004312" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1032" name="Evaluate_BinaryMultiOutput_RequiresEveryOutput" fullname="Convergence.Tests.EditMode.Core.AttentionAndTrainingTests.Evaluate_BinaryMultiOutput_RequiresEveryOutput" methodname="Evaluate_BinaryMultiOutput_RequiresEveryOutput" classname="Convergence.Tests.EditMode.Core.AttentionAndTrainingTests" runstate="Runnable" seed="1596600639" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.003440" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1031" name="Evaluate_ContinuousTwoOutputs_UsesPerOutputTolerance" fullname="Convergence.Tests.EditMode.Core.AttentionAndTrainingTests.Evaluate_ContinuousTwoOutputs_UsesPerOutputTolerance" methodname="Evaluate_ContinuousTwoOutputs_UsesPerOutputTolerance" classname="Convergence.Tests.EditMode.Core.AttentionAndTrainingTests" runstate="Runnable" seed="669697301" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.001155" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1030" name="MeanSquaredErrorGradient_ZeroAndNegative" fullname="Convergence.Tests.EditMode.Core.AttentionAndTrainingTests.MeanSquaredErrorGradient_ZeroAndNegative" methodname="MeanSquaredErrorGradient_ZeroAndNegative" classname="Convergence.Tests.EditMode.Core.AttentionAndTrainingTests" runstate="Runnable" seed="1991068796" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000346" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1034" name="NavLog_UnmaskedNoiseMissesHome_MaskPredictsJumpHome" fullname="Convergence.Tests.EditMode.Core.AttentionAndTrainingTests.NavLog_UnmaskedNoiseMissesHome_MaskPredictsJumpHome" methodname="NavLog_UnmaskedNoiseMissesHome_MaskPredictsJumpHome" classname="Convergence.Tests.EditMode.Core.AttentionAndTrainingTests" runstate="Runnable" seed="2119185529" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.004083" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1025" name="ScaledDotProduct_EmptyQuery_Throws" fullname="Convergence.Tests.EditMode.Core.AttentionAndTrainingTests.ScaledDotProduct_EmptyQuery_Throws" methodname="ScaledDotProduct_EmptyQuery_Throws" classname="Convergence.Tests.EditMode.Core.AttentionAndTrainingTests" runstate="Runnable" seed="875743027" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000450" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1022" name="ScaledDotProduct_Mask_DropsTheMaskedValue" fullname="Convergence.Tests.EditMode.Core.AttentionAndTrainingTests.ScaledDotProduct_Mask_DropsTheMaskedValue" methodname="ScaledDotProduct_Mask_DropsTheMaskedValue" classname="Convergence.Tests.EditMode.Core.AttentionAndTrainingTests" runstate="Runnable" seed="1960555955" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000419" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1021" name="ScaledDotProduct_MatchingKey_ReceivesMoreWeight" fullname="Convergence.Tests.EditMode.Core.AttentionAndTrainingTests.ScaledDotProduct_MatchingKey_ReceivesMoreWeight" methodname="ScaledDotProduct_MatchingKey_ReceivesMoreWeight" classname="Convergence.Tests.EditMode.Core.AttentionAndTrainingTests" runstate="Runnable" seed="1920554431" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000328" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1024" name="ScaledDotProduct_NegativeQuery_PrefersTheOppositeKey" fullname="Convergence.Tests.EditMode.Core.AttentionAndTrainingTests.ScaledDotProduct_NegativeQuery_PrefersTheOppositeKey" methodname="ScaledDotProduct_NegativeQuery_PrefersTheOppositeKey" classname="Convergence.Tests.EditMode.Core.AttentionAndTrainingTests" runstate="Runnable" seed="1292288595" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000219" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1023" name="ScaledDotProduct_ZeroQuery_SplitsEqualKeysEvenly" fullname="Convergence.Tests.EditMode.Core.AttentionAndTrainingTests.ScaledDotProduct_ZeroQuery_SplitsEqualKeysEvenly" methodname="ScaledDotProduct_ZeroQuery_SplitsEqualKeysEvenly" classname="Convergence.Tests.EditMode.Core.AttentionAndTrainingTests" runstate="Runnable" seed="1527981265" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000262" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1028" name="SgdRun_SameSeed_IsDeterministic" fullname="Convergence.Tests.EditMode.Core.AttentionAndTrainingTests.SgdRun_SameSeed_IsDeterministic" methodname="SgdRun_SameSeed_IsDeterministic" classname="Convergence.Tests.EditMode.Core.AttentionAndTrainingTests" runstate="Runnable" seed="1084886391" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.004492" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1027" name="SgdStep_HighLearningRate_IncreasesLossOnTheNextStep" fullname="Convergence.Tests.EditMode.Core.AttentionAndTrainingTests.SgdStep_HighLearningRate_IncreasesLossOnTheNextStep" methodname="SgdStep_HighLearningRate_IncreasesLossOnTheNextStep" classname="Convergence.Tests.EditMode.Core.AttentionAndTrainingTests" runstate="Runnable" seed="608114506" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000532" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1026" name="SgdStep_LinearNeuron_MatchesClosedFormMseUpdate" fullname="Convergence.Tests.EditMode.Core.AttentionAndTrainingTests.SgdStep_LinearNeuron_MatchesClosedFormMseUpdate" methodname="SgdStep_LinearNeuron_MatchesClosedFormMseUpdate" classname="Convergence.Tests.EditMode.Core.AttentionAndTrainingTests" runstate="Runnable" seed="1846899161" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000821" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1033" name="Xor_SingleNeuronCannotPass_HiddenLayerCan" fullname="Convergence.Tests.EditMode.Core.AttentionAndTrainingTests.Xor_SingleNeuronCannotPass_HiddenLayerCan" methodname="Xor_SingleNeuronCannotPass_HiddenLayerCan" classname="Convergence.Tests.EditMode.Core.AttentionAndTrainingTests" runstate="Runnable" seed="526185373" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000776" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+              </test-suite>
+              <test-suite type="TestFixture" id="1035" name="LossFunctionsTests" fullname="Convergence.Tests.EditMode.Core.LossFunctionsTests" classname="Convergence.Tests.EditMode.Core.LossFunctionsTests" runstate="Runnable" testcasecount="10" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.004882" total="10" passed="10" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="1041" name="BinaryAccuracy_AllCorrect_ReturnsOne" fullname="Convergence.Tests.EditMode.Core.LossFunctionsTests.BinaryAccuracy_AllCorrect_ReturnsOne" methodname="BinaryAccuracy_AllCorrect_ReturnsOne" classname="Convergence.Tests.EditMode.Core.LossFunctionsTests" runstate="Runnable" seed="2107838769" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000538" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1045" name="BinaryAccuracy_LengthMismatch_ThrowsArgumentException" fullname="Convergence.Tests.EditMode.Core.LossFunctionsTests.BinaryAccuracy_LengthMismatch_ThrowsArgumentException" methodname="BinaryAccuracy_LengthMismatch_ThrowsArgumentException" classname="Convergence.Tests.EditMode.Core.LossFunctionsTests" runstate="Runnable" seed="1158154290" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000419" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1044" name="BinaryAccuracy_NonBinaryTarget_ThrowsArgumentException" fullname="Convergence.Tests.EditMode.Core.LossFunctionsTests.BinaryAccuracy_NonBinaryTarget_ThrowsArgumentException" methodname="BinaryAccuracy_NonBinaryTarget_ThrowsArgumentException" classname="Convergence.Tests.EditMode.Core.LossFunctionsTests" runstate="Runnable" seed="243347048" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000384" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1042" name="BinaryAccuracy_ThreeOfFourCorrect_ReturnsZeroPointSevenFive" fullname="Convergence.Tests.EditMode.Core.LossFunctionsTests.BinaryAccuracy_ThreeOfFourCorrect_ReturnsZeroPointSevenFive" methodname="BinaryAccuracy_ThreeOfFourCorrect_ReturnsZeroPointSevenFive" classname="Convergence.Tests.EditMode.Core.LossFunctionsTests" runstate="Runnable" seed="585451297" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000201" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1043" name="BinaryAccuracy_ThresholdBoundary_PointFiveIsOne" fullname="Convergence.Tests.EditMode.Core.LossFunctionsTests.BinaryAccuracy_ThresholdBoundary_PointFiveIsOne" methodname="BinaryAccuracy_ThresholdBoundary_PointFiveIsOne" classname="Convergence.Tests.EditMode.Core.LossFunctionsTests" runstate="Runnable" seed="789526974" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000114" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1040" name="BinaryCrossEntropy_NonBinaryTarget_ThrowsArgumentException" fullname="Convergence.Tests.EditMode.Core.LossFunctionsTests.BinaryCrossEntropy_NonBinaryTarget_ThrowsArgumentException" methodname="BinaryCrossEntropy_NonBinaryTarget_ThrowsArgumentException" classname="Convergence.Tests.EditMode.Core.LossFunctionsTests" runstate="Runnable" seed="1227514082" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000436" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1039" name="BinaryCrossEntropy_PerfectMatch_ReturnsNearZero" fullname="Convergence.Tests.EditMode.Core.LossFunctionsTests.BinaryCrossEntropy_PerfectMatch_ReturnsNearZero" methodname="BinaryCrossEntropy_PerfectMatch_ReturnsNearZero" classname="Convergence.Tests.EditMode.Core.LossFunctionsTests" runstate="Runnable" seed="1332114913" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000150" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1037" name="MeanSquaredError_KnownDifferences_ReturnsExpectedAverage" fullname="Convergence.Tests.EditMode.Core.LossFunctionsTests.MeanSquaredError_KnownDifferences_ReturnsExpectedAverage" methodname="MeanSquaredError_KnownDifferences_ReturnsExpectedAverage" classname="Convergence.Tests.EditMode.Core.LossFunctionsTests" runstate="Runnable" seed="477139315" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000111" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1038" name="MeanSquaredError_LengthMismatch_ThrowsArgumentException" fullname="Convergence.Tests.EditMode.Core.LossFunctionsTests.MeanSquaredError_LengthMismatch_ThrowsArgumentException" methodname="MeanSquaredError_LengthMismatch_ThrowsArgumentException" classname="Convergence.Tests.EditMode.Core.LossFunctionsTests" runstate="Runnable" seed="726861367" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000186" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1036" name="MeanSquaredError_PerfectPrediction_ReturnsZero" fullname="Convergence.Tests.EditMode.Core.LossFunctionsTests.MeanSquaredError_PerfectPrediction_ReturnsZero" methodname="MeanSquaredError_PerfectPrediction_ReturnsZero" classname="Convergence.Tests.EditMode.Core.LossFunctionsTests" runstate="Runnable" seed="1296733319" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000089" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+              </test-suite>
+              <test-suite type="TestFixture" id="1046" name="NetworkModelTests" fullname="Convergence.Tests.EditMode.Core.NetworkModelTests" classname="Convergence.Tests.EditMode.Core.NetworkModelTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.004291" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="1047" name="LayerModel_VectorSoftmax_OutputsNormalizedDistribution" fullname="Convergence.Tests.EditMode.Core.NetworkModelTests.LayerModel_VectorSoftmax_OutputsNormalizedDistribution" methodname="LayerModel_VectorSoftmax_OutputsNormalizedDistribution" classname="Convergence.Tests.EditMode.Core.NetworkModelTests" runstate="Runnable" seed="2055979191" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000357" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1049" name="NetworkModel_DeepCopy_CreatesIndependentNetwork" fullname="Convergence.Tests.EditMode.Core.NetworkModelTests.NetworkModel_DeepCopy_CreatesIndependentNetwork" methodname="NetworkModel_DeepCopy_CreatesIndependentNetwork" classname="Convergence.Tests.EditMode.Core.NetworkModelTests" runstate="Runnable" seed="415501470" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000596" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1048" name="NetworkModel_SingleNeuronNetwork_MatchesPerceptronCalculations" fullname="Convergence.Tests.EditMode.Core.NetworkModelTests.NetworkModel_SingleNeuronNetwork_MatchesPerceptronCalculations" methodname="NetworkModel_SingleNeuronNetwork_MatchesPerceptronCalculations" classname="Convergence.Tests.EditMode.Core.NetworkModelTests" runstate="Runnable" seed="1814529394" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.002337" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+              </test-suite>
+              <test-suite type="TestFixture" id="1050" name="NeuronModelTests" fullname="Convergence.Tests.EditMode.Core.NeuronModelTests" classname="Convergence.Tests.EditMode.Core.NeuronModelTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.004605" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="1055" name="NeuronModel_DeepCopy_IsCompletelyIndependent" fullname="Convergence.Tests.EditMode.Core.NeuronModelTests.NeuronModel_DeepCopy_IsCompletelyIndependent" methodname="NeuronModel_DeepCopy_IsCompletelyIndependent" classname="Convergence.Tests.EditMode.Core.NeuronModelTests" runstate="Runnable" seed="2091776375" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.001682" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1053" name="NeuronModel_InputDimensionMismatch_ThrowsArgumentException" fullname="Convergence.Tests.EditMode.Core.NeuronModelTests.NeuronModel_InputDimensionMismatch_ThrowsArgumentException" methodname="NeuronModel_InputDimensionMismatch_ThrowsArgumentException" classname="Convergence.Tests.EditMode.Core.NeuronModelTests" runstate="Runnable" seed="583516635" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000424" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1051" name="NeuronModel_ORGateStepForward_ComputesExpectedMargins" fullname="Convergence.Tests.EditMode.Core.NeuronModelTests.NeuronModel_ORGateStepForward_ComputesExpectedMargins" methodname="NeuronModel_ORGateStepForward_ComputesExpectedMargins" classname="Convergence.Tests.EditMode.Core.NeuronModelTests" runstate="Runnable" seed="1016806475" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000263" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1052" name="NeuronModel_SoftmaxActivation_ThrowsNotSupportedException" fullname="Convergence.Tests.EditMode.Core.NeuronModelTests.NeuronModel_SoftmaxActivation_ThrowsNotSupportedException" methodname="NeuronModel_SoftmaxActivation_ThrowsNotSupportedException" classname="Convergence.Tests.EditMode.Core.NeuronModelTests" runstate="Runnable" seed="1702024889" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000555" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1054" name="NeuronModel_WeightsProperty_MaintainsDefensiveCopies" fullname="Convergence.Tests.EditMode.Core.NeuronModelTests.NeuronModel_WeightsProperty_MaintainsDefensiveCopies" methodname="NeuronModel_WeightsProperty_MaintainsDefensiveCopies" classname="Convergence.Tests.EditMode.Core.NeuronModelTests" runstate="Runnable" seed="1337549660" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000194" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+              </test-suite>
+              <test-suite type="TestFixture" id="1056" name="PuzzleEvaluatorTests" fullname="Convergence.Tests.EditMode.Core.PuzzleEvaluatorTests" classname="Convergence.Tests.EditMode.Core.PuzzleEvaluatorTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.003473" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="1059" name="Evaluate_ActivationMismatch_DoesNotPassEvenIfAccuracyCoincides" fullname="Convergence.Tests.EditMode.Core.PuzzleEvaluatorTests.Evaluate_ActivationMismatch_DoesNotPassEvenIfAccuracyCoincides" methodname="Evaluate_ActivationMismatch_DoesNotPassEvenIfAccuracyCoincides" classname="Convergence.Tests.EditMode.Core.PuzzleEvaluatorTests" runstate="Runnable" seed="1933621050" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000523" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1061" name="Evaluate_DiagnosticExplanations_ProvideActionableFeedback" fullname="Convergence.Tests.EditMode.Core.PuzzleEvaluatorTests.Evaluate_DiagnosticExplanations_ProvideActionableFeedback" methodname="Evaluate_DiagnosticExplanations_ProvideActionableFeedback" classname="Convergence.Tests.EditMode.Core.PuzzleEvaluatorTests" runstate="Runnable" seed="866457030" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000205" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1060" name="Evaluate_NetworkInputCountMismatch_ThrowsArgumentException" fullname="Convergence.Tests.EditMode.Core.PuzzleEvaluatorTests.Evaluate_NetworkInputCountMismatch_ThrowsArgumentException" methodname="Evaluate_NetworkInputCountMismatch_ThrowsArgumentException" classname="Convergence.Tests.EditMode.Core.PuzzleEvaluatorTests" runstate="Runnable" seed="113166339" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000323" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1058" name="Evaluate_ThreeOfFourCorrect_ProducesZeroPointSevenFiveAndFails" fullname="Convergence.Tests.EditMode.Core.PuzzleEvaluatorTests.Evaluate_ThreeOfFourCorrect_ProducesZeroPointSevenFiveAndFails" methodname="Evaluate_ThreeOfFourCorrect_ProducesZeroPointSevenFiveAndFails" classname="Convergence.Tests.EditMode.Core.PuzzleEvaluatorTests" runstate="Runnable" seed="330517449" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000456" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1057" name="Evaluate_ValidORGateConfiguration_PassesWithExpectedMargins" fullname="Convergence.Tests.EditMode.Core.PuzzleEvaluatorTests.Evaluate_ValidORGateConfiguration_PassesWithExpectedMargins" methodname="Evaluate_ValidORGateConfiguration_PassesWithExpectedMargins" classname="Convergence.Tests.EditMode.Core.PuzzleEvaluatorTests" runstate="Runnable" seed="1611455124" result="Passed" start-time="2026-10-03 22:08:54Z" end-time="2026-10-03 22:08:54Z" duration="0.000702" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[<b><color=#2EA3FF>MCP-FOR-UNITY</color></b>: [TestRunnerNoThrottle] Restored Interaction Mode after test run.
+Saving results to: C:/Users/Panda/AppData/LocalLow/DefaultCompany/My project (2)\TestResults.xml
+]]></output>
+                </test-case>
+              </test-suite>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

@@ -2,16 +2,18 @@
 
 ## Premise
 
-An asteroid strike knocks the ship out of hyperspace. The navigation AI, A.U.R.A., has lost its trained weights. The player is alone with it. Each chamber teaches one real machine-learning concept and changes the ship. The decision record is ADR-008.
+An asteroid strike knocks the ship *Neural* out of hyperspace and tears the neural cables out of the targeting core. The player's own recorded voice warns the passengers that the ship has lost connection. Each chamber teaches one real machine-learning concept and changes the ship. The decision records are ADR-008 (premise) and ADR-010 (Chamber 01 point defense).
 
 ## Chamber Roadmap
 
-1. **Chamber 01, sensor array**
-   - Setting: the ship's sensor bay, power out, shutters closed.
-   - Concept: one neuron, two inputs, a bias, and a step activation.
-   - Core discovery: the array wakes if a radio beacon OR a light signature is present. Quiet sensors stay dark.
+1. **Chamber 01, point defense**
+   - Setting: the bridge, red alarm light, an asteroid field drifting toward the canopy.
+   - Concept: one neuron, two inputs, a bias, and a step activation. The neuron is the brain of an automatic laser. The player never aims or fires.
+   - Core discovery: the laser should FIRE if an object is ROCK or ICE. The friendly repair drone (neither) must be let through to dock.
+   - Inputs: ROCK sensor \(x_1\), ICE sensor \(x_2\). Output: FIRE \(= \text{step}(w_1 \cdot \text{ROCK} + w_2 \cdot \text{ICE} + b)\).
    - Canonical margin: \(w_1 = 1\), \(w_2 = 1\), \(b = -0.5\), Step. Any weights that score every row pass. The displays do not print those numbers as the answer.
-   - Payoff: shutters open, lights steady, the door aft of the bay unlocks. The ship drifts toward the asteroids. Nothing kills the player.
+   - Pressure: missed threats dent the hull. At 0 hull the ship reroutes power back to 60% and keeps the player's settings. Nothing kills the player.
+   - Payoff: a victory swarm the laser clears on its own, lights turn blue, and the bridge door opens.
 2. **Chamber 02, spectrum filter**
    - Concept: XOR is not linearly separable. A hidden layer with a non-linear activation can separate it.
    - Payoff: the telescope powers on.
@@ -25,4 +27,4 @@ An asteroid strike knocks the ship out of hyperspace. The navigation AI, A.U.R.A
 
 ## Cut from the live game
 
-Sentry defense, the neural gun, the motherboard room, and Synapse-GPT. Those tasks are dropped, not completed.
+Sentry defense, the handheld neural gun, the motherboard room, and Synapse-GPT. Those tasks are dropped, not completed. The Chamber 01 laser is automatic and is driven only by the neuron (ADR-010).

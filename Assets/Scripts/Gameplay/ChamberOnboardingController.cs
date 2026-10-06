@@ -67,6 +67,9 @@ namespace Convergence.Gameplay
         public event Action<OnboardingStep> OnStepChanged;
         public event Action<string> OnAnnouncerVoicePrompt;
 
+        /// <summary>Fired once when the opening strike begins. Presentation plays the recording from here.</summary>
+        public event Action OnOpeningBriefing;
+
         /// <summary>
         /// Returns a short, friendly single-line prompt for the current step.
         /// Shown in the bottom action strip — no jargon, no all-caps walls of text.
@@ -75,11 +78,11 @@ namespace Convergence.Gameplay
         {
             return currentStep switch
             {
-                OnboardingStep.Awakening      => "Sensor array dark. Either beacon should wake it.",
-                OnboardingStep.ConnectSensors => "Plug in the radio beacon and the light signature.",
-                OnboardingStep.TuneSensitivity => "Turn W1, W2, and bias. They are three different numbers.",
-                OnboardingStep.FireTest       => "Pull the lever. Each sensor ping should light from the test.",
-                OnboardingStep.Completed      => "Array awake. The aft door is open. We cannot jump yet.",
+                OnboardingStep.Awakening      => "Two cables popped out. You will plug them back in.",
+                OnboardingStep.ConnectSensors => "Grab the ROCK cable and click it in. Then do the same for ICE.",
+                OnboardingStep.TuneSensitivity => "Left dial is ROCK. Right dial is ICE. The third dial moves every flier together.",
+                OnboardingStep.FireTest       => "Watch the lamps. ROCK or ICE should light FIRE. The drone should not.",
+                OnboardingStep.Completed      => "The laser learned the rule. The door opens when the swarm is done.",
                 _                             => ""
             };
         }
@@ -94,7 +97,10 @@ namespace Convergence.Gameplay
         private void OnEnable()
         {
             if (neuralState != null)
+            {
                 neuralState.OnStateMutated += HandleNeuralStateMutated;
+                neuralState.OnCableStateChanged += HandleCableChanged;
+            }
             if (chamberController != null)
                 chamberController.OnEvaluationComplete += HandleEvaluationComplete;
         }
@@ -102,7 +108,10 @@ namespace Convergence.Gameplay
         private void OnDisable()
         {
             if (neuralState != null)
+            {
                 neuralState.OnStateMutated -= HandleNeuralStateMutated;
+                neuralState.OnCableStateChanged -= HandleCableChanged;
+            }
             if (chamberController != null)
                 chamberController.OnEvaluationComplete -= HandleEvaluationComplete;
         }
@@ -139,13 +148,12 @@ namespace Convergence.Gameplay
 
         private void CheckProgressiveHints()
         {
-            // First hint at 20 s, second at 45 s (was 40/85 — too slow)
-            if (_stepTimeElapsed > 20f && _progressiveHintIndex == 0)
+            if (_stepTimeElapsed > 8f && _progressiveHintIndex == 0)
             {
                 _progressiveHintIndex = 1;
                 TriggerProgressiveHint(1);
             }
-            else if (_stepTimeElapsed > 45f && _progressiveHintIndex == 1)
+            else if (_stepTimeElapsed > 22f && _progressiveHintIndex == 1)
             {
                 _progressiveHintIndex = 2;
                 TriggerProgressiveHint(2);
@@ -157,21 +165,21 @@ namespace Convergence.Gameplay
             switch (currentStep)
             {
                 case OnboardingStep.ConnectSensors:
-                    OnAnnouncerVoicePrompt?.Invoke("Hint: each cable is one beacon. A disconnected cable is a beacon that never arrives.");
+                    OnAnnouncerVoicePrompt?.Invoke("The glowing cables are loose. Pick one up and click it into the console.");
                     break;
 
                 case OnboardingStep.TuneSensitivity:
                     if (hintLevel == 1)
-                        OnAnnouncerVoicePrompt?.Invoke("Hint: W1 only changes the radio beacon. W2 only changes the light. Bias moves every case together.");
+                        OnAnnouncerVoicePrompt?.Invoke("A rock alone should burn. Ice alone should burn. The green drone, with neither, should dock.");
                     else
-                        OnAnnouncerVoicePrompt?.Invoke("Hint: quiet sensors should stay off. Either beacon by itself should be enough to fire.");
+                        OnAnnouncerVoicePrompt?.Invoke("If a rock gets through, its dial is too low. If the drone burns, the third dial is too high.");
                     break;
 
                 case OnboardingStep.FireTest:
                     if (hintLevel == 1)
-                        OnAnnouncerVoicePrompt?.Invoke("Hint: pull the lever. The four pings are the four rows of the sensor table.");
+                        OnAnnouncerVoicePrompt?.Invoke("SELF-TEST runs all four fliers at once. Or just watch the next one come in.");
                     else
-                        OnAnnouncerVoicePrompt?.Invoke("Hint: a red ping is a row the neuron got wrong. Read which way the sum missed, then change one dial.");
+                        OnAnnouncerVoicePrompt?.Invoke("Change one dial, then let the next flier show you the result.");
                     break;
             }
         }
@@ -182,8 +190,8 @@ namespace Convergence.Gameplay
             return step switch
             {
                 OnboardingStep.ConnectSensors   => lightIndex == 0 || lightIndex == 1,
-                OnboardingStep.TuneSensitivity  => lightIndex == 2,
-                OnboardingStep.FireTest         => lightIndex == 3,
+                OnboardingStep.TuneSensitivity  => lightIndex == 2 || lightIndex == 3 || lightIndex == 4,
+                OnboardingStep.FireTest         => lightIndex == 6,
                 OnboardingStep.Completed        => true,
                 _                               => false
             };
@@ -195,7 +203,7 @@ namespace Convergence.Gameplay
             _stepTimeElapsed = 0f;
             _progressiveHintIndex = 0;
             OnStepChanged?.Invoke(currentStep);
-            OnAnnouncerVoicePrompt?.Invoke("Warning. Asteroid impact detected. Neural navigation offline. Manual repair required to return to Earth.");
+            OnOpeningBriefing?.Invoke();
 
             yield return new WaitForSeconds(awakeningDelay);
 
@@ -217,6 +225,43 @@ namespace Convergence.Gameplay
             }
 
             TransitionToStep(OnboardingStep.ConnectSensors);
+        }
+
+        private void HandleCableChanged(int index, bool connected)
+        {
+            if (currentStep != OnboardingStep.ConnectSensors || neuralState == null) return;
+            if (neuralState.Cable1Connected && neuralState.Cable2Connected) return;
+
+            if (neuralState.Cable1Connected)
+                OnAnnouncerVoicePrompt?.Invoke("ROCK is in. The ICE cable is still loose.");
+            else if (neuralState.Cable2Connected)
+                OnAnnouncerVoicePrompt?.Invoke("ICE is in. The ROCK cable is still loose.");
+        }
+
+        static string DescribeMiss(PuzzleEvaluation eval)
+        {
+            if (eval.Diagnostics == null) return "Change one dial, then watch the next flier.";
+            for (int i = 0; i < eval.Diagnostics.Count; i++)
+            {
+                CaseDiagnostic diag = eval.Diagnostics[i];
+                if (diag == null || diag.IsCorrect) continue;
+                string name = i switch
+                {
+                    0 => "The repair drone",
+                    1 => "The icy comet",
+                    2 => "The rocky asteroid",
+                    _ => "The rock-and-ice chunk"
+                };
+                bool fired = diag.ActualOutput >= 0.5;
+                if (!fired && diag.ExpectedOutput >= 0.5)
+                {
+                    if (i == 1) return name + " got through. Turn the ICE dial up. The sum has to reach zero.";
+                    if (i == 2) return name + " got through. Turn the ROCK dial up. The sum has to reach zero.";
+                    return name + " got through. Either sensor dial can lift it. The sum has to reach zero.";
+                }
+                return name + " burned. It has neither rock nor ice. Lower the third dial so an empty pair stays dark.";
+            }
+            return "Change one dial, then watch the next flier.";
         }
 
         private void HandleNeuralStateMutated()
@@ -242,7 +287,10 @@ namespace Convergence.Gameplay
         {
             if (eval != null && eval.Passed)
             {
-                TransitionToStep(OnboardingStep.Completed);
+                if (currentStep != OnboardingStep.Completed)
+                {
+                    TransitionToStep(OnboardingStep.Completed);
+                }
             }
             else if (currentStep == OnboardingStep.FireTest && eval != null && !eval.Passed)
             {
@@ -257,12 +305,12 @@ namespace Convergence.Gameplay
         /// </summary>
         private string BuildRetryAdvice(PuzzleEvaluation eval)
         {
-            if (eval == null) return "Navigation failed. Try recalculating.";
+            if (eval == null) return "Change one dial, then watch the next flier.";
 
             if (!eval.ActivationMatches)
-                return "The navigation computer requires a Sigmoid crystal for coordinate mapping. Check the socket.";
+                return "The crystal in the socket should be Step. The dials can be right and the laser still wrong.";
 
-            return $"Navigation error: {eval.PassedCases}/{eval.TotalCases} coordinates matched. Adjust the weights and try again.";
+            return DescribeMiss(eval);
         }
 
         public void TransitionToStep(OnboardingStep newStep)
@@ -275,19 +323,19 @@ namespace Convergence.Gameplay
             switch (newStep)
             {
                 case OnboardingStep.ConnectSensors:
-                    OnAnnouncerVoicePrompt?.Invoke("Navigation sensors offline. Plug the power cables into the main console to reboot the matrix.");
+                    OnAnnouncerVoicePrompt?.Invoke("Grab the glowing ROCK cable and click it in. Then the ICE cable.");
                     break;
 
                 case OnboardingStep.TuneSensitivity:
-                    OnAnnouncerVoicePrompt?.Invoke("Power restored! Now adjust the neural matrix weights. We need to lock onto Earth's location.");
+                    OnAnnouncerVoicePrompt?.Invoke("Sensors are live. Watch the lamps on the next flier, then turn one dial.");
                     break;
 
                 case OnboardingStep.FireTest:
-                    OnAnnouncerVoicePrompt?.Invoke("Trajectory looks stable. Pull the lever to run the navigation diagnostic.");
+                    OnAnnouncerVoicePrompt?.Invoke("ROCK or ICE should light FIRE. The drone should stay dark and dock.");
                     break;
 
                 case OnboardingStep.Completed:
-                    OnAnnouncerVoicePrompt?.Invoke("Sensor array is awake. Walk through the aft door. The ship cannot jump yet.");
+                    OnAnnouncerVoicePrompt?.Invoke("It has the rule. Watch the swarm. The door opens at the end.");
                     break;
             }
         }

@@ -28,24 +28,21 @@ namespace Convergence.Presentation
         [SerializeField] private Vector3 perimeterPosition = new Vector3(0, 1.2f, 2.5f);
 
         [Header("Tactical Colors")]
-        [SerializeField] private Color voidNoiseColor = new Color(0.40f, 0.50f, 0.65f, 1.0f);       // Deep Space Cosmic Void (Slate Blue)
-        [SerializeField] private Color atmosphereColor = new Color(0.20f, 0.75f, 1.0f, 1.0f);      // Earth Atmosphere (Cyan Sky)
-        [SerializeField] private Color landmassColor = new Color(0.15f, 0.90f, 0.45f, 1.0f);        // Continental Landmass (Verdant Green)
-        [SerializeField] private Color confirmedEarthColor = new Color(0.25f, 0.85f, 1.0f, 1.0f);  // Confirmed Earth Orbit (Orbital Aqua)
-        [SerializeField] private Color harmonizedEmerald = new Color(0.05f, 1.0f, 0.45f, 1.0f);
         [SerializeField] private Color errorRed = new Color(1.0f, 0.15f, 0.15f, 1.0f);
 
         private float _impactTimer;
-        private Camera _mainCam;
         private Vector3 _currentBasePos;
         private bool _isExploding = false;
+        private TextMesh _callout;
+        private Camera _billboardCamera;
+
+        static readonly string[] Callouts = { "DRONE", "ICE", "ROCK", "BOTH" };
 
         public DataTargetReceptor Receptor => receptor;
 
         private void Awake()
         {
             if (receptor == null) receptor = GetComponent<DataTargetReceptor>();
-            _mainCam = Camera.main;
 
             if (floatingTargetBody != null)
             {
@@ -63,6 +60,7 @@ namespace Convergence.Presentation
                 receptor.OnVaporized += HandleVaporized;
                 receptor.OnBreached += HandleBreached;
                 receptor.OnDocked += HandleDocked;
+                receptor.OnFlightChanged += HandleFlightChanged;
             }
         }
 
@@ -76,14 +74,17 @@ namespace Convergence.Presentation
                 receptor.OnVaporized -= HandleVaporized;
                 receptor.OnBreached -= HandleBreached;
                 receptor.OnDocked -= HandleDocked;
+                receptor.OnFlightChanged -= HandleFlightChanged;
             }
         }
 
         private void Start()
         {
+            EnsureCallout();
             SetupTargetTheme();
             UpdateVisualState();
             UpdateApproachPosition();
+            ApplyBodyVisibility();
         }
 
         private void Update()
@@ -92,8 +93,8 @@ namespace Convergence.Presentation
             if (floatingTargetBody != null && !_isExploding)
             {
                 int idx = receptor != null ? receptor.CaseIndex : 0;
-                float bobFreq = (idx == 0) ? 2.0f : (idx == 3 ? 4.5f : 3.0f);
-                float bobAmp = (idx == 0) ? 0.04f : 0.025f;
+                float bobFreq = (idx == 0) ? 1.6f : (idx == 3 ? 2.4f : 1.8f);
+                float bobAmp = (idx == 0) ? 0.08f : 0.16f;
 
                 float bob = Mathf.Sin(Time.time * bobFreq + (idx * 1.5f)) * bobAmp;
                 floatingTargetBody.localPosition = _currentBasePos + new Vector3(0, bob, 0);
@@ -102,15 +103,63 @@ namespace Convergence.Presentation
                 floatingTargetBody.Rotate(Vector3.up, rotSpeed * Time.deltaTime, Space.Self);
             }
 
+            if (_callout != null && _callout.gameObject.activeSelf)
+            {
+                if (_billboardCamera == null) _billboardCamera = Camera.main;
+                if (_billboardCamera != null)
+                {
+                    Vector3 toHead = _billboardCamera.transform.position - _callout.transform.position;
+                    if (toHead.sqrMagnitude > 0.01f)
+                    {
+                        _callout.transform.rotation = Quaternion.LookRotation(toHead, Vector3.up);
+                    }
+                }
+            }
+
             if (_impactTimer > 0f)
             {
                 _impactTimer -= Time.deltaTime;
                 if (_impactTimer <= 0f)
                 {
                     _isExploding = false;
-                    if (floatingTargetBody != null) floatingTargetBody.gameObject.SetActive(true);
+                    ApplyBodyVisibility();
                 }
             }
+        }
+
+        private void HandleFlightChanged(DataTargetReceptor r)
+        {
+            if (r != null && r.IsInFlight)
+            {
+                _isExploding = false;
+                _impactTimer = 0f;
+            }
+            ApplyBodyVisibility();
+        }
+
+        private void ApplyBodyVisibility()
+        {
+            bool show = receptor != null && receptor.IsInFlight && !receptor.IsVaporized && !_isExploding;
+            if (floatingTargetBody != null) floatingTargetBody.gameObject.SetActive(show);
+            if (auraLight != null) auraLight.enabled = show;
+            if (_callout != null) _callout.gameObject.SetActive(show);
+        }
+
+        private void EnsureCallout()
+        {
+            if (_callout != null || receptor == null) return;
+            var go = new GameObject("Callout");
+            go.transform.SetParent(transform, false);
+            go.transform.localPosition = new Vector3(0f, 1.35f, 0f);
+            _callout = go.AddComponent<TextMesh>();
+            int idx = receptor.CaseIndex;
+            _callout.text = idx >= 0 && idx < Callouts.Length ? Callouts[idx] : "FLIER";
+            _callout.characterSize = 0.55f;
+            _callout.fontSize = 0;
+            _callout.anchor = TextAnchor.MiddleCenter;
+            _callout.alignment = TextAlignment.Center;
+            _callout.fontStyle = FontStyle.Bold;
+            _callout.color = GetBaseTargetColor();
         }
 
         public void SetCorridorWaypoints(Vector3 spawn, Vector3 perimeter)
@@ -145,11 +194,7 @@ namespace Convergence.Presentation
                 impactParticles.Play();
             }
 
-            if (floatingTargetBody != null)
-            {
-                floatingTargetBody.gameObject.SetActive(false);
-            }
-
+            ApplyBodyVisibility();
             UpdateVisualState();
         }
 
@@ -195,11 +240,11 @@ namespace Convergence.Presentation
             int idx = receptor != null ? receptor.CaseIndex : 0;
             return idx switch
             {
-                0 => voidNoiseColor,
-                1 => atmosphereColor,
-                2 => landmassColor,
-                3 => confirmedEarthColor,
-                _ => voidNoiseColor
+                0 => new Color(0.55f, 0.95f, 0.72f),
+                1 => new Color(0.45f, 0.86f, 1f),
+                2 => new Color(0.95f, 0.46f, 0.16f),
+                3 => new Color(0.78f, 0.82f, 1f),
+                _ => Color.white
             };
         }
 
@@ -226,23 +271,19 @@ namespace Convergence.Presentation
             Color activeColor = baseColor;
             float lightIntensity = 1.8f;
 
-            if (receptor.LastDiagnostic != null)
+            if (receptor.LastDiagnostic != null && !receptor.IsHarmonized)
             {
-                if (receptor.IsHarmonized)
-                {
-                    activeColor = harmonizedEmerald;
-                    lightIntensity = 3.5f;
-                }
-                else
-                {
-                    activeColor = errorRed;
-                    lightIntensity = 2.8f;
-                }
+                activeColor = Color.Lerp(baseColor, errorRed, 0.35f);
+                lightIntensity = 2.4f;
+            }
+            else if (receptor.IsHarmonized)
+            {
+                lightIntensity = 3.2f;
             }
 
             if (_impactTimer > 0f)
             {
-                activeColor = Color.white;
+                activeColor = Color.Lerp(baseColor, Color.white, 0.7f);
                 lightIntensity *= 2.2f;
             }
 
@@ -273,81 +314,5 @@ namespace Convergence.Presentation
             }
         }
 
-        private void OnGUI()
-        {
-            if (receptor == null || _isExploding) return;
-            if (_mainCam == null) _mainCam = Camera.main;
-            if (_mainCam == null) return;
-
-            Vector3 worldPos = transform.position + Vector3.up * 1.3f;
-            Vector3 screenPos = _mainCam.WorldToScreenPoint(worldPos);
-
-            if (screenPos.z <= 0.5f || screenPos.z > 25.0f) return;
-
-            float scale = Mathf.Clamp(1.0f - (screenPos.z / 32.0f), 0.65f, 1.0f);
-            float w = 260f * scale;
-            float h = 68f * scale;
-            float x = screenPos.x - (w * 0.5f);
-            float y = Screen.height - screenPos.y - (h * 0.5f);
-
-            Color statusCol = receptor.IsHarmonized
-                ? harmonizedEmerald
-                : (receptor.LastDiagnostic == null ? GetBaseTargetColor() : errorRed);
-
-            GUIStyle cardStyle = new GUIStyle(GUI.skin.box)
-            {
-                fontSize = Mathf.RoundToInt(11 * scale),
-                fontStyle = FontStyle.Bold,
-                alignment = TextAnchor.MiddleCenter
-            };
-
-            GUI.color = statusCol;
-            GUI.Box(new Rect(x, y, w, h), "", cardStyle);
-            GUI.color = Color.white;
-
-            GUIStyle titleStyle = new GUIStyle(GUI.skin.label)
-            {
-                fontSize = Mathf.RoundToInt(10 * scale),
-                fontStyle = FontStyle.Bold,
-                alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = Color.white }
-            };
-
-            GUI.Label(new Rect(x, y + 2, w, 18 * scale), $"TARGET {receptor.CaseIndex + 1}: {receptor.TargetTitle.ToUpper()}", titleStyle);
-
-            GUIStyle roleStyle = new GUIStyle(titleStyle)
-            {
-                fontSize = Mathf.RoundToInt(9 * scale),
-                normal = { textColor = statusCol }
-            };
-
-            string statusText = receptor.IsHarmonized
-                ? "[SECURED / PASS]"
-                : (receptor.LastDiagnostic == null ? $"APPROACHING [{(1f - receptor.ApproachProgress) * 100f:F0}m]" : "[BREACH / ERROR]");
-
-            string telemetryStr = $"Inputs: (X1={receptor.InputX1:F0}, X2={receptor.InputX2:F0})  |  {statusText}";
-            GUI.Label(new Rect(x, y + (20 * scale), w, 16 * scale), telemetryStr, roleStyle);
-
-            GUIStyle subStyle = new GUIStyle(titleStyle)
-            {
-                fontSize = Mathf.RoundToInt(8.5f * scale),
-                fontStyle = FontStyle.Normal,
-                normal = { textColor = new Color(0.85f, 0.9f, 1f, 0.9f) }
-            };
-
-            string ruleStr = $"Required Action: {receptor.ThreatRole}";
-            GUI.Label(new Rect(x, y + (38 * scale), w, 16 * scale), ruleStr, subStyle);
-
-            if (receptor.LastDiagnostic != null && !receptor.IsHarmonized)
-            {
-                string outcomeText = (receptor.LastActualOutput >= 0.5) ? "FIRED PLASMA" : "HOLD / MISSED";
-                string errStr = $"Sentry Decision: {outcomeText} (y={receptor.LastActualOutput:F0}) -> MISMATCH!";
-                GUIStyle alertStyle = new GUIStyle(subStyle)
-                {
-                    normal = { textColor = errorRed }
-                };
-                GUI.Label(new Rect(x, y + (52 * scale), w, 16 * scale), errStr, alertStyle);
-            }
-        }
     }
 }

@@ -1,0 +1,5 @@
+Source: neural recording 4.m4a
+Plays: both sensor cables connected
+Speech: 0.00-9.70 s
+
+Our sensors are back online. Now you have to teach it when to fire. Rock or ice, shoot it. Our drone, you must leave it alone.

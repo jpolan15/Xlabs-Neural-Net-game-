@@ -17,6 +17,7 @@ Canonical decisions live in `Documentation/Architecture/ADRs/`.
 | ADR-007 | XRI Starter Assets rig replaces the custom pointer rig | Accepted | [`ADR-007-xri-starter-rig.md`](../Documentation/Architecture/ADRs/ADR-007-xri-starter-rig.md) |
 | ADR-008 | Lost-in-space premise; sentry, gun, and Synapse-GPT leave the live game | Accepted | [`ADR-008-premise-lost-in-space.md`](../Documentation/Architecture/ADRs/ADR-008-premise-lost-in-space.md) |
 | ADR-009 | MCP for Unity added as Editor-only development tooling | Accepted | [`ADR-009-unity-mcp-tooling.md`](../Documentation/Architecture/ADRs/ADR-009-unity-mcp-tooling.md) |
+| ADR-010 | Chamber 01 neuron drives an automatic point-defense laser; OR table and Core unchanged | Accepted | [`ADR-010-automated-point-defense.md`](../Documentation/Architecture/ADRs/ADR-010-automated-point-defense.md) |
 
 ---
 

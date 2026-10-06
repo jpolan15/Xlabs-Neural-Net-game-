@@ -48,6 +48,9 @@ namespace Convergence.Presentation
 
         [Header("Volume")]
         [Range(0f, 1f)] [SerializeField] private float masterVolume = 0.8f;
+        [SerializeField] private bool playEvaluationSounds = true;
+        [SerializeField] private AudioClip shipBedClip;
+        [SerializeField] private AudioSource shipBedSource;
 
         private AudioSource _audioSource;
 
@@ -120,9 +123,21 @@ namespace Convergence.Presentation
             PlayOr(pulseClip, SynthTone(660f, 0.12f));
         }
 
+        private void Start()
+        {
+            if (shipBedSource != null && shipBedClip != null && !shipBedSource.isPlaying)
+            {
+                shipBedSource.spatialBlend = 0f;
+                shipBedSource.loop = true;
+                shipBedSource.clip = shipBedClip;
+                shipBedSource.volume = 0.18f;
+                shipBedSource.Play();
+            }
+        }
+
         private void HandleEvaluationComplete(PuzzleEvaluation eval)
         {
-            if (eval == null) return;
+            if (!playEvaluationSounds || eval == null) return;
             if (eval.Passed)
                 PlayOr(successClip, SynthChord(new[]{ 523.25f, 659.25f, 783.99f }, 0.45f));
             else

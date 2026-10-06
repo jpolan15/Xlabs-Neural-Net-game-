@@ -15,17 +15,21 @@ namespace Convergence.Presentation
         [SerializeField] private ChamberOnboardingController onboarding;
         [SerializeField] private FailureHintDirector hints;
         [SerializeField] private VoyageDirector voyage;
-        [SerializeField] private AudioSource voice;
-        [SerializeField] private AudioClip lineClip;
+        [SerializeField] private OpeningTeleprompter teleprompter;
+        [SerializeField] private VoiceLinePlayer voicePlayer;
         [SerializeField] private float holdSeconds = 6f;
 
         private Coroutine _clear;
+        private string _pending;
 
         private void Awake()
         {
+            transform.rotation = Quaternion.LookRotation(Vector3.forward, Vector3.up);
             if (onboarding == null) onboarding = FindAnyObjectByType<ChamberOnboardingController>();
             if (hints == null) hints = FindAnyObjectByType<FailureHintDirector>();
             if (voyage == null) voyage = FindAnyObjectByType<VoyageDirector>();
+            if (teleprompter == null) teleprompter = FindAnyObjectByType<OpeningTeleprompter>();
+            if (voicePlayer == null) voicePlayer = FindAnyObjectByType<VoiceLinePlayer>();
         }
 
         private void OnEnable()
@@ -42,12 +46,36 @@ namespace Convergence.Presentation
             if (voyage != null) voyage.OnAuraLine -= Show;
         }
 
-        /// <summary>Shows one line and plays the interface clip when one is assigned.</summary>
+        void Update()
+        {
+            if (_pending == null || Busy()) return;
+            string line = _pending;
+            _pending = null;
+            ShowNow(line);
+        }
+
+        bool Busy()
+        {
+            if (teleprompter != null && teleprompter.IsPlaying) return true;
+            if (voicePlayer != null && voicePlayer.IsBusy) return true;
+            return false;
+        }
+
+        /// <summary>Shows one line. Holds it while the opening recording or a voice line owns the banner.</summary>
         public void Show(string line)
+        {
+            if (Busy())
+            {
+                _pending = line ?? string.Empty;
+                return;
+            }
+            ShowNow(line);
+        }
+
+        void ShowNow(string line)
         {
             if (subtitle != null) subtitle.text = line ?? string.Empty;
             if (legacyLine != null) legacyLine.text = line ?? string.Empty;
-            if (voice != null && lineClip != null) voice.PlayOneShot(lineClip);
             if (_clear != null) StopCoroutine(_clear);
             if (isActiveAndEnabled) _clear = StartCoroutine(ClearAfter());
         }

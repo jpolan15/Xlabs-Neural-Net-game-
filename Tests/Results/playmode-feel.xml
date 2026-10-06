@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="10" result="Passed" total="10" passed="10" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-10-04 02:35:37Z" end-time="2026-10-04 02:35:37Z" duration="0.1912848">
+  <test-suite type="TestSuite" id="1027" name="My project (2)" fullname="My project (2)" runstate="Runnable" testcasecount="13" result="Passed" start-time="2026-10-04 02:35:37Z" end-time="2026-10-04 02:35:37Z" duration="0.191285" total="10" passed="10" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <test-suite type="Assembly" id="1018" name="Convergence.Tests.PlayMode.dll" fullname="C:/Users/Panda/Downloads/neural game/Library/ScriptAssemblies/Convergence.Tests.PlayMode.dll" runstate="Runnable" testcasecount="13" result="Passed" start-time="2026-10-04 02:35:37Z" end-time="2026-10-04 02:35:37Z" duration="0.176883" total="10" passed="10" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="3640" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <test-suite type="TestSuite" id="1019" name="Convergence" fullname="Convergence" runstate="Runnable" testcasecount="13" result="Passed" start-time="2026-10-04 02:35:37Z" end-time="2026-10-04 02:35:37Z" duration="0.174997" total="10" passed="10" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1020" name="Tests" fullname="Convergence.Tests" runstate="Runnable" testcasecount="13" result="Passed" start-time="2026-10-04 02:35:37Z" end-time="2026-10-04 02:35:37Z" duration="0.174092" total="10" passed="10" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1021" name="PlayMode" fullname="Convergence.Tests.PlayMode" runstate="Runnable" testcasecount="13" result="Passed" start-time="2026-10-04 02:35:37Z" end-time="2026-10-04 02:35:37Z" duration="0.173340" total="10" passed="10" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestSuite" id="1023" name="Gameplay" fullname="Convergence.Tests.PlayMode.Gameplay" runstate="Runnable" testcasecount="10" result="Passed" start-time="2026-10-04 02:35:37Z" end-time="2026-10-04 02:35:37Z" duration="0.172395" total="10" passed="10" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-suite type="TestFixture" id="1006" name="AsteroidDefenseTests" fullname="Convergence.Tests.PlayMode.Gameplay.AsteroidDefenseTests" classname="Convergence.Tests.PlayMode.Gameplay.AsteroidDefenseTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-10-04 02:35:37Z" end-time="2026-10-04 02:35:37Z" duration="0.154628" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="1007" name="BrokenNetwork_ThreatsBreach_AndHullDrops" fullname="Convergence.Tests.PlayMode.Gameplay.AsteroidDefenseTests.BrokenNetwork_ThreatsBreach_AndHullDrops" methodname="BrokenNetwork_ThreatsBreach_AndHullDrops" classname="Convergence.Tests.PlayMode.Gameplay.AsteroidDefenseTests" runstate="Runnable" seed="1694620516" result="Passed" start-time="2026-10-04 02:35:37Z" end-time="2026-10-04 02:35:37Z" duration="0.081706" asserts="0">
+                  <properties>
+                    <property name="_JOINTYPE" value="UnityCombinatorial" />
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1008" name="CorrectNetwork_RocksVaporize_DroneDocks_SolvesOnce" fullname="Convergence.Tests.PlayMode.Gameplay.AsteroidDefenseTests.CorrectNetwork_RocksVaporize_DroneDocks_SolvesOnce" methodname="CorrectNetwork_RocksVaporize_DroneDocks_SolvesOnce" classname="Convergence.Tests.PlayMode.Gameplay.AsteroidDefenseTests" runstate="Runnable" seed="646111647" result="Passed" start-time="2026-10-04 02:35:37Z" end-time="2026-10-04 02:35:37Z" duration="0.013348" asserts="0">
+                  <properties>
+                    <property name="_JOINTYPE" value="UnityCombinatorial" />
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1012" name="Gateway_StaysShut_UntilVictory_WhenDeferred" fullname="Convergence.Tests.PlayMode.Gameplay.AsteroidDefenseTests.Gateway_StaysShut_UntilVictory_WhenDeferred" methodname="Gateway_StaysShut_UntilVictory_WhenDeferred" classname="Convergence.Tests.PlayMode.Gameplay.AsteroidDefenseTests" runstate="Runnable" seed="1583054818" result="Passed" start-time="2026-10-04 02:35:37Z" end-time="2026-10-04 02:35:37Z" duration="0.003876" asserts="0">
+                  <properties>
+                    <property name="_JOINTYPE" value="UnityCombinatorial" />
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1009" name="HullZero_Reroutes_AndKeepsSettings" fullname="Convergence.Tests.PlayMode.Gameplay.AsteroidDefenseTests.HullZero_Reroutes_AndKeepsSettings" methodname="HullZero_Reroutes_AndKeepsSettings" classname="Convergence.Tests.PlayMode.Gameplay.AsteroidDefenseTests" runstate="Runnable" seed="1091612537" result="Passed" start-time="2026-10-04 02:35:37Z" end-time="2026-10-04 02:35:37Z" duration="0.014890" asserts="0">
+                  <properties>
+                    <property name="_JOINTYPE" value="UnityCombinatorial" />
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1010" name="ThreeOfFour_NeverSolves" fullname="Convergence.Tests.PlayMode.Gameplay.AsteroidDefenseTests.ThreeOfFour_NeverSolves" methodname="ThreeOfFour_NeverSolves" classname="Convergence.Tests.PlayMode.Gameplay.AsteroidDefenseTests" runstate="Runnable" seed="207206652" result="Passed" start-time="2026-10-04 02:35:37Z" end-time="2026-10-04 02:35:37Z" duration="0.003071" asserts="0">
+                  <properties>
+                    <property name="_JOINTYPE" value="UnityCombinatorial" />
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1011" name="VictoryWaves_StayOnOr_AfterXorSwap" fullname="Convergence.Tests.PlayMode.Gameplay.AsteroidDefenseTests.VictoryWaves_StayOnOr_AfterXorSwap" methodname="VictoryWaves_StayOnOr_AfterXorSwap" classname="Convergence.Tests.PlayMode.Gameplay.AsteroidDefenseTests" runstate="Runnable" seed="1879092932" result="Passed" start-time="2026-10-04 02:35:37Z" end-time="2026-10-04 02:35:37Z" duration="0.006268" asserts="0">
+                  <properties>
+                    <property name="_JOINTYPE" value="UnityCombinatorial" />
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+              </test-suite>
+              <test-suite type="TestFixture" id="1013" name="Level01IntegrationTests" fullname="Convergence.Tests.PlayMode.Gameplay.Level01IntegrationTests" classname="Convergence.Tests.PlayMode.Gameplay.Level01IntegrationTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-10-04 02:35:37Z" end-time="2026-10-04 02:35:37Z" duration="0.015225" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="1016" name="Level01_DisconnectedConduit_PreventsCompletion" fullname="Convergence.Tests.PlayMode.Gameplay.Level01IntegrationTests.Level01_DisconnectedConduit_PreventsCompletion" methodname="Level01_DisconnectedConduit_PreventsCompletion" classname="Convergence.Tests.PlayMode.Gameplay.Level01IntegrationTests" runstate="Runnable" seed="884079047" result="Passed" start-time="2026-10-04 02:35:37Z" end-time="2026-10-04 02:35:37Z" duration="0.004702" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1014" name="Level01_FullPlayableLoop_VerifiesCanonicalSequence" fullname="Convergence.Tests.PlayMode.Gameplay.Level01IntegrationTests.Level01_FullPlayableLoop_VerifiesCanonicalSequence" methodname="Level01_FullPlayableLoop_VerifiesCanonicalSequence" classname="Convergence.Tests.PlayMode.Gameplay.Level01IntegrationTests" runstate="Runnable" seed="1010275876" result="Passed" start-time="2026-10-04 02:35:37Z" end-time="2026-10-04 02:35:37Z" duration="0.005654" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[Sensor array passed. The ship is not clear to jump.
+]]></output>
+                </test-case>
+                <test-case id="1015" name="Level01_ThreeOfFourCorrect_DoesNotOpenGateway" fullname="Convergence.Tests.PlayMode.Gameplay.Level01IntegrationTests.Level01_ThreeOfFourCorrect_DoesNotOpenGateway" methodname="Level01_ThreeOfFourCorrect_DoesNotOpenGateway" classname="Convergence.Tests.PlayMode.Gameplay.Level01IntegrationTests" runstate="Runnable" seed="1991350308" result="Passed" start-time="2026-10-04 02:35:37Z" end-time="2026-10-04 02:35:37Z" duration="0.001444" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1017" name="SetUnifiedWeight_DoesNotChangeBias" fullname="Convergence.Tests.PlayMode.Gameplay.Level01IntegrationTests.SetUnifiedWeight_DoesNotChangeBias" methodname="SetUnifiedWeight_DoesNotChangeBias" classname="Convergence.Tests.PlayMode.Gameplay.Level01IntegrationTests" runstate="Runnable" seed="1926031351" result="Passed" start-time="2026-10-04 02:35:37Z" end-time="2026-10-04 02:35:37Z" duration="0.000821" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[<b><color=#2EA3FF>MCP-FOR-UNITY</color></b>: [TestRunnerNoThrottle] Restored Interaction Mode after test run.
+Saving results to: C:/Users/Panda/AppData/LocalLow/DefaultCompany/My project (2)\TestResults.xml
+]]></output>
+                </test-case>
+              </test-suite>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

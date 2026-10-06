@@ -36,6 +36,14 @@ namespace Convergence.Gameplay
         [Tooltip("Sandbox mode: disables timer countdown, shield damage, and wave perimeter penalties. Default ON for Level 1.")]
         [SerializeField] private bool enableSandboxMode = true;
 
+        [Tooltip("When true, AsteroidDefenseDirector owns waves and scans. The built-in wave loop stays off.")]
+        [SerializeField] private bool externalWaveDirector = false;
+
+        [Tooltip("At 0 hull, restore a fraction and keep the player's settings instead of purging the chamber.")]
+        [SerializeField] private bool enableSoftReroute = false;
+
+        [SerializeField] private float rerouteRestoreFraction = 0.6f;
+
         private PuzzleDefinition _puzzle;
         private bool _hasSolved;
         private float _waveTimer;
@@ -66,6 +74,7 @@ namespace Convergence.Gameplay
         public event Action<float, float> OnTimerUpdated;
         public event Action<float, float> OnShieldUpdated;
         public event Action<float> OnShieldDamaged; // Damage amount (for screen shake / alarm)
+        public event Action OnHullRerouted;
         public event Action<int, string> OnPerimeterBreached;
         public event Action<int, string> OnFriendlyCasualty;
         public event Action OnEmergencyPurge;
@@ -96,6 +105,7 @@ namespace Convergence.Gameplay
 
         private void Update()
         {
+            if (externalWaveDirector) return;
             if (_hasSolved || _isPurged || Phase == ChamberPhase.Arrival) return;
 
             // 1. Tick Purge Countdown Timer
@@ -135,6 +145,21 @@ namespace Convergence.Gameplay
             {
                 _waveTimer = 0f; // Just loop the wave visually, no penalty
             }
+        }
+
+        public void SetExternalWaveDirector(bool enabled)
+        {
+            externalWaveDirector = enabled;
+        }
+
+        public void ReportFriendlyCasualty(int index, string message)
+        {
+            OnFriendlyCasualty?.Invoke(index, message);
+        }
+
+        public void ReportPerimeterBreach(int index, string message)
+        {
+            OnPerimeterBreached?.Invoke(index, message);
         }
 
         public void SetPhase(ChamberPhase newPhase)
@@ -198,7 +223,10 @@ namespace Convergence.Gameplay
             LastEvaluation = evaluation;
 
             DispatchDiagnosticsToReceptors(evaluation);
-            EvaluateTacticalOutcomes(evaluation);
+            if (!externalWaveDirector)
+            {
+                EvaluateTacticalOutcomes(evaluation);
+            }
 
             performanceTracker?.RecordEvaluation(evaluation);
             OnEvaluationComplete?.Invoke(evaluation);
@@ -252,6 +280,32 @@ namespace Convergence.Gameplay
                 OnPuzzleSolved?.Invoke();
             }
 
+            return diag;
+        }
+
+        /// <summary>
+        /// Evaluates one case of a captured puzzle for the victory swarm.
+        /// Does not change solve state, the live puzzle, the phase, or last evaluation.
+        /// </summary>
+        public CaseDiagnostic ReplaySingleCase(int caseIndex, PuzzleDefinition puzzle)
+        {
+            if (puzzle == null) return null;
+
+            NetworkModel evalModel = GetEffectiveNetwork();
+            if (evalModel == null) return null;
+
+            PuzzleEvaluation evaluation = PuzzleEvaluator.Evaluate(evalModel, puzzle);
+            if (evaluation == null || evaluation.Diagnostics == null) return null;
+            if (caseIndex < 0 || caseIndex >= evaluation.Diagnostics.Count) return null;
+
+            CaseDiagnostic diag = evaluation.Diagnostics[caseIndex];
+            if (caseIndex < targetReceptors.Count && targetReceptors[caseIndex] != null)
+            {
+                targetReceptors[caseIndex].ApplyDiagnostic(diag, evaluation.ActivationMatches);
+                targetReceptors[caseIndex].NotifyPulseHit();
+            }
+
+            OnSingleCaseEvaluated?.Invoke(caseIndex, diag, evaluation.ActivationMatches);
             return diag;
         }
 
@@ -339,7 +393,17 @@ namespace Convergence.Gameplay
 
             if (shieldIntegrity <= 0f)
             {
-                TriggerEmergencyPurge("CRITICAL FAILURE: CONTAINMENT SHIELD COLLAPSED");
+                if (enableSoftReroute)
+                {
+                    float restored = maxShieldIntegrity * Mathf.Clamp01(rerouteRestoreFraction);
+                    shieldIntegrity = restored;
+                    OnShieldUpdated?.Invoke(shieldIntegrity, maxShieldIntegrity);
+                    OnHullRerouted?.Invoke();
+                }
+                else
+                {
+                    TriggerEmergencyPurge("CRITICAL FAILURE: CONTAINMENT SHIELD COLLAPSED");
+                }
             }
         }
 

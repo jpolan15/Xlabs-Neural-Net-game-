@@ -1,0 +1,5 @@
+Source: neural recording 7.m4a, cut 0.00-2.30 s
+Plays: random later hull hit (6 s cooldown, dropped if another line is playing)
+Speech: 0.00-1.88 s
+
+Our hull has taken damage.

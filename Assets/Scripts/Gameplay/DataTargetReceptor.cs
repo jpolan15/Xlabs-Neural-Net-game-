@@ -32,6 +32,7 @@ namespace Convergence.Gameplay
         [SerializeField] private bool isBreached = false;
         [SerializeField] private bool isVaporized = false;
         [SerializeField] private bool isDocked = false;
+        [SerializeField] private bool isInFlight = true;
 
         public int CaseIndex => caseIndex;
         public string CaseLabel => caseLabel;
@@ -49,22 +50,23 @@ namespace Convergence.Gameplay
         public bool IsBreached => isBreached;
         public bool IsVaporized => isVaporized;
         public bool IsDocked => isDocked;
+        public bool IsInFlight => isInFlight;
 
         public static string GetDefaultTargetTitle(int idx) => idx switch
         {
-            0 => "Friendly Maintenance Drone",
-            1 => "Biohazard Toxin Canister",
-            2 => "Rogue Radiation Drone",
-            3 => "Overloaded Dual-Breach Core",
+            0 => "Repair Drone",
+            1 => "Icy Comet",
+            2 => "Rocky Asteroid",
+            3 => "Rock-and-Ice Chunk",
             _ => $"Target Pod {idx + 1}"
         };
 
         public static string GetDefaultThreatRole(int idx) => idx switch
         {
-            0 => "SAFE ALLY [TARGET Y=0]",
-            1 => "LETHAL HAZARD [INTERCEPT Y=1]",
-            2 => "LETHAL HAZARD [INTERCEPT Y=1]",
-            3 => "CRITICAL BREACH [INTERCEPT Y=1]",
+            0 => "LET IT DOCK",
+            1 => "FIRE",
+            2 => "FIRE",
+            3 => "FIRE",
             _ => "UNCLASSIFIED"
         };
 
@@ -74,6 +76,7 @@ namespace Convergence.Gameplay
         public event Action<DataTargetReceptor> OnBreached;
         public event Action<DataTargetReceptor> OnVaporized;
         public event Action<DataTargetReceptor> OnDocked;
+        public event Action<DataTargetReceptor> OnFlightChanged;
 
         public void Initialize(int index, string label, double x1, double x2, double expected)
         {
@@ -136,6 +139,23 @@ namespace Convergence.Gameplay
         {
             isBreached = true;
             OnBreached?.Invoke(this);
+        }
+
+        public void Launch()
+        {
+            isInFlight = true;
+            isVaporized = false;
+            isBreached = false;
+            isDocked = false;
+            approachProgress = 0f;
+            OnFlightChanged?.Invoke(this);
+            OnApproachUpdated?.Invoke(this);
+        }
+
+        public void Retire()
+        {
+            isInFlight = false;
+            OnFlightChanged?.Invoke(this);
         }
 
         public void ResetReceptor()

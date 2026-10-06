@@ -1,0 +1,5 @@
+Source: neural recording 8.m4a
+Plays: hull integrity drops below 50%
+Speech: 0.00-3.62 s
+
+Our hull is at 50%. You must hurry.

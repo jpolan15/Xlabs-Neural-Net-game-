@@ -22,6 +22,7 @@
 # IDE / Editor cache & generated files
 .vs/
 .vsconfig
+.vscode/
 .gradle/
 ExportedObj/
 .consulo/

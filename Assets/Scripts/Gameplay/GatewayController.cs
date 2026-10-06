@@ -11,6 +11,7 @@ namespace Convergence.Gameplay
     public class GatewayController : MonoBehaviour
     {
         [SerializeField] private ChamberController chamberController;
+        [SerializeField] private bool deferOpenToDirector = false;
 
         public bool IsOpen { get; private set; }
 
@@ -48,6 +49,7 @@ namespace Convergence.Gameplay
         /// </summary>
         private void HandlePuzzleSolved()
         {
+            if (deferOpenToDirector) return;
             Open();
         }
 

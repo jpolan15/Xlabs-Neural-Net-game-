@@ -1,0 +1,5 @@
+Source: neural recording 11.m4a, leading 0.45 s trimmed
+Plays: OnPuzzleSolved; interrupts other lines
+Speech: 0.21-3.57 s
+
+It's working, the ship has begun to defend itself.

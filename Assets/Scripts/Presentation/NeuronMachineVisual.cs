@@ -30,6 +30,13 @@ namespace Convergence.Presentation
         [SerializeField] private Color awakenedColor = new Color(0.10f, 0.90f, 0.50f);       // Mint Emerald
         [SerializeField] private Color disconnectedColor = new Color(0.95f, 0.60f, 0.10f);  // Warm Amber
 
+        private bool _axonsDark;
+
+        public void SetAxonsDark(bool dark)
+        {
+            _axonsDark = dark;
+        }
+
         private void Awake()
         {
             if (neuralState == null) neuralState = FindAnyObjectByType<NeuralState>();
@@ -76,7 +83,7 @@ namespace Convergence.Presentation
 
             if (cable1Renderer != null)
             {
-                Color c1 = neuralState.Cable1Connected ? activeColor : disconnectedColor;
+                Color c1 = _axonsDark ? Color.black : (neuralState.Cable1Connected ? activeColor : disconnectedColor);
                 cable1Renderer.GetPropertyBlock(_cablePropBlock);
                 _cablePropBlock.SetColor("_Color", c1);
                 _cablePropBlock.SetColor("_EmissionColor", c1 * 2.0f);
@@ -84,7 +91,7 @@ namespace Convergence.Presentation
             }
             if (cable2Renderer != null)
             {
-                Color c2 = neuralState.Cable2Connected ? activeColor : disconnectedColor;
+                Color c2 = _axonsDark ? Color.black : (neuralState.Cable2Connected ? activeColor : disconnectedColor);
                 cable2Renderer.GetPropertyBlock(_cablePropBlock);
                 _cablePropBlock.SetColor("_Color", c2);
                 _cablePropBlock.SetColor("_EmissionColor", c2 * 2.0f);
