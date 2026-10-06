@@ -1172,13 +1172,28 @@ namespace Convergence.EditorTools
             WirePointDefense(controllersGo, chamberController, gatewayController, neuralState, onboardingController, audioHookManager, subText, voice);
 
             AttachXriBridges();
+            var live = controllersGo.AddComponent<LiveEvaluationRelay>();
+            var liveSO = new SerializedObject(live);
+            liveSO.FindProperty("neuralState").objectReferenceValue = neuralState;
+            liveSO.FindProperty("chamberController").objectReferenceValue = chamberController;
+            liveSO.FindProperty("hintIdleSeconds").floatValue = 45f;
+            liveSO.FindProperty("engageCaseSeconds").floatValue = 6f;
+            liveSO.ApplyModifiedProperties();
             CreateWorldSpaceHud(chamberController, neuralState, onboardingController);
+            var feedbackGo = new GameObject("ChamberFeedback");
+            var feedback = feedbackGo.AddComponent<ChamberFeedbackVisual>();
+            var feedbackSO = new SerializedObject(feedback);
+            feedbackSO.FindProperty("neuralState").objectReferenceValue = neuralState;
+            feedbackSO.FindProperty("chamberController").objectReferenceValue = chamberController;
+            feedbackSO.FindProperty("live").objectReferenceValue = live;
+            feedbackSO.ApplyModifiedProperties();
             BakeNonKeyLights();
             Chamber01Concept.Install(neuralState, chamberController);
             Chamber01TextRules.Apply();
 
             CreateChamber01CaptureMarkers();
             Chamber01TextRules.WriteAudit();
+            Chamber01StateTest.Write();
 
             // Save Scene
             EditorSceneManager.SaveScene(scene, ScenePath);
@@ -1392,8 +1407,13 @@ namespace Convergence.EditorTools
             var relaySO = new SerializedObject(relay);
             relaySO.FindProperty("chamberController").objectReferenceValue = chamberController;
             relaySO.ApplyModifiedProperties();
+            var testButton = canvasGo.AddComponent<ChamberTestButton>();
+            var testSO = new SerializedObject(testButton);
+            testSO.FindProperty("chamberController").objectReferenceValue = chamberController;
+            testSO.FindProperty("live").objectReferenceValue = UnityEngine.Object.FindAnyObjectByType<LiveEvaluationRelay>();
+            testSO.ApplyModifiedProperties();
             UnityEditor.Events.UnityEventTools.AddPersistentListener(
-                button.onClick, new UnityEngine.Events.UnityAction(relay.RequestForwardPass));
+                button.onClick, new UnityEngine.Events.UnityAction(testButton.Press));
 
             var hud = canvasGo.AddComponent<WorldSpaceHud>();
             var hudSO = new SerializedObject(hud);

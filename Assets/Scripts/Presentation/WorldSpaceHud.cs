@@ -67,15 +67,22 @@ namespace Convergence.Presentation
         /// <summary>Formula stays behind this toggle. Default is off.</summary>
         public void ToggleMath()
         {
-            showMath = !showMath;
+            SetShowMath(!showMath);
+        }
+
+        public void SetShowMath(bool value)
+        {
+            showMath = value;
             Refresh();
         }
 
         private void Refresh()
         {
-            if (objectiveText != null && onboardingController != null)
+            if (objectiveText != null)
             {
-                objectiveText.text = onboardingController.GetCurrentStepPrompt();
+                var board = ChamberPromptBoard.Instance;
+                if (board != null && !string.IsNullOrEmpty(board.Current)) objectiveText.text = board.Current;
+                else if (onboardingController != null) objectiveText.text = onboardingController.GetCurrentStepPrompt();
             }
 
             if (readoutText != null)
@@ -104,12 +111,23 @@ namespace Convergence.Presentation
         private string BuildResultLine()
         {
             PuzzleEvaluation eval = chamberController != null ? chamberController.LastEvaluation : null;
-            if (eval == null || eval.Diagnostics == null || !eval.Passed)
+            if (eval == null || eval.Diagnostics == null) return "Not yet.";
+            if (eval.Passed) return "Handled.";
+            for (int i = 0; i < eval.Diagnostics.Count; i++)
             {
-                return "Not yet.";
+                if (eval.Diagnostics[i].IsCorrect && eval.ActivationMatches) continue;
+                return FirstWords(eval.Diagnostics[i].Explanation, 12);
             }
 
-            return "Handled.";
+            return "Not yet.";
+        }
+
+        static string FirstWords(string line, int max)
+        {
+            if (string.IsNullOrWhiteSpace(line)) return "Not yet.";
+            string[] parts = line.Split(new[] { ' ', '\n', '\r', '\t' }, System.StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length <= max) return string.Join(" ", parts);
+            return string.Join(" ", parts, 0, max);
         }
     }
 }

@@ -7,7 +7,7 @@
     Documentation/Design/captures/verify_{wp}.log.
     Exits non-zero when any check FAILs.
     WARN is an uncalibrated threshold miss. SKIP is a missing operator step.
-    This work package implements V-01, V-02, V-03, V-05, V-06, and V-10.
+    This work package implements V-01, V-02, V-03, V-05, V-06, V-07, and V-10.
 
 .PARAMETER Wp
     Capture set token. Default B0.
@@ -311,6 +311,38 @@ function Invoke-V03 {
     Add-Fail ("V-03 text audit: " + $violations.Count + " violations; first: " + $first)
 }
 
+function Invoke-V07 {
+    if ($dry) {
+        Add-CheckLine "[DRY] V-07 would read Documentation/Design/captures/state_test.json written by BuildLevel01. Passed must converge to cyan, back to amber, then cyan, with flash at or below 3 Hz."
+        return
+    }
+
+    if (-not $script:V01Passed) {
+        Add-Skip "V-07 state test: scene was not rebuilt in this run"
+        return
+    }
+
+    $statePath = Join-Path $ProjectRoot "Documentation/Design/captures/state_test.json"
+    if (-not (Test-Path -LiteralPath $statePath)) {
+        Add-Fail "V-07 state test file missing after the build"
+        return
+    }
+
+    $state = Get-Content -LiteralPath $statePath -Raw | ConvertFrom-Json
+    $ok = $false
+    if ($null -ne $state.PSObject.Properties["passed"]) { $ok = [bool]$state.passed }
+    $flash = 0
+    if ($null -ne $state.PSObject.Properties["flashHz"]) { $flash = [double]$state.flashHz }
+    $damage = 0
+    if ($null -ne $state.PSObject.Properties["damageElements"]) { $damage = [int]$state.damageElements }
+    if ($ok -and $flash -le 3) {
+        Add-Pass ("V-07 state test passed (flashHz " + $flash + ", damage elements " + $damage + ")")
+        return
+    }
+
+    Add-Fail ("V-07 state test failed (passed " + $ok + ", flashHz " + $flash + ", damage elements " + $damage + ")")
+}
+
 function Invoke-V05($Thresholds) {
     if ($dry) {
         Add-CheckLine "[DRY] V-05 would compare Documentation/Design/captures/editor_numbers.json with Tools/chamber01-thresholds.json. trianglesMax is a fail. drawCallsMax is a warning while calibrated is false."
@@ -507,6 +539,7 @@ if (-not $dry) {
 Invoke-V01
 Invoke-V02 -Names $names -NamesKnown:$namesKnown
 Invoke-V03
+Invoke-V07
 if ($dry) {
     Invoke-V05 -Thresholds $null
     Invoke-V06 -Thresholds $null
