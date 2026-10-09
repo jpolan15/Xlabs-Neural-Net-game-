@@ -1,0 +1,46 @@
+KEY - OPERATOR ONLY. Hide this file from the listener. Do not copy it into the listening folder.
+
+Label to tool mapping (random shuffle, 2026-10-09, PowerShell Get-Random; not chosen by preference):
+
+A.wav = Gemini TTS (Google AI Studio)
+B.wav = ElevenLabs (free tier)
+C.wav = Chatterbox-Turbo
+D.wav = Qwen3-TTS VoiceDesign
+
+Per-label record. Fill during the render. ArtSource/AGENTS.md requires each generated file to keep its tool, settings and license next to it, so this file is that record.
+
+A (Gemini TTS):
+  voice name: ____
+  settings / style prompt used: ____
+  license / terms checked: ____ (AI Studio terms, public-event use)
+  render date: ____
+
+B (ElevenLabs free tier):
+  voice name (library, not a real-person clone): ____
+  model name shown in app: ____
+  license / terms: free tier, non-commercial, credit "elevenlabs.io" required (plan WP4 and Appendix B). Confirm public-event use.
+  render date: ____
+
+C (Chatterbox-Turbo):
+  run chosen for C.wav (1 = default voice, 2 = Qwen reference): ____
+  exaggeration: ____   cfg: ____   seed: ____
+  reference clip: ____ (none, or work\reference_qwen.wav)
+  license: MIT. Output carries Resemble AI Perth watermark.
+  render date: ____
+
+D (Qwen3-TTS VoiceDesign):
+  repo ID (confirm on model card): Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign
+  seed: ____
+  sample rate returned by the model: ____
+  license: Apache-2.0 per release post (confirm LICENSE file)
+  render date: ____
+
+Pick (fill after the human and one classmate pick blind):
+  winning label: ____
+  winning tool: ____
+  copied to VOICE_SPEC.md on: ____
+
+UPDATE 2026-10-09 (later the same day): the owner asked the agent to choose the voices. The A-D candidates above
+were not rendered. The agent picked Kokoro-82M (bm_fable for the Guide, af_heart for AURA) by measurement; see
+VOICE_SPEC.md and ArtSource/voice/README.md. A blind listen can still be run on the installed set against any
+alternative rendered with ArtSource/voice/render_voices.py.

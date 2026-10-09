@@ -1,0 +1,4 @@
+Source: Archival. President John F. Kennedy, Rice University, Houston, 12 September 1962. JFK Presidential Library and Museum, asset JFKWHA-127-002 ("Copyright Status: Public Domain"). Trim 535.43 to 543.12 s of the source; mono 48 kHz, 80 Hz high-pass, -16 LUFS. Details: ArtSource/archival/SOURCES.md
+Segments: 4.380 3.310
+
+We choose to go to the Moon in this decade and do the other things, not because they are easy, but because they are hard.

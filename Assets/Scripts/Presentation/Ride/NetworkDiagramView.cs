@@ -77,7 +77,7 @@ namespace Convergence.Presentation.Ride
             line.startWidth = width;
             line.endWidth = width;
             line.sharedMaterial = w > 0.001f ? positiveLine : w < -0.001f ? negativeLine : zeroLine;
-            label.text = "weight " + w.ToString("0.0", CultureInfo.InvariantCulture);
+            label.text = "×" + w.ToString("0.0", CultureInfo.InvariantCulture); // one line, written like the pipes' labels at stop 1
             label.color = w < 0f ? theme.amber : theme.cyan;
         }
 

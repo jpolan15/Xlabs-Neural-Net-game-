@@ -6,7 +6,18 @@ Written in plain words so everyone in the group can explain it and answer questi
 
 You sit in a little pod and ride into the brain of a ship's AI. At three stops you teach it, step by step, that **an AI is just math**, ending with how it **teaches itself** by rolling a ball downhill.
 
-## What we changed (simple)
+## Ride v3 (Ignite): what is new
+
+- **A narrated opening (about 80 seconds):** JFK's 1962 Moon speech, then the Guide explains neurons and **weights**, the three stops, and that orange means "grab it". GO stays quiet until it ends. Hold GO for 2 seconds (or press Space on the keyboard) to skip it for repeat riders.
+- **A short briefing on every flight between stops,** each with a big chapter card: 1943 the first neuron, 1958 the perceptron, 1960 learning downhill. The next stop does not start until the briefing is over.
+- **The story of AI:** the three stops are three real chapters of history, and the ending points at 1969 and the problem one neuron cannot solve (the next ride).
+- **A big neural network to fly through:** seven layers of glowing neurons. Each stop docks at one of them, solving a stop lights up its connections, and at the end the whole network lights and AURA's core appears.
+- **Nothing in the way:** the posts and the canopy are gone (a low cockpit tub instead), every panel sits where you naturally look, and a check on every build proves it from three eye heights.
+- **Quieter music** (about 13 dB under the voice) and **subtitles for every line,** one phrase at a time, for a loud room.
+- **Operator keys (desktop):** Space skips the narration, R restarts the ride for the next person.
+- **Voices:** the new script runs on subtitles until the new voices are recorded; the old robotic recordings are not used because they say different words.
+
+## What we changed in v2 (simple)
 
 **Before:** one dark, cluttered room with one big console. Lots of tiny labels, glitchy visuals (a pink cube, a blown-out white ball), and error messages on screen. Too many ideas at once, so people skipped the explanations.
 

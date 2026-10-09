@@ -11,6 +11,10 @@ Convergence is an educational VR puzzle game built with Unity.
 - Interaction authority: XR Interaction Toolkit
 - Desktop test environment: Meta XR Simulator
 
+## Current priority (2026-10)
+
+The active plan is `.agents/tasks/TASK_IGNITE_RIDE_V3_MASTER_PLAN.md`: narrated intro, voices, sightlines, music level, the big neural network, and verified AI-made 3D assets for a live **Ignite** demo. Read it before any ride work. New 3D assets go through the Asset Forge skill (`.agents/skills/asset-forge/SKILL.md`, subagents in `.claude/agents/`). Raw art lives in `ArtSource/`, never in `Assets/`.
+
 ## Agent startup procedure
 
 Before changing any file:
@@ -84,6 +88,13 @@ Before reporting completion:
 3. Run `pwsh Tools/Validation/Validate-RepositoryLayout.ps1` when directories or instruction files change.
 4. Report every command run and its exact output.
 5. Do not claim a test passed if it was not run.
+6. After any visual or layout change to the ride, look at it from more than one angle, and get a second pair of eyes:
+   capture rider-eye views (dock, each stop, during a briefing, finale) at eye heights 1.15 / 1.30 / 1.45 m and gaze
+   yaw −30° / 0° / +30° (`Tools/Editor/RideLiveShot.cs` in Play Mode, `Convergence/Capture Ride Seat Views` in edit
+   mode), then have the `vr-qa` subagent (`.claude/agents/vr-qa.md`) read the images and list what is blocked, hard
+   to read or hard to tell apart. Generated 3D assets additionally pass Asset Forge Gates A to C
+   (`.agents/skills/asset-forge/SKILL.md`: a 4-view turnaround, the Unity render from the same 4 angles, silhouette
+   IoU ≥ 0.80 per view, reviewed by `asset-verifier`).
 
 ## Development tooling: Unity MCP
 

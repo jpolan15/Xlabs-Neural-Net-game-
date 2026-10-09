@@ -1,0 +1,4 @@
+Source: AI synthesized, Kokoro-82M v1.0 (hexgrad, Apache-2.0) via kokoro-onnx 0.6.1 (MIT); voice bm_fable, speed 0.9, lang en-gb; one sentence per call, explicit pauses, -16 LUFS / -1 dBTP / mono 48 kHz; ArtSource/voice/render_voices.py, 2026-10-09
+Segments: 4.550 6.481 2.628 3.501 2.120 8.360
+
+Chapter one. Nineteen forty-three. Two scientists, Warren McCulloch and Walter Pitts, imagined the first artificial neuron. It adds up its signals, and if the total crosses a line, the trigger, it fires. Up ahead, rocks are mixed in with our friendly repair drones. Set the trigger so the neuron zaps rocks, and only rocks.

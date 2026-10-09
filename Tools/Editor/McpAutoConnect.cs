@@ -21,7 +21,10 @@ namespace Convergence.EditorTools
 
         static McpAutoConnect()
         {
-            if (Application.isBatchMode)
+            // EditorPrefs.SetBool("Convergence.McpAutoConnect.Disabled", true) turns this off for a session where no MCP
+            // server is running (for example agents driving the Editor through the Unity CLI): the bridge's failed-connection
+            // error logs otherwise make Unity's test runner fail any PlayMode test that happens to be running.
+            if (Application.isBatchMode || EditorPrefs.GetBool("Convergence.McpAutoConnect.Disabled", false))
             {
                 return;
             }

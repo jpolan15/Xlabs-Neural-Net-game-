@@ -10,7 +10,9 @@ Last updated: 2026-09-14 (Phase 5 + 6 complete)
 
 | Path | Purpose |
 |---|---|
-| `.agents/` | Agent-only: workflow, task tracking, decision index, templates |
+| `.agents/` | Agent-only: workflow, task tracking, decision index, templates, skills |
+| `.claude/` | Claude Code config: `agents/` (Asset Forge subagents), `skills/` (entry points to `.agents/skills/`) |
+| `ArtSource/` | Source art outside Unity's import: concept art, raw/clean meshes, verify renders, voice bake-off, the narration pipeline (`voice/`), archival clips (`archival/`), effect derivation (`sfx/`) (see `ArtSource/AGENTS.md`) |
 | `Assets/` | All Unity asset content for the shipped game |
 | `Builds/` | Release agent output; not committed to source control |
 | `Documentation/` | Canonical architecture, mathematics, testing, and operations docs |
@@ -31,6 +33,8 @@ Last updated: 2026-09-14 (Phase 5 + 6 complete)
 | `.agents/tasks/` | Active task files: BACKLOG, BLOCKED, COMPLETED, IN_PROGRESS |
 | `.agents/templates/TASK_TEMPLATE.md` | Standard task file format |
 | `.agents/templates/HANDOFF_TEMPLATE.md` | Standard task report / handoff format |
+| `.agents/skills/unity-cli/` | Unity CLI skill: drive the open Editor, capture, test, build |
+| `.agents/skills/asset-forge/` | Concept art → multi-view → 3D → verified Unity import (gated pipeline) |
 
 ---
 
@@ -39,13 +43,14 @@ Last updated: 2026-09-14 (Phase 5 + 6 complete)
 | Path | Purpose |
 |---|---|
 | `Assets/_Project/` | First-party assets: Audio, Materials, Prefabs, Scenes, ScriptableObjects |
-| `Assets/_Project/Audio/` | **Canonical** audio assets location — see `Assets/_Project/Audio/AGENTS.md` |
+| `Assets/_Project/Audio/` | **Canonical** audio assets location — see `Assets/_Project/Audio/AGENTS.md`. Ride: `Voice/vo_ride_NN.wav` (+ `.txt` sidecars), `Sfx/` (derived loops and buzzer), `Kenney/` (CC0 effects), `Music/` |
 | `Assets/AudioAssets/` | **Deprecated** — redirect to `Assets/_Project/Audio/` (no files; only AGENTS.md) |
-| `Assets/Materials/` | Shared materials and shaders. `NeuralRide/` holds the ride's unlit materials |
-| `Assets/Prefabs/` | Shared prefabs. `NeuralRide/` holds Pod, Station, and Track (built by `Tools/Editor/NeuralRideBuilder.cs`) |
+| `Assets/Materials/` | Shared materials. `NeuralRide/` holds the ride's materials (HoloLit solids, unlit icons and lines, additive glows, the two network materials) |
+| `Assets/Shaders/` | Hand-written URP shaders for the Neural Ride: `HoloLit`, `NeuralLinks`, `NeuralNodes` (ADR-013) |
+| `Assets/Prefabs/` | Shared prefabs. `NeuralRide/` holds Pod, Station, and Track (built by `Tools/Editor/NeuralRideBuilder*.cs`); `NeuralRide/Meshes/` holds the generated tub and network meshes |
 | `Assets/Puzzles/` | Per-chamber puzzle data: test cases, rules, configuration |
 | `Assets/Scenes/` | Unity scene files. `NeuralRide.unity` is build scene 0 (ADR-011); `Level01_AwakeningGate.unity` is kept |
-| `Assets/ScriptableObjects/` | Shared ScriptableObject data |
+| `Assets/ScriptableObjects/` | Shared ScriptableObject data. `RideTheme`, `RideScript` (narration pacing) and `NarrationLibrary` (subtitles, clips, chapter cards) are written by the ride builder |
 | `Assets/Samples/` | SDK sample imports (third-party; do not modify) |
 | `Assets/ThirdParty/` | Third-party plugin assets (do not modify) |
 
@@ -54,11 +59,11 @@ Last updated: 2026-09-14 (Phase 5 + 6 complete)
 | Path | Purpose |
 |---|---|
 | `Assets/Scripts/Core/` | Engine-independent C# — Math, Neural, Training, Puzzles |
-| `Assets/Scripts/Gameplay/` | MonoBehaviour orchestration — chamber state, blast doors, facility. `Ride/` is the Neural Ride director and stations |
+| `Assets/Scripts/Gameplay/` | MonoBehaviour orchestration — chamber state, blast doors, facility. `Ride/` is the Neural Ride director (intro, briefings, outro, skip), `RideScript`, and stations |
 | `Assets/Scripts/XR/` | XR input translation — converts interaction to gameplay commands |
-| `Assets/Scripts/XR/Ride/` | Pod lever, pod seat, and desktop mouse fallback (ADR-011) |
+| `Assets/Scripts/XR/Ride/` | Pod lever, pod seat (eye-height normalisation), and desktop fallback with operator keys: Space skips narration, R restarts (ADR-011) |
 | `Assets/Scripts/XR/Meta/` | Meta-specific adapters only (isolated from Core and Gameplay) |
-| `Assets/Scripts/Presentation/` | Visualization, audio, haptics — observes state, never decides it. `Ride/` holds the ride views |
+| `Assets/Scripts/Presentation/` | Visualization, audio, haptics — observes state, never decides it. `Ride/` holds the ride views, `NarrationLibrary`, `ChapterCardView` and `NeuralCoreView` (the big network) |
 | `Assets/Scripts/Infrastructure/` | Cross-cutting utilities: logging, events, telemetry contracts |
 
 > Note: `Assets/Scripts/Visualization/` and `Assets/Scripts/Audio/` are being consolidated into `Assets/Scripts/Presentation/` in a future migration task. Do not move files yet.
@@ -97,7 +102,7 @@ Last updated: 2026-09-14 (Phase 5 + 6 complete)
 
 | Path | Purpose |
 |---|---|
-| `Tools/Editor/` | Unity Editor tooling: validation, build scripts, project map generation |
+| `Tools/Editor/` | Unity Editor tooling: validation, build scripts, project map generation. The ride builder is split into partial files: `NeuralRideBuilder.cs` (pod, station, scene), `.Pod.cs` (tub, layout helpers), `.Narration.cs`, `.Network.cs`; plus `RideNarrationData.cs` (the script), `RideSightlines.cs` (sightline, cone and text check, and the draw-call report), `RideSeatCaptures.cs` and `RideLiveShot.cs` (screenshots) |
 | `Tools/Validation/` | PowerShell validators for boundaries and repository layout |
 | `Tools/AgentBridge/` | MCP / XR Operator integration; NOT a runtime dependency |
 

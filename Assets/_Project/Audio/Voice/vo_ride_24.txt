@@ -1,0 +1,4 @@
+Source: Archival. NASA, Apollo 11 launch, 16 July 1969, launch commentary by Jack King (NASA Public Affairs). NASA historical sounds, 590320main_ringtone_apollo11_countdown.mp3; NASA media is generally not subject to copyright in the US, credit NASA, no implied endorsement. Trim 5.03 to 13.84 s of the source; mono 48 kHz, 80 Hz high-pass, -16 LUFS. Details: ArtSource/archival/SOURCES.md
+Segments: 4.720 1.940 2.150
+
+Three, two, one, zero, all engine running. Liftoff! We have a liftoff.

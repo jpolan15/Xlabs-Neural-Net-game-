@@ -1,0 +1,5 @@
+# TTS model weights (hundreds of MB; see README.md for where they come from)
+models/
+# Render candidates; the chosen set is installed into Assets/_Project/Audio/Voice/ with its sidecars
+out/
+__pycache__/

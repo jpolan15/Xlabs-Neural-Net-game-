@@ -1,0 +1,8 @@
+Neural Ride derived sound effects.
+
+ride_hum_loop.wav     Kenney Sci-fi Sounds, spaceEngineLow_002.ogg, low-passed at 1.8 kHz and crossfaded into a seamless loop.
+ride_engine_loop.wav  Kenney Sci-fi Sounds, engineCircular_000.ogg, crossfaded into a seamless loop.
+ride_wrong.wav        Synthesized for this project (two-tone buzzer).
+
+Sources: Kenney Sci-fi Sounds (https://kenney.nl/assets/sci-fi-sounds), CC0 1.0 Universal. The synthesized tone is
+also released as CC0. Credit is not required. Made by ArtSource/sfx/make_sfx.py; re-run it to regenerate.

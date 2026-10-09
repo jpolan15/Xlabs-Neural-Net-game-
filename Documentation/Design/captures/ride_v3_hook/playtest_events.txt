@@ -1,0 +1,91 @@
+000.00  SCENE LOADED, intro starting
+000.00  STATE Intro
+000.00  NARRATED ArchivalMoon
+007.84  NARRATED AuraOffline
+012.45  NARRATED GuideWakeAura
+012.45  HINT action 1
+012.45  TASK_START action atLeast 0.5
+014.96  RIDER pulls GO and keeps holding
+014.97  HINT none 0
+014.97  TASK_DONE action byRider True
+017.46  RIDER lets go of GO
+018.84  NARRATED GuideAuraBrain
+033.96  NARRATED GuideMakeItFire
+033.96  HINT w_rock 1
+033.96  TASK_START w_rock atLeast 1.5
+035.96  RIDER pushes ROCK to +1.0 (one short)
+038.47  RIDER pushes ROCK to +1.5
+038.47  HINT none 0
+038.47  TASK_DONE w_rock byRider True
+041.28  NARRATED GuideWeights
+051.77  NARRATED GuidePlan
+063.90  NARRATED Launch
+067.64  STATE Dock
+067.64  HINT action 1
+070.15  RIDER plays: ROCK +2
+071.65  RIDER plays: ROCK -1
+074.15  HINT none 0
+074.15  STATE Traveling
+074.15  NARRATED ApolloLiftoff
+074.15  RIDER pulls GO: launch
+083.36  NARRATED BriefingFirstNeuron
+112.54  STATE AtStop
+112.54  HINT trigger -1
+112.54  PHASE OneSignal Tuning
+112.54  SAID NeuronIntro
+115.54  RIDER pushes trigger to the top (worst case for the subtitle)
+122.04  PHASE OneSignal Oops
+122.04  SAID DroneOops
+122.04  HINT trigger 1
+122.04  RIDER mistake: trigger -0.5 (too low)
+128.54  PHASE OneSignal Tuning
+128.54  HINT none 0
+128.54  RIDER fixes: trigger 0.5
+129.54  HINT none 0
+129.54  PHASE OneSignal Solved
+129.54  SAID WeightTimesInput
+129.54  SOLVED OneSignal
+138.34  STATE Traveling
+138.34  NARRATED BriefingPerceptron
+167.40  STATE AtStop
+167.40  HINT w_ice 1
+167.40  PHASE TwoSignals Tuning
+167.40  SAID TwoSensors
+171.41  HINT w_ice 1
+171.41  RIDER: rock +1, ice left backwards
+178.41  HINT none 0
+178.41  RIDER fixes: ice +1
+179.41  HINT none 0
+179.41  PHASE TwoSignals Solved
+179.41  SAID OrBuilt
+179.41  SOLVED TwoSignals
+181.41  RIDER: trigger 0.5
+186.64  STATE Traveling
+186.64  NARRATED BriefingLearning
+210.48  STATE AtStop
+210.48  PHASE Learns Tuning
+210.48  SAID PullLearn
+210.48  HINT action 1
+214.48  HINT none 0
+214.48  PHASE Learns Learning
+214.48  SAID HillIsError
+214.48  RIDER mistake: learning rate 2, pulls LEARN
+217.29  PHASE Learns Overshoot
+217.29  SAID LrTooHigh
+219.79  PHASE Learns Tuning
+219.79  HINT eta -1
+224.48  HINT none 0
+224.48  PHASE Learns Learning
+224.48  SAID HillIsError
+224.48  RIDER fixes: learning rate 1, pulls LEARN
+230.09  SAID GradientDescent
+230.09  HINT none 0
+230.09  PHASE Learns Solved
+230.09  SOLVED Learns
+238.30  STATE Traveling
+238.30  NARRATED TargetingRestored
+241.70  NARRATED GuideHeartOfNetworks
+253.74  NARRATED GuideTheProblem
+262.34  NARRATED CourseLocked
+266.84  STATE Complete
+266.84  RIDE COMPLETE

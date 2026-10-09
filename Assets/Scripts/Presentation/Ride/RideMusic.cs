@@ -12,8 +12,8 @@ namespace Convergence.Presentation.Ride
         [SerializeField] private AudioSource source;
         [SerializeField] private RideDirector director;
         [SerializeField] private DashScreenView dash;
-        [SerializeField] private float volume = 0.5f;
-        [SerializeField] private float duckedVolume = 0.2f;
+        [SerializeField] private float volume = 0.14f;
+        [SerializeField] private float duckedVolume = 0.05f;
         [SerializeField] private float fadeSeconds = 3f;
 
         private bool _started;

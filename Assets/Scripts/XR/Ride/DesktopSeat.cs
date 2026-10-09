@@ -2,7 +2,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.XR;
+using UnityEngine.SceneManagement;
 using UnityEngine.XR;
+using Convergence.Gameplay.Ride;
 
 namespace Convergence.XR.Ride
 {
@@ -27,6 +29,7 @@ namespace Convergence.XR.Ride
         private float _yaw;
         private float _pitch;
         private float _allowedAfter;
+        private RideDirector _director;
 
         private void Start()
         {
@@ -42,6 +45,8 @@ namespace Convergence.XR.Ride
 
         private void Update()
         {
+            OperatorKeys();
+
             if (_camera == null)
             {
                 _camera = Camera.main;
@@ -57,6 +62,20 @@ namespace Convergence.XR.Ride
             Take();
             Look();
             Drag();
+        }
+
+        private void OperatorKeys()
+        {
+            Keyboard keyboard = Keyboard.current;
+            if (keyboard == null) return;
+
+            if (keyboard.spaceKey.wasPressedThisFrame)
+            {
+                if (_director == null) _director = FindFirstObjectByType<RideDirector>();
+                if (_director != null) _director.SkipNarration();
+            }
+
+            if (keyboard.rKey.wasPressedThisFrame) SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
 
         private void Take()

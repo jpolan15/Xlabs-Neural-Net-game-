@@ -34,10 +34,13 @@ namespace Convergence.Gameplay.Ride
         Dock,
         Traveling,
         AtStop,
-        Complete
+        Complete,
+
+        /// <summary>The narrated opening at the dock. GO does not launch until it ends or is skipped. Appended, so older ids keep their numbers.</summary>
+        Intro
     }
 
-    /// <summary>The fifteen narration lines, in script order. The number is the file suffix (vo_ride_NN).</summary>
+    /// <summary>The narration lines. The number is the file suffix (vo_ride_NN). Ids 1 to 15 never change; new lines are appended.</summary>
     public enum RideLine
     {
         Launch = 1,
@@ -54,7 +57,26 @@ namespace Convergence.Gameplay.Ride
         LrTooHigh = 12,
         Converged = 13,
         TargetingRestored = 14,
-        CourseLocked = 15
+        CourseLocked = 15,
+
+        // Ride v3 (Ignite). Appended, never renumbered. 23 is intentionally unused.
+        ArchivalMoon = 16,
+        GuideHardProblem = 17,
+        AuraOffline = 18,
+        GuideAuraBrain = 19,
+        GuideWeights = 20,
+        GuidePlan = 21,
+        GuideOrange = 22,
+        ApolloLiftoff = 24,
+        BriefingFirstNeuron = 25,
+        BriefingPerceptron = 26,
+        BriefingLearning = 27,
+        GuideHeartOfNetworks = 28,
+        GuideTheProblem = 29,
+
+        // Interactive opening (handoff part 2): the rider wakes AURA, then makes one neuron fire.
+        GuideWakeAura = 30,
+        GuideMakeItFire = 31
     }
 
     /// <summary>The four things that can float down the stream, named by which sensors they light.</summary>

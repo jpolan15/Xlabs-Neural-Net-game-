@@ -37,6 +37,12 @@ namespace Convergence.Presentation.Ride
         private float _rockLampUntil;
         private float _iceLampUntil;
 
+        /// <summary>An object passed the scanner arch; its world position. Sound and haptics follow this, not the spawn.</summary>
+        public event System.Action<CaseOutcome, Vector3> Scanned;
+
+        /// <summary>The core decided an object (the beam fires now if it fired); its world position.</summary>
+        public event System.Action<CaseOutcome, Vector3> Decided;
+
         private void OnEnable()
         {
             if (station != null) station.CaseFed += OnCaseFed;
@@ -112,6 +118,8 @@ namespace Convergence.Presentation.Ride
                 icePipe.Pulse((float)item.outcome.IceSignal);
                 _iceLampUntil = Time.time + lampSeconds;
             }
+
+            Scanned?.Invoke(item.outcome, item.root.position);
         }
 
         /// <summary>The same kind of object, judged at the lever positions right now (not when it spawned).</summary>
@@ -133,6 +141,7 @@ namespace Convergence.Presentation.Ride
             core.SetSum(item.outcome.Sum);
             core.Fire(item.outcome.Fired, item.root.position);
             if (item.outcome.Fired) item.zapAge = 0f;
+            Decided?.Invoke(item.outcome, item.root.position);
         }
 
         private void Remove(int index)

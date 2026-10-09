@@ -4,15 +4,18 @@ using Convergence.Gameplay.Ride;
 namespace Convergence.Presentation.Ride
 {
     /// <summary>
-    /// The ending: when the ride completes, a panel with one check mark per stop pops up in front of the pod.
+    /// The ending: when the ride completes, a panel with one check mark per stop pops up in front of the pod, then
+    /// "to be continued", then the credits (every voice, music and sound source with its license).
     /// </summary>
     public sealed class FinaleView : MonoBehaviour
     {
         [SerializeField] private RideDirector director;
         [SerializeField] private GameObject panel;
         [SerializeField] private GameObject toBeContinued;
+        [SerializeField] private GameObject credits;
         [SerializeField] private float popSeconds = 0.6f;
         [SerializeField] private float continuedDelay = 2.5f;
+        [SerializeField] private float creditsDelay = 5f;
 
         private float _age = -1f;
 
@@ -20,6 +23,7 @@ namespace Convergence.Presentation.Ride
         {
             if (panel != null) panel.SetActive(false);
             if (toBeContinued != null) toBeContinued.SetActive(false);
+            if (credits != null) credits.SetActive(false);
             if (director != null) director.RideCompleted += OnCompleted;
         }
 
@@ -40,6 +44,7 @@ namespace Convergence.Presentation.Ride
             if (_age < 0f) return;
             _age += Time.deltaTime;
             if (toBeContinued != null && !toBeContinued.activeSelf && _age >= continuedDelay) toBeContinued.SetActive(true);
+            if (credits != null && !credits.activeSelf && _age >= creditsDelay) credits.SetActive(true);
             if (_age > popSeconds) return;
             float t = Mathf.Clamp01(_age / popSeconds);
             float overshoot = 1f + 0.15f * Mathf.Sin(t * Mathf.PI);

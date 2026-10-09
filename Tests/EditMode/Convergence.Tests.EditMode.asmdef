@@ -5,7 +5,10 @@
         "Convergence.Core.Math",
         "Convergence.Core.Neural",
         "Convergence.Core.Training",
-        "Convergence.Core.Puzzles"
+        "Convergence.Core.Puzzles",
+        "Convergence.Gameplay",
+        "Convergence.Presentation",
+        "Convergence.EditorTools"
     ],
     "includePlatforms": [
         "Editor"

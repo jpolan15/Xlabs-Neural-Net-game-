@@ -1,0 +1,4 @@
+Source: AI synthesized, Kokoro-82M v1.0 (hexgrad, Apache-2.0) via kokoro-onnx 0.6.1 (MIT); voice bm_fable, speed 0.9, lang en-gb; one sentence per call, explicit pauses, -16 LUFS / -1 dBTP / mono 48 kHz; ArtSource/voice/render_voices.py, 2026-10-09
+Segments: 4.279 2.455
+
+Every great journey starts with a hard problem. Ours is inside this ship.

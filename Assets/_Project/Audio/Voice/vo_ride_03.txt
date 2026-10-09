@@ -1,4 +1,4 @@
-﻿Source: AI synthesized, Windows OneCore voice 'Microsoft Zira', rate 0.95
-Speech: full clip
+Source: AI synthesized, Kokoro-82M v1.0 (hexgrad, Apache-2.0) via kokoro-onnx 0.6.1 (MIT); voice bm_fable, speed 1.0, lang en-gb; one sentence per call, explicit pauses, -16 LUFS / -1 dBTP / mono 48 kHz; ArtSource/voice/render_voices.py, 2026-10-09
+Segments: 1.176 2.839
 
-Rocks are slipping through. Lower the trigger line.
+Lower. The rock's signal needs to reach the line.

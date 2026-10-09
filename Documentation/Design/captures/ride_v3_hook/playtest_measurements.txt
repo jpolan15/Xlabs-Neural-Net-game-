@@ -1,0 +1,19 @@
+(intro and travel ran at 3x) game seconds to Complete: 266.8
+COMFORT max yaw rate 3.0 deg/s, max accel 1.75 m/s2 (Traveling @251.4 speed 2.68), max speed 3.03 m/s
+LOUD MOMENTS (>= -1 dBFS, real-time only):
+122.44 peak 0.955 : laserLarge_000(v0.76) ride_hum_loop(v0.05) telstar(v0.05) ride_wrong(v0.15) ride_engine_loop(v0.00) vo_ride_25(v1.00)
+122.44 peak 0.955 : laserLarge_000(v0.76) ride_hum_loop(v0.05) telstar(v0.05) ride_wrong(v0.15) ride_engine_loop(v0.00) vo_ride_25(v1.00)
+122.44 peak 0.955 : laserLarge_000(v0.76) ride_hum_loop(v0.05) telstar(v0.05) ride_wrong(v0.15) ride_engine_loop(v0.00) vo_ride_25(v1.00)
+122.45 peak 0.955 : laserLarge_000(v0.76) ride_hum_loop(v0.05) telstar(v0.05) ride_wrong(v0.15) ride_engine_loop(v0.00) vo_ride_25(v1.00)
+122.45 peak 0.955 : laserLarge_000(v0.76) ride_hum_loop(v0.05) telstar(v0.05) ride_wrong(v0.15) ride_engine_loop(v0.00) vo_ride_25(v1.00)
+122.45 peak 0.955 : laserLarge_000(v0.76) ride_hum_loop(v0.05) telstar(v0.05) ride_wrong(v0.15) ride_engine_loop(v0.00) vo_ride_25(v1.00)
+122.45 peak 0.955 : laserLarge_000(v0.76) ride_hum_loop(v0.05) telstar(v0.05) ride_wrong(v0.15) ride_engine_loop(v0.00) vo_ride_25(v1.00)
+122.45 peak 0.955 : laserLarge_000(v0.76) ride_hum_loop(v0.05) telstar(v0.05) ride_wrong(v0.15) ride_engine_loop(v0.00) vo_ride_25(v1.00)
+
+AUDIO max output peak 0.955 (-0.4 dBFS) at 122.4 s; Unity clipping amount max 0.000; max simultaneous voice clips 1 at 0.1 s
+AUDIO Intro: mean rms -19.4 dBFS, max rms -11.4 dBFS
+AUDIO Dock: mean rms -20.2 dBFS, max rms -12.5 dBFS
+AUDIO Traveling: mean rms -19.6 dBFS, max rms -9.7 dBFS
+AUDIO AtStop: mean rms -20.5 dBFS, max rms -9.5 dBFS
+AUDIO Complete: mean rms -25.0 dBFS, max rms -12.2 dBFS
+FRAME editor mean 2.3 ms, worst 277.8 ms; max draw calls 100 (AtStop @172), max setpass 32, max tris 15100

@@ -6,37 +6,19 @@ using Convergence.Gameplay.Ride;
 namespace Convergence.Presentation.Ride
 {
     /// <summary>
-    /// The pod's one screen: a single instruction line, and the subtitle for whatever the ship AI is saying.
-    /// Lines play one at a time from the dash speaker. A line with no clip shows its subtitle only, so recordings
-    /// can be dropped in by filename later without touching the scene logic.
+    /// The pod's one screen: who is speaking, and the subtitle for what they are saying, one clause at a time.
+    /// Scripted lines (intro, briefings, outro) play at once and replace any chatter; station hints and reactions
+    /// queue behind each other. A line with no clip shows its subtitle for its reading time, so recordings can be
+    /// dropped in by filename later without touching the scene logic (see <see cref="NarrationLibrary"/>).
     /// </summary>
     public sealed class DashScreenView : MonoBehaviour
     {
         [SerializeField] private RideDirector director;
+        [SerializeField] private NarrationLibrary library;
+        [SerializeField] private RideTheme theme;
         [SerializeField] private TMP_Text instruction;
         [SerializeField] private TMP_Text subtitle;
         [SerializeField] private AudioSource voice;
-        [SerializeField] private AudioClip[] clips = new AudioClip[15];
-        [SerializeField] private float silentSubtitleSeconds = 4f;
-
-        private static readonly string[] Subtitles =
-        {
-            "Neural, launching the probe. Pull the orange lever.",
-            "Rocks are slipping through. Lower the trigger line.",
-            "Rocks are slipping through. Lower the trigger line.",
-            "Whoa, you zapped the drone! Trigger's too low.",
-            "That's it. Weight times input, compared to a threshold. That's all a neuron is: math.",
-            "Two sensors now. The ice sensor is wired backwards. It is draining the core.",
-            "Turn each pipe up or down. That number is called a weight.",
-            "Congratulations! Every case is right. You just built an OR gate out of multiplication and addition.",
-            "Hand-tuning is slow. Real AI tunes itself. Pull LEARN.",
-            "This hill is the error. Lower is better. Every step, the weights roll downhill.",
-            "That's gradient descent: measure the slope, step down it, repeat.",
-            "Learning rate too high. Watch it overshoot.",
-            "Converged. The machine found its own weights.",
-            "",
-            "Course locked. Taking us home for now."
-        };
 
         private struct Queued
         {
@@ -45,20 +27,47 @@ namespace Convergence.Presentation.Ride
         }
 
         private const float QueueLife = 8f;
+        private const float LineCooldown = 0.5f;
+
         private readonly List<Queued> _queue = new List<Queued>();
+        private NarrationLibrary.Entry _entry;
         private RideLine _current;
         private bool _hasCurrent;
-        private float _subtitleUntil;
         private bool _playing;
+        private float _startedAt;
+        private float _speakSeconds;
+        private float _subtitleUntil;
+        private int _shownIndex = -1;
 
         /// <summary>True while a narration clip is playing. The music ducks under it.</summary>
         public bool IsSpeaking => _playing && voice != null && voice.isPlaying;
 
+        /// <summary>True while any line, voiced or silent, is on screen.</summary>
+        public bool IsShowingLine => _playing;
+
+        /// <summary>
+        /// A clause started: the line, its clause index (0 = the line just began), and the clause with its cues. The
+        /// explainer panel, the network and the hint arrows follow this, so the rider sees what is being said.
+        /// </summary>
+        public event System.Action<RideLine, int, NarrationLibrary.Segment> SegmentShown;
+
+        /// <summary>The screen went quiet: the line finished or was cut off.</summary>
+        public event System.Action LineCleared;
+
+        /// <summary>How long the clause on screen now is spoken, so a view can time a reaction to its words (0 when none).</summary>
+        public float CurrentSegmentSeconds => _hasCurrent && _shownIndex >= 0 ? NarrationLibrary.SegmentSeconds(_entry, _shownIndex) : 0f;
+
         private void OnEnable()
         {
+            // Clear here, not in Start: the director starts the intro in its own Start, and a Start-time clear here would
+            // wipe the first line (and its speaker tag) the moment it appeared.
+            if (subtitle != null) subtitle.text = string.Empty;
+            if (instruction != null) instruction.text = string.Empty;
+
             if (director == null) return;
             director.Said += Enqueue;
-            director.PhaseChanged += OnPhase;
+            director.Narrated += PlayScripted;
+            director.NarrationSkipped += OnSkipped;
             director.StateChanged += OnState;
         }
 
@@ -66,14 +75,9 @@ namespace Convergence.Presentation.Ride
         {
             if (director == null) return;
             director.Said -= Enqueue;
-            director.PhaseChanged -= OnPhase;
+            director.Narrated -= PlayScripted;
+            director.NarrationSkipped -= OnSkipped;
             director.StateChanged -= OnState;
-        }
-
-        private void Start()
-        {
-            if (subtitle != null) subtitle.text = string.Empty;
-            if (instruction != null) instruction.text = string.Empty;
         }
 
         private void Update()
@@ -83,14 +87,10 @@ namespace Convergence.Presentation.Ride
                 if (Time.time > _queue[i].expireAt) _queue.RemoveAt(i);
             }
 
-            const float lineCooldown = 0.5f;
-            bool busy = IsSpeaking || Time.time < _subtitleUntil + lineCooldown;
-            if (!busy && _playing)
-            {
-                _playing = false;
-                _hasCurrent = false;
-                if (subtitle != null) subtitle.text = string.Empty;
-            }
+            if (_playing) ShowSegment();
+
+            bool busy = IsSpeaking || Time.time < _subtitleUntil + LineCooldown;
+            if (!busy && _playing) Clear();
 
             if (!busy && _queue.Count > 0)
             {
@@ -100,7 +100,7 @@ namespace Convergence.Presentation.Ride
             }
         }
 
-        /// <summary>Which part of the ride a line belongs to: 0 dock, 1 to 3 the stops, -1 for the travel and finish lines.</summary>
+        /// <summary>Which part of the ride a hint line belongs to: 0 dock, 1 to 3 the stops, -1 for lines that are not tied to one.</summary>
         private static int SectionOf(RideLine line)
         {
             switch (line)
@@ -158,42 +158,90 @@ namespace Convergence.Presentation.Ride
             _queue.Add(new Queued { line = line, expireAt = Time.time + QueueLife });
         }
 
+        private void PlayScripted(RideLine line)
+        {
+            _queue.Clear();
+            InterruptCurrent();
+            Play(line);
+        }
+
+        private void OnSkipped()
+        {
+            _queue.Clear();
+            InterruptCurrent();
+        }
+
         private void InterruptCurrent()
         {
             if (voice != null) voice.Stop();
+            Clear();
+        }
+
+        private void Clear()
+        {
+            bool wasShowing = _playing;
             _subtitleUntil = 0f;
             _playing = false;
             _hasCurrent = false;
+            _shownIndex = -1;
             if (subtitle != null) subtitle.text = string.Empty;
+            if (instruction != null) instruction.text = string.Empty;
+            if (wasShowing) LineCleared?.Invoke();
         }
 
         private void Play(RideLine line)
         {
-            int index = (int)line - 1;
-            if (index < 0 || index >= Subtitles.Length) return;
+            if (library == null || !library.TryGet(line, out NarrationLibrary.Entry entry)) return;
 
-            AudioClip clip = index < clips.Length ? clips[index] : null;
-            if (string.IsNullOrEmpty(Subtitles[index]) && (clip == null || clip.length <= 0.2f)) return;
-
+            _entry = entry;
             _current = line;
             _hasCurrent = true;
-            if (subtitle != null) subtitle.text = Subtitles[index];
             _playing = true;
-            if (clip != null && voice != null)
+            _startedAt = Time.time;
+            _speakSeconds = Mathf.Max(0.5f, entry.SpeakSeconds);
+            _subtitleUntil = Time.time + _speakSeconds;
+            _shownIndex = -1;
+
+            if (instruction != null)
+            {
+                instruction.text = "<color=#" + ColorUtility.ToHtmlStringRGB(TagColor(entry.speaker)) + ">" + entry.tag + "</color>";
+            }
+
+            if (entry.clip != null && entry.clip.length > 0.2f && voice != null)
             {
                 voice.Stop();
-                voice.clip = clip;
+                voice.clip = entry.clip;
                 voice.Play();
-                _subtitleUntil = Time.time + clip.length;
             }
-            else
+
+            ShowSegment();
+        }
+
+        private void ShowSegment()
+        {
+            float fraction = Mathf.Clamp01((Time.time - _startedAt) / _speakSeconds);
+            int index = NarrationLibrary.SegmentIndexAt(_entry, fraction);
+            if (index == _shownIndex || index < 0) return;
+            _shownIndex = index;
+            NarrationLibrary.Segment segment = _entry.segments[index];
+            if (subtitle != null) subtitle.text = segment.text;
+            SegmentShown?.Invoke(_current, index, segment);
+        }
+
+        private Color TagColor(NarrationLibrary.Speaker speaker)
+        {
+            if (theme == null) return Color.white;
+            switch (speaker)
             {
-                _subtitleUntil = Time.time + silentSubtitleSeconds;
+                case NarrationLibrary.Speaker.Aura: return theme.aura;
+                case NarrationLibrary.Speaker.AuraClean: return theme.offWhite;
+                case NarrationLibrary.Speaker.Archival: return theme.amber;
+                default: return theme.cyan;
             }
         }
 
         // Instructions are shown as arrows on the levers (HintArrowView), not as sentences.
-        // When the ride moves to a new section, anything left over from the old one is dropped or cut off.
+        // When the ride moves to a new section, hint chatter left over from the old one is dropped or cut off.
         private void OnState(RideState state)
         {
             int section = CurrentSection;
@@ -208,10 +256,6 @@ namespace Convergence.Presentation.Ride
                 int current = SectionOf(_current);
                 if (current >= 0 && current != section) InterruptCurrent();
             }
-        }
-
-        private void OnPhase(StationKind kind, StationPhase phase)
-        {
         }
     }
 }

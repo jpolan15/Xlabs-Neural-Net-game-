@@ -18,6 +18,8 @@ MonoBehaviour:
   orange: {r: 1, g: 0.4, b: 0.04, a: 1}
   offWhite: {r: 0.92, g: 0.95, b: 1, a: 1}
   locked: {r: 0.36, g: 0.4, b: 0.48, a: 1}
+  aura: {r: 0.72, g: 0.52, b: 1, a: 1}
+  violet: {r: 0.55, g: 0.4, b: 0.95, a: 1}
   streamSpeed: 1.2
   spawnX: 3.8
   scanX: 0
@@ -28,9 +30,16 @@ MonoBehaviour:
   tankUnitsPerSum: 0.27
   tankMaxSum: 3
   tankFollow: 6
-  landscapeSize: 4.4
+  landscapeSize: 3.2
   heightPerLoss: 0.12
   maxHeight: 1.1
   marbleRadius: 0.09
   contourEvery: 0.5
+  networkDim: 0.3
+  pulseSpacing: 5
+  pulseSpeed: 7
+  lightReach: 0.12
+  lightFollowSeconds: 2.5
+  stopFocus: 0.55
+  igniteSeconds: 5
   instructionSeconds: 3.5

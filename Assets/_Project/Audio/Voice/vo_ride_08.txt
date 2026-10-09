@@ -1,4 +1,4 @@
-﻿Source: AI synthesized, Windows OneCore voice 'Microsoft Zira', rate 0.95
-Speech: full clip
+Source: AI synthesized, Kokoro-82M v1.0 (hexgrad, Apache-2.0) via kokoro-onnx 0.6.1 (MIT); voice bm_fable, speed 0.9, lang en-gb; one sentence per call, explicit pauses, -16 LUFS / -1 dBTP / mono 48 kHz; ArtSource/voice/render_voices.py, 2026-10-09
+Segments: 2.357 4.375
 
 Every case is right. You just built an OR gate out of multiplication and addition.

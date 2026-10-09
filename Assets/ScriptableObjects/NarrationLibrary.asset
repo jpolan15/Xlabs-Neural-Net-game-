@@ -1,0 +1,531 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e4830236c1d92f49b621bb030dda2a5, type: 3}
+  m_Name: NarrationLibrary
+  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.NarrationLibrary
+  entries:
+  - line: 16
+    speaker: 3
+    tag: J.F.K., 1962
+    clip: {fileID: 8300000, guid: 8f923168d2f0bd24c9c89a93deef121f, type: 3}
+    pauseAfter: 0.8
+    readSeconds: 10.416666
+    segments:
+    - text: We choose to go to the Moon in this decade and do the other things,
+      weight: 4.38
+      cues:
+      - jfk_build
+    - text: not because they are easy, but because they are hard.
+      weight: 3.31
+      cues:
+      - jfk_hard
+  - line: 17
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: 115ac5d376672bf479558fc5563aa1f4, type: 3}
+    pauseAfter: 0.5
+    readSeconds: 6.2166667
+    segments:
+    - text: Every great journey starts with a hard problem.
+      weight: 4.279
+      cues: []
+    - text: Ours is inside this ship.
+      weight: 2.455
+      cues:
+      - net_wake
+  - line: 18
+    speaker: 1
+    tag: AURA
+    clip: {fileID: 8300000, guid: abd84f748081c4c4387fb28f9fe56a19, type: 3}
+    pauseAfter: 0.5
+    readSeconds: 4.6666665
+    segments:
+    - text: Targeting... offline.
+      weight: 2.08
+      cues:
+      - offline
+      - net_broken
+    - text: I can't tell a rock... from a friend.
+      weight: 2.04
+      cues:
+      - rock_friend
+  - line: 30
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: 463a99f401e3b674cb1ad20cb4cf0b3c, type: 3}
+    pauseAfter: 0.3
+    readSeconds: 5.9166665
+    segments:
+    - text: Anything orange, you can grab.
+      weight: 2.989
+      cues:
+      - orange
+    - text: Pull the orange lever,
+      weight: 1.918
+      cues:
+      - go
+    - text: and wake her up.
+      weight: 1.55
+      cues: []
+  - line: 19
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: 07157ee6b535cb94295fa67c28f1977a, type: 3}
+    pauseAfter: 0.6
+    readSeconds: 13.383333
+    segments:
+    - text: 'There she is: AURA, the ship''s mind.'
+      weight: 3.472
+      cues: []
+    - text: 'Her brain is a neural network:'
+      weight: 2.78
+      cues: []
+    - text: thousands of tiny decision-makers called neurons,
+      weight: 4.08
+      cues:
+      - neurons
+    - text: all wired together.
+      weight: 2.487
+      cues:
+      - links
+    - text: But something in it has gone wrong.
+      weight: 2.54
+      cues:
+      - net_broken
+  - line: 31
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: 7b9144bafb5e594439f9302f44b21f4e, type: 3}
+    pauseAfter: 0.3
+    readSeconds: 6.333333
+    segments:
+    - text: Here's one connection, up close.
+      weight: 3.139
+      cues:
+      - fire_goal
+    - text: Push the rock lever up,
+      weight: 2.05
+      cues: []
+    - text: until this neuron fires.
+      weight: 2.56
+      cues: []
+  - line: 20
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: e6be35b6c170a0548a6d89d190397eb4, type: 3}
+    pauseAfter: 0.7
+    readSeconds: 10.066667
+    segments:
+    - text: 'That lever is a weight:'
+      weight: 2.18
+      cues:
+      - try_weight
+    - text: how much one neuron listens to another.
+      weight: 3.616
+      cues: []
+    - text: Change the weights,
+      weight: 1.79
+      cues:
+      - weights_change
+    - text: and you change what the AI thinks.
+      weight: 2.93
+      cues: []
+  - line: 21
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: 5284feb0e12b54c45960fda24e240c4f, type: 3}
+    pauseAfter: 0.7
+    readSeconds: 10.783333
+    segments:
+    - text: We'll make three stops.
+      weight: 2.5
+      cues:
+      - plan
+    - text: One neuron with one signal.
+      weight: 3.068
+      cues:
+      - plan1
+    - text: One neuron that weighs two signals.
+      weight: 3.3
+      cues:
+      - plan2
+    - text: And last, we'll watch the machine teach itself.
+      weight: 3.41
+      cues:
+      - plan3
+  - line: 22
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: 8f473abbe727b294297ebe70c6610ab4, type: 3}
+    pauseAfter: 0.5
+    readSeconds: 4.883333
+    segments:
+    - text: Anything orange, you can grab.
+      weight: 2.989
+      cues:
+      - orange
+    - text: Everything else is just for looking.
+      weight: 2.903
+      cues: []
+  - line: 1
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: 233636cd394fa1440b5a1529c986823c, type: 3}
+    pauseAfter: 0.3
+    readSeconds: 3.733333
+    segments:
+    - text: When you're ready,
+      weight: 1.714
+      cues: []
+    - text: pull the orange GO lever.
+      weight: 2.433
+      cues:
+      - go
+  - line: 24
+    speaker: 3
+    tag: NASA, APOLLO 11
+    clip: {fileID: 8300000, guid: fc10315023af3784b8146c4e2ff5fc24, type: 3}
+    pauseAfter: 0.4
+    readSeconds: 8.8
+    segments:
+    - text: Three, two, one, zero,
+      weight: 4.72
+      cues: []
+    - text: all engine running.
+      weight: 1.94
+      cues: []
+    - text: Liftoff! We have a liftoff.
+      weight: 2.15
+      cues:
+      - liftoff
+  - line: 25
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: 49027108fe0d4b34db0f115b7f7421fc, type: 3}
+    pauseAfter: 0.8
+    readSeconds: 24.9
+    segments:
+    - text: Chapter one. Nineteen forty-three.
+      weight: 4.55
+      cues: []
+    - text: Two scientists, Warren McCulloch and Walter Pitts, imagined the first artificial neuron.
+      weight: 6.481
+      cues: []
+    - text: It adds up its signals,
+      weight: 2.628
+      cues:
+      - sum
+    - text: and if the total crosses a line, the trigger,
+      weight: 3.501
+      cues:
+      - trigger
+    - text: it fires.
+      weight: 2.12
+      cues:
+      - fire
+    - text: Up ahead, rocks are mixed in with our friendly repair drones. Set the trigger so the neuron zaps rocks, and only rocks.
+      weight: 8.36
+      cues:
+      - rock_drone
+  - line: 2
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: 7d28b4f020ae40d448e3e13f59dc9456, type: 3}
+    pauseAfter: 0.5
+    readSeconds: 2.9166665
+    segments:
+    - text: Rocks are slipping through. Lower the trigger.
+      weight: 4.26
+      cues: []
+  - line: 3
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: f3a2a07f5aea3fe4d9ecfe9bc0d9c49c, type: 3}
+    pauseAfter: 0.5
+    readSeconds: 4.0499997
+    segments:
+    - text: Lower.
+      weight: 1.176
+      cues: []
+    - text: The rock's signal needs to reach the line.
+      weight: 2.839
+      cues: []
+  - line: 4
+    speaker: 1
+    tag: AURA
+    clip: {fileID: 8300000, guid: 91a328f6f9951a54c828fabf5a32fee8, type: 3}
+    pauseAfter: 0.5
+    readSeconds: 3.733333
+    segments:
+    - text: Whoa, you zapped a drone!
+      weight: 1.86
+      cues: []
+    - text: Trigger's too low.
+      weight: 1.15
+      cues: []
+  - line: 5
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: bee75b53f110a4845a7953542a647f5a, type: 3}
+    pauseAfter: 0.6
+    readSeconds: 7.35
+    segments:
+    - text: That's it.
+      weight: 1.62
+      cues: []
+    - text: Signal times weight, compared to a trigger.
+      weight: 3.97
+      cues: []
+    - text: 'That''s all a neuron is: math.'
+      weight: 2.68
+      cues: []
+  - line: 26
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: 539062b63cd2cbc4f8a906056abce118, type: 3}
+    pauseAfter: 0.8
+    readSeconds: 25.099998
+    segments:
+    - text: Chapter two. Nineteen fifty-eight.
+      weight: 4.273
+      cues: []
+    - text: Frank Rosenblatt's perceptron gave every input its own weight, like a volume knob.
+      weight: 6.34
+      cues:
+      - knob
+    - text: 'Now there are two sensors: rock, and ice.'
+      weight: 3.707
+      cues:
+      - sensors
+    - text: But the ice wire is plugged in backwards. A negative weight.
+      weight: 5.807
+      cues:
+      - negative
+    - text: Fix the weights so anything rocky or icy gets zapped.
+      weight: 4.529
+      cues:
+      - fix
+    - text: Today, you are the one doing the learning.
+      weight: 2.9
+      cues:
+      - you_learn
+  - line: 6
+    speaker: 1
+    tag: AURA
+    clip: {fileID: 8300000, guid: 61f3f5f752f53e0428e21a66b2d6c42a, type: 3}
+    pauseAfter: 0.5
+    readSeconds: 4.4666667
+    segments:
+    - text: The ice sensor is wired backwards.
+      weight: 2.52
+      cues: []
+    - text: It's draining my core.
+      weight: 1.29
+      cues: []
+  - line: 7
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: 34c8cbe33f12875408ad19afcdfa47f9, type: 3}
+    pauseAfter: 0.5
+    readSeconds: 4.883333
+    segments:
+    - text: Turn each pipe up or down.
+      weight: 2.904
+      cues: []
+    - text: That number is the weight.
+      weight: 2.049
+      cues: []
+  - line: 8
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: d53d1a83bca43994e82a75da9aa7a5c0, type: 3}
+    pauseAfter: 0.6
+    readSeconds: 6.7499995
+    segments:
+    - text: Every case is right.
+      weight: 2.357
+      cues: []
+    - text: You just built an OR gate out of multiplication and addition.
+      weight: 4.375
+      cues: []
+  - line: 27
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: a7f5408c38b702147b6ca071d2227f34, type: 3}
+    pauseAfter: 0.8
+    readSeconds: 20.516666
+    segments:
+    - text: Chapter three. Nineteen sixty.
+      weight: 4.141
+      cues: []
+    - text: 'Bernard Widrow and Ted Hoff asked: what if the machine tuned its own weights?'
+      weight: 5.592
+      cues:
+      - self_tune
+    - text: Measure how wrong it is, the error,
+      weight: 3.05
+      cues:
+      - error
+    - text: then nudge every weight a little bit downhill.
+      weight: 3.672
+      cues:
+      - downhill
+    - text: Repeat.
+      weight: 1.88
+      cues:
+      - repeat
+    - text: A version of that idea still trains today's AI.
+      weight: 3.948
+      cues:
+      - today
+  - line: 9
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: 5c24a3411e2e0004e86cd9ebbacedf35, type: 3}
+    pauseAfter: 0.5
+    readSeconds: 7.2499995
+    segments:
+    - text: Hand-tuning is slow.
+      weight: 2.663
+      cues: []
+    - text: Pick a learning rate,
+      weight: 1.954
+      cues: []
+    - text: how big each step is,
+      weight: 2.499
+      cues: []
+    - text: then pull LEARN.
+      weight: 1.708
+      cues: []
+  - line: 10
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: 872b320782936ad4fbef7b22130d4231, type: 3}
+    pauseAfter: 0.5
+    readSeconds: 5.8166666
+    segments:
+    - text: This hill is the error. Lower is better.
+      weight: 4.423
+      cues: []
+    - text: Watch the weights roll downhill.
+      weight: 2.73
+      cues: []
+  - line: 11
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: 3785b6d985b1bd148ac40fc9763a1b59, type: 3}
+    pauseAfter: 0.6
+    readSeconds: 4.5666666
+    segments:
+    - text: That's gradient descent.
+      weight: 2.62
+      cues: []
+    - text: Measure the slope. Step down it. Repeat.
+      weight: 4.69
+      cues: []
+  - line: 12
+    speaker: 1
+    tag: AURA
+    clip: {fileID: 8300000, guid: 3648dc203545c9a429089fec13f8d501, type: 3}
+    pauseAfter: 0.5
+    readSeconds: 2.8
+    segments:
+    - text: Too big a step!
+      weight: 1.35
+      cues: []
+    - text: I'm overshooting!
+      weight: 0.98
+      cues: []
+  - line: 13
+    speaker: 1
+    tag: AURA
+    clip: {fileID: 8300000, guid: 639d660b599a1124eab7e5e5c654e5d3, type: 3}
+    pauseAfter: 0.5
+    readSeconds: 2.8999999
+    segments:
+    - text: Converged.
+      weight: 1.2
+      cues: []
+    - text: I found my own weights.
+      weight: 1.37
+      cues: []
+  - line: 14
+    speaker: 2
+    tag: AURA
+    clip: {fileID: 8300000, guid: feb7550839d466c448ee6162442bd162, type: 3}
+    pauseAfter: 0.7
+    readSeconds: 3.4166665
+    segments:
+    - text: Targeting restored.
+      weight: 1.64
+      cues:
+      - online
+    - text: I learned it from you.
+      weight: 1.06
+      cues: []
+  - line: 28
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: 3ab220697397a1840906f068457371a3, type: 3}
+    pauseAfter: 0.8
+    readSeconds: 11.833333
+    segments:
+    - text: Weights, sums, triggers, and learning by rolling downhill.
+      weight: 4.676
+      cues:
+      - recap
+    - text: That's the heart of every neural network.
+      weight: 3.49
+      cues:
+      - heart
+    - text: Real ones just do it with billions of weights at once.
+      weight: 3.863
+      cues:
+      - billions
+  - line: 29
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: a8aea9791c00dab429540cbcb2f3988a, type: 3}
+    pauseAfter: 0.8
+    readSeconds: 8.083333
+    segments:
+    - text: But in nineteen sixty-nine, researchers found a problem one neuron can never solve.
+      weight: 6.525
+      cues:
+      - xor
+    - text: That's our next ride.
+      weight: 1.71
+      cues:
+      - next_ride
+  - line: 15
+    speaker: 2
+    tag: AURA
+    clip: {fileID: 8300000, guid: ff59ede6811f2e14f900ef04b49d8724, type: 3}
+    pauseAfter: 0.5
+    readSeconds: 2.9166665
+    segments:
+    - text: Course locked. Taking us home, for now.
+      weight: 2.52
+      cues: []
+  chapters:
+  - year: 1943
+    title: THE FIRST NEURON
+    blurb: 'McCulloch and Pitts: add up the signals. Past the line? FIRE.'
+  - year: 1958
+    title: THE PERCEPTRON
+    blurb: 'Rosenblatt: every input gets its own weight, like a volume knob.'
+  - year: 1960
+    title: LEARNING DOWNHILL
+    blurb: 'Widrow and Hoff: measure the error, nudge every weight downhill.'
+  - year: 1969
+    title: THE NEXT PROBLEM
+    blurb: 'One neuron can never solve XOR. Next ride: hidden layers.'

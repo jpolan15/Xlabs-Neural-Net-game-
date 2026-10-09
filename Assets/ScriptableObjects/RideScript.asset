@@ -1,0 +1,304 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f52b15080431d4e4fa718f132c709fde, type: 3}
+  m_Name: RideScript
+  m_EditorClassIdentifier: Convergence.Gameplay::Convergence.Gameplay.Ride.RideScript
+  intro:
+    name: Intro
+    beats:
+    - line: 16
+      seconds: 8.49
+      waitFor: 
+      waitFrom: 0
+      waitAtLeast: 0
+      waitTimeout: 0
+    - line: 18
+      seconds: 4.61
+      waitFor: 
+      waitFrom: 0
+      waitAtLeast: 0
+      waitTimeout: 0
+    - line: 30
+      seconds: 6.38
+      waitFor: action
+      waitFrom: 0
+      waitAtLeast: 0.5
+      waitTimeout: 8
+    - line: 19
+      seconds: 15.120001
+      waitFor: 
+      waitFrom: 0
+      waitAtLeast: 0
+      waitTimeout: 0
+    - line: 31
+      seconds: 7.32
+      waitFor: w_rock
+      waitFrom: 0
+      waitAtLeast: 1.5
+      waitTimeout: 12
+    - line: 20
+      seconds: 10.48
+      waitFor: 
+      waitFrom: 0
+      waitAtLeast: 0
+      waitTimeout: 0
+    - line: 21
+      seconds: 12.13
+      waitFor: 
+      waitFrom: 0
+      waitAtLeast: 0
+      waitTimeout: 0
+    - line: 1
+      seconds: 3.74
+      waitFor: 
+      waitFrom: 0
+      waitAtLeast: 0
+      waitTimeout: 0
+  briefings:
+  - name: Briefing 1
+    beats:
+    - line: 24
+      seconds: 9.21
+      waitFor: 
+      waitFrom: 0
+      waitAtLeast: 0
+      waitTimeout: 0
+    - line: 25
+      seconds: 27.679998
+      waitFor: 
+      waitFrom: 0
+      waitAtLeast: 0
+      waitTimeout: 0
+  - name: Briefing 2
+    beats:
+    - line: 26
+      seconds: 27.56
+      waitFor: 
+      waitFrom: 0
+      waitAtLeast: 0
+      waitTimeout: 0
+  - name: Briefing 3
+    beats:
+    - line: 27
+      seconds: 22.34
+      waitFor: 
+      waitFrom: 0
+      waitAtLeast: 0
+      waitTimeout: 0
+  outro:
+    name: Outro
+    beats:
+    - line: 14
+      seconds: 3.39
+      waitFor: 
+      waitFrom: 0
+      waitAtLeast: 0
+      waitTimeout: 0
+    - line: 28
+      seconds: 12.03
+      waitFor: 
+      waitFrom: 0
+      waitAtLeast: 0
+      waitTimeout: 0
+    - line: 29
+      seconds: 8.6
+      waitFor: 
+      waitFrom: 0
+      waitAtLeast: 0
+      waitTimeout: 0
+    - line: 15
+      seconds: 3.01
+      waitFor: 
+      waitFrom: 0
+      waitAtLeast: 0
+      waitTimeout: 0
+  lines:
+  - line: 16
+    seconds: 8.49
+    waitFor: 
+    waitFrom: 0
+    waitAtLeast: 0
+    waitTimeout: 0
+  - line: 17
+    seconds: 6.46
+    waitFor: 
+    waitFrom: 0
+    waitAtLeast: 0
+    waitTimeout: 0
+  - line: 18
+    seconds: 4.61
+    waitFor: 
+    waitFrom: 0
+    waitAtLeast: 0
+    waitTimeout: 0
+  - line: 30
+    seconds: 6.38
+    waitFor: 
+    waitFrom: 0
+    waitAtLeast: 0
+    waitTimeout: 0
+  - line: 19
+    seconds: 15.120001
+    waitFor: 
+    waitFrom: 0
+    waitAtLeast: 0
+    waitTimeout: 0
+  - line: 31
+    seconds: 7.32
+    waitFor: 
+    waitFrom: 0
+    waitAtLeast: 0
+    waitTimeout: 0
+  - line: 20
+    seconds: 10.48
+    waitFor: 
+    waitFrom: 0
+    waitAtLeast: 0
+    waitTimeout: 0
+  - line: 21
+    seconds: 12.13
+    waitFor: 
+    waitFrom: 0
+    waitAtLeast: 0
+    waitTimeout: 0
+  - line: 22
+    seconds: 5.52
+    waitFor: 
+    waitFrom: 0
+    waitAtLeast: 0
+    waitTimeout: 0
+  - line: 1
+    seconds: 3.74
+    waitFor: 
+    waitFrom: 0
+    waitAtLeast: 0
+    waitTimeout: 0
+  - line: 24
+    seconds: 9.21
+    waitFor: 
+    waitFrom: 0
+    waitAtLeast: 0
+    waitTimeout: 0
+  - line: 25
+    seconds: 27.679998
+    waitFor: 
+    waitFrom: 0
+    waitAtLeast: 0
+    waitTimeout: 0
+  - line: 2
+    seconds: 4.33
+    waitFor: 
+    waitFrom: 0
+    waitAtLeast: 0
+    waitTimeout: 0
+  - line: 3
+    seconds: 3.87
+    waitFor: 
+    waitFrom: 0
+    waitAtLeast: 0
+    waitTimeout: 0
+  - line: 4
+    seconds: 3.5
+    waitFor: 
+    waitFrom: 0
+    waitAtLeast: 0
+    waitTimeout: 0
+  - line: 5
+    seconds: 8.2
+    waitFor: 
+    waitFrom: 0
+    waitAtLeast: 0
+    waitTimeout: 0
+  - line: 26
+    seconds: 27.56
+    waitFor: 
+    waitFrom: 0
+    waitAtLeast: 0
+    waitTimeout: 0
+  - line: 6
+    seconds: 4.3
+    waitFor: 
+    waitFrom: 0
+    waitAtLeast: 0
+    waitTimeout: 0
+  - line: 7
+    seconds: 4.97
+    waitFor: 
+    waitFrom: 0
+    waitAtLeast: 0
+    waitTimeout: 0
+  - line: 8
+    seconds: 6.63
+    waitFor: 
+    waitFrom: 0
+    waitAtLeast: 0
+    waitTimeout: 0
+  - line: 27
+    seconds: 22.34
+    waitFor: 
+    waitFrom: 0
+    waitAtLeast: 0
+    waitTimeout: 0
+  - line: 9
+    seconds: 8.71
+    waitFor: 
+    waitFrom: 0
+    waitAtLeast: 0
+    waitTimeout: 0
+  - line: 10
+    seconds: 6.82
+    waitFor: 
+    waitFrom: 0
+    waitAtLeast: 0
+    waitTimeout: 0
+  - line: 11
+    seconds: 7.61
+    waitFor: 
+    waitFrom: 0
+    waitAtLeast: 0
+    waitTimeout: 0
+  - line: 12
+    seconds: 2.82
+    waitFor: 
+    waitFrom: 0
+    waitAtLeast: 0
+    waitTimeout: 0
+  - line: 13
+    seconds: 3.06
+    waitFor: 
+    waitFrom: 0
+    waitAtLeast: 0
+    waitTimeout: 0
+  - line: 14
+    seconds: 3.39
+    waitFor: 
+    waitFrom: 0
+    waitAtLeast: 0
+    waitTimeout: 0
+  - line: 28
+    seconds: 12.03
+    waitFor: 
+    waitFrom: 0
+    waitAtLeast: 0
+    waitTimeout: 0
+  - line: 29
+    seconds: 8.6
+    waitFor: 
+    waitFrom: 0
+    waitAtLeast: 0
+    waitTimeout: 0
+  - line: 15
+    seconds: 3.01
+    waitFor: 
+    waitFrom: 0
+    waitAtLeast: 0
+    waitTimeout: 0

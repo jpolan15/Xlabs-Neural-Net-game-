@@ -16,6 +16,8 @@ namespace Convergence.Presentation.Ride
         public Color orange = new Color(1.00f, 0.40f, 0.04f);
         public Color offWhite = new Color(0.92f, 0.95f, 1.00f);
         public Color locked = new Color(0.36f, 0.40f, 0.48f);
+        public Color aura = new Color(0.72f, 0.52f, 1.00f);
+        public Color violet = new Color(0.55f, 0.40f, 0.95f);
 
         [Header("Data stream")]
         public float streamSpeed = 1.2f;
@@ -39,6 +41,20 @@ namespace Convergence.Presentation.Ride
         public float maxHeight = 1.1f;
         public float marbleRadius = 0.09f;
         public float contourEvery = 0.5f;
+
+        [Header("Big network")]
+        [Tooltip("Brightness of a connection that has not been lit by a solved stop yet.")]
+        [Range(0f, 1f)] public float networkDim = 0.22f;
+        [Tooltip("Meters between pulses racing along a connection.")]
+        public float pulseSpacing = 5f;
+        [Tooltip("Meters per second a pulse travels.")]
+        public float pulseSpeed = 7f;
+        [Tooltip("How far past a solved stop the light reaches, as a share of the whole track.")]
+        public float lightReach = 0.12f;
+        public float lightFollowSeconds = 2.5f;
+        [Tooltip("How bright the network stays while a stop is live, so the teaching panels in front of it stay readable.")]
+        [Range(0.1f, 1f)] public float stopFocus = 0.25f;
+        public float igniteSeconds = 5f;
 
         [Header("Text")]
         public float instructionSeconds = 3.5f;

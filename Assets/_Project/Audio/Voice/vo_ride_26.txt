@@ -1,0 +1,4 @@
+Source: AI synthesized, Kokoro-82M v1.0 (hexgrad, Apache-2.0) via kokoro-onnx 0.6.1 (MIT); voice bm_fable, speed 0.9, lang en-gb; one sentence per call, explicit pauses, -16 LUFS / -1 dBTP / mono 48 kHz; ArtSource/voice/render_voices.py, 2026-10-09
+Segments: 4.273 6.340 3.707 5.807 4.529 2.900
+
+Chapter two. Nineteen fifty-eight. Frank Rosenblatt's perceptron gave every input its own weight, like a volume knob. Now there are two sensors: rock, and ice. But the ice wire is plugged in backwards. A negative weight. Fix the weights so anything rocky or icy gets zapped. Today, you are the one doing the learning.

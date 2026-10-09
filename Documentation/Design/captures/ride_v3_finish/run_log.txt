@@ -1,0 +1,11 @@
+17.9 Intro
+38.5 Dock
+39.0 Traveling
+48.6 AtStop stop 0
+66.4 Traveling
+73.7 AtStop stop 1
+84.4 Traveling
+90.4 AtStop stop 2
+112.2 Traveling
+119.3 Complete
+max live draw calls at stops 100 (stop 1); max output peak 0.831 = -1.6 dBFS at stop 1 t7.4
