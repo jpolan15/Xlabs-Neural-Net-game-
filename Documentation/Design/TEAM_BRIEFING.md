@@ -1,113 +1,52 @@
-# Team Briefing: The Neural Ride (read this before presenting)
+# Team Briefing: Level 1 — How a Machine Learns to Read a Digit
 
-Written in plain words so everyone in the group can explain it and answer questions.
+Plain words, so you can explain it and answer questions. (The old spaceship/AURA version is in git history.)
 
 ## The one-sentence version
 
-You sit in a little pod and ride into the brain of a ship's AI. At three stops you teach it, step by step, that **an AI is just math**, ending with how it **teaches itself** by rolling a ball downhill.
+You ride inside a real AI and watch it go from guessing wrong to reading a handwritten 3, and you help it learn.
 
-## Ride v3 (Ignite): what is new
+## Why it is real, not a cartoon
 
-- **A narrated opening (about 80 seconds):** JFK's 1962 Moon speech, then the Guide explains neurons and **weights**, the three stops, and that orange means "grab it". GO stays quiet until it ends. Hold GO for 2 seconds (or press Space on the keyboard) to skip it for repeat riders.
-- **A short briefing on every flight between stops,** each with a big chapter card: 1943 the first neuron, 1958 the perceptron, 1960 learning downhill. The next stop does not start until the briefing is over.
-- **The story of AI:** the three stops are three real chapters of history, and the ending points at 1969 and the problem one neuron cannot solve (the next ride).
-- **A big neural network to fly through:** seven layers of glowing neurons. Each stop docks at one of them, solving a stop lights up its connections, and at the end the whole network lights and AURA's core appears.
-- **Nothing in the way:** the posts and the canopy are gone (a low cockpit tub instead), every panel sits where you naturally look, and a check on every build proves it from three eye heights.
-- **Quieter music** (about 13 dB under the voice) and **subtitles for every line,** one phrase at a time, for a loud room.
-- **Operator keys (desktop):** Space skips the narration, R restarts the ride for the next person.
-- **Voices:** the new script runs on subtitles until the new voices are recorded; the old robotic recordings are not used because they say different words.
+- The AI was really trained on **60,000 handwritten digits** (the famous MNIST set). It gets **92 %** of 10,000
+  digits it has never seen right.
+- Before training it calls the 3 a **1**. That is its real answer, not a scripted one.
+- What lights up is what the math computes. The puzzle is graded by the same code that runs the network.
+- The hill you drop down in the Valley is the real "how wrong" score along the real training run, including the
+  first step that was too big and flew past the bottom.
 
-## What we changed in v2 (simple)
+## The ride, stop by stop (about 5 minutes)
 
-**Before:** one dark, cluttered room with one big console. Lots of tiny labels, glitchy visuals (a pink cube, a blown-out white ball), and error messages on screen. Too many ideas at once, so people skipped the explanations.
+| Stop | The idea | What the rider does |
+|---|---|---|
+| The Page | A computer can't see a picture, only numbers | Pull the orange lever |
+| The Grid | Every pixel becomes a number: blank 0, ink 1. Shrunk to 7×7 = 49 numbers | Watch the pillars |
+| One Neuron | Each pixel has a weight: plus = "I want ink here", minus = "I don't". Add it all up; past the line, it fires | **Paint the weights** so it fires for 1s, not 0s. The panel shows *why* each digit passed or failed |
+| The Network | Many neurons in layers: 49 in, 16 hidden, 10 answers | Watch the 3 travel through |
+| Wrong | It has never been taught; its weights are random | It says "1" |
+| Rewind | **Backpropagation**: the mistake flows back; the more a wire caused it, the brighter it burns | The cart rolls backwards. **Point at the brightest wires** |
+| The Valley | **Gradient descent**: height = how wrong; each step goes downhill | Hold on: the ride drops by itself, overshoots once, then settles |
+| Right | Same 3, new weights | It says "3". Then: do the same with words and billions of weights, and you get the AI you can talk to |
 
-**Now:** a short ride with three stops. Each stop teaches one idea and gives you one new control.
+## Questions people ask
 
-| Stop | Idea | What you do | What you see |
-|---|---|---|---|
-| Start | Begin | Pull the orange GO lever | The pod rides into the AI's brain |
-| 1 | A neuron multiplies a signal by a weight and fires if it passes a trigger | Slide the TRIGGER lever | Rocks get zapped. Slide too low and the friendly drone gets zapped too |
-| 2 | Many inputs add up (an OR gate) | Three levers: ROCK, ICE, TRIGGER | The ICE pipe starts wired backwards and drains the core. Fix it and every picture gets a check |
-| 3 | Learning: the AI fixes its own mistakes | Pull LEARN and pick slow, good or crazy | A ball rolls down an "error hill" while the levers move by themselves |
+- **"Is it really learning in the headset?"** The training happened beforehand on a normal computer (3,000
+  rounds of math over all 60,000 images). The ride shows the real before and after, and the real path in between.
+- **"Why only 49 pixels?"** The real digits are 28×28 = 784 pixels. We average them down to 7×7 so you can see
+  every single connection. It still gets 92 % right.
+- **"What is backpropagation?"** Working out, for every wire, how much it caused the mistake, so you know which way
+  to nudge it.
+- **"What is gradient descent?"** Nudging every weight a little bit downhill on the "how wrong" landscape, over and over.
 
-Other changes:
-- **One rule for color:** orange means "you can touch this". Nothing else is orange.
-- **Everything is plain words and icons.** The screen tells you what to do in a short sentence.
-- **After each stop the math equation builds itself** from the numbers you just set, so you feel it first and see the math second.
-- **Voice and music:** 15 narrated lines (an AI voice, not a person) with subtitles, plus background music.
-- **Works without a headset:** hold right mouse to look around, drag levers with the left mouse.
-- **A real neural-network picture** (circles and lines) is on screen at every stop. See below.
+## Running the demo
 
-## Where is the neural net? (they will ask)
+- Unity: open `Assets/Scenes/NeuralRide.unity`, press Play (or run it on the Quest).
+- **Space** skips a line or hurries a stop, **R** restarts for the next person, **G** gentle mode for anyone
+  nervous about drops (half the drop, slower).
+- Anything orange can be grabbed.
 
-Look at the **circles-and-lines diagram** on the left of each stop:
+## Still to check before Ignite (April 2027)
 
-`[ROCK input] ──×weight──▶ ( neuron ) ──▶ [FIRE output]` (stop 2 adds an ICE input).
-
-- Each circle on the left is an **input**. The big circle is the **neuron**. The circle on the right is the **output**.
-- A **thicker line** means a bigger weight. A **cyan line** pushes the neuron to fire. An **amber line** holds it back (a negative weight).
-- The same neuron is also drawn as a machine: sensors, pipes, and an energy tank with a trigger line.
-
-**Be honest about this:** what we show is **one neuron**, which is the smallest possible neural network and the building block of every big one. A "network" means lots of neurons connected in layers. Our planned XOR stop would show a real multi-neuron network.
-
-## What is real and what is not
-
-**Real:**
-- Whether a stop is solved is decided by the project's real math code, which checks every case. Nobody wrote "stop solved".
-- In stop 3 the computer really works out the slope of the error and steps downhill. It starts at weights (-1.5, 1.5) and ends near (0.67, 0.67), the correct answer, in about 14 steps.
-- Slow, good and crazy learning rates really behave that way. Crazy flies off the hill.
-
-**Simplified on purpose:**
-- It is a tiny neuron with two inputs. Real AIs have millions or billions of weights.
-- The "stream of objects" is a picture of the four test cases (drone, comet, rock, rock+ice).
-
-## What we plan to add (simple)
-
-1. **Intro and ending scenes:** a short ship scene before the ride, and after it the ship's laser uses the brain you trained. Then a 3-question quiz and credits.
-2. **A fourth stop, the "impossible one" (XOR):** one neuron cannot solve it, so the player connects neurons into a real network with a hidden layer. This is also where **backpropagation** (error flowing backwards through layers) becomes visible.
-3. **Comfort for VR:** a vignette while the pod moves, and comfort settings.
-4. **Polish:** nicer art and sound, and testing on a real Quest headset.
-5. **Playtest:** try it with 3 to 5 classmates and fix what confuses them.
-
-## Questions your teacher might ask (and simple answers)
-
-**What is a neural network?** A bunch of simple "neurons" connected together. Each neuron takes numbers in, multiplies each by a weight, adds them up, and decides whether to fire.
-
-**What is a weight?** How much a neuron listens to one input. Big positive: listens a lot. Zero: ignores it. Negative: does the opposite. (The backwards ICE pipe is a negative weight.)
-
-**What is the trigger (threshold)?** How much total signal is needed before the neuron fires. In the math it is the "bias", the same number with the opposite sign.
-
-**Why does the neuron fire for a rock but not the drone?** Rock gives signal 1 × weight 1 = 1, which is above the trigger 0.5, so it fires. The drone gives 0, which is below 0.5, so it does not.
-
-**What is loss (the "error hill")?** A number for how wrong the AI is. High on the hill is very wrong. The bottom is as right as it can get.
-
-**What is gradient descent?** Measure which way is downhill (the slope), take a small step that way, and repeat until you reach the bottom.
-
-**What is the learning rate?** How big each step is. Too small: takes forever. Too big: jumps over the bottom and gets worse. "Good" lands at the bottom.
-
-**Where is backpropagation?** It runs inside stop 3: the trainer does a forward pass and then a backward pass to find the slope for each weight. With one neuron that is a single step, so we do not teach it visually yet. It becomes visible in the planned XOR stop with hidden layers.
-
-**Why can't one neuron do XOR?** XOR means "fire for one input or the other, but not both". One neuron can only draw a single straight dividing line, and no single line separates those four cases. Two layers of neurons can.
-
-**Is this like ChatGPT?** Same core ideas: weights, and training by gradient descent with backpropagation. ChatGPT-style models just have billions of weights and learn from huge amounts of text.
-
-**Is the AI really learning, or is it scripted?** The weights really change by the real gradient-descent math. What is scripted is the story and the instructions around it.
-
-**Who made the voice and music?** The voice is an AI voice (synthesized), not a person. The music is a track our teammate said we have permission to use. (Be ready to say that plainly.)
-
-## Demo cheat sheet (about 5 minutes)
-
-1. Open `Assets/Scenes/NeuralRide.unity` and press Play. Let it settle for 2 seconds.
-2. **GO:** pull the orange lever. Point out the tunnel and the circles-and-lines neural net.
-3. **Stop 1:** slide TRIGGER down to 0.5. Say "weight times input, compared to a trigger". If you want a laugh, slide it below zero first and zap the drone.
-4. **Stop 2:** set ROCK to 1, ICE to 1, TRIGGER to 0.5. Say "now two inputs add up: that is an OR gate".
-5. **Stop 3:** pull LEARN. Watch the ball roll. Then replay with the knob on CRAZY to show the overshoot. Say "that is gradient descent".
-6. If the headset acts up, switch to the mouse. Everything works from the desk.
-
-## Known gaps (do not claim these)
-
-- Intro and ending scenes, quiz and credits are not built yet.
-- The XOR stop and the hidden layer are not built yet.
-- The tunneling vignette and comfort settings are not built yet.
-- It has not been run on a headset yet, and there are no frame-rate numbers.
-- One old Level 01 automated test fails. It is not part of the ride, and we have not found the cause.
+- Ride it in the headset: comfort on the backward roll and the drop, text readability, both hands, smooth frame rate.
+- The voice is synthetic for now; record a human narrator once the script is final.
+- Music "Telstar": confirm we are allowed to use it in public, or swap it.

@@ -1,4 +1,4 @@
-# Level 1: what is done, what is left (status 2026-10-12, evening)
+# Level 1: what is done, what is left (status 2026-10-12, night: agent work complete; owner checks left)
 
 Plan: `TASK_LEVEL1_DIGITS_RESTRUCTURE.md`. Full steps: `HANDOFF_LEVEL1_FULL_BUILD.md`. Branch `jonathan/polishing-level-1`.
 
@@ -42,18 +42,18 @@ Original notes:
 - Valley sign rect widened; recapture to confirm no wrap.
 - Run model sheets: `unity command eval "return Convergence.EditorTools.RideModelSheets.Capture();"`; look at all 18 sheets (backs, mirrored text, floating parts, wide shots).
 
-### 4. WP11 narration + sound
+### 4. ~~WP11 narration~~ DONE — 32 lines, Kokoro `bm_fable` 0.9 (same Guide voice as v3), verify worst WER 9.1 %, bound 32/32 (`8f667df`)
 - Render the 32 Level 1 lines (ids 32–63, Guide voice) with `ArtSource/voice/render_voices.py`, run its `verify` (WER ≤ 10 %, −16 LUFS, −1 dBTP), install, rebuild. This also turns the last EditMode test green.
 - **Owner listens** (I can't judge audio).
 - Music: telstar.wav kept by owner choice — licence must be confirmed before Ignite.
 - Put the 8 region frames side by side in the task file (proof regions look different).
 
-### 5. WP12 verification
+### 5. WP12 verification — agent part DONE (full recapture, two vr-qa passes, fixes in `bcfc2d1`, `d638cb2`; desktop Play Mode: subtitles and voice play in sync)
 - Full recapture (done tooling), `vr-qa` subagent reads `Documentation/Design/captures/level1/*.jpg` + model sheets; fix blockers.
 - Play once on desktop end to end (GO, paint, point at wires, G, Space, R) and in the Meta XR Simulator (poke + ray on the grid).
 - **Owner, headset (Quest 2):** comfort on the reverse and the drop (gentle mode G), text readability, both hands, 72 fps in OVR Metrics. Ask: headset days this week? What will the teacher grade?
 
-### 6. WP13 docs
+### 6. ~~WP13 docs~~ DONE (ADR-016, DECISIONS_INDEX, PROJECT_MAP, README, TEAM_BRIEFING; both validators exit 0)
 `ADR-016` (digits restructure, ribbon Valley instead of PCA plane, diagram network, 40° branch instead of 25°, segment director), `.agents/DECISIONS_INDEX.md`, `.agents/PROJECT_MAP.md` (`ArtSource/training/`, `Assets/_Project/Data/`, `Gameplay/Ride/Level1/`), README/TEAM_BRIEFING, task file status, final handoff report with every command and output. Run `Validate-CoreBoundaries.ps1` + `Validate-RepositoryLayout.ps1` (via `powershell -NoProfile -ExecutionPolicy Bypass -File ...`).
 
 ## Deviations to record (owner should know)
@@ -61,3 +61,31 @@ Original notes:
 - Network = a 30 m-wide diagram facing the rider (axial walls read as a tangle); the "Wrong" beat is said from the same stop.
 - Grid = relief walls beside the track (a floor of pillars was hidden by the dash).
 - Branch to the Valley turns 40° (eased, ~6°/s), not 25°, to clear the diagram.
+
+## Final handoff (2026-10-12, night)
+
+Commits on `jonathan/polishing-level-1`: `ba746b4` WP4–WP10, `1a7503e` network plate + 21 m first hop, `bcfc2d1`
+sun over the rim + sign backings, `8f667df` voices, `d638cb2` end card + neuron readout, then docs and the test
+log-scope fix.
+
+| Command | Result |
+|---|---|
+| `unity command run_tests -- --mode editmode --async_tests` | 113/113 passed |
+| `unity command run_tests -- --mode playmode --async_tests` (twice) | 23/23 passed both times |
+| `NeuralRideBuilder.Build()` | Sightlines clear at 1.15/1.30/1.45 m; every view within 100 draw calls / 100k tris (max 87, network); voice clips bound 32 of 32 |
+| `render_voices.py render --lines 32..63 --out out/level1` | 32 clips, −16 LUFS, true peak ≤ −1.02 dBTP |
+| `render_voices.py verify out/level1` | 32 clips, worst WER 9.1 % (line 32: "read" heard as "rate"), none over 10 % |
+| `Validate-CoreBoundaries.ps1` | 17 files, 0 violations, exit 0 |
+| `Validate-RepositoryLayout.ps1` | 46 checks, 0 violations, exit 0 |
+
+Tooling changes: `render_voices.py` parses the speaker-less Level 1 lines and reads "92%" / "60,000" as spoken in the
+word check. `RideDirectorTests` ignore MCP-for-Unity bridge errors in SetUp, body and TearDown (each has its own log
+scope); any other error fails the test.
+
+Left for the owner (agents cannot do these):
+- Listen to the 32 lines (line 32 "You read it instantly" is the weakest by transcription).
+- Headset (Quest 2): comfort on the reverse and the drop (G = gentle), text readability, both hands, 72 fps in OVR Metrics.
+- `telstar.wav` licence before Ignite.
+- Delete the 15 stale model sheets listed in section 3 (the agent's delete was blocked).
+- vr-qa nits not acted on: the dock's orange lever sits low-left (the GO arrow hint points at it); the 60 wall
+  digits at `right` compete a little with the gold network.

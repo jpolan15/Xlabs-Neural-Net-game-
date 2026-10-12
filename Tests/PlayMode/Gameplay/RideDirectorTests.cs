@@ -26,12 +26,13 @@ namespace Convergence.Tests.PlayMode.Gameplay
         /// <summary>
         /// The MCP-for-Unity editor bridge logs "[WebSocket] Connection failed" as an error whenever its server is
         /// down, which has nothing to do with the ride. Ignore that one source; any other error still fails the test
-        /// in TearDown. The runner gives SetUp, the test body and TearDown separate log scopes, so the body turns
-        /// the runner's own check off in Load().
+        /// in TearDown. The runner gives SetUp, the test body and TearDown separate log scopes, so each of them turns
+        /// the runner's own check off (the body in Load()).
         /// </summary>
         [SetUp]
         public void SetUp()
         {
+            LogAssert.ignoreFailingMessages = true;
             _errors.Clear();
             Application.logMessageReceived += CollectError;
         }
@@ -46,6 +47,7 @@ namespace Convergence.Tests.PlayMode.Gameplay
         [TearDown]
         public void TearDown()
         {
+            LogAssert.ignoreFailingMessages = true;
             Application.logMessageReceived -= CollectError;
             Time.timeScale = 1f;
             var director = UnityEngine.Object.FindAnyObjectByType<RideDirector>();

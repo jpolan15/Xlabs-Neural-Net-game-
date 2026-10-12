@@ -2,7 +2,7 @@
 
 Read this before scanning the repository. Each entry is a one-line description of the directory's purpose.
 
-Last updated: 2026-09-14 (Phase 5 + 6 complete)
+Last updated: 2026-10-12 (Level 1 digits ride, ADR-016)
 
 ---
 
@@ -12,7 +12,7 @@ Last updated: 2026-09-14 (Phase 5 + 6 complete)
 |---|---|
 | `.agents/` | Agent-only: workflow, task tracking, decision index, templates, skills |
 | `.claude/` | Claude Code config: `agents/` (Asset Forge subagents), `skills/` (entry points to `.agents/skills/`) |
-| `ArtSource/` | Source art outside Unity's import: concept art, raw/clean meshes, verify renders, voice bake-off, the narration pipeline (`voice/`), archival clips (`archival/`), effect derivation (`sfx/`) (see `ArtSource/AGENTS.md`) |
+| `ArtSource/` | Source art outside Unity's import: concept art, raw/clean meshes, verify renders, voice bake-off, the narration pipeline (`voice/`), archival clips (`archival/`), effect derivation (`sfx/`), the Level 1 MNIST bake (`training/`) (see `ArtSource/AGENTS.md`) |
 | `Assets/` | All Unity asset content for the shipped game |
 | `Builds/` | Release agent output; not committed to source control |
 | `Documentation/` | Canonical architecture, mathematics, testing, and operations docs |
@@ -43,6 +43,7 @@ Last updated: 2026-09-14 (Phase 5 + 6 complete)
 | Path | Purpose |
 |---|---|
 | `Assets/_Project/` | First-party assets: Audio, Materials, Prefabs, Scenes, ScriptableObjects |
+| `Assets/_Project/Data/Level1/` | `level1_digits.json`: the baked Level 1 network (both weight sets), hero digit, puzzle, Valley ribbon and finale digits, written by `ArtSource/training/bake_level1.py` |
 | `Assets/_Project/Audio/` | **Canonical** audio assets location — see `Assets/_Project/Audio/AGENTS.md`. Ride: `Voice/vo_ride_NN.wav` (+ `.txt` sidecars), `Sfx/` (derived loops and buzzer), `Kenney/` (CC0 effects), `Music/` |
 | `Assets/AudioAssets/` | **Deprecated** — redirect to `Assets/_Project/Audio/` (no files; only AGENTS.md) |
 | `Assets/Materials/` | Shared materials. `NeuralRide/` holds the ride's materials (HoloLit solids, unlit icons and lines, additive glows, the two network materials) |
@@ -59,7 +60,7 @@ Last updated: 2026-09-14 (Phase 5 + 6 complete)
 | Path | Purpose |
 |---|---|
 | `Assets/Scripts/Core/` | Engine-independent C# — Math, Neural, Training, Puzzles |
-| `Assets/Scripts/Gameplay/` | MonoBehaviour orchestration — chamber state, blast doors, facility. `Ride/` is the Neural Ride director (intro, briefings, outro, skip), `RideScript`, and stations |
+| `Assets/Scripts/Gameplay/` | MonoBehaviour orchestration — chamber state, blast doors, facility. `Ride/` is the Neural Ride segment director, `RideScript` and moments; `Ride/Level1/` loads the bake (`Level1Data`) and holds Level 1's moments (weight paint, forward pass, blame, valley run) |
 | `Assets/Scripts/XR/` | XR input translation — converts interaction to gameplay commands |
 | `Assets/Scripts/XR/Ride/` | Pod lever, pod seat (eye-height normalisation), and desktop fallback with operator keys: Space skips narration, R restarts (ADR-011) |
 | `Assets/Scripts/XR/Meta/` | Meta-specific adapters only (isolated from Core and Gameplay) |
