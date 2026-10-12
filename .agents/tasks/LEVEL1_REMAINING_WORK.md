@@ -23,7 +23,16 @@ Plan: `TASK_LEVEL1_DIGITS_RESTRUCTURE.md`. Full steps: `HANDOFF_LEVEL1_FULL_BUIL
 ### 2. ~~Commit WP4–WP10~~ DONE
 One commit once PlayMode is green (note in task file that the 11 old stop tests were **replaced** by the 10 segment tests, and the old narration tests by Level 1 ones).
 
-### 3. Visual polish still open (from my capture review)
+### 3. Visual polish — mostly DONE (2026-10-12 night)
+- DONE: network — a 7×7 plate of lit squares behind the 49 input nodes; the 3 now reads from the seat (87 draw calls).
+- DONE: rim — hop 1 (the overshoot) stretched from 7 m to 21 m (`Layout.FirstHopLength`, `Layout.RowZ`); the rim now
+  shows a hill to climb, not a wall. Loss values unchanged; PlayMode 23/23 after the change.
+- DONE: valley sign fits one line; model sheets re-shot (19, 19:11). The 15 stale sheets of cut models
+  (chapter_card, comet, diagram, drone, equation, explainer, finale, ice_chunk, live_board, loss_landscape, network,
+  network_lit, neuron_core, rock, scanner_arch) still sit in `model_sheets/`: delete them (the agent's delete was blocked).
+- Open: the dash shows "0 · THE PAGE" in every edit-mode capture (run-time text); confirm in Play Mode.
+
+Original notes:
 - Network diagram: rebuild + recapture after the last tweak (wires dimmed, bigger pixel nodes) and confirm the **3 is visible in the 49-pixel grid**.
 - Rim view: the overshoot hill fills the view 7 m ahead (honest shape of the data). Decide: accept, or lengthen hop 1.
 - Valley sign rect widened; recapture to confirm no wrap.

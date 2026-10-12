@@ -23,8 +23,10 @@ namespace Convergence.EditorTools
             // Network: one diagram in the plane z = 0 of its pose, seen from ViewDistance (NeuralRideBuilder.Network).
             public const float ViewDistance = 30f;
 
-            // Valley: one hop is this long; the ribbon's columns are this far apart; loss to meters.
+            // Valley: one hop is this long; the ribbon's columns are this far apart; loss to meters. The first hop (the
+            // overshoot, +1.05 loss = +5.2 m) is stretched so it reads as a hill to climb, not a wall 7 m from the rim.
             public const float HopLength = 7f;
+            public const float FirstHopLength = 21f;
             public const float ColumnSpacing = 2.2f;
             public const float MetersPerLoss = 5f;
             public const float Clearance = 0.4f;
@@ -40,6 +42,7 @@ namespace Convergence.EditorTools
 
             public int RimIndex;
             public float RowSpacing;
+            public int SamplesPerHop;
             public int Rows, Columns;
             public float StartLoss;
             public float[] HopDistances;
@@ -101,13 +104,14 @@ namespace Convergence.EditorTools
                 L.Rows = valley.rows;
                 L.Columns = valley.columns;
                 L.RowSpacing = HopLength / valley.samplesPerHop;
+                L.SamplesPerHop = valley.samplesPerHop;
                 int centre = valley.columns / 2;
                 L.StartLoss = (float)data.ValleyLoss(0, centre);
                 L.RimIndex = L.LegC.Count;
                 for (int r = 0; r < valley.rows; r++)
                 {
                     float y = ((float)data.ValleyLoss(r, centre) - L.StartLoss) * MetersPerLoss;
-                    L.LegC.Add(rim + forward * (r * L.RowSpacing) + Vector3.up * y);
+                    L.LegC.Add(rim + forward * L.RowZ(r) + Vector3.up * y);
                 }
 
                 Vector3 floor = L.LegC[L.LegC.Count - 1];
@@ -148,7 +152,14 @@ namespace Convergence.EditorTools
             public Vector3 Ribbon(Level1Data data, int r, int c)
             {
                 float y = ((float)data.ValleyLoss(r, c) - StartLoss) * MetersPerLoss;
-                return Rim.position + Rim.rotation * new Vector3((c - Columns / 2) * ColumnSpacing, y, r * RowSpacing);
+                return Rim.position + Rim.rotation * new Vector3((c - Columns / 2) * ColumnSpacing, y, RowZ(r));
+            }
+
+            /// <summary>Distance of ribbon row r from the rim along the Valley: the first hop is FirstHopLength long, every other hop HopLength.</summary>
+            public float RowZ(int r)
+            {
+                if (r <= SamplesPerHop) return r * (FirstHopLength / SamplesPerHop);
+                return FirstHopLength + (r - SamplesPerHop) * RowSpacing;
             }
         }
     }

@@ -46,7 +46,7 @@ namespace Convergence.EditorTools
             int rows = layout.Rows, cols = layout.Columns, mid = cols / 2;
 
             Vector3 Local(int r, int c) => new Vector3((c - mid) * Layout.ColumnSpacing,
-                ((float)_data.ValleyLoss(r, c) - layout.StartLoss) * Layout.MetersPerLoss - Layout.Clearance, r * layout.RowSpacing);
+                ((float)_data.ValleyLoss(r, c) - layout.StartLoss) * Layout.MetersPerLoss - Layout.Clearance, layout.RowZ(r));
 
             // The surface, its skirts and a floor, as one closed mesh.
             var v = new List<Vector3>();
@@ -104,7 +104,7 @@ namespace Convergence.EditorTools
             Skirt(left);
             Skirt(right);
             int f0 = v.Count;
-            float halfWidth = mid * Layout.ColumnSpacing, length = (rows - 1) * layout.RowSpacing;
+            float halfWidth = mid * Layout.ColumnSpacing, length = layout.RowZ(rows - 1);
             foreach (Vector3 corner in new[] { new Vector3(-halfWidth, baseY, 0f), new Vector3(halfWidth, baseY, 0f), new Vector3(halfWidth, baseY, length), new Vector3(-halfWidth, baseY, length) })
             {
                 v.Add(corner);

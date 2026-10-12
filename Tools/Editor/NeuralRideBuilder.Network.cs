@@ -253,6 +253,20 @@ namespace Convergence.EditorTools
             parts.Links = AddMeshObject("Links", root, SaveMesh(ToLinkMesh(links), "L1_NetLinks" + tag), "NetLinks" + tag).GetComponent<Renderer>();
             parts.Nodes = AddMeshObject("Nodes", root, SaveMesh(ToNodeMesh(nodes), "L1_NetNodes" + tag), "NetNodes" + tag).GetComponent<Renderer>();
 
+            // The 49 pixels as a picture behind their nodes: from 30 m a cloud of dots under the wires does not read
+            // as a 3, a 7×7 plate of lit squares does. Solid tiles, so the additive wires still draw over them.
+            var plate = new TileMesh();
+            Color ink = trained ? _theme.gold : _theme.networkBlue;
+            for (int i = 0; i < 49; i++)
+            {
+                float v = (float)inputs[i];
+                Color c = Color.Lerp(new Color(0.03f, 0.05f, 0.10f), ink, v);
+                c.a = v;
+                plate.Face(parts.InputPos[i] + new Vector3(0f, 0f, 0.5f), 1.36f, 1.36f, c);
+            }
+
+            TileObject("PixelPlate" + tag, root, plate, "TilesBright");
+
             // The ten answers, labelled 0 to 9 beside each node, on solid tags (1.5 degrees from 30 m).
             Transform outputs10 = Make("Outputs", root, Vector3.zero).transform;
             parts.Outputs = new Transform[10];
