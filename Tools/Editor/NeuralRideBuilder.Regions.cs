@@ -366,23 +366,23 @@ namespace Convergence.EditorTools
             for (int d = 0; d < puzzle.Digits.Length; d++)
             {
                 float x = -0.98f + d * 0.21f;
-                Transform anchor = Make("Thumb" + d, panel, new Vector3(x, -0.45f, -0.012f)).transform;
+                Transform anchor = Make("Thumb" + d, panel, new Vector3(x, -0.48f, -0.012f)).transform;
                 thumbTransforms.Add(anchor);
                 for (int r = 0; r < 7; r++)
                 {
                     for (int c = 0; c < 7; c++)
                     {
-                        thumbs.Face(new Vector3(x + (c - 3) * thumbTile, -0.45f + (3 - r) * thumbTile, -0.012f), thumbTile, thumbTile, Ink(puzzle.Digits[d][r * 7 + c]));
+                        thumbs.Face(new Vector3(x + (c - 3) * thumbTile, -0.48f + (3 - r) * thumbTile, -0.012f), thumbTile, thumbTile, Ink(puzzle.Digits[d][r * 7 + c]));
                     }
                 }
 
-                checks.Add(Quad("Check" + d, panel, new Vector3(x + 0.085f, -0.40f, -0.015f), new Vector2(0.06f, 0.06f), "Icon_Check").GetComponent<Renderer>());
-                crosses.Add(Quad("Cross" + d, panel, new Vector3(x + 0.085f, -0.40f, -0.015f), new Vector2(0.06f, 0.06f), "Icon_Cross").GetComponent<Renderer>());
+                checks.Add(Quad("Check" + d, panel, new Vector3(x + 0.085f, -0.43f, -0.015f), new Vector2(0.06f, 0.06f), "Icon_Check").GetComponent<Renderer>());
+                crosses.Add(Quad("Cross" + d, panel, new Vector3(x + 0.085f, -0.43f, -0.015f), new Vector2(0.06f, 0.06f), "Icon_Cross").GetComponent<Renderer>());
             }
 
             TileObject("Thumbs", panel, thumbs, "TilesBright");
-            var focus = Quad("Focus", panel, new Vector3(-0.98f, -0.45f, -0.011f), new Vector2(0.15f, 0.15f), "GlowWhite");
-            TextMeshPro score = Text("Score", panel, new Vector3(0.93f, -0.45f, -0.01f), "4 / 8 RIGHT", 0.11f, _theme.offWhite, 0.6f, TextAlignmentOptions.Left);
+            var focus = Quad("Focus", panel, new Vector3(-0.98f, -0.48f, -0.011f), new Vector2(0.15f, 0.15f), "GlowWhite");
+            TextMeshPro score = Text("Score", panel, new Vector3(0.93f, -0.48f, -0.01f), "4 / 8 RIGHT", 0.11f, _theme.offWhite, 0.6f, TextAlignmentOptions.Left);
 
             var view = root.AddComponent<NeuronPanelView>();
             Ref(view, "moment", moment);

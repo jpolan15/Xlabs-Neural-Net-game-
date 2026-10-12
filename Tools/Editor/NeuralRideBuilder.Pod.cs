@@ -137,8 +137,8 @@ namespace Convergence.EditorTools
             music.spatialBlend = 0f;
             music.clip = AssetDatabase.LoadAssetAtPath<AudioClip>(MusicPath);
 
-            // End card: 2.6 m out, a little above the eye. Solid board with a back, so nothing reads mirrored.
-            var end = Make("EndCard", pod.transform, new Vector3(0, 2.3f, 2.6f));
+            // End card: 2.6 m out, a little above the eye (low enough that the title clears the top of the view at 1.15 m). Solid board with a back, so nothing reads mirrored.
+            var end = Make("EndCard", pod.transform, new Vector3(0, 2.08f, 2.6f));
             Board("Plate", end.transform, Vector3.zero, new Vector2(3.5f, 1.2f), "PlateSolid");
             TextMeshPro title = Text("Title", end.transform, new Vector3(0, 0.40f, -0.01f), "YOU WATCHED A MACHINE LEARN", 0.15f, _theme.gold, 3.4f, bold: true);
             TextMeshPro next = Text("Next", end.transform, new Vector3(0, 0.15f, -0.01f), "NEXT: LEVEL 2 - WORDS", 0.15f, _theme.cyan, 2.8f, bold: true);
