@@ -1009,6 +1009,7 @@ namespace Convergence.EditorTools
             AssertRideAudioLevels(pod);
             AssertRideSfxLevels(pod);
             RideSightlines.Assert();
+            RideModelSheets.AssertCoverage(); // every model the builder makes has a multi-angle sheet
             RideBudget.Report();
             EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene(), ScenePath);
             SetBuildScenes();

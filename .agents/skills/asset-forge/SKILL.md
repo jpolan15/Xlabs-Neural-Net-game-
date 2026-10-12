@@ -77,6 +77,7 @@ PASS only if:
 
 - The builder places the asset (never a hand edit). Re-run `Convergence > Build Neural Ride`.
 - Capture the seat views (master plan section 8). The asset must look right at play distance and must not break sightlines.
+- Add the asset to `RideModelSheets.Models` and shoot its model sheet (`Convergence/Capture Model Sheets`): it must hold up from all 8 sides, the top and the low hero angle, not only from the 4 Gate B views.
 - Scene totals stay ≤ 100 draw calls and ≤ 100k tris.
 - **The human approves hero assets** by looking at `side_by_side.png` and `seat_view.png`.
 

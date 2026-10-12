@@ -244,5 +244,58 @@ namespace Convergence.Tests.EditMode.Ride
                 EditorSceneManager.CloseScene(scene, true);
             }
         }
+
+        [Test]
+        public void BuiltRide_EveryModelHasASheetAndEverySheetFindsItsModel()
+        {
+            var scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Additive);
+            try
+            {
+                var uncovered = RideModelSheets.FindUncovered(scene);
+                Assert.IsEmpty(uncovered, "Ride objects without a model sheet:\n  - " + string.Join("\n  - ", uncovered));
+                var missing = RideModelSheets.FindMissingPaths(scene);
+                Assert.IsEmpty(missing, "Model sheet paths the ride no longer has:\n  - " + string.Join("\n  - ", missing));
+            }
+            finally
+            {
+                EditorSceneManager.CloseScene(scene, true);
+            }
+        }
+
+        [Test]
+        public void ASetPieceWithoutASheet_IsCaught()
+        {
+            var scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Additive);
+            try
+            {
+                GameObject station = null;
+                foreach (GameObject root in scene.GetRootGameObjects())
+                {
+                    if (root.name == "Station_2") station = root;
+                }
+
+                Assert.IsNotNull(station, "Station_2 is missing from the built ride");
+
+                // A new set piece on a stop, and a new region root, neither listed in RideModelSheets.Models.
+                GameObject piece = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(piece, scene);
+                piece.transform.SetParent(station.transform, false);
+                piece.name = "TestSetPiece";
+
+                var region = new GameObject("Region_9");
+                UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(region, scene);
+                GameObject hill = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                hill.transform.SetParent(region.transform, false);
+                hill.name = "TestHill";
+
+                var uncovered = RideModelSheets.FindUncovered(scene);
+                Assert.Contains("Station_2/TestSetPiece", uncovered, "It said: " + string.Join(" | ", uncovered));
+                Assert.Contains("Region_9/TestHill", uncovered, "It said: " + string.Join(" | ", uncovered));
+            }
+            finally
+            {
+                EditorSceneManager.CloseScene(scene, true);
+            }
+        }
     }
 }

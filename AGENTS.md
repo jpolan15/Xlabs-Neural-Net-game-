@@ -13,7 +13,7 @@ Convergence is an educational VR puzzle game built with Unity.
 
 ## Current priority (2026-10)
 
-The active plan is `.agents/tasks/TASK_IGNITE_RIDE_V3_MASTER_PLAN.md`: narrated intro, voices, sightlines, music level, the big neural network, and verified AI-made 3D assets for a live **Ignite** demo. Read it before any ride work. New 3D assets go through the Asset Forge skill (`.agents/skills/asset-forge/SKILL.md`, subagents in `.claude/agents/`). Raw art lives in `ArtSource/`, never in `Assets/`.
+The active plan is `.agents/tasks/TASK_LEVEL1_DIGITS_RESTRUCTURE.md`: Level 1 as one continuous ride on handwritten digits (pixels → neuron → network → backprop → gradient descent), teacher demo 2026-10-20, live **Ignite** demo April 2027. Read it before any ride work; the full build steps and definition of done are in `.agents/tasks/HANDOFF_LEVEL1_FULL_BUILD.md`. Its infrastructure rules (builder, sightlines, captures, audio levels) come from `.agents/tasks/TASK_IGNITE_RIDE_V3_MASTER_PLAN.md`, whose story content is superseded. New 3D assets go through the Asset Forge skill (`.agents/skills/asset-forge/SKILL.md`, subagents in `.claude/agents/`). Raw art lives in `ArtSource/`, never in `Assets/`.
 
 ## Agent startup procedure
 
@@ -95,6 +95,11 @@ Before reporting completion:
    to read or hard to tell apart. Generated 3D assets additionally pass Asset Forge Gates A to C
    (`.agents/skills/asset-forge/SKILL.md`: a 4-view turnaround, the Unity render from the same 4 angles, silhouette
    IoU ≥ 0.80 per view, reviewed by `asset-verifier`).
+7. Every model the ride uses is also shot on its own from every side: `Convergence/Capture Model Sheets`
+   (`Tools/Editor/RideModelSheets.cs`, 8 views around it, top, low hero, rider eye, in the world) into
+   `Documentation/Design/captures/model_sheets/`. Look at the sheet of every new or changed model and fix what looks
+   wrong from any side. A new set piece gets a `RideModelSheets.Models` entry in the same change; the builder fails
+   without one (`.agents/tasks/TASK_LEVEL1_DIGITS_RESTRUCTURE.md`, section 6).
 
 ## Development tooling: Unity MCP
 

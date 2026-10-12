@@ -102,7 +102,7 @@ Last updated: 2026-09-14 (Phase 5 + 6 complete)
 
 | Path | Purpose |
 |---|---|
-| `Tools/Editor/` | Unity Editor tooling: validation, build scripts, project map generation. The ride builder is split into partial files: `NeuralRideBuilder.cs` (pod, station, scene), `.Pod.cs` (tub, layout helpers), `.Narration.cs`, `.Network.cs`; plus `RideNarrationData.cs` (the script), `RideSightlines.cs` (sightline, cone and text check, and the draw-call report), `RideSeatCaptures.cs` and `RideLiveShot.cs` (screenshots) |
+| `Tools/Editor/` | Unity Editor tooling: validation, build scripts, project map generation. The ride builder is split into partial files: `NeuralRideBuilder.cs` (pod, station, scene), `.Pod.cs` (tub, layout helpers), `.Narration.cs`, `.Network.cs`; plus `RideNarrationData.cs` (the script), `RideSightlines.cs` (sightline, cone and text check, and the draw-call report), `RideSeatCaptures.cs` and `RideLiveShot.cs` (screenshots), `RideModelSheets.cs` (every model from every side; the builder checks each model has a sheet) |
 | `Tools/Validation/` | PowerShell validators for boundaries and repository layout |
 | `Tools/AgentBridge/` | MCP / XR Operator integration; NOT a runtime dependency |
 

@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Ready to execute. Written 2026-10-09 from the teacher meeting and a seat-camera audit of `NeuralRide.unity`. |
+| Status | **Content superseded 2026-10-12** by `TASK_LEVEL1_DIGITS_RESTRUCTURE.md` (JFK/AURA/history story cut; Level 1 is now digits → network → backprop → gradient descent). The infrastructure rules below (builder, sightlines, captures, audio levels, Asset Forge gates) still apply. Written 2026-10-09 from the teacher meeting and a seat-camera audit of `NeuralRide.unity`. |
 | Owner | Executing agent (Sonnet) + human for audio choice and the headset run |
 | Goal | A ride a stranger can put on at **Ignite** (a public live demo), understand without help, and remember. |
 | Supersedes | Phase B items in `IN_PROGRESS.md`. ADR-011 stays the base. |
