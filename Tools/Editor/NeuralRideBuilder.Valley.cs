@@ -161,8 +161,9 @@ namespace Convergence.EditorTools
             LabelBacking(text, "HEIGHT = HOW WRONG", 0.3f);
             FaceToward(sign, layout.MidDrop + Vector3.up * 1.3f);
 
-            // The sun, low over the far end of the valley: pink, never orange.
-            Transform sun = Make("Sun", root.transform, new Vector3(-28f, 13f, 105f)).transform;
+            // The sun over the far end of the valley: pink, never orange. High enough to show over the overshoot hill
+            // from the rim, so the rider sees where the ride is going before the climb.
+            Transform sun = Make("Sun", root.transform, new Vector3(-16f, 30f, 115f)).transform;
             Prim(PrimitiveType.Sphere, "Disc", sun, Vector3.zero, Vector3.one * 18f, "Sun");
             var halo = Quad("Halo", sun, Vector3.zero, new Vector2(70f, 70f), "GlowPink");
             halo.AddComponent<FaceCamera>();

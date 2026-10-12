@@ -289,9 +289,9 @@ namespace Convergence.EditorTools
             Vector3 viewer = new Vector3(0f, 1.3f, -Layout.ViewDistance);
             foreach ((string text, Vector3 at) in new[]
             {
-                ("49 PIXELS", new Vector3(InputX, 0.0f, -0.3f)),
+                ("49 PIXELS", new Vector3(InputX, -0.6f, -0.3f)),
                 ("16 HIDDEN", new Vector3(0f, 1.9f, -0.3f)),
-                ("10 ANSWERS", new Vector3(OutputX + 0.6f, -0.45f, -0.3f)),
+                ("10 ANSWERS", new Vector3(OutputX + 0.6f, -1.1f, -0.3f)),
             })
             {
                 TextMeshPro sign = Text(text.Replace(" ", ""), signs, at, text, 1.35f, trained ? _theme.gold : _theme.networkBlue, 11f, bold: true);
@@ -421,7 +421,7 @@ namespace Convergence.EditorTools
                 + " NEW DIGITS\nTRAINED ON " + _data.File.trainCount.ToString("N0", System.Globalization.CultureInfo.InvariantCulture),
                 1.2f, _theme.gold, 24f, bold: true);
             acc.rectTransform.sizeDelta = new Vector2(24f, 3.2f);
-            LabelBacking(acc, "92% RIGHT ON 10,000 NEW DIGITS", 0.25f);
+            LabelBacking(acc, "92% RIGHT ON 10,000 NEW DIGITS\nTRAINED ON 60,000", 0.25f);
             FaceToward(accuracy, layout.RightView.position + Vector3.up * 1.3f);
 
             BuildDigitWalls(root.transform);

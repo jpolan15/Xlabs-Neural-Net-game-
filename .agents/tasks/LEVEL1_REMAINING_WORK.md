@@ -30,6 +30,10 @@ One commit once PlayMode is green (note in task file that the 11 old stop tests 
 - DONE: valley sign fits one line; model sheets re-shot (19, 19:11). The 15 stale sheets of cut models
   (chapter_card, comet, diagram, drone, equation, explainer, finale, ice_chunk, live_board, loss_landscape, network,
   network_lit, neuron_core, rock, scanner_arch) still sit in `model_sheets/`: delete them (the agent's delete was blocked).
+- DONE (vr-qa review, 2026-10-12): sun raised (−16, 30, 115) so it shows over the crest from the rim; accuracy
+  sign backing now covers both lines; "10 ANSWERS" and "49 PIXELS" tags moved off the 9 and the plate.
+- Not changed (judged fine): network edges leave the frame only at yaw ±30 (a head turn shows them); valley sign
+  clipped only at yaw ±30; accuracy sign is small from the valley floor but read at the `right` stop.
 - Open: the dash shows "0 · THE PAGE" in every edit-mode capture (run-time text); confirm in Play Mode.
 
 Original notes:
