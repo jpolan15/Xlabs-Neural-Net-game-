@@ -16,139 +16,139 @@ MonoBehaviour:
     name: Intro
     beats:
     - line: 32
-      seconds: 5.883333
+      seconds: 6.2999997
     - line: 33
-      seconds: 5.583333
+      seconds: 5.24
     - line: 34
-      seconds: 5.8999996
+      seconds: 5.17
   dockLine: 35
   sequences:
   - name: Into the picture
     beats:
     - line: 36
-      seconds: 4.9666667
+      seconds: 5.15
     - line: 37
-      seconds: 7.35
+      seconds: 7.29
     - line: 38
-      seconds: 8.7
+      seconds: 8.46
   - name: One neuron
     beats:
     - line: 39
-      seconds: 5.7999997
+      seconds: 5.06
     - line: 40
-      seconds: 7.35
+      seconds: 7.68
     - line: 41
-      seconds: 9.233334
+      seconds: 7.69
   - name: Your turn
     beats:
     - line: 42
-      seconds: 9.333333
+      seconds: 8.04
   - name: To the network
     beats:
     - line: 46
-      seconds: 6.2166667
+      seconds: 7.08
     - line: 47
-      seconds: 7.45
+      seconds: 8.660001
   - name: Send it through
     beats:
     - line: 48
-      seconds: 3.9333332
+      seconds: 4.1
   - name: Wrong
     beats:
     - line: 49
-      seconds: 2.15
+      seconds: 2.888
     - line: 50
-      seconds: 5.3666663
+      seconds: 5.87
   - name: Rewind
     beats:
     - line: 51
-      seconds: 5.383333
+      seconds: 5.08
     - line: 52
-      seconds: 6.833333
+      seconds: 6.69
   - name: Point at the blame
     beats:
     - line: 53
-      seconds: 3.8333333
+      seconds: 2.89
   - name: Downhill
     beats:
     - line: 55
-      seconds: 6.933333
+      seconds: 6.8399997
   - name: Gradient descent
     beats:
     - line: 56
-      seconds: 6.9333334
+      seconds: 7.86
   - name: Back in the network
     beats:
     - line: 59
-      seconds: 4.4333334
+      seconds: 4.99
   - name: Words
     beats:
     - line: 62
-      seconds: 9.85
+      seconds: 8.13
     - line: 63
-      seconds: 2.8833332
+      seconds: 2.47
   lines:
   - line: 32
-    seconds: 5.883333
+    seconds: 6.2999997
   - line: 33
-    seconds: 5.583333
+    seconds: 5.24
   - line: 34
-    seconds: 5.8999996
+    seconds: 5.17
   - line: 35
-    seconds: 4.6666665
+    seconds: 3.87
   - line: 36
-    seconds: 4.9666667
+    seconds: 5.15
   - line: 37
-    seconds: 7.35
+    seconds: 7.29
   - line: 38
-    seconds: 8.7
+    seconds: 8.46
   - line: 39
-    seconds: 5.7999997
+    seconds: 5.06
   - line: 40
-    seconds: 7.35
+    seconds: 7.68
   - line: 41
-    seconds: 9.233334
+    seconds: 7.69
   - line: 42
-    seconds: 9.333333
+    seconds: 8.04
   - line: 43
-    seconds: 6.833333
+    seconds: 7.32
   - line: 44
-    seconds: 4.9666667
+    seconds: 4.3
   - line: 45
-    seconds: 6.716666
+    seconds: 6.88
   - line: 46
-    seconds: 6.2166667
+    seconds: 7.08
   - line: 47
-    seconds: 7.45
+    seconds: 8.660001
   - line: 48
-    seconds: 3.9333332
+    seconds: 4.1
   - line: 49
-    seconds: 2.15
+    seconds: 2.888
   - line: 50
-    seconds: 5.3666663
+    seconds: 5.87
   - line: 51
-    seconds: 5.383333
+    seconds: 5.08
   - line: 52
-    seconds: 6.833333
+    seconds: 6.69
   - line: 53
-    seconds: 3.8333333
+    seconds: 2.89
   - line: 54
-    seconds: 3.9333334
+    seconds: 3.06
   - line: 55
-    seconds: 6.933333
+    seconds: 6.8399997
   - line: 56
-    seconds: 6.9333334
+    seconds: 7.86
   - line: 57
-    seconds: 4.866667
+    seconds: 4.2599998
   - line: 58
-    seconds: 4.833333
+    seconds: 6.5699997
   - line: 59
-    seconds: 4.4333334
+    seconds: 4.99
   - line: 60
-    seconds: 3.0666666
+    seconds: 4.15
   - line: 61
-    seconds: 8.7
+    seconds: 8.4
   - line: 62
-    seconds: 9.85
+    seconds: 8.13
   - line: 63
-    seconds: 2.8833332
+    seconds: 2.47

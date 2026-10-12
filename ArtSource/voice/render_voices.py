@@ -75,12 +75,14 @@ def load_script() -> list[dict]:
     enum_body = re.search(r"enum RideLine\s*\{(.*?)\}", types, re.S).group(1)
     ids = {name: int(num) for name, num in re.findall(r"(\w+)\s*=\s*(\d+)", enum_body)}
 
+    # v3 lines named a speaker and tag: new Line(RideLine.X, G, "GUIDE", "text", ...). Level 1 has one narrator and
+    # drops them: new Line(RideLine.X, "text", ...), always the Guide.
     line_re = re.compile(
-        r'new Line\(RideLine\.(\w+),\s*([GACX]),\s*"((?:[^"\\]|\\.)*)",\s*"((?:[^"\\]|\\.)*)"'
+        r'new Line\(RideLine\.(\w+),\s*(?:([GACX]),\s*"((?:[^"\\]|\\.)*)",\s*)?"((?:[^"\\]|\\.)*)"'
         r'\s*(?:,\s*([\d.]+)f)?\s*(?:,\s*([\d.]+)f)?\s*\)', re.S)
     lines = []
     for m in line_re.finditer(cs):
-        name, spk, tag, text = m.group(1), m.group(2), m.group(3), m.group(4)
+        name, spk, tag, text = m.group(1), m.group(2) or "G", m.group(3) or "GUIDE", m.group(4)
         lines.append({"name": name, "id": ids[name], "speaker": SPEAKERS[spk], "tag": tag, "text": text})
     if len(lines) < 20:
         sys.exit(f"Parsed only {len(lines)} lines from {DATA_CS}; the parser is out of date.")
@@ -372,6 +374,9 @@ def two_digits(n: int) -> str:
 
 def words(text: str) -> list[str]:
     text = text.lower().replace("-", " ").replace("’", "'")
+    # Numerals the transcriber writes for spoken words: "92%" is "ninety-two percent", "60,000" is "sixty thousand".
+    text = re.sub(r"%", " percent", text)
+    text = re.sub(r"\b(\d{1,2}),000\b", lambda m: m.group(1) + " thousand", text)
     text = re.sub(r"\b(1[0-9])(\d\d)\b", lambda m: two_digits(int(m.group(1))) + " " + two_digits(int(m.group(2))), text)
     text = re.sub(r"\b(\d{1,2})\b", lambda m: two_digits(int(m.group(1))), text)
     text = re.sub(r"\ba\.i\.?", "ai", text)
