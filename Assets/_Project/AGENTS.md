@@ -12,6 +12,7 @@ It distinguishes Convergence content from third-party SDK samples and imports.
 | `_Project/Prefabs/` | First-party prefabs |
 | `_Project/Scenes/` | Unity scene files |
 | `_Project/ScriptableObjects/` | Data assets for puzzle configs, facility settings, etc. |
+| `_Project/Data/` | Baked data files (TextAssets). `Data/Level1/level1_digits.json` is written by `ArtSource/training/bake_level1.py`; never edit it by hand, re-run the bake |
 
 ## Rules
 

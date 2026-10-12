@@ -83,7 +83,22 @@ Clamp $\hat{y}$ to avoid $\log(0)$: `LossFunctions.DefaultEpsilon` is $10^{-15}$
 
 $$\text{CCE} = -\sum_{k=1}^K y_k \log(\hat{y}_k + \epsilon)$$
 
-Clamp $\hat{y}$ with $\epsilon = 10^{-7}$. Target $y_k$ is one-hot encoded.
+Target $y_k$ is one-hot encoded, so for the true class $t$: $\text{CCE} = -\ln(\max(\hat{y}_t, \epsilon))$.
+`LossFunctions.CategoricalCrossEntropy` clamps with `DefaultEpsilon` ($10^{-15}$).
+
+Gradient with respect to the probabilities (`CategoricalCrossEntropyGradient`):
+$\partial L / \partial \hat{y}_t = -1 / \max(\hat{y}_t, \epsilon)$ and $0$ for every other class. Fed through a
+layer-wide softmax (`LayerModel.Backward`) this becomes $\partial L / \partial z_k = \hat{y}_k - y_k$.
+
+### Level 1 network and weight-paint neuron
+
+- Level 1's digit network (`NetworkModel.CreateDense`, data from `ArtSource/training/bake_level1.py`): 49 inputs
+  (7×7 averages of 4×4 pixel blocks, 0 = paper, 1 = ink) → 16 sigmoid → 10 softmax, trained with full-batch gradient
+  descent on CCE. Blame for a wire is the real $\partial L / \partial w$ for the hero digit (target 3).
+- Weight-paint neuron (`Core.Puzzles.WeightPaintPuzzle`): weights $w_i \in \{-1, 0, +1\}$, total
+  $s = \sum_i x_i w_i$, fires when $s \ge T$. A digit is right when it fires exactly when it should. The hint is the
+  single weight change that maximises (digits right, then $\sum_d m_d$) with margin $m_d = s_d - T$ for digits that
+  should fire and $T - s_d$ for the others.
 
 ---
 
@@ -114,6 +129,7 @@ Full Chamber 04 implementation spec: `Assets/Puzzles/Chamber04_Attention/`.
 | Loss function convergence (puzzle pass) | $10^{-4}$ | Configurable per chamber |
 | UI display rounding | $10^{-3}$ | Display only; not used in evaluation |
 | Softmax sum check | $10^{-6}$ | Probability distribution must sum to 1 |
-| BCE/CCE log clamp | $10^{-7}$ | Prevents $\log(0)$ |
+| BCE/CCE log clamp | $10^{-15}$ | `LossFunctions.DefaultEpsilon`; prevents $\log(0)$ |
+| Level 1 bake reproduction | $10^{-6}$ | Core forward of the baked weights vs the bake's golden activations |
 
 Do not use exact floating-point equality (`==`) in any test assertion.

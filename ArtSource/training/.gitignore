@@ -1,0 +1,3 @@
+# Raw MNIST download cache (bake_level1.py fetches and checks it)
+mnist/
+__pycache__/

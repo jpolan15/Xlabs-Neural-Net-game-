@@ -135,3 +135,52 @@ Paused for the teacher demo. Regions are built from shaders/procedural geometry 
 - Is a Quest 2 available for daily testing this week, or only on Sat?
 - Music per region: which tracks (license must allow a public demo)?
 - Ignite slot length and how many riders: decide the skip/length later.
+
+## 9. Progress log
+
+### 2026-10-12 — WP1 gates (owner answers)
+
+- Script (handoff section 9): **approved as drafted**. Numbers come from the bake.
+- Commits: owner delegated ("whatever you need to make the best version"): one commit per work package, no pushes.
+- Music: **keep `telstar.wav`** (owner's choice). Licence risk for the public Ignite demo stays open: if it is the 1962
+  Tornados recording, it needs written permission or a CC0 swap before April 2027.
+- MNIST download: approved. Headset days and the teacher's criteria: not asked yet (owner prefers fewer questions);
+  ask before WP12.
+
+### 2026-10-12 — WP2 data bake
+
+`uv run --with numpy python -I ArtSource/training/bake_level1.py --out Assets/_Project/Data/Level1/level1_digits.json`
+(MNIST MD5s verified; 68 KB JSON):
+
+| check | value |
+|---|---|
+| test accuracy (10,000 unseen digits) | **92.50 %** (narration: "92 percent", rounded down) |
+| training | 3001 full-batch gradient-descent steps on all **60,000** training digits; lr 10 for step 1, then 2.0 |
+| loss: start / after step 1 / end | 2.5316 / **3.5813 (overshoot +1.05)** / 0.2673 |
+| hero 3 | test #1845; untrained guess **1** (p 0.29); trained p(3) 0.9998 |
+| puzzle | line 2.0; empty 4/8, all-plus 4/8, reference 8/8 (margin 0.66); hints solve from empty in 6 moves |
+| valley | ribbon 193 × 9 of real loss; centre = training loss exactly (gap 0); walls rise +0.04 … +0.44 |
+| big first step | 2.532 → dips to 2.325 → climbs to 3.581 (the bottom it flew past is real) |
+| finale | 55/60 of the sampled test digits right |
+| hops (step:real steps:loss) | 0:0:2.532; 1:1:3.581; 3:2:2.785; 8:5:2.343; 20:12:2.139; 50:30:1.603; 120:70:0.819; 250:130:0.540; 500:250:0.440; 900:400:0.378; 1500:600:0.325; 2200:700:0.291; 3001:801:0.267 |
+
+Script values: `{WRONG_GUESS}` = **one**, `{TRAIN_COUNT}` = **60,000**, `{TEST_ACCURACY}` = **92**.
+
+**Deviation from the handoff (Valley):** the handoff asked for a PCA plane through the trained weights. Measured on
+this run it puts the start 0.82 and the overshoot 1.90 loss units *below* their real loss (PCA explains 98.5 % of the
+weight motion, but the loss is steep in the 1.5 % it drops). A plane through start, step 1 and the end is exact at
+those three points but still 0.85 off mid-path. So the Valley is a **ribbon**: each row is a real point on the
+training path (straight along the one big step, then the recorded steps placed by distance travelled), each column
+steps sideways along one fixed random direction. The track (middle column) is exactly the real training loss, the
+walls are real losses beside it, and the cart can sit on the terrain without any gap.
+
+### 2026-10-12 — WP3 Core
+
+- `Core.Math.LossFunctions.CategoricalCrossEntropy` (+ gradient), `Core.Neural.NetworkModel.CreateDense` (flat
+  row-major weights, layer-wide softmax), `Core.Puzzles.WeightPaintPuzzle` (evaluate, per-cell contribution, first
+  wrong digit, hint computed from the evaluator).
+- `Gameplay/Ride/Level1/Level1Data.cs`: JsonUtility DTO → Core models, shape checks.
+- Tests: `WeightPaintPuzzleTests` (6), `CategoricalCrossEntropyTests` (7), `Level1BakeTests` (8: golden activations
+  ≤ 1e-6 for both weight sets, wrong guess / right 3, finale predictions, reference/empty/all-plus, hints from empty
+  and from 25 random states, blame = finite-difference gradient and stable, valley hops on the ribbon centre).
+- EditMode **110/110** passed; `Validate-CoreBoundaries.ps1`: 17 files, 0 violations, exit 0.

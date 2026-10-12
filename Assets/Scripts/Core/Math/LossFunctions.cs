@@ -181,5 +181,57 @@ namespace Convergence.Core.Math
                 destination[i] = scale * ((y / p) - ((1.0 - y) / (1.0 - p)));
             }
         }
+
+        /// <summary>
+        /// Categorical cross-entropy of one sample whose true class is <paramref name="targetIndex"/>:
+        /// L = −ln(max(p_t, ε)).
+        /// </summary>
+        public static double CategoricalCrossEntropy(double[] probabilities, int targetIndex, double epsilon = DefaultEpsilon)
+        {
+            ValidateCategorical(probabilities, targetIndex, epsilon);
+            double p = probabilities[targetIndex];
+            return -System.Math.Log(p < epsilon ? epsilon : p);
+        }
+
+        /// <summary>
+        /// Partial derivative of categorical cross-entropy with respect to each probability:
+        /// dL/dp_t = −1 / max(p_t, ε), and 0 for every other class.
+        /// </summary>
+        public static void CategoricalCrossEntropyGradient(double[] probabilities, int targetIndex, double[] destination, double epsilon = DefaultEpsilon)
+        {
+            ValidateCategorical(probabilities, targetIndex, epsilon);
+            if (destination == null)
+            {
+                throw new ArgumentNullException(nameof(destination));
+            }
+            if (destination.Length != probabilities.Length)
+            {
+                throw new ArgumentException("Destination length must match the probability length.", nameof(destination));
+            }
+
+            Array.Clear(destination, 0, destination.Length);
+            double p = probabilities[targetIndex];
+            destination[targetIndex] = -1.0 / (p < epsilon ? epsilon : p);
+        }
+
+        private static void ValidateCategorical(double[] probabilities, int targetIndex, double epsilon)
+        {
+            if (probabilities == null)
+            {
+                throw new ArgumentNullException(nameof(probabilities));
+            }
+            if (probabilities.Length == 0)
+            {
+                throw new ArgumentException("Probabilities cannot be empty.", nameof(probabilities));
+            }
+            if (targetIndex < 0 || targetIndex >= probabilities.Length)
+            {
+                throw new ArgumentOutOfRangeException(nameof(targetIndex));
+            }
+            if (epsilon <= 0.0 || epsilon >= 0.5)
+            {
+                throw new ArgumentOutOfRangeException(nameof(epsilon), "Epsilon must be between 0.0 and 0.5.");
+            }
+        }
     }
 }

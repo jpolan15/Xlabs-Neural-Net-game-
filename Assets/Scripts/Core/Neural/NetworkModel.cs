@@ -107,6 +107,55 @@ namespace Convergence.Core.Neural
         }
 
         /// <summary>
+        /// Builds a fully connected network from flat, row-major weights.
+        /// <paramref name="weights"/>[l][n * inputs + i] is neuron n's weight on input i of layer l, where inputs is
+        /// <paramref name="inputCount"/> for the first layer and the previous layer's neuron count after that.
+        /// A <see cref="ActivationType.Softmax"/> layer is evaluated layer-wide.
+        /// </summary>
+        public static NetworkModel CreateDense(
+            int inputCount,
+            double[][] weights,
+            double[][] biases,
+            ActivationType[] activations)
+        {
+            if (inputCount <= 0) throw new ArgumentOutOfRangeException(nameof(inputCount));
+            if (weights == null) throw new ArgumentNullException(nameof(weights));
+            if (biases == null) throw new ArgumentNullException(nameof(biases));
+            if (activations == null) throw new ArgumentNullException(nameof(activations));
+            if (weights.Length == 0 || biases.Length != weights.Length || activations.Length != weights.Length)
+            {
+                throw new ArgumentException("weights, biases and activations need one entry per layer.");
+            }
+
+            var layers = new List<LayerModel>(weights.Length);
+            int inputs = inputCount;
+            for (int l = 0; l < weights.Length; l++)
+            {
+                double[] flat = weights[l] ?? throw new ArgumentException($"Layer {l} weights are null.", nameof(weights));
+                double[] bias = biases[l] ?? throw new ArgumentException($"Layer {l} biases are null.", nameof(biases));
+                int neurons = bias.Length;
+                if (neurons == 0 || flat.Length != neurons * inputs)
+                {
+                    throw new ArgumentException(
+                        $"Layer {l}: expected {neurons} x {inputs} = {neurons * inputs} weights, found {flat.Length}.",
+                        nameof(weights));
+                }
+
+                bool softmax = activations[l] == ActivationType.Softmax;
+                var layerNeurons = new List<NeuronModel>(neurons);
+                for (int n = 0; n < neurons; n++)
+                {
+                    var row = new double[inputs];
+                    Array.Copy(flat, n * inputs, row, 0, inputs);
+                    layerNeurons.Add(new NeuronModel(row, bias[n], softmax ? ActivationType.Linear : activations[l]));
+                }
+                layers.Add(new LayerModel(layerNeurons, softmax ? ActivationType.Softmax : (ActivationType?)null));
+                inputs = neurons;
+            }
+            return new NetworkModel(layers);
+        }
+
+        /// <summary>
         /// Propagates input vector through all layers sequentially and returns final output vector.
         /// </summary>
         public double[] Forward(double[] inputs)
