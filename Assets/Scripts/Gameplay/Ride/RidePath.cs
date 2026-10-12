@@ -61,6 +61,26 @@ namespace Convergence.Gameplay.Ride
             return d.sqrMagnitude < 1e-8f ? Vector3.forward : d.normalized;
         }
 
+        /// <summary>The arc distance of the sampled point nearest to a world position (where a pod switching onto this path is).</summary>
+        public float ClosestDistance(Vector3 position)
+        {
+            float best = float.MaxValue;
+            float at = 0f;
+            for (int i = 0; i < _cumulative.Length; i++)
+            {
+                SegmentAndT(i, out int seg, out float t);
+                if (i == _cumulative.Length - 1) { seg = _segments - 1; t = 1f; }
+                float d = (Sample(seg, t) - position).sqrMagnitude;
+                if (d < best)
+                {
+                    best = d;
+                    at = _cumulative[i];
+                }
+            }
+
+            return at;
+        }
+
         private void Locate(float distance, out int seg, out float t)
         {
             float d = Mathf.Clamp(distance, 0f, Length);

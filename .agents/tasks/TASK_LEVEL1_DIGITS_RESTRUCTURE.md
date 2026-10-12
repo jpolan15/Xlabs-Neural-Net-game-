@@ -184,3 +184,19 @@ walls are real losses beside it, and the cart can sit on the terrain without any
   ≤ 1e-6 for both weight sets, wrong guess / right 3, finale predictions, reference/empty/all-plus, hints from empty
   and from 25 random states, blame = finite-difference gradient and stable, valley hops on the ribbon centre).
 - EditMode **110/110** passed; `Validate-CoreBoundaries.ps1`: 17 files, 0 violations, exit 0.
+
+### 2026-10-12 — WP4–WP10 (first full pass)
+
+- Segment `RideDirector` with moments (weight-paint puzzle, forward pass, blame, valley run); all 8 regions built from
+  the bake; switchback track; region streaming, atmosphere and tags; XR weight cells and blame wires; desk G = gentle
+  mode. Sightlines, seat captures, per-viewpoint budget and the model-sheet registry moved to Level 1 (builder green:
+  sightlines clear, max 86 draw calls / 30k tris).
+- **Tests replaced, not deleted for convenience:** the 11 PlayMode tests of the old v3 stops (trigger, OR gate,
+  learning rate; content Level 1 cut) are replaced by 10 segment tests in `RideDirectorTests`, and the old narration
+  tests by Level 1 ones in `RideNarrationTests`.
+- `RideDirectorTests` ignore only errors from the MCP-for-Unity bridge (it logs `[WebSocket] Connection failed` when
+  its server is down); any other error logged during a ride test fails it in TearDown.
+- `SensorPingTests.SelectOnVoyageButton_InvokesTheVoyageAction` had failed since `e302da7` (2026-10-06) inserted
+  chambers 02 and 03 between OR and XOR; the test now solves all three before installing the hidden layer.
+- PlayMode **23/23** passed. EditMode **112/113**: the one failure is
+  `RideNarrationTests.EveryLevel1Line_HasAVoiceClipMatchingTheScript` (no Level 1 voice clips yet; WP11).

@@ -74,6 +74,9 @@ namespace Convergence.EditorTools
             /// <summary>Shader floats set on the model's copies only (a property block), to show a run-time state such as the lit finale.</summary>
             public Dictionary<string, float> MaterialFloats;
 
+            /// <summary>Shader colours set the same way, for a run-time state such as the wrong guess's red flash.</summary>
+            public Dictionary<string, Color> MaterialColors;
+
             /// <param name="riderAt">Scene path of the transform the pod sits at when the rider meets the model ("Pod" for where the pod is now).</param>
             public Model(string id, string note, string riderAt, params string[] paths)
             {
@@ -84,36 +87,39 @@ namespace Convergence.EditorTools
             }
         }
 
-        // The models of the ride as it stands. When the Level 1 regions replace the stations, each region's set pieces
-        // get an entry here in the same commit that builds them (TASK_LEVEL1_DIGITS_RESTRUCTURE, section 6).
-        // Station_2 and Station_3 are the same prefab as Station_1, so Station_1 stands for all three.
+        // The models of Level 1 (TASK_LEVEL1_DIGITS_RESTRUCTURE section 6). Every set piece the builder makes is here, in
+        // the same change that builds it; the rider spot is the RideViewpoint where the rider meets it.
         public static readonly Model[] Models =
         {
-            new Model("pod", "The rider's cart: tub, seat and dash with the levers.", "Pod", "Pod")
+            new Model("pod", "The rider's cart: tub, seat and the dash with GO, the subtitle screen and the region tag.", "Pod", "Pod")
             {
-                Skip = new[] { "SeatAnchor", "Finale", "ChapterCard", "Explainer" }
+                Skip = new[] { "SeatAnchor", "EndCard", "Dash/WeightGrid" }
             },
-            new Model("network", "The big neural network the track runs through: links, nodes and the rails, unlit as at the dock.", "Pod", "Track"),
-            new Model("network_lit", "The same network fully lit, as the finale shows it (LitUpTo 1.2, Ignite 0.35).", "Pod", "Track")
+            new Model("weight_grid", "Region 2: the 7x7 weight grid on the dash the rider paints (+ cyan, - amber, orange frame = press).", "Viewpoints/neuron", "Pod/Dash/WeightGrid"),
+            new Model("end_card", "The end card with the next level and the credits.", "Viewpoints/end", "Pod/EndCard"),
+            new Model("rails", "The two slate rails under every leg of the track.", "Viewpoints/dock", "Track"),
+            new Model("page", "Region 0: the sheet with the real handwritten 3 (test digit) on its desk.", "Viewpoints/dock", "Region_0/Page", "Region_0/Desk"),
+            new Model("pixel_field", "Region 1: the 3's 784 pixels as pillars, height = ink, with three values.", "Viewpoints/grid_approach", "Region_1/PixelField"),
+            new Model("input_grid_7x7", "Region 1: the 49 numbers the machine gets (4x4 averages) and their sign.", "Viewpoints/grid", "Region_1/InputGrid7"),
+            new Model("neuron_amber", "Region 2: the big amber neuron with its 49 dendrites.", "Viewpoints/neuron", "Region_2/Neuron"),
+            new Model("why_readout", "Region 2: the why panel: the digit on show, ink x weight, the total against the line, all eight digits.", "Viewpoints/neuron", "Region_2/Panel"),
+            new Model("network_untrained", "Region 3: the real 49-16-10 network with its untrained weights, wires by sign and size, neurons by activation.", "Viewpoints/network", "Region_3/Network"),
+            new Model("output_labels", "Region 3: the ten answers 0 to 9 on solid tags, and the guess glow.", "Viewpoints/wrong", "Region_3/Network/Outputs"),
+            new Model("network_wrong", "Region 4: the untrained network flashing red, with the wrong guess.", "Viewpoints/wrong", "Region_3/Network", "Region_4/GuessSign")
             {
-                MaterialFloats = new Dictionary<string, float> { { "_LitUpTo", 1.2f }, { "_Ignite", 0.35f } }
+                MaterialColors = new Dictionary<string, Color> { { "_PosColor", new Color(1f, 0.23f, 0.23f) }, { "_NegColor", new Color(0.7f, 0.16f, 0.16f) } }
             },
-            new Model("neuron_core", "The neuron each stop docks at: tank, shell, labels and both input pipes.", "Station_1", "Station_1/Neuron", "Station_1/IcePipeGroup"),
-            new Model("scanner_arch", "The scanner arch and belt the test objects ride through, with both sensor lamps.", "Station_1", "Station_1/Stream", "Station_1/IceLamp"),
-            new Model("drone", "Test object: the friendly drone (fire: no).", "Station_1", "Station_1/Stream/Templates/Drone") { ShowHidden = true, ShowAt = Lane, Front = Vector3.back },
-            new Model("comet", "Test object: the ice comet.", "Station_1", "Station_1/Stream/Templates/Comet") { ShowHidden = true, ShowAt = Lane, Front = Vector3.back },
-            new Model("rock", "Test object: the rock.", "Station_1", "Station_1/Stream/Templates/Rock") { ShowHidden = true, ShowAt = Lane, Front = Vector3.back },
-            new Model("ice_chunk", "Test object: the rock with ice crystals.", "Station_1", "Station_1/Stream/Templates/Chunk") { ShowHidden = true, ShowAt = Lane, Front = Vector3.back },
-            new Model("live_board", "The board of the four test cases and how each one went.", "Station_1", "Station_1/Board"),
-            new Model("diagram", "The input, neuron, output diagram with the live weights.", "Station_1", "Station_1/Diagram"),
-            new Model("equation", "The equation plate above the stop.", "Station_1", "Station_1/Equation"),
-            new Model("loss_landscape", "The error landscape with the marble, trail and slope arrow.", "Station_3", "Station_3/Landscape"),
-            new Model("chapter_card", "The card of the briefing that is playing.", "Pod", "Pod/ChapterCard"),
-            new Model("explainer", "The diagrams shown under the chapter card while the Guide explains.", "Pod", "Pod/Explainer"),
-            new Model("finale", "The end panel and the credits.", "Pod", "Pod/Finale"),
+            new Model("blame_wires", "Region 5: every wire burning by its real blame, and the brightest six as pointable targets.", "Viewpoints/blame", "Region_5/Blame")
+            {
+                MaterialFloats = new Dictionary<string, float> { { "_LitUpTo", 2f } }
+            },
+            new Model("valley_terrain", "Region 6: the ground of real loss along the training path, with contours, the trail and the hop posts.", "Viewpoints/rim", "Region_6/Ground"),
+            new Model("valley_set", "Region 6: the deck at the rim, the sign, and the pink sun.", "Viewpoints/rim", "Region_6/Deck", "Region_6/Sign", "Region_6/Sun"),
+            new Model("network_trained", "Region 7: the same network with its trained weights, in gold.", "Viewpoints/right", "Region_7/Network"),
+            new Model("finale_digits", "Region 7: 60 real test digits with the trained network's real answers (wrong ones red).", "Viewpoints/right", "Region_7/DigitWall"),
+            new Model("accuracy_sign", "Region 7: the real accuracy and training count.", "Viewpoints/right", "Region_7/AccuracySign"),
+            new Model("words", "Region 7: the teaser, the same machinery with words.", "Viewpoints/end", "Region_7/Words"),
         };
-
-        private const string Lane = "Station_1/Stream/Lane"; // where DataStreamView floats the test objects
 
         /// <summary>Renderable ride objects that are not models, by scene path, with the reason. Keep this short.</summary>
         public static readonly Dictionary<string, string> NotModels = new Dictionary<string, string>
@@ -131,7 +137,7 @@ namespace Convergence.EditorTools
         private const float RiderEyeHeight = 1.30f;
         private const float RiderFov = 68f;   // the seat captures' field of view (RideSeatCaptures)
         private static readonly string[] RootNames = { "Pod", "Track" };
-        private static readonly string[] RuntimeOnlyPanels = { "Pod/Finale", "Pod/ChapterCard" };
+        private static readonly string[] RuntimeOnlyPanels = { "Pod/EndCard", "Pod/Dash/WeightGrid" };
 
         private sealed class Tile
         {
@@ -286,8 +292,8 @@ namespace Convergence.EditorTools
         }
 
         /// <summary>
-        /// Every direct child of a ride root (Pod, Track, Station_N, and later the regions) that renders anything must sit
-        /// on, above, or under a model's path. Root names ending in _N are compared as one (Station_2 is covered by Station_1).
+        /// Every direct child of a ride root (Pod, Track, Region_N; Station_N for older scenes) that renders anything must sit
+        /// on, above, or under a model's path. Station_N roots compare as one (Station_2 is covered by Station_1); regions do not.
         /// </summary>
         public static List<string> FindUncovered(Scene scene)
         {
@@ -325,14 +331,14 @@ namespace Convergence.EditorTools
             return name.StartsWith("Station_", StringComparison.Ordinal) || name.StartsWith("Region_", StringComparison.Ordinal);
         }
 
-        /// <summary>"Station_2/Neuron" and "Station_1/Neuron" compare equal: a trailing _N on the root becomes _*.</summary>
+        /// <summary>"Station_2/Neuron" and "Station_1/Neuron" compare equal: a trailing _N on a Station root becomes _*. Region roots differ, so they stay apart.</summary>
         private static string Normalize(string path)
         {
             int slash = path.IndexOf('/');
             string root = slash < 0 ? path : path.Substring(0, slash);
             string rest = slash < 0 ? "" : path.Substring(slash);
             int us = root.LastIndexOf('_');
-            if (us > 0 && us < root.Length - 1 && int.TryParse(root.Substring(us + 1), out _)) root = root.Substring(0, us) + "_*";
+            if (root.StartsWith("Station_", StringComparison.Ordinal) && us > 0 && us < root.Length - 1 && int.TryParse(root.Substring(us + 1), out _)) root = root.Substring(0, us) + "_*";
             return root + rest;
         }
 
@@ -664,7 +670,6 @@ namespace Convergence.EditorTools
             public readonly Dictionary<string, Transform> Roots = new Dictionary<string, Transform>();
             public readonly List<(GameObject go, bool active)> Saved = new List<(GameObject, bool)>();
             private readonly List<(Transform t, Vector3 position)> _moved = new List<(Transform, Vector3)>();
-            private readonly List<(string station, GameObject group, bool shows)> _stationGroups = new List<(string, GameObject, bool)>();
             private readonly List<Renderer> _blocked = new List<Renderer>();
 
             /// <summary>Back to the scene as saved, then: the pod at the rider spot, the stop's own groups live, runtime panels hidden, the model shown.</summary>
@@ -681,7 +686,6 @@ namespace Convergence.EditorTools
                     if (model.RiderAt != "Pod") Pod.SetPositionAndRotation(rider.position, rider.rotation);
                 }
 
-                StageStations(rider.name);
                 foreach (string panel in RuntimeOnlyPanels)
                 {
                     Transform t = Find(panel);
@@ -704,47 +708,24 @@ namespace Convergence.EditorTools
                         t.position = showAt.position;
                     }
 
-                    if (model.MaterialFloats == null) continue;
+                    if (model.MaterialFloats == null && model.MaterialColors == null) continue;
                     var block = new MaterialPropertyBlock();
                     foreach (Renderer r in t.GetComponentsInChildren<Renderer>(true))
                     {
                         if (r.sharedMaterial == null) continue;
                         r.GetPropertyBlock(block);
-                        ApplyFloats(block, r.sharedMaterial, model.MaterialFloats);
+                        if (model.MaterialFloats != null) ApplyFloats(block, r.sharedMaterial, model.MaterialFloats);
+                        if (model.MaterialColors != null)
+                        {
+                            foreach (KeyValuePair<string, Color> c in model.MaterialColors)
+                            {
+                                if (r.sharedMaterial.HasProperty(c.Key)) block.SetColor(c.Key, c.Value);
+                            }
+                        }
+
                         r.SetPropertyBlock(block);
                         _blocked.Add(r);
                     }
-                }
-            }
-
-            // The v3 stops show only the live stop's groups for its kind (as RideSeatCaptures does). Read from the copy's
-            // StationReveal before its scripts are stripped; roots without one are left as saved.
-            public void ReadStationGroups(string rootName, GameObject copy)
-            {
-                var reveal = copy.GetComponent<StationReveal>();
-                var controller = copy.GetComponent<StationController>();
-                if (reveal == null || controller == null) return;
-                var so = new SerializedObject(reveal);
-                SerializedProperty groups = so.FindProperty("groups");
-                for (int i = 0; groups != null && i < groups.arraySize; i++)
-                {
-                    SerializedProperty e = groups.GetArrayElementAtIndex(i);
-                    var root = e.FindPropertyRelative("root").objectReferenceValue as GameObject;
-                    if (root == null) continue;
-                    bool forKind = controller.Kind == StationKind.OneSignal ? e.FindPropertyRelative("oneSignal").boolValue
-                        : controller.Kind == StationKind.TwoSignals ? e.FindPropertyRelative("twoSignals").boolValue
-                        : e.FindPropertyRelative("learns").boolValue;
-                    _stationGroups.Add((rootName, root, forKind));
-                }
-
-                so.Dispose();
-            }
-
-            private void StageStations(string riderName)
-            {
-                foreach ((string station, GameObject group, bool shows) in _stationGroups)
-                {
-                    if (group != null) group.SetActive(station == riderName && shows);
                 }
             }
 
@@ -773,7 +754,6 @@ namespace Convergence.EditorTools
                     continue;
                 }
 
-                world.ReadStationGroups(root.name, copy);
                 StripBehaviours(holder);
                 holder.SetActive(true);
                 world.Roots[root.name] = copy.transform;

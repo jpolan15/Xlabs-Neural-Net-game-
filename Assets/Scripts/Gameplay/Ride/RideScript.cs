@@ -4,10 +4,10 @@ using UnityEngine;
 namespace Convergence.Gameplay.Ride
 {
     /// <summary>
-    /// The pacing of the narrated ride: which lines play in the intro, in each briefing, and in the outro, and how
-    /// many seconds each one holds the floor (clip length plus the pause after it). Numbers only. Gameplay paces the
-    /// ride from this and never touches an AudioClip, so the flow is testable without audio. The builder writes it
-    /// from the narration data (Tools/Editor/RideNarrationData.cs).
+    /// The pacing of the narrated ride: the lines of the intro, the line said at the dock, and the sequences the
+    /// segments play while the pod travels and when it arrives, with how many seconds each line holds the floor (clip
+    /// length plus the pause after it). Numbers only. Gameplay paces the ride from this and never touches an AudioClip,
+    /// so the flow is testable without audio. The builder writes it from Tools/Editor/RideNarrationData.cs.
     /// </summary>
     [CreateAssetMenu(menuName = "Convergence/Ride Script", fileName = "RideScript")]
     public sealed class RideScript : ScriptableObject
@@ -19,19 +19,6 @@ namespace Convergence.Gameplay.Ride
 
             [Tooltip("How long this line holds the floor: clip length (or reading time) plus the pause after it.")]
             public float seconds;
-
-            [Tooltip("Empty for a spoken beat. A control id (RideControlIds) makes it a hands-on beat: the ride waits for the rider to set that control to at least Wait At Least, or for Wait Timeout after the line, whichever comes first.")]
-            public string waitFor;
-
-            [Tooltip("Where the control is set when the hands-on beat opens. Ignored for GO, which the rider may be holding.")]
-            public float waitFrom;
-
-            public float waitAtLeast;
-
-            [Tooltip("Seconds after the line ends before the ride does it for the rider, so nobody gets stuck.")]
-            public float waitTimeout;
-
-            public bool WaitsForRider => !string.IsNullOrEmpty(waitFor);
         }
 
         [Serializable]
@@ -56,17 +43,19 @@ namespace Convergence.Gameplay.Ride
 
         public Sequence intro;
 
-        [Tooltip("One briefing per stop, played while the pod travels to it.")]
-        public Sequence[] briefings = new Sequence[0];
+        [Tooltip("Said when the dock opens and GO goes live.")]
+        public RideLine dockLine = RideLine.PagePullToDive;
 
-        public Sequence outro;
+        [Tooltip("The sequences segments play, by index (RideDirector.Segment.travel and arrival).")]
+        public Sequence[] sequences = new Sequence[0];
 
-        [Tooltip("Every line's seconds, including the station lines said in the moment, so the ride can let a line finish before it moves on.")]
+        [Tooltip("Every line's seconds, including the lines moments say in the moment, so the ride can let a line finish before it moves on.")]
         public Beat[] lines = new Beat[0];
 
-        public Sequence BriefingFor(int stopIndex)
+        /// <summary>The sequence at an index, or an empty one for -1 or an index the script does not have.</summary>
+        public Sequence SequenceAt(int index)
         {
-            return briefings != null && stopIndex >= 0 && stopIndex < briefings.Length ? briefings[stopIndex] : default;
+            return sequences != null && index >= 0 && index < sequences.Length ? sequences[index] : default;
         }
 
         /// <summary>How long a line holds the floor, or 0 if the script does not know it.</summary>

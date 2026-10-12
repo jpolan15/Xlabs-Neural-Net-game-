@@ -44,15 +44,12 @@ namespace Convergence.Tests.PlayMode.XR
             var interactor = interactorGo.AddComponent<XRDirectInteractor>();
             interactor.interactionManager = manager;
 
-            // Move the chamber onto the XOR leg by solving OR first, then install a hidden layer.
-            neural.SetActivation(ActivationType.Step);
-            neural.SetCableConnected(0, true);
-            neural.SetCableConnected(1, true);
-            neural.SetWeight(0, 1.0);
-            neural.SetWeight(1, 1.0);
-            neural.SetBias(-0.5);
-            chamber.TriggerForwardPass();
-            yield return null;
+            // Move the chamber onto the XOR leg by solving OR, AND and rock-not-ice first (the order
+            // VoyageDirector plays them in since chambers 02 and 03 were added), then install a hidden layer.
+            yield return Solve(neural, chamber, 1.0, 1.0, -0.5);
+            yield return Solve(neural, chamber, 1.0, 1.0, -1.5);
+            yield return Solve(neural, chamber, 1.0, -1.0, -0.5);
+            Assert.AreEqual(VoyageDirector.Leg.SpectrumXor, voyage.CurrentLeg, "Solving chambers 01 to 03 must reach the XOR leg.");
 
             manager.SelectEnter((IXRSelectInteractor)interactor, (IXRSelectInteractable)bridge);
             yield return null;
@@ -61,6 +58,18 @@ namespace Convergence.Tests.PlayMode.XR
             Assert.AreEqual(2, neural.Network.Layers.Count);
             Assert.IsNotNull(button);
             Assert.IsNotNull(voyage);
+        }
+
+        private static IEnumerator Solve(NeuralState neural, ChamberController chamber, double w0, double w1, double bias)
+        {
+            neural.SetActivation(ActivationType.Step);
+            neural.SetCableConnected(0, true);
+            neural.SetCableConnected(1, true);
+            neural.SetWeight(0, w0);
+            neural.SetWeight(1, w1);
+            neural.SetBias(bias);
+            chamber.TriggerForwardPass();
+            yield return null;
         }
     }
 }

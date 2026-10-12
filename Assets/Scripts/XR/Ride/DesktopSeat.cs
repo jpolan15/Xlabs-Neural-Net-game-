@@ -10,8 +10,10 @@ namespace Convergence.XR.Ride
 {
     /// <summary>
     /// Plays the ride from the desk when no headset is running: hold the right mouse button to look around the
-    /// cockpit, and click and drag a lever with the left button. The moment a headset or XR display is running it
-    /// gives the camera back to tracking. The mouse writes the same lever API a hand does.
+    /// cockpit, click and drag a lever with the left button, click a weight cell or a glowing wire. The moment a
+    /// headset or XR display is running it gives the camera back to tracking. The mouse uses the same APIs a hand does.
+    /// Operator keys work with or without a headset: Space skips the lines (or hurries a moment), R restarts, G toggles
+    /// gentle mode (half the drop, slower travel).
     /// </summary>
     public sealed class DesktopSeat : MonoBehaviour
     {
@@ -20,6 +22,8 @@ namespace Convergence.XR.Ride
         [SerializeField] private float maxYaw = 100f;
         [SerializeField] private float maxPitch = 55f;
         [SerializeField] private float reach = 6f;
+        [Tooltip("How far a click reaches for the rewind's wires, which hang far out in the network.")]
+        [SerializeField] private float wireReach = 80f;
 
         private readonly List<XRDisplaySubsystem> _displays = new List<XRDisplaySubsystem>(2);
         private Camera _camera;
@@ -71,11 +75,17 @@ namespace Convergence.XR.Ride
 
             if (keyboard.spaceKey.wasPressedThisFrame)
             {
-                if (_director == null) _director = FindFirstObjectByType<RideDirector>();
+                if (_director == null) _director = FindAnyObjectByType<RideDirector>();
                 if (_director != null) _director.SkipNarration();
             }
 
             if (keyboard.rKey.wasPressedThisFrame) SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+
+            if (keyboard.gKey.wasPressedThisFrame)
+            {
+                if (_director == null) _director = FindAnyObjectByType<RideDirector>();
+                if (_director != null) _director.GentleMode = !_director.GentleMode;
+            }
         }
 
         private void Take()
@@ -115,13 +125,23 @@ namespace Convergence.XR.Ride
             if (mouse == null) return;
 
             Ray ray = _camera.ScreenPointToRay(mouse.position.ReadValue());
-            if (mouse.leftButton.wasPressedThisFrame && Physics.Raycast(ray, out RaycastHit hit, reach))
+            if (mouse.leftButton.wasPressedThisFrame && Physics.Raycast(ray, out RaycastHit hit, wireReach))
             {
                 PodLeverInteractable lever = hit.collider.GetComponentInParent<PodLeverInteractable>();
-                if (lever != null && lever.isActiveAndEnabled)
+                WeightCellInteractable cell = hit.collider.GetComponent<WeightCellInteractable>();
+                BlameWireInteractable wire = hit.collider.GetComponentInParent<BlameWireInteractable>();
+                if (lever != null && lever.isActiveAndEnabled && hit.distance <= reach)
                 {
                     _dragged = lever;
                     _dragged.BeginGrab(_dragged.FractionFromRay(ray));
+                }
+                else if (cell != null && cell.isActiveAndEnabled && hit.distance <= reach)
+                {
+                    cell.Tap();
+                }
+                else if (wire != null && wire.isActiveAndEnabled)
+                {
+                    wire.Point();
                 }
             }
 

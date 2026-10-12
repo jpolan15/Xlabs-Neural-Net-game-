@@ -21,13 +21,6 @@ namespace Convergence.XR.Ride
         [SerializeField] private float hoverHaptic = 0.1f;
         [SerializeField] private float detentHaptic = 0.3f;
 
-        [Tooltip("The intro's hands-on beats (wake AURA, make the neuron fire): the director says when one is done.")]
-        [SerializeField] private RideDirector director;
-
-        [Tooltip("A strong pulse in the hand that just woke AURA or made the neuron fire.")]
-        [SerializeField] private float taskHaptic = 0.8f;
-        [SerializeField] private float taskHapticSeconds = 0.25f;
-
         [Tooltip("Raised with the requested value (range units) while a hand or mouse drags the handle.")]
         [SerializeField] private UnityEvent<float> userMoved = new UnityEvent<float>();
 
@@ -49,7 +42,6 @@ namespace Convergence.XR.Ride
         protected override void OnEnable()
         {
             base.OnEnable();
-            if (director != null) director.RiderTaskDone += OnRiderTaskDone;
             if (channel == null) return;
             channel.Changed += OnChannelChanged;
             channel.StateChanged += ApplyGate;
@@ -58,7 +50,6 @@ namespace Convergence.XR.Ride
 
         protected override void OnDisable()
         {
-            if (director != null) director.RiderTaskDone -= OnRiderTaskDone;
             if (channel != null)
             {
                 channel.Changed -= OnChannelChanged;
@@ -118,7 +109,7 @@ namespace Convergence.XR.Ride
         }
 
         /// <summary>
-        /// A click, or a squeeze and release, without dragging. A two-position lever (GO, LEARN) is pulled to its end.
+        /// A click, or a squeeze and release, without dragging. A two-position lever (GO) is pulled to its end.
         /// A three-position lever (the learning rate) steps to the next detent and wraps around. Others ignore a tap.
         /// </summary>
         public void Tap()
@@ -174,11 +165,6 @@ namespace Convergence.XR.Ride
         private void OnChannelChanged(RideControlChannel changed, bool byUser)
         {
             if (byUser && _holder != null) Haptic(_holder, detentHaptic, 0.03f);
-        }
-
-        private void OnRiderTaskDone(string control, bool byRider)
-        {
-            if (byRider && _holder != null && channel != null && channel.Id == control) Haptic(_holder, taskHaptic, taskHapticSeconds);
         }
 
         private static void Haptic(IXRInteractor interactor, float amplitude, float duration)

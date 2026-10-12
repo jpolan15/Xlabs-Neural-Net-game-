@@ -1,11 +1,12 @@
-// Neural Ride seat view re-shoot (TASK_IGNITE_RIDE_V3_MASTER_PLAN, section 8).
-// Edit mode only. For each stop N the Pod moves onto Station_N, only that station's StationReveal
-// groups for its kind are shown, and Pod/Finale is hidden. Each stop is rendered at three eye heights.
-// The dock view keeps the Pod where the scene has it, with every stop group and Finale hidden.
-// Every transform and active state changed here is restored in a finally block. The scene is never
-// saved and never marked dirty.
+// Level 1 seat views (AGENTS.md validation item 6, TASK_LEVEL1_DIGITS_RESTRUCTURE section 5).
+// Edit mode only. For every RideViewpoint (dock, each stop, the rim, the middle of the drop, the valley floor, the end)
+// the Pod is moved onto the viewpoint, only the regions the streamer shows at that segment are active, the fog and sky
+// are that region's, and pod panels that are hidden there are hidden. Each viewpoint is rendered at eye heights 1.15,
+// 1.30 and 1.45 m and gaze yaws -30, 0 and +30 degrees, plus one 3 x 3 contact sheet. Every transform, active state and
+// render setting changed here is restored in a finally block. The scene is never saved.
 // Prerequisite: Assets/Scenes/NeuralRide.unity is the active scene, built by Convergence/Build Neural Ride.
-// Output: Documentation/Design/captures/ride_v3/stop{N}_eye{115|130|145}.png and dock_eye130.png.
+// Output: Documentation/Design/captures/level1/<viewpoint>/eye{115|130|145}_yaw{m30|0|p30}.jpg and level1/<viewpoint>.jpg.
+// From the Unity CLI: unity command eval "return Convergence.EditorTools.RideSeatCaptures.CaptureAll();"
 
 using System.Collections.Generic;
 using System.IO;
@@ -21,281 +22,169 @@ namespace Convergence.EditorTools
 {
     public static class RideSeatCaptures
     {
-        const string PodName = "Pod";
-        const string FinaleName = "Finale";
-        const int StopCount = 3;
-        const int Width = 1600;
-        const int Height = 900;
+        const int Width = 1280;
+        const int Height = 720;
         const float FieldOfView = 68f;
-        const float DockEyeHeight = 1.30f;
-        static readonly float[] StopEyeHeights = { 1.15f, 1.30f, 1.45f };
+        static readonly float[] EyeHeights = { 1.15f, 1.30f, 1.45f };
+        static readonly float[] Yaws = { -30f, 0f, 30f };
 
         [MenuItem("Convergence/Capture Ride Seat Views")]
-        public static void Capture()
+        public static void Capture() => Debug.Log("[RideSeatCaptures] " + CaptureAll());
+
+        /// <summary>Shoots every viewpoint (or only those whose label is in a comma-separated list). Returns a summary.</summary>
+        public static string CaptureAll(string only = null)
         {
-            if (Application.isPlaying)
-            {
-                Debug.LogError("[RideSeatCaptures] Exit Play Mode first. Seat views are captured in Edit mode only. Nothing was changed.");
-                return;
-            }
-
+            if (Application.isPlaying) return "FAILED: exit Play Mode first. Seat views are captured in edit mode only. Nothing was changed.";
             Scene scene = SceneManager.GetActiveScene();
-            if (scene.isDirty)
+            if (scene.isDirty) return "FAILED: " + scene.name + " has unsaved changes. Save or revert it first so the captures match the saved scene. Nothing was changed.";
+
+            GameObject pod = null;
+            RegionStreamer streamer = null;
+            RideDirector director = null;
+            var regions = new Dictionary<int, GameObject>();
+            var viewpoints = new List<RideViewpoint>();
+            foreach (GameObject root in scene.GetRootGameObjects())
             {
-                Debug.LogError("[RideSeatCaptures] " + scene.name + " has unsaved changes. Save or revert it first so the captures match the saved scene. Nothing was changed.");
-                return;
+                if (root.name == "Pod") pod = root;
+                if (root.name.StartsWith("Region_") && int.TryParse(root.name.Substring(7), out int n)) regions[n] = root;
+                if (streamer == null) streamer = root.GetComponentInChildren<RegionStreamer>(true);
+                if (director == null) director = root.GetComponentInChildren<RideDirector>(true);
+                viewpoints.AddRange(root.GetComponentsInChildren<RideViewpoint>(true));
             }
 
-            GameObject pod = FindRoot(scene, PodName);
-            if (pod == null) return;
+            if (pod == null || viewpoints.Count == 0) return "FAILED: no Pod or no viewpoints. Open Assets/Scenes/NeuralRide.unity (built by Convergence/Build Neural Ride). Nothing was changed.";
+            var theme = AssetDatabase.LoadAssetAtPath<RideTheme>("Assets/ScriptableObjects/RideTheme.asset");
+            var wanted = only == null ? null : new HashSet<string>(only.Split(','));
 
-            Transform finale = pod.transform.Find(FinaleName);
-            if (finale == null)
-            {
-                Debug.LogError("[RideSeatCaptures] Pod/Finale is missing. Rebuild the ride with Convergence/Build Neural Ride. Nothing was changed.");
-                return;
-            }
-
-            var stops = new List<StopRig>();
-            for (int n = 1; n <= StopCount; n++)
-            {
-                StopRig stop = ReadStop(scene, n);
-                if (stop == null) return;
-                stops.Add(stop);
-            }
-
-            string outDir = Path.Combine(ProjectRoot(), "Documentation", "Design", "captures", "ride_v3");
+            string outDir = Path.Combine(ProjectRoot(), "Documentation", "Design", "captures", "level1");
             Directory.CreateDirectory(outDir);
-
             Transform podT = pod.transform;
-            Vector3 podLocalPosition = podT.localPosition;
-            Quaternion podLocalRotation = podT.localRotation;
-            Vector3 podLocalScale = podT.localScale;
-            bool finaleWasActive = finale.gameObject.activeSelf;
-            Transform card = pod.transform.Find("ChapterCard");
-            bool cardWasActive = card != null && card.gameObject.activeSelf;
-            if (card != null) card.gameObject.SetActive(false); // it only shows during a briefing
+            Vector3 podPosition = podT.position;
+            Quaternion podRotation = podT.rotation;
+            var regionWasActive = new Dictionary<GameObject, bool>();
+            foreach (GameObject r in regions.Values) regionWasActive[r] = r.activeSelf;
+            var podPanels = new Dictionary<Transform, bool>();
+            foreach (string path in new[] { "EndCard", "Dash/WeightGrid" })
+            {
+                Transform t = podT.Find(path);
+                if (t != null) podPanels[t] = t.gameObject.activeSelf;
+            }
 
+            bool fog = RenderSettings.fog;
+            Color fogColor = RenderSettings.fogColor;
+            float fogDensity = RenderSettings.fogDensity;
             GameObject camGo = null;
             RenderTexture rt = null;
-            Texture2D tex = null;
+            Texture2D tex = null, sheet = null;
+            int shots = 0;
             try
             {
                 camGo = new GameObject("RideSeatCaptureCam") { hideFlags = HideFlags.HideAndDontSave };
                 Camera cam = camGo.AddComponent<Camera>();
                 cam.enabled = false;
                 camGo.AddComponent<UniversalAdditionalCameraData>();
-                ConfigureCamera(cam, pod);
-
-                rt = new RenderTexture(Width, Height, GraphicsFormat.R8G8B8A8_SRGB, UnityEngine.Rendering.CoreUtils.GetDefaultDepthOnlyFormat());
+                cam.fieldOfView = FieldOfView;
+                cam.aspect = (float)Width / Height;
+                cam.nearClipPlane = 0.03f;
+                cam.farClipPlane = 160f;
+                cam.clearFlags = CameraClearFlags.SolidColor;
+                rt = new RenderTexture(Width, Height, GraphicsFormat.R8G8B8A8_UNorm, UnityEngine.Rendering.CoreUtils.GetDefaultDepthOnlyFormat()) { antiAliasing = 4 };
                 cam.targetTexture = rt;
                 tex = new Texture2D(Width, Height, TextureFormat.RGB24, false);
+                sheet = new Texture2D(Width / 2 * 3, Height / 2 * 3, TextureFormat.RGB24, false);
 
-                // Dock: no stop is live. The Pod stays where the scene has it.
-                ApplyStage(stops, -1, finale);
-                Shoot(cam, rt, tex, podT, DockEyeHeight, Path.Combine(outDir, "dock_" + EyeTag(DockEyeHeight) + ".png"));
-
-                for (int i = 0; i < stops.Count; i++)
+                foreach (RideViewpoint vp in viewpoints)
                 {
-                    ApplyStage(stops, i, finale);
-                    Transform station = stops[i].Station.transform;
-                    podT.SetPositionAndRotation(station.position, station.rotation);
-
-                    foreach (float eyeHeight in StopEyeHeights)
+                    if (wanted != null && !wanted.Contains(vp.label)) continue;
+                    int mask = streamer != null ? streamer.MaskFor(vp.segment) : ~0;
+                    foreach (KeyValuePair<int, GameObject> r in regions) r.Value.SetActive((mask & (1 << r.Key)) != 0);
+                    foreach (KeyValuePair<Transform, bool> panel in podPanels)
                     {
-                        string file = "stop" + (i + 1) + "_" + EyeTag(eyeHeight) + ".png";
-                        Shoot(cam, rt, tex, podT, eyeHeight, Path.Combine(outDir, file));
+                        string path = panel.Key.name == "WeightGrid" ? "Dash/WeightGrid" : panel.Key.name;
+                        panel.Key.gameObject.SetActive(System.Array.IndexOf(vp.podPanels, path) >= 0);
                     }
+
+                    int region = vp.segment < 0 || director == null ? 0 : director.Segments[vp.segment].region;
+                    RideTheme.RegionLook look = theme != null ? theme.Region(region) : default;
+                    RenderSettings.fog = true;
+                    RenderSettings.fogColor = look.fog;
+                    RenderSettings.fogDensity = look.fogDensity;
+                    cam.backgroundColor = look.background;
+
+                    podT.SetPositionAndRotation(vp.transform.position, vp.transform.rotation);
+                    string dir = Path.Combine(outDir, vp.label);
+                    Directory.CreateDirectory(dir);
+                    for (int e = 0; e < EyeHeights.Length; e++)
+                    {
+                        for (int y = 0; y < Yaws.Length; y++)
+                        {
+                            Shoot(cam, rt, tex, podT, EyeHeights[e], Yaws[y]);
+                            File.WriteAllBytes(Path.Combine(dir, "eye" + Mathf.RoundToInt(EyeHeights[e] * 100f) + "_yaw" + YawTag(Yaws[y]) + ".jpg"), tex.EncodeToJPG(88));
+                            Paste(tex, sheet, y, 2 - e);
+                            shots++;
+                        }
+                    }
+
+                    sheet.Apply();
+                    File.WriteAllBytes(Path.Combine(outDir, vp.label + ".jpg"), sheet.EncodeToJPG(85));
                 }
             }
             finally
             {
-                foreach (StopRig stop in stops)
-                {
-                    foreach (GroupEntry group in stop.Groups)
-                    {
-                        if (group.Root != null) group.Root.SetActive(group.WasActive);
-                    }
-                }
-
-                finale.gameObject.SetActive(finaleWasActive);
-                if (card != null) card.gameObject.SetActive(cardWasActive);
-                podT.localPosition = podLocalPosition;
-                podT.localRotation = podLocalRotation;
-                podT.localScale = podLocalScale;
-
+                foreach (KeyValuePair<GameObject, bool> r in regionWasActive) r.Key.SetActive(r.Value);
+                foreach (KeyValuePair<Transform, bool> panel in podPanels) panel.Key.gameObject.SetActive(panel.Value);
+                RenderSettings.fog = fog;
+                RenderSettings.fogColor = fogColor;
+                RenderSettings.fogDensity = fogDensity;
+                podT.SetPositionAndRotation(podPosition, podRotation);
                 RenderTexture.active = null;
-                if (camGo != null)
-                {
-                    Camera cam = camGo.GetComponent<Camera>();
-                    if (cam != null) cam.targetTexture = null;
-                    UnityEngine.Object.DestroyImmediate(camGo);
-                }
-
+                if (camGo != null) Object.DestroyImmediate(camGo);
                 if (rt != null)
                 {
                     rt.Release();
-                    UnityEngine.Object.DestroyImmediate(rt);
+                    Object.DestroyImmediate(rt);
                 }
 
-                if (tex != null) UnityEngine.Object.DestroyImmediate(tex);
+                if (tex != null) Object.DestroyImmediate(tex);
+                if (sheet != null) Object.DestroyImmediate(sheet);
             }
 
-            if (scene.isDirty)
-            {
-                Debug.LogWarning("[RideSeatCaptures] The capture marked " + scene.name + " as modified. Its values were restored. Revert the scene instead of saving it.");
-            }
-
-            Debug.Log("[RideSeatCaptures] Finished. PNGs are in " + outDir);
+            string note = scene.isDirty ? " The capture marked the scene modified; its values were restored. Revert it instead of saving." : "";
+            return "Wrote " + shots + " seat views to " + outDir + " (one folder and one 3 x 3 sheet per viewpoint: rows eye 1.45 / 1.30 / 1.15 m, columns yaw -30 / 0 / +30)." + note;
         }
 
-        static StopRig ReadStop(Scene scene, int number)
-        {
-            GameObject station = FindRoot(scene, "Station_" + number);
-            if (station == null) return null;
+        static string YawTag(float yaw) => yaw < 0 ? "m" + Mathf.RoundToInt(-yaw) : yaw > 0 ? "p" + Mathf.RoundToInt(yaw) : "0";
 
-            var controller = station.GetComponent<StationController>();
-            var reveal = station.GetComponent<StationReveal>();
-            if (controller == null || reveal == null)
-            {
-                Debug.LogError("[RideSeatCaptures] Station_" + number + " has no StationController or StationReveal. Rebuild the ride. Nothing was changed.");
-                return null;
-            }
-
-            return new StopRig
-            {
-                Station = station,
-                Kind = controller.Kind,
-                Groups = ReadGroups(reveal)
-            };
-        }
-
-        // Reads the StationReveal groups and their current active state before anything is changed.
-        static List<GroupEntry> ReadGroups(StationReveal reveal)
-        {
-            var list = new List<GroupEntry>();
-            var so = new SerializedObject(reveal);
-            SerializedProperty array = so.FindProperty("groups");
-            for (int i = 0; array != null && i < array.arraySize; i++)
-            {
-                SerializedProperty element = array.GetArrayElementAtIndex(i);
-                var root = element.FindPropertyRelative("root").objectReferenceValue as GameObject;
-                if (root == null) continue;
-
-                list.Add(new GroupEntry
-                {
-                    Root = root,
-                    WasActive = root.activeSelf,
-                    OneSignal = element.FindPropertyRelative("oneSignal").boolValue,
-                    TwoSignals = element.FindPropertyRelative("twoSignals").boolValue,
-                    Learns = element.FindPropertyRelative("learns").boolValue
-                });
-            }
-
-            so.Dispose();
-            return list;
-        }
-
-        // Shows only the live stop's groups for its kind, hides every other group, and hides Finale.
-        // liveIndex -1 means the dock, where no stop is live.
-        static void ApplyStage(List<StopRig> stops, int liveIndex, Transform finale)
-        {
-            for (int i = 0; i < stops.Count; i++)
-            {
-                StopRig stop = stops[i];
-                foreach (GroupEntry group in stop.Groups)
-                {
-                    if (group.Root == null) continue;
-                    group.Root.SetActive(i == liveIndex && ShowsForKind(group, stop.Kind));
-                }
-            }
-
-            finale.gameObject.SetActive(false);
-        }
-
-        static bool ShowsForKind(GroupEntry group, StationKind kind)
-        {
-            if (kind == StationKind.OneSignal) return group.OneSignal;
-            if (kind == StationKind.TwoSignals) return group.TwoSignals;
-            return group.Learns;
-        }
-
-        static void ConfigureCamera(Camera cam, GameObject pod)
-        {
-            cam.fieldOfView = FieldOfView;
-            cam.aspect = (float)Width / Height;
-            cam.nearClipPlane = 0.03f;
-            cam.farClipPlane = 55f;
-            cam.clearFlags = CameraClearFlags.SolidColor;
-            cam.backgroundColor = new Color(0.012f, 0.016f, 0.030f);
-            cam.cullingMask = ~0;
-
-            // Match the player's head camera (built by NeuralRideBuilder) when it is present.
-            Camera head = pod.GetComponentInChildren<Camera>(true);
-            if (head == null) return;
-            cam.clearFlags = head.clearFlags;
-            cam.backgroundColor = head.backgroundColor;
-            cam.nearClipPlane = head.nearClipPlane;
-            cam.farClipPlane = head.farClipPlane;
-        }
-
-        // The Pod origin is the floor: RideDirector places it on the path. The eye sits straight up from
-        // there and looks level along the Pod's forward direction.
-        static void Shoot(Camera cam, RenderTexture rt, Texture2D tex, Transform pod, float eyeHeight, string path)
+        // The pod origin is the floor; the eye sits straight up from there and looks level, turned by the gaze yaw.
+        static void Shoot(Camera cam, RenderTexture rt, Texture2D tex, Transform pod, float eyeHeight, float yaw)
         {
             Vector3 forward = pod.forward;
             forward.y = 0f;
             if (forward.sqrMagnitude < 0.0001f) forward = Vector3.forward;
-
-            Vector3 eye = pod.position + Vector3.up * eyeHeight;
-            cam.transform.SetPositionAndRotation(eye, Quaternion.LookRotation(forward.normalized, Vector3.up));
+            Quaternion look = Quaternion.LookRotation(forward.normalized, Vector3.up) * Quaternion.Euler(5f, yaw, 0f);
+            cam.transform.SetPositionAndRotation(pod.position + Vector3.up * eyeHeight, look);
             cam.Render();
-
             RenderTexture previous = RenderTexture.active;
             RenderTexture.active = rt;
             tex.ReadPixels(new Rect(0, 0, Width, Height), 0, 0);
             tex.Apply();
             RenderTexture.active = previous;
-
-            File.WriteAllBytes(path, tex.EncodeToPNG());
-            Debug.Log("[RideSeatCaptures] Wrote " + path);
         }
 
-        static string EyeTag(float eyeHeight)
+        /// <summary>Copies a frame, halved, into cell (column, row) of the contact sheet (row 0 at the bottom).</summary>
+        static void Paste(Texture2D frame, Texture2D sheet, int column, int row)
         {
-            return "eye" + Mathf.RoundToInt(eyeHeight * 100f).ToString();
-        }
-
-        static GameObject FindRoot(Scene scene, string name)
-        {
-            foreach (GameObject root in scene.GetRootGameObjects())
+            int w = Width / 2, h = Height / 2;
+            var pixels = new Color32[w * h];
+            Color32[] src = frame.GetPixels32();
+            for (int y = 0; y < h; y++)
             {
-                if (root.name == name) return root;
+                for (int x = 0; x < w; x++) pixels[y * w + x] = src[(y * 2) * Width + x * 2];
             }
 
-            Debug.LogError("[RideSeatCaptures] Root object " + name + " is missing from " + scene.name + ". Open Assets/Scenes/NeuralRide.unity first. Nothing was changed.");
-            return null;
+            sheet.SetPixels32(column * w, row * h, w, h, pixels);
         }
 
-        static string ProjectRoot()
-        {
-            return Directory.GetParent(Application.dataPath).FullName;
-        }
-
-        sealed class StopRig
-        {
-            public GameObject Station;
-            public StationKind Kind;
-            public List<GroupEntry> Groups;
-        }
-
-        sealed class GroupEntry
-        {
-            public GameObject Root;
-            public bool WasActive;
-            public bool OneSignal;
-            public bool TwoSignals;
-            public bool Learns;
-        }
+        static string ProjectRoot() => Directory.GetParent(Application.dataPath).FullName;
     }
 }

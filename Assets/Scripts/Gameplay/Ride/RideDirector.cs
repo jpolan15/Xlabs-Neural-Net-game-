@@ -6,126 +6,179 @@ using UnityEngine;
 namespace Convergence.Gameplay.Ride
 {
     /// <summary>
-    /// Runs the ride: intro, dock, travel, stop, solve, travel, and so on. Moves the pod along a Catmull-Rom path with
-    /// eased starts and stops, yaw only, so the pod never pitches or rolls. Stations raise Solved; the director only
-    /// moves on. It reads the dash through <see cref="RideControlSet"/> and holds no XR types.
-    /// With a <see cref="RideScript"/> it also paces the narration: a spoken intro that holds GO (with hands-on beats
-    /// that wait for the rider or time out), a briefing during every travel that must finish before the next station
-    /// goes live, and an outro. Without a script it behaves as the plain ride (ADR-011).
+    /// Runs Level 1 as one continuous ride: a narrated intro that holds GO, the dock, then an ordered list of segments.
+    /// Each segment moves the pod along one leg of track to a distance (forward, or backward for the rewind), plays
+    /// its travel lines on the way and its arrival lines once stopped, then runs its moment (the puzzle, the forward
+    /// pass, the blame, the Valley drop) and waits for it to finish and for the last line to end before moving on.
+    /// The pod only ever yaws, with eased starts and stops; facing follows the track's own direction, so on the
+    /// rewind the rider keeps facing the network while it recedes. It reads the dash through
+    /// <see cref="RideControlSet"/> and holds no XR types. Moments decide nothing about the ride's order; the director
+    /// decides nothing about a moment's outcome.
     /// </summary>
     public sealed class RideDirector : MonoBehaviour
     {
         [Serializable]
-        public struct Stop
+        public struct Leg
         {
-            [Tooltip("Index into Path Points where the pod halts.")]
-            public int pointIndex;
-            public StationController station;
+            public string name;
+            public Vector3[] points;
+
+            [Tooltip("Gentle mode scales the height of every point at or past this distance about Gentle Base Y (-1: never).")]
+            public float gentleFrom;
+            public float gentleBaseY;
+        }
+
+        [Serializable]
+        public struct Segment
+        {
+            public string name;
+
+            [Tooltip("Which of the eight regions (0 The Page to 7 Right) this segment is in.")]
+            public int region;
+
+            public int leg;
+
+            [Tooltip("Where on the leg the segment ends, in meters along it. Lower than where the pod is: it rolls backward.")]
+            public float to;
+
+            [Tooltip("Plain speed for the travel, m/s.")]
+            public float cruise;
+
+            public float minSeconds;
+
+            [Tooltip("RideScript sequence played while moving (-1: none).")]
+            public int travel;
+
+            [Tooltip("RideScript sequence played once stopped (-1: none).")]
+            public int arrival;
+
+            [Tooltip("Runs after the arrival lines; the ride moves on when it finishes.")]
+            public RideMoment moment;
         }
 
         [SerializeField] private Transform pod;
         [SerializeField] private RideControlSet controls;
-        [SerializeField] private Transform[] pathPoints = new Transform[0];
-        [SerializeField] private Stop[] stops = new Stop[0];
+        [SerializeField] private Leg[] legs = new Leg[0];
+        [SerializeField] private Segment[] segments = new Segment[0];
         [SerializeField] private RideScript script;
-        [SerializeField] private float cruiseSpeed = 4f;
-        [SerializeField] private float minTravelSeconds = 5f;
-        [SerializeField] private float advanceDelay = 3f;
         [SerializeField] private float yawFollow = 3f;
-        [SerializeField] private float briefingPadSeconds = 1.5f;
+        [SerializeField] private float narrationPadSeconds = 1.0f;
         [SerializeField] private float skipHoldSeconds = 2f;
-
-        [Tooltip("After a stop is solved, the pod waits for the line said at the solve to finish (plus this), so the lesson's last words are never cut off by the next briefing.")]
         [SerializeField] private float speechPadSeconds = 0.6f;
-
-        [Tooltip("The longest the pod waits for that line, so a long line can never stall the ride.")]
         [SerializeField] private float maxSpeechHoldSeconds = 15f;
+        [Tooltip("Gentle mode: the Valley drop is this much of its height, and travel this much slower.")]
+        [SerializeField] private float gentleScale = 0.5f;
 
-        [Tooltip("After a hands-on intro beat is done (the rider woke AURA, the neuron fired), the reaction gets at least this long before the next line.")]
-        [SerializeField] private float taskReactSeconds = 1.8f;
-
-        private RidePath _path;
-        private float _speechEndsAt;
+        private RidePath[] _paths;
         private RideState _state = RideState.Dock;
-        private int _stopIndex = -1;
+        private int _segment = -1;
+        private int _leg;
+        private int _region;
         private float _distance;
         private float _speed;
         private float _yaw;
+        private float _segmentFraction;
+        private float _speechEndsAt;
         private Coroutine _routine;
         private RideControlChannel _action;
         private bool _narrating;
         private bool _skipRequested;
         private bool _skippedThisLeg;
         private float _holdSeconds;
-        private bool _holdNeedsRelease;
+        private RideMoment _moment;
+        private bool _gentle;
 
         public RideState State => _state;
-        public int StopIndex => _stopIndex;
-        public int StopCount => stops.Length;
 
-        /// <summary>Current speed in meters per second. Drives the motion hum.</summary>
+        /// <summary>The segment running now, or -1 at the intro and the dock.</summary>
+        public int SegmentIndex => _segment;
+        public int SegmentCount => segments.Length;
+        public IReadOnlyList<Segment> Segments => segments;
+
+        /// <summary>The region the ride is in: 0 at the dock, then each segment's own.</summary>
+        public int Region => _region;
+
+        /// <summary>Current speed along the track in meters per second (negative while rolling backward).</summary>
         public float Speed => _speed;
 
-        /// <summary>How far along the track the pod is, 0 at the dock to 1 at the end.</summary>
-        public float Progress01 => _path != null && _path.Length > 0f ? Mathf.Clamp01(_distance / _path.Length) : 0f;
+        /// <summary>How far through the whole ride the pod is, 0 at the dock to 1 at the end.</summary>
+        public float Progress01 => segments.Length == 0 ? 0f
+            : _state == RideState.Complete ? 1f
+            : Mathf.Clamp01((Mathf.Max(0, _segment) + (_segment < 0 ? 0f : _segmentFraction)) / segments.Length);
 
         public RideControlSet Controls => controls;
-
-        /// <summary>The pacing data the ride runs on (null for the plain unscripted ride).</summary>
         public RideScript Script => script;
+        public Transform Pod => pod;
+        public int LegIndex => _leg;
+        public float Distance => _distance;
 
-        /// <summary>True while an intro, briefing, or outro line sequence is running.</summary>
+        /// <summary>True while an intro or segment line sequence is running.</summary>
         public bool IsNarrating => _narrating;
 
-        public event Action<RideState> StateChanged;
-        public event Action<int> StopReached;
+        /// <summary>The moment running now, or null.</summary>
+        public RideMoment ActiveMoment => _moment;
 
-        /// <summary>A line a station or the dock says in the moment (hints and reactions).</summary>
+        /// <summary>Gentle mode for first-time riders: half the drop, slower travel. G on the desk.</summary>
+        public bool GentleMode
+        {
+            get => _gentle;
+            set
+            {
+                if (_gentle == value) return;
+                _gentle = value;
+                GentleModeChanged?.Invoke(value);
+                if (_paths != null && _state != RideState.Traveling) Place(_distance, false);
+            }
+        }
+
+        /// <summary>How much of its height the Valley keeps now (1, or the gentle scale).</summary>
+        public float VerticalScale => _gentle ? gentleScale : 1f;
+
+        public event Action<RideState> StateChanged;
+
+        /// <summary>A line said in the moment (a hint or a reaction). It queues behind what is playing.</summary>
         public event Action<RideLine> Said;
 
-        /// <summary>A scripted line has the floor now (intro, briefing, outro). It plays at once and replaces any hint chatter.</summary>
+        /// <summary>A line that has the floor now. It plays at once and replaces any chatter.</summary>
         public event Action<RideLine> Narrated;
 
         /// <summary>The operator skipped the running sequence. Views cut off the current line.</summary>
         public event Action NarrationSkipped;
 
-        /// <summary>The briefing for this stop begins; it ends before the stop goes live.</summary>
-        public event Action<int> BriefingStarted;
-        public event Action<int> BriefingEnded;
-
-        /// <summary>The last stop is solved and the outro begins. The big network ignites here.</summary>
-        public event Action OutroStarted;
-
-        public event Action<StationKind, StationPhase> PhaseChanged;
-
-        /// <summary>A hands-on intro beat opens: the ride waits for the rider to set this control to at least this value.</summary>
-        public event Action<string, float> RiderTaskStarted;
-
-        /// <summary>That beat is done: true if the rider did it, false if it timed out and the ride did it for them.</summary>
-        public event Action<string, bool> RiderTaskDone;
-
         /// <summary>Which lever to nudge and which way. A null id clears the hint.</summary>
         public event Action<string, int> HintChanged;
-        public event Action<StationSummary> StationSolved;
+
+        public event Action<int> SegmentStarted;
+
+        /// <summary>The pod stopped at the end of a segment's travel; its arrival lines and moment follow.</summary>
+        public event Action<int> SegmentArrived;
+        public event Action<int> SegmentEnded;
+        public event Action<int> RegionChanged;
+        public event Action<bool> GentleModeChanged;
         public event Action RideCompleted;
 
         private void Start()
         {
-            if (pod == null || controls == null || pathPoints.Length < 2)
+            if (pod == null || controls == null || legs.Length == 0 || segments.Length == 0)
             {
-                Debug.LogError("[RideDirector] Needs a pod, a control set, and at least two path points.");
+                Debug.LogError("[RideDirector] Needs a pod, a control set, track legs and segments.");
                 enabled = false;
                 return;
             }
 
-            var points = new List<Vector3>(pathPoints.Length);
-            for (int i = 0; i < pathPoints.Length; i++) points.Add(pathPoints[i].position);
-            _path = new RidePath(points);
+            _paths = new RidePath[legs.Length];
+            for (int i = 0; i < legs.Length; i++) _paths[i] = new RidePath(legs[i].points);
+            _leg = 0;
             _distance = 0f;
             Place(_distance, true);
-
             _action = controls.Get(RideControlIds.Action);
-            ConfigureLevers();
+            if (_action == null)
+            {
+                Debug.LogError("[RideDirector] The dash has no GO control.");
+                enabled = false;
+                return;
+            }
+
             if (script != null && !script.intro.IsEmpty) _routine = StartCoroutine(IntroThenDock());
             else EnterDock(true);
         }
@@ -137,23 +190,8 @@ namespace Convergence.Gameplay.Ride
 
         private void Update()
         {
-            // During the intro GO is a hold-to-skip handle: a short touch does nothing, two seconds skips. The pull that
-            // wakes AURA is not a skip, even if the rider keeps holding: the timer only counts again after a release.
-            if (_state != RideState.Intro || _action == null)
-            {
-                _holdSeconds = 0f;
-                _holdNeedsRelease = false;
-                return;
-            }
-
-            if (_action.Value < 0.5f)
-            {
-                _holdSeconds = 0f;
-                _holdNeedsRelease = false;
-                return;
-            }
-
-            if (_holdNeedsRelease)
+            // During the intro GO is a hold-to-skip handle: a short touch does nothing, two seconds skips.
+            if (_state != RideState.Intro || _action == null || _action.Value < 0.5f)
             {
                 _holdSeconds = 0f;
                 return;
@@ -165,43 +203,77 @@ namespace Convergence.Gameplay.Ride
             SkipNarration();
         }
 
-        /// <summary>Cuts the running intro, briefing, or outro short. Safe to call at any time.</summary>
+        // ---------- operator ----------
+
+        /// <summary>
+        /// Cuts the running intro or segment lines short, and hurries a running moment to its end (the puzzle solves
+        /// itself from the hints, the blame nudges itself). Safe to call at any time.
+        /// </summary>
         public void SkipNarration()
         {
             if (_narrating) _skipRequested = true;
+            else if (_moment != null) _moment.Hurry();
         }
 
-        private void ConfigureLevers()
+        // ---------- what moments use ----------
+
+        /// <summary>Queues a line said in the moment (hints, reactions).</summary>
+        public void Say(RideLine line)
         {
-            controls.Get(RideControlIds.Rock).Configure(-2f, 2f, 0.5f, 0f, true, false);
-            controls.Get(RideControlIds.Ice).Configure(-2f, 2f, 0.5f, 0f, true, false);
-            controls.Get(RideControlIds.Trigger).Configure(-1f, 2f, 0.5f, 0f, true, false);
-            controls.Get(RideControlIds.Eta).Configure(0f, 2f, 1f, 1f, true, false);
+            _speechEndsAt = Mathf.Max(_speechEndsAt, Time.time) + (script != null ? script.SecondsOf(line) : 0f);
+            Said?.Invoke(line);
         }
 
-        private void EnterDock(bool announceLaunch)
+        /// <summary>Gives a line the floor at once. Returns how long it holds it.</summary>
+        public float Narrate(RideLine line)
         {
-            _state = RideState.Dock;
-            _action.Configure(0f, 1f, 1f, 0f, false, true);
-
-            // While the rider decides to launch, the ROCK lever is a weight they can play with: the explainer panel shows
-            // one connection whose weight follows it ("change the weights, and you change what the AI thinks").
-            // It locks again the moment GO is pulled.
-            controls.Get(RideControlIds.Rock).Configure(-2f, 2f, 0.5f, 1f, false, true);
-            _action.Changed -= OnDockAction;
-            _action.Changed += OnDockAction;
-            StateChanged?.Invoke(_state);
-            if (announceLaunch) Said?.Invoke(RideLine.Launch);
-            HintChanged?.Invoke(RideControlIds.Action, 1);
+            float seconds = script != null ? script.SecondsOf(line) : 0f;
+            _speechEndsAt = Time.time + seconds;
+            Narrated?.Invoke(line);
+            return seconds;
         }
+
+        /// <summary>Waits until the last line said or narrated has finished (plus a pad), or a long line's cap.</summary>
+        public IEnumerator WaitForSpeech()
+        {
+            float started = Time.time;
+            while (Time.time < _speechEndsAt + speechPadSeconds && Time.time < started + maxSpeechHoldSeconds) yield return null;
+        }
+
+        /// <summary>For a moment that moves the pod (the Valley): an eased move along the current leg.</summary>
+        public IEnumerator TravelTo(float distance, float seconds)
+        {
+            yield return Travel(distance, Mathf.Max(0.05f, seconds), Mathf.Max(0.05f, seconds));
+        }
+
+        /// <summary>The height the pod has at a distance on a leg, after gentle mode.</summary>
+        public Vector3 PositionOn(int leg, float distance)
+        {
+            if (_paths == null) return Vector3.zero;
+            Vector3 p = _paths[leg].Position(distance);
+            Leg l = legs[leg];
+            if (_gentle && l.gentleFrom >= 0f && distance >= l.gentleFrom) p.y = l.gentleBaseY + (p.y - l.gentleBaseY) * gentleScale;
+            return p;
+        }
+
+        // ---------- flow ----------
 
         private IEnumerator IntroThenDock()
         {
-            _state = RideState.Intro;
+            SetState(RideState.Intro);
             _action.Configure(0f, 1f, 1f, 0f, false, true);
-            StateChanged?.Invoke(_state);
             yield return RunBeats(script.intro);
-            EnterDock(false);
+            EnterDock(true);
+        }
+
+        private void EnterDock(bool announce)
+        {
+            SetState(RideState.Dock);
+            _action.Configure(0f, 1f, 1f, 0f, false, true);
+            _action.Changed -= OnDockAction;
+            _action.Changed += OnDockAction;
+            if (announce && script != null) Narrate(script.dockLine);
+            HintChanged?.Invoke(RideControlIds.Action, 1);
         }
 
         private void OnDockAction(RideControlChannel channel, bool byUser)
@@ -209,17 +281,76 @@ namespace Convergence.Gameplay.Ride
             if (!byUser || _state != RideState.Dock || channel.Value < 0.5f) return;
             _action.Changed -= OnDockAction;
             HintChanged?.Invoke(null, 0);
-            ConfigureLevers(); // the dock's weight toy locks; each stop sets up its own levers
-            GoToStop(0);
-        }
-
-        private void GoToStop(int index)
-        {
+            _action.Configure(0f, 1f, 1f, 1f, true, true);
             if (_routine != null) StopCoroutine(_routine);
-            _routine = StartCoroutine(TravelThenStop(index));
+            _routine = StartCoroutine(RunSegments());
         }
 
-        /// <summary>Plays one sequence beat by beat. Each beat holds the floor for its seconds (or until the rider acts) unless skipped.</summary>
+        private IEnumerator RunSegments()
+        {
+            for (int i = 0; i < segments.Length; i++) yield return RunSegment(i);
+            SetState(RideState.Complete);
+            RideCompleted?.Invoke();
+        }
+
+        private IEnumerator RunSegment(int index)
+        {
+            Segment s = segments[index];
+            _segment = index;
+            _segmentFraction = 0f;
+            _skippedThisLeg = false;
+            if (s.leg != _leg)
+            {
+                // Switching legs: the builder lays the legs so they meet here.
+                _leg = Mathf.Clamp(s.leg, 0, _paths.Length - 1);
+                _distance = _paths[_leg].ClosestDistance(pod.position);
+            }
+
+            if (s.region != _region)
+            {
+                _region = s.region;
+                RegionChanged?.Invoke(_region);
+            }
+
+            SegmentStarted?.Invoke(index);
+            SetState(RideState.Traveling);
+
+            float span = Mathf.Abs(s.to - _distance);
+            RideScript.Sequence travelLines = script != null ? script.SequenceAt(s.travel) : default;
+            if (!travelLines.IsEmpty) StartCoroutine(PlaySequence(travelLines));
+            if (span > 0.01f)
+            {
+                float plain = Mathf.Max(s.minSeconds, span / Mathf.Max(0.5f, s.cruise) * 1.2f) * (_gentle ? 1f / gentleScale * 0.8f : 1f);
+                float duration = travelLines.IsEmpty ? plain : Mathf.Max(plain, travelLines.TotalSeconds + narrationPadSeconds);
+                yield return Travel(s.to, duration, plain);
+            }
+
+            // The lesson of the way is never cut off by what happens at the stop.
+            while (_narrating) yield return null;
+            _segmentFraction = 1f;
+            SetState(RideState.AtStop);
+            SegmentArrived?.Invoke(index);
+
+            RideScript.Sequence arrivalLines = script != null ? script.SequenceAt(s.arrival) : default;
+            if (!arrivalLines.IsEmpty) yield return PlaySequence(arrivalLines);
+
+            if (s.moment != null)
+            {
+                _moment = s.moment;
+                yield return s.moment.RunMoment(this);
+                _moment = null;
+            }
+
+            yield return WaitForSpeech();
+            SegmentEnded?.Invoke(index);
+        }
+
+        private IEnumerator PlaySequence(RideScript.Sequence sequence)
+        {
+            yield return RunBeats(sequence);
+        }
+
+        /// <summary>Plays one sequence beat by beat. Each beat holds the floor for its seconds unless skipped.</summary>
         private IEnumerator RunBeats(RideScript.Sequence sequence)
         {
             _narrating = true;
@@ -227,9 +358,13 @@ namespace Convergence.Gameplay.Ride
             RideScript.Beat[] beats = sequence.beats ?? new RideScript.Beat[0];
             for (int i = 0; i < beats.Length && !_skipRequested; i++)
             {
-                Narrated?.Invoke(beats[i].line);
-                if (beats[i].WaitsForRider) yield return RiderBeat(beats[i]);
-                else yield return Hold(beats[i].seconds);
+                Narrate(beats[i].line);
+                float held = 0f;
+                while (held < beats[i].seconds && !_skipRequested)
+                {
+                    held += Time.deltaTime;
+                    yield return null;
+                }
             }
 
             bool skipped = _skipRequested;
@@ -238,82 +373,14 @@ namespace Convergence.Gameplay.Ride
             if (skipped)
             {
                 _skippedThisLeg = true;
+                _speechEndsAt = 0f;
                 NarrationSkipped?.Invoke();
             }
         }
 
-        private IEnumerator Hold(float seconds)
-        {
-            float held = 0f;
-            while (held < seconds && !_skipRequested)
-            {
-                held += Time.deltaTime;
-                yield return null;
-            }
-        }
-
         /// <summary>
-        /// A hands-on beat: its line plays and the ride waits for the rider to set a control to at least a value. If
-        /// nobody does by the timeout, the ride sets it itself (except GO, which would read as a skip), so the moment
-        /// still happens and nobody gets stuck. Either way the line finishes and the reaction gets a moment of its own.
-        /// </summary>
-        private IEnumerator RiderBeat(RideScript.Beat beat)
-        {
-            RideControlChannel control = controls.Get(beat.waitFor);
-            if (control == null)
-            {
-                Debug.LogError("[RideDirector] The intro waits for control '" + beat.waitFor + "', which the dash does not have; the beat only holds its seconds.");
-                yield return Hold(beat.seconds);
-                yield break;
-            }
-
-            bool isGo = control == _action;
-            if (!isGo) control.Configure(control.Min, control.Max, control.Step, beat.waitFrom, false, true);
-            HintChanged?.Invoke(beat.waitFor, 1);
-            RiderTaskStarted?.Invoke(beat.waitFor, beat.waitAtLeast);
-
-            float held = 0f;
-            float doneAt = -1f;
-            while (!_skipRequested)
-            {
-                if (doneAt < 0f)
-                {
-                    bool byRider = control.Value >= beat.waitAtLeast;
-                    if (byRider || held >= beat.seconds + beat.waitTimeout)
-                    {
-                        doneAt = held;
-                        if (!byRider && !isGo) control.Drive(beat.waitAtLeast);
-                        if (byRider && isGo) _holdNeedsRelease = true;
-                        HintChanged?.Invoke(null, 0);
-                        RiderTaskDone?.Invoke(beat.waitFor, byRider);
-                    }
-                }
-                else if (held >= beat.seconds && held >= doneAt + taskReactSeconds)
-                {
-                    break;
-                }
-
-                held += Time.deltaTime;
-                yield return null;
-            }
-
-            if (doneAt < 0f) HintChanged?.Invoke(null, 0);
-
-            // The lever stays in view, locked, until the dock hands it back as a toy (EnterDock).
-            if (!isGo) control.Configure(control.Min, control.Max, control.Step, control.Value, true, true);
-        }
-
-        private IEnumerator PlayBriefing(int index, RideScript.Sequence sequence)
-        {
-            _narrating = true;
-            BriefingStarted?.Invoke(index);
-            yield return RunBeats(sequence);
-            BriefingEnded?.Invoke(index);
-        }
-
-        /// <summary>
-        /// Moves along the track over the given seconds with the eased profile. If the operator skips the narration
-        /// mid-leg, time speeds up smoothly toward the plain pace, so the pod never lurches.
+        /// Moves along the current leg over the given seconds with an eased start and stop. If the operator skips the
+        /// lines mid-leg, time speeds up smoothly toward the plain pace, so the pod never lurches.
         /// </summary>
         private IEnumerator Travel(float to, float duration, float plainDuration)
         {
@@ -329,6 +396,7 @@ namespace Convergence.Gameplay.Ride
                 float eased = t * t * t * (t * (t * 6f - 15f) + 10f);
                 float previous = _distance;
                 _distance = Mathf.Lerp(from, to, eased);
+                _segmentFraction = Mathf.Max(_segmentFraction, eased * 0.99f);
                 _speed = Time.deltaTime > 0f ? (_distance - previous) / Time.deltaTime : 0f;
                 Place(_distance, false);
                 yield return null;
@@ -339,117 +407,22 @@ namespace Convergence.Gameplay.Ride
             Place(_distance, false);
         }
 
-        private IEnumerator TravelThenStop(int index)
-        {
-            _state = RideState.Traveling;
-            _skippedThisLeg = false;
-            StateChanged?.Invoke(_state);
-
-            float to = _path.DistanceAtPoint(stops[index].pointIndex);
-            float span = Mathf.Max(0.01f, to - _distance);
-            float plainDuration = Mathf.Max(minTravelSeconds, span / cruiseSpeed * 1.2f);
-            float duration = plainDuration;
-
-            RideScript.Sequence briefing = script != null ? script.BriefingFor(index) : default;
-            if (!briefing.IsEmpty)
-            {
-                // The travel lasts at least as long as the lesson, so the lesson is never cut off by the puzzle.
-                duration = Mathf.Max(duration, briefing.TotalSeconds + briefingPadSeconds);
-                StartCoroutine(PlayBriefing(index, briefing));
-            }
-
-            yield return Travel(to, duration, plainDuration);
-
-            // Hold the levers until the briefing is done.
-            while (_narrating) yield return null;
-
-            _stopIndex = index;
-            _state = RideState.AtStop;
-            StateChanged?.Invoke(_state);
-            StopReached?.Invoke(index);
-
-            StationController station = stops[index].station;
-            station.Said += ForwardSaid;
-            station.Solved += ForwardSolved;
-            station.PhaseChanged += ForwardPhase;
-            station.HintChanged += ForwardHint;
-            station.Begin(controls);
-
-            while (!station.IsSolved) yield return null;
-
-            // The line said at the solve is the lesson's punchline ("That's all a neuron is: math."). Let it finish
-            // before the pod moves on, because the next briefing would cut it off.
-            float solvedAt = Time.time;
-            while (Time.time < solvedAt + advanceDelay
-                   || (Time.time < _speechEndsAt + speechPadSeconds && Time.time < solvedAt + maxSpeechHoldSeconds))
-            {
-                yield return null;
-            }
-
-            station.Said -= ForwardSaid;
-            station.Solved -= ForwardSolved;
-            station.PhaseChanged -= ForwardPhase;
-            station.HintChanged -= ForwardHint;
-            station.End();
-
-            if (index + 1 < stops.Length) GoToStop(index + 1);
-            else _routine = StartCoroutine(Finish());
-        }
-
-        private IEnumerator Finish()
-        {
-            _state = RideState.Traveling;
-            _skippedThisLeg = false;
-            StateChanged?.Invoke(_state);
-            OutroStarted?.Invoke();
-
-            // Roll on to the end of the track with the same eased motion as between stops.
-            float to = _path.DistanceAtPoint(pathPoints.Length - 1);
-            float plainDuration = Mathf.Max(minTravelSeconds, Mathf.Max(0.01f, to - _distance) / cruiseSpeed * 1.2f);
-            float duration = plainDuration;
-
-            RideScript.Sequence outro = script != null ? script.outro : default;
-            if (!outro.IsEmpty)
-            {
-                duration = Mathf.Max(duration, outro.TotalSeconds + briefingPadSeconds);
-                StartCoroutine(RunBeats(outro));
-            }
-            else
-            {
-                Said?.Invoke(RideLine.TargetingRestored);
-            }
-
-            yield return Travel(to, duration, plainDuration);
-            while (_narrating) yield return null;
-
-            if (outro.IsEmpty) Said?.Invoke(RideLine.CourseLocked);
-            _state = RideState.Complete;
-            StateChanged?.Invoke(_state);
-            RideCompleted?.Invoke();
-        }
-
-        private void ForwardSaid(RideLine line)
-        {
-            // The newest line is the one on screen (a closing line cuts off older chatter), so its end is what to wait for.
-            _speechEndsAt = Time.time + (script != null ? script.SecondsOf(line) : 0f);
-            Said?.Invoke(line);
-        }
-
-        private void ForwardSolved(StationSummary summary) => StationSolved?.Invoke(summary);
-
-        private void ForwardHint(string id, int direction) => HintChanged?.Invoke(id, direction);
-
-        private void ForwardPhase(StationKind kind, StationPhase phase) => PhaseChanged?.Invoke(kind, phase);
-
         private void Place(float distance, bool snapYaw)
         {
-            pod.position = _path.Position(distance);
-            Vector3 heading = _path.Heading(distance);
+            RidePath path = _paths[_leg];
+            pod.position = PositionOn(_leg, distance);
+            Vector3 heading = path.Heading(distance);
             heading.y = 0f;
             if (heading.sqrMagnitude < 1e-6f) return;
             float target = Mathf.Atan2(heading.x, heading.z) * Mathf.Rad2Deg;
             _yaw = snapYaw ? target : Mathf.LerpAngle(_yaw, target, 1f - Mathf.Exp(-yawFollow * Time.deltaTime));
             pod.rotation = Quaternion.Euler(0f, _yaw, 0f);
+        }
+
+        private void SetState(RideState state)
+        {
+            _state = state;
+            StateChanged?.Invoke(state);
         }
     }
 }

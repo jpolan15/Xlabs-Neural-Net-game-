@@ -7,8 +7,7 @@ namespace Convergence.Presentation.Ride
     /// <summary>
     /// Everything the ear and the eye get for each <see cref="RideLine"/>: who speaks, the subtitle split into
     /// clauses, the voice clip, and the pause after it. A line with no clip still shows its subtitle for its reading
-    /// time, so a recording is added by filename and a builder re-run without touching scene logic. Also holds the
-    /// chapter cards shown during briefings. The builder writes it from Tools/Editor/RideNarrationData.cs.
+    /// time, so a recording is added by filename and a builder re-run without touching scene logic. The builder writes it from Tools/Editor/RideNarrationData.cs.
     /// </summary>
     [CreateAssetMenu(menuName = "Convergence/Narration Library", fileName = "NarrationLibrary")]
     public sealed class NarrationLibrary : ScriptableObject
@@ -57,19 +56,7 @@ namespace Convergence.Presentation.Ride
             public float TotalSeconds => SpeakSeconds + pauseAfter;
         }
 
-        /// <summary>A card shown during a briefing: a year, a title, and one plain sentence.</summary>
-        [Serializable]
-        public struct Chapter
-        {
-            public string year;
-            public string title;
-            public string blurb;
-        }
-
         public Entry[] entries = new Entry[0];
-
-        [Tooltip("One per stop, then one for the outro.")]
-        public Chapter[] chapters = new Chapter[0];
 
         public bool TryGet(RideLine line, out Entry entry)
         {

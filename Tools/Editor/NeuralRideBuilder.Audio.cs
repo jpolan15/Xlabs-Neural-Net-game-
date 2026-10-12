@@ -48,19 +48,13 @@ namespace Convergence.EditorTools
         {
             new CueSpec("launch", SciFiDir + "thrusterFire_000.ogg", -19.9f, -25f),
             new CueSpec("launchRumble", SciFiDir + "lowFrequency_explosion_000.ogg", -18.3f, -27f),
-            new CueSpec("dock", SciFiDir + "doorClose_001.ogg", -13.3f, -26f, 0.03f),
-            new CueSpec("stationLive", SciFiDir + "forceField_000.ogg", -11.3f, -27f),
-            new CueSpec("scan", KenneyDir + "click_001.wav", -26.1f, -34f, 0.05f),
-            // Zap and solve chime sit 1 to 2 dB under where they started: in a Play Mode run the output peaked at -0.4 dBFS
-            // when a zap, the "wrong" buzzer and a voice line landed together (and reached full scale at a solve).
-            new CueSpec("zap", SciFiDir + "laserLarge_000.ogg", -19.6f, -24f, 0.06f),
-            new CueSpec("shatter", SciFiDir + "explosionCrunch_000.ogg", -17.7f, -25f, 0.08f),
-            new CueSpec("wrong", SfxDir + "ride_wrong.wav", -7.3f, -24f),
-            new CueSpec("tick", KenneyDir + "click_001.wav", -26.1f, -29f),
+            new CueSpec("region", SciFiDir + "doorOpen_000.ogg", -14.3f, -28f),
+            new CueSpec("tick", KenneyDir + "click_001.wav", -26.1f, -29f, 0.04f),
             new CueSpec("solved", KenneyDir + "confirmation_001.wav", -11.6f, -22f),
             new CueSpec("solvedShimmer", SciFiDir + "forceField_002.ogg", -11.3f, -27f),
-            new CueSpec("learnStep", KenneyDir + "click_001.wav", -26.1f, -33f),
-            new CueSpec("chapter", SciFiDir + "doorOpen_000.ogg", -14.3f, -28f),
+            new CueSpec("wrong", SfxDir + "ride_wrong.wav", -7.3f, -24f),
+            new CueSpec("nudge", SciFiDir + "laserLarge_000.ogg", -19.6f, -25f, 0.05f),
+            new CueSpec("hop", KenneyDir + "click_001.wav", -26.1f, -30f),
             new CueSpec("finale", SciFiDir + "lowFrequency_explosion_001.ogg", -15.9f, -21f),
             new CueSpec("finaleShimmer", SciFiDir + "forceField_004.ogg", -11.4f, -24f),
             new CueSpec("skip", KenneyDir + "click_001.wav", -26.1f, -30f),
@@ -124,8 +118,8 @@ namespace Convergence.EditorTools
             return source;
         }
 
-        /// <summary>The effects rig on the pod. The director, stations and streams are wired in BuildScene.</summary>
-        private static void BuildSfx(GameObject pod, DashScreenView dash, ChapterCardView card, RideControlSet controls)
+        /// <summary>The effects rig on the pod. The director and the moments are wired in WireSfx.</summary>
+        private static void BuildSfx(GameObject pod, DashScreenView dash)
         {
             Transform root = Make("Sfx", pod.transform, new Vector3(0, 1.2f, 0)).transform;
             AudioSource hum = Source("Hum", root, false);
@@ -137,8 +131,6 @@ namespace Convergence.EditorTools
 
             var view = pod.AddComponent<RideSfxView>();
             Ref(view, "dash", dash);
-            Ref(view, "chapterCard", card);
-            Ref(view, "controls", controls);
             Ref(view, "hum", hum);
             Ref(view, "engine", engine);
             Refs(view, "pool", pool);
@@ -156,22 +148,13 @@ namespace Convergence.EditorTools
             }
         }
 
-        private static void WireSfx(GameObject pod, RideDirector director, List<StationController> stations)
+        private static void WireSfx(GameObject pod, RideDirector director, Moments moments)
         {
             var view = pod.GetComponent<RideSfxView>();
             Ref(view, "director", director);
-            var stationRefs = new List<UnityEngine.Object>();
-            var streamRefs = new List<UnityEngine.Object>();
-            foreach (StationController station in stations)
-            {
-                stationRefs.Add(station);
-                DataStreamView stream = station.GetComponentInChildren<DataStreamView>(true);
-                if (stream == null) throw new InvalidOperationException(station.name + " has no DataStreamView; the zap sounds have nothing to follow.");
-                streamRefs.Add(stream);
-            }
-
-            Refs(view, "stations", stationRefs);
-            Refs(view, "streams", streamRefs);
+            Ref(view, "puzzle", moments.Paint);
+            Ref(view, "blame", moments.Blame);
+            Ref(view, "valley", moments.Valley);
         }
 
         /// <summary>Fails the build if an effect is missing or would play louder than SfxCeilingLufs, or a loop above the music.</summary>

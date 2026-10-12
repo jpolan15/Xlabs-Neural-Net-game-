@@ -14,32 +14,55 @@ MonoBehaviour:
   m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.RideTheme
   voidNavy: {r: 0.015, g: 0.025, b: 0.06, a: 1}
   cyan: {r: 0.1, g: 0.88, b: 1, a: 1}
-  amber: {r: 1, g: 0.8, b: 0.12, a: 1}
+  amber: {r: 1, g: 0.70980394, b: 0.2784314, a: 1}
   orange: {r: 1, g: 0.4, b: 0.04, a: 1}
   offWhite: {r: 0.92, g: 0.95, b: 1, a: 1}
   locked: {r: 0.36, g: 0.4, b: 0.48, a: 1}
-  aura: {r: 0.72, g: 0.52, b: 1, a: 1}
   violet: {r: 0.55, g: 0.4, b: 0.95, a: 1}
-  streamSpeed: 1.2
-  spawnX: 3.8
-  scanX: 0
-  despawnX: -3.8
-  pulseTravelSeconds: 0.7
-  pipeHairline: 0.008
-  pipeWidthPerWeight: 0.05
-  tankUnitsPerSum: 0.27
-  tankMaxSum: 3
-  tankFollow: 6
-  landscapeSize: 3.2
-  heightPerLoss: 0.12
-  maxHeight: 1.1
-  marbleRadius: 0.09
-  contourEvery: 0.5
+  paper: {r: 0.9843137, g: 0.9647059, b: 0.9254902, a: 1}
+  ink: {r: 0.105882354, g: 0.105882354, b: 0.18431373, a: 1}
+  pillar: {r: 0.9607843, g: 0.96862745, b: 1, a: 1}
+  networkBlue: {r: 0.30980393, g: 0.7647059, b: 1, a: 1}
+  negativeWeight: {r: 0.7019608, g: 0.53333336, b: 1, a: 1}
+  wrongRed: {r: 1, g: 0.23137255, b: 0.23137255, a: 1}
+  rewindMagenta: {r: 1, g: 0.16862746, b: 0.8392157, a: 1}
+  valleyPink: {r: 1, g: 0.43529412, b: 0.5686275, a: 1}
+  valleyViolet: {r: 0.41960785, g: 0.1764706, b: 0.54901963, a: 1}
+  gold: {r: 1, g: 0.81960785, b: 0.4, a: 1}
+  right: {r: 0.4, g: 1, b: 0.61960787, a: 1}
+  regions:
+  - tag: THE PAGE
+    background: {r: 0.8509804, g: 0.8039216, b: 0.7137255, a: 1}
+    fog: {r: 0.9098039, g: 0.87058824, b: 0.7882353, a: 1}
+    fogDensity: 0.01
+  - tag: THE GRID
+    background: {r: 0.011764706, g: 0.015686275, b: 0.02745098, a: 1}
+    fog: {r: 0.011764706, g: 0.015686275, b: 0.02745098, a: 1}
+    fogDensity: 0.018
+  - tag: ONE NEURON
+    background: {r: 0.078431375, g: 0.043137256, b: 0.015686275, a: 1}
+    fog: {r: 0.10980392, g: 0.0627451, b: 0.023529412, a: 1}
+    fogDensity: 0.02
+  - tag: THE NETWORK
+    background: {r: 0.023529412, g: 0.0627451, b: 0.14117648, a: 1}
+    fog: {r: 0.023529412, g: 0.0627451, b: 0.14117648, a: 1}
+    fogDensity: 0.011
+  - tag: WRONG
+    background: {r: 0.10980392, g: 0.015686275, b: 0.02745098, a: 1}
+    fog: {r: 0.17254902, g: 0.023529412, b: 0.039215688, a: 1}
+    fogDensity: 0.014
+  - tag: REWIND
+    background: {r: 0.08627451, g: 0.015686275, b: 0.10980392, a: 1}
+    fog: {r: 0.13333334, g: 0.023529412, b: 0.17254902, a: 1}
+    fogDensity: 0.013
+  - tag: THE VALLEY
+    background: {r: 0.23137255, g: 0.08627451, b: 0.2509804, a: 1}
+    fog: {r: 0.41960785, g: 0.1764706, b: 0.36862746, a: 1}
+    fogDensity: 0.009
+  - tag: RIGHT
+    background: {r: 0.078431375, g: 0.05882353, b: 0.015686275, a: 1}
+    fog: {r: 0.11764706, g: 0.08627451, b: 0.023529412, a: 1}
+    fogDensity: 0.011
   networkDim: 0.3
   pulseSpacing: 5
   pulseSpeed: 7
-  lightReach: 0.12
-  lightFollowSeconds: 2.5
-  stopFocus: 0.55
-  igniteSeconds: 5
-  instructionSeconds: 3.5

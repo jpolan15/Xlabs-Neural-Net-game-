@@ -1,33 +1,5 @@
-using System;
-using System.Collections.Generic;
-
 namespace Convergence.Gameplay.Ride
 {
-    /// <summary>Which idea a stop teaches.</summary>
-    public enum StationKind
-    {
-        /// <summary>Weight times input against a trigger. One lever.</summary>
-        OneSignal,
-
-        /// <summary>A weighted sum of two inputs. Three levers.</summary>
-        TwoSignals,
-
-        /// <summary>Loss and gradient descent. LEARN plus a learning-rate lever.</summary>
-        Learns
-    }
-
-    /// <summary>What a stop is doing right now. Presentation maps this to the instruction line.</summary>
-    public enum StationPhase
-    {
-        Idle,
-        Tuning,
-        Oops,
-        Solved,
-        Learning,
-        Overshoot,
-        Stalled
-    }
-
     /// <summary>Where the pod is in the ride.</summary>
     public enum RideState
     {
@@ -35,12 +7,15 @@ namespace Convergence.Gameplay.Ride
         Traveling,
         AtStop,
         Complete,
-
         /// <summary>The narrated opening at the dock. GO does not launch until it ends or is skipped. Appended, so older ids keep their numbers.</summary>
         Intro
     }
 
-    /// <summary>The narration lines. The number is the file suffix (vo_ride_NN). Ids 1 to 15 never change; new lines are appended.</summary>
+    /// <summary>
+    /// The narration lines. The number is the file suffix (vo_ride_NN) and never changes. 1 to 31 belonged to the v3
+    /// ride (AURA, JFK, Apollo), which Level 1 cut; their numbers stay reserved so old files can never be mistaken for
+    /// new ones. Level 1's lines are appended from 32 (TASK_LEVEL1_DIGITS_RESTRUCTURE, approved script).
+    /// </summary>
     public enum RideLine
     {
         Launch = 1,
@@ -58,8 +33,6 @@ namespace Convergence.Gameplay.Ride
         Converged = 13,
         TargetingRestored = 14,
         CourseLocked = 15,
-
-        // Ride v3 (Ignite). Appended, never renumbered. 23 is intentionally unused.
         ArchivalMoon = 16,
         GuideHardProblem = 17,
         AuraOffline = 18,
@@ -67,101 +40,54 @@ namespace Convergence.Gameplay.Ride
         GuideWeights = 20,
         GuidePlan = 21,
         GuideOrange = 22,
+        // 23 is intentionally unused.
         ApolloLiftoff = 24,
         BriefingFirstNeuron = 25,
         BriefingPerceptron = 26,
         BriefingLearning = 27,
         GuideHeartOfNetworks = 28,
         GuideTheProblem = 29,
-
-        // Interactive opening (handoff part 2): the rider wakes AURA, then makes one neuron fire.
         GuideWakeAura = 30,
-        GuideMakeItFire = 31
+        GuideMakeItFire = 31,
+
+        // Level 1: how a machine learns to read a digit.
+        PageLook = 32,
+        PageOnlyNumbers = 33,
+        PageFromInside = 34,
+        PagePullToDive = 35,
+        GridInsidePicture = 36,
+        GridZeroAndOne = 37,
+        GridSevenBySeven = 38,
+        NeuronThisIsOne = 39,
+        NeuronWeights = 40,
+        NeuronMultiplyAdd = 41,
+        NeuronYourTurn = 42,
+        NeuronFiredForZero = 43,
+        NeuronMissedOne = 44,
+        NeuronSolved = 45,
+        NetworkManyNeurons = 46,
+        NetworkLayers = 47,
+        NetworkSendItThrough = 48,
+        WrongItSays = 49,
+        WrongNeverTaught = 50,
+        RewindBackwards = 51,
+        RewindBackprop = 52,
+        RewindPointAtWires = 53,
+        RewindWiresKnow = 54,
+        ValleyDownhill = 55,
+        ValleyGradientDescent = 56,
+        ValleyOvershoot = 57,
+        ValleySmallerSteps = 58,
+        RightBackInNetwork = 59,
+        RightItSays = 60,
+        RightAccuracy = 61,
+        RightWords = 62,
+        RightNextLevel = 63
     }
 
-    /// <summary>The four things that can float down the stream, named by which sensors they light.</summary>
-    public enum CaseKind
-    {
-        Drone,
-        Comet,
-        Rock,
-        Chunk
-    }
-
-    /// <summary>Stable ids for the pod's control channels.</summary>
+    /// <summary>Stable ids for the pod's control channels. Level 1 has one: GO.</summary>
     public static class RideControlIds
     {
         public const string Action = "action";
-        public const string Eta = "eta";
-        public const string Rock = "w_rock";
-        public const string Ice = "w_ice";
-        public const string Trigger = "trigger";
-    }
-
-    /// <summary>What one test case did at the current settings. Data only.</summary>
-    public readonly struct CaseOutcome
-    {
-        public readonly int Index;
-        public readonly CaseKind Kind;
-        public readonly double RockSignal;
-        public readonly double IceSignal;
-        public readonly double Sum;
-        public readonly bool Fired;
-        public readonly bool ShouldFire;
-        public readonly bool Correct;
-
-        public CaseOutcome(int index, CaseKind kind, double rock, double ice, double sum, bool fired, bool shouldFire, bool correct)
-        {
-            Index = index;
-            Kind = kind;
-            RockSignal = rock;
-            IceSignal = ice;
-            Sum = sum;
-            Fired = fired;
-            ShouldFire = shouldFire;
-            Correct = correct;
-        }
-    }
-
-    /// <summary>One gradient-descent step, for the marble and the readouts.</summary>
-    public readonly struct TrainingFrame
-    {
-        public readonly int Step;
-        public readonly double W1;
-        public readonly double W2;
-        public readonly double Loss;
-        public readonly double Gradient1;
-        public readonly double Gradient2;
-        public readonly double LearningRate;
-
-        public TrainingFrame(int step, double w1, double w2, double loss, double g1, double g2, double learningRate)
-        {
-            Step = step;
-            W1 = w1;
-            W2 = w2;
-            Loss = loss;
-            Gradient1 = g1;
-            Gradient2 = g2;
-            LearningRate = learningRate;
-        }
-    }
-
-    /// <summary>The numbers an equation reveal is built from.</summary>
-    public readonly struct StationSummary
-    {
-        public readonly StationKind Kind;
-        public readonly double RockWeight;
-        public readonly double IceWeight;
-        public readonly double Trigger;
-        public readonly double LearningRate;
-
-        public StationSummary(StationKind kind, double rock, double ice, double trigger, double learningRate)
-        {
-            Kind = kind;
-            RockWeight = rock;
-            IceWeight = ice;
-            Trigger = trigger;
-            LearningRate = learningRate;
-        }
     }
 }

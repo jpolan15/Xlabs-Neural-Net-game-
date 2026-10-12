@@ -7,13 +7,15 @@ using Convergence.Presentation.Ride;
 namespace Convergence.EditorTools
 {
     /// <summary>
-    /// The narration script for the Neural Ride, the single source for subtitles, pauses, pacing, and what the rider
-    /// sees while each clause is spoken. It is the approved draft from TASK_IGNITE_RIDE_V3_MASTER_PLAN.md Appendix A.
+    /// The narration script of Level 1, the single source for subtitles, pauses, pacing, and what the rider sees while
+    /// each clause is spoken. It is the owner-approved draft of HANDOFF_LEVEL1_FULL_BUILD.md section 9 (2026-10-12),
+    /// with the bake's numbers written in (the untrained guess, the training count, the test accuracy); the builder
+    /// fails if they ever disagree with Assets/_Project/Data/Level1/level1_digits.json. One narrator, the Guide.
     /// [p0.8] marks a pause of 0.8 s inside a line: subtitles change clause by clause at the marks, and the reading
     /// time includes them. {cue} at the start of a clause names what to show while that clause is spoken (several:
-    /// {a,b}); the views that know a cue react to it (ExplainerView, NeuralCoreView, HintArrowView). A voice file only
-    /// plays when its sidecar text matches this text, so an old recording can never be heard under new words.
-    /// ArtSource/voice/render_voices.py reads this file to render the voice. Development tooling only.
+    /// {a,b}); the views that know a cue react to it. A voice file only plays when its sidecar text matches this text,
+    /// so an old recording can never be heard under new words. ArtSource/voice/render_voices.py reads this file to
+    /// render the voice. Development tooling only.
     /// </summary>
     internal static class RideNarrationData
     {
@@ -27,151 +29,100 @@ namespace Convergence.EditorTools
             public string Tag;
             public string Text;
             public float PauseAfter;
-            public float FixedSpeakSeconds; // archival clips with no spoken text we can count
+            public float FixedSpeakSeconds;
 
-            public Line(RideLine id, NarrationLibrary.Speaker speaker, string tag, string text, float pauseAfter = DefaultPauseAfter, float fixedSeconds = 0f)
+            public Line(RideLine id, string text, float pauseAfter = DefaultPauseAfter)
             {
                 Id = id;
-                Speaker = speaker;
-                Tag = tag;
+                Speaker = NarrationLibrary.Speaker.Guide;
+                Tag = "GUIDE";
                 Text = text;
                 PauseAfter = pauseAfter;
-                FixedSpeakSeconds = fixedSeconds;
+                FixedSpeakSeconds = 0f;
             }
         }
-
-        private const NarrationLibrary.Speaker G = NarrationLibrary.Speaker.Guide;
-        private const NarrationLibrary.Speaker A = NarrationLibrary.Speaker.Aura;
-        private const NarrationLibrary.Speaker C = NarrationLibrary.Speaker.AuraClean;
-        private const NarrationLibrary.Speaker X = NarrationLibrary.Speaker.Archival;
 
         public static readonly Line[] Lines =
         {
-            // Intro. The rider's hands are on a lever within about 15 s: JFK in the dark, AURA offline, then the rider wakes
-            // her (GuideWakeAura waits for GO) and makes one neuron fire (GuideMakeItFire waits for the ROCK weight). See
-            // IntroTasks below; GuideOrange and GuideHardProblem are no longer in the intro (the wake line teaches orange).
-            new Line(RideLine.ArchivalMoon, X, "J.F.K., 1962",
-                "{jfk_build}We choose to go to the Moon in this decade and do the other things, [p0] {jfk_hard}not because they are easy, but because they are hard.", 0.8f),
-            new Line(RideLine.GuideHardProblem, G, "GUIDE", "Every great journey starts with a hard problem. [p0.8] {net_wake}Ours is inside this ship."),
-            new Line(RideLine.AuraOffline, A, "AURA", "{offline,net_broken}Targeting... offline. [p0.5] {rock_friend}I can't tell a rock... from a friend."),
-            new Line(RideLine.GuideWakeAura, G, "GUIDE", "{orange}Anything orange, you can grab. [p0.3] {go}Pull the orange lever, [p0.2] and wake her up.", 0.3f),
-            new Line(RideLine.GuideAuraBrain, G, "GUIDE",
-                "There she is: AURA, the ship's mind. [p0.4] Her brain is a neural network: [p0.2] {neurons}thousands of tiny decision-makers called neurons, [p0.2] {links}all wired together. [p0.5] {net_broken}But something in it has gone wrong.", 0.6f),
-            new Line(RideLine.GuideMakeItFire, G, "GUIDE", "{fire_goal}Here's one connection, up close. [p0.3] Push the rock lever up, [p0.2] until this neuron fires.", 0.3f),
-            new Line(RideLine.GuideWeights, G, "GUIDE",
-                "{try_weight}That lever is a weight: [p0.2] how much one neuron listens to another. [p0.5] {weights_change}Change the weights, [p0.2] and you change what the AI thinks.", 0.7f),
-            new Line(RideLine.GuidePlan, G, "GUIDE",
-                "{plan}We'll make three stops. [p0.4] {plan1}One neuron with one signal. [p0.4] {plan2}One neuron that weighs two signals. [p0.4] {plan3}And last, we'll watch the machine teach itself.", 0.7f),
-            new Line(RideLine.GuideOrange, G, "GUIDE", "{orange}Anything orange, you can grab. [p0.3] Everything else is just for looking."),
-            new Line(RideLine.Launch, G, "GUIDE", "When you're ready, [p0.4] {go}pull the orange GO lever.", 0.3f),
+            // Region 0, the Page (dock).
+            new Line(RideLine.PageLook, "{page}Look at this number. [p0.4] You read it instantly. [p0.3] It's a three.", 0.6f),
+            new Line(RideLine.PageOnlyNumbers, "A computer can't see it. [p0.4] All it ever gets is numbers.", 0.6f),
+            new Line(RideLine.PageFromInside, "Today you'll watch a machine learn to read it. [p0.3] From the inside.", 0.6f),
+            new Line(RideLine.PagePullToDive, "{go}Pull the orange lever, [p0.2] and we'll dive into the picture.", 0.3f),
 
-            // Briefing 1 (opens with the Apollo 11 liftoff when GO is pulled)
-            // Jack King, NASA launch commentary. He says "all engine running" (singular), as NASA's own transcript has it.
-            new Line(RideLine.ApolloLiftoff, X, "NASA, APOLLO 11",
-                "Three, two, one, zero, [p0] all engine running. [p0] {liftoff}Liftoff! We have a liftoff.", 0.4f, 8.8f),
-            new Line(RideLine.BriefingFirstNeuron, G, "GUIDE",
-                "Chapter one. Nineteen forty-three. [p0.6] Two scientists, Warren McCulloch and Walter Pitts, imagined the first artificial neuron. [p0.4] {sum}It adds up its signals, [p0.3] {trigger}and if the total crosses a line, the trigger, [p0.3] {fire}it fires. [p0.8] {rock_drone}Up ahead, rocks are mixed in with our friendly repair drones. Set the trigger so the neuron zaps rocks, and only rocks.", 0.8f),
+            // Region 1, the Grid.
+            new Line(RideLine.GridInsidePicture, "We're inside the picture now. [p0.3] {pixels}Every pixel became one number."),
+            new Line(RideLine.GridZeroAndOne, "{zero}Blank paper is zero. [p0.3] {one}Full ink is one. [p0.3] {tall}The taller the pillar, the more ink."),
+            new Line(RideLine.GridSevenBySeven, "{seven}To keep it simple, we shrink it to seven by seven. [p0.3] Forty-nine numbers. [p0.3] That's all the machine gets.", 0.6f),
 
-            // Stop 1
-            new Line(RideLine.NeuronIntro, G, "GUIDE", "Rocks are slipping through. Lower the trigger."),
-            new Line(RideLine.LowerTrigger, G, "GUIDE", "Lower. [p0.3] The rock's signal needs to reach the line."),
-            new Line(RideLine.DroneOops, A, "AURA", "Whoa, you zapped a drone! [p0.4] Trigger's too low."),
-            new Line(RideLine.WeightTimesInput, G, "GUIDE", "That's it. [p0.5] Signal times weight, compared to a trigger. [p0.6] That's all a neuron is: math.", 0.6f),
+            // Region 2, One Neuron.
+            new Line(RideLine.NeuronThisIsOne, "{neuron}This is a neuron. [p0.3] It looks at all forty-nine numbers at once."),
+            new Line(RideLine.NeuronWeights, "{weights}Every pixel has a weight. [p0.3] {plus}Plus means: I want ink here. [p0.3] {minus}Minus means: I don't."),
+            new Line(RideLine.NeuronMultiplyAdd, "{multiply}It multiplies each pixel by its weight and adds it all up. [p0.3] {line}If the total passes the line, it fires.", 0.6f),
+            new Line(RideLine.NeuronYourTurn, "{paint}Your turn. [p0.2] Paint the weights so it fires for ones, and not for zeros. [p0.3] Tap a square to change it."),
+            new Line(RideLine.NeuronFiredForZero, "It fired for a zero. [p0.3] Zeros have ink around the edges. [p0.2] Try minus there."),
+            new Line(RideLine.NeuronMissedOne, "That one didn't fire. [p0.3] Ones have ink down the middle."),
+            new Line(RideLine.NeuronSolved, "You found a pattern in plain numbers. [p0.4] That's all a neuron does. [p0.3] Math.", 0.6f),
 
-            // Briefing 2
-            new Line(RideLine.BriefingPerceptron, G, "GUIDE",
-                "Chapter two. Nineteen fifty-eight. [p0.6] {knob}Frank Rosenblatt's perceptron gave every input its own weight, like a volume knob. [p0.6] {sensors}Now there are two sensors: rock, and ice. [p0.4] {negative}But the ice wire is plugged in backwards. A negative weight. [p0.6] {fix}Fix the weights so anything rocky or icy gets zapped. [p0.4] {you_learn}Today, you are the one doing the learning.", 0.8f),
+            // Region 3, the Network.
+            new Line(RideLine.NetworkManyNeurons, "One neuron spots one pattern. [p0.3] Reading digits takes many, wired together in layers."),
+            new Line(RideLine.NetworkLayers, "{inputs}Forty-nine pixels in. [p0.3] {hidden}Sixteen hidden neurons in the middle. [p0.3] {outputs}Ten answers out, zero to nine.", 0.6f),
+            new Line(RideLine.NetworkSendItThrough, "Let's send our three through. [p0.3] {race}Watch the light.", 0.3f),
 
-            // Stop 2
-            new Line(RideLine.TwoSensors, A, "AURA", "The ice sensor is wired backwards. [p0.3] It's draining my core."),
-            new Line(RideLine.TurnPipes, G, "GUIDE", "Turn each pipe up or down. [p0.3] That number is the weight."),
-            new Line(RideLine.OrBuilt, G, "GUIDE", "Every case is right. [p0.5] You just built an OR gate out of multiplication and addition.", 0.6f),
+            // Region 4, Wrong. The guess is the bake's untrainedGuess.
+            new Line(RideLine.WrongItSays, "{guess}It says... [p0.5] one.", 0.4f),
+            new Line(RideLine.WrongNeverTaught, "{wrong}Wrong. [p0.3] It has never been taught. [p0.3] Every weight is random.", 0.6f),
 
-            // Briefing 3
-            new Line(RideLine.BriefingLearning, G, "GUIDE",
-                "Chapter three. Nineteen sixty. [p0.6] {self_tune}Bernard Widrow and Ted Hoff asked: what if the machine tuned its own weights? [p0.6] {error}Measure how wrong it is, the error, [p0.3] {downhill}then nudge every weight a little bit downhill. [p0.3] {repeat}Repeat. [p0.8] {today}A version of that idea still trains today's AI.", 0.8f),
+            // Region 5, Rewind.
+            new Line(RideLine.RewindBackwards, "{backwards}So we go backwards. [p0.3] The mistake flows back through every wire."),
+            new Line(RideLine.RewindBackprop, "{burn}The more a wire caused the mistake, the brighter it burns. [p0.4] That's called backpropagation.", 0.6f),
+            new Line(RideLine.RewindPointAtWires, "{point}Point at the brightest wires to nudge them."),
+            new Line(RideLine.RewindWiresKnow, "Now every wire knows which way to move.", 0.6f),
 
-            // Stop 3
-            new Line(RideLine.PullLearn, G, "GUIDE", "Hand-tuning is slow. [p0.4] Pick a learning rate, [p0.3] how big each step is, [p0.3] then pull LEARN."),
-            new Line(RideLine.HillIsError, G, "GUIDE", "This hill is the error. Lower is better. [p0.4] Watch the weights roll downhill."),
-            new Line(RideLine.GradientDescent, G, "GUIDE", "That's gradient descent. [p0.4] Measure the slope. Step down it. Repeat.", 0.6f),
-            new Line(RideLine.LrTooHigh, A, "AURA", "Too big a step! [p0.3] I'm overshooting!"),
-            new Line(RideLine.Converged, A, "AURA", "Converged. [p0.4] I found my own weights."),
+            // Region 6, the Valley.
+            new Line(RideLine.ValleyDownhill, "All that blame points one way: [p0.2] downhill. [p0.3] {low}Down here, the network is less wrong.", 0.6f),
+            new Line(RideLine.ValleyGradientDescent, "Each step moves every weight a little bit downhill. [p0.3] That's gradient descent. [p0.4] Hold on.", 0.4f),
+            new Line(RideLine.ValleyOvershoot, "Too big a step. [p0.3] We flew right past the bottom.", 0.4f),
+            new Line(RideLine.ValleySmallerSteps, "Smaller steps now. [p0.3] Down... [p0.3] and down... [p0.3] settling in.", 0.6f),
 
-            // Outro
-            new Line(RideLine.TargetingRestored, C, "AURA", "{online}Targeting restored. [p0.5] I learned it from you.", 0.7f),
-            new Line(RideLine.GuideHeartOfNetworks, G, "GUIDE",
-                "{recap}Weights, sums, triggers, and learning by rolling downhill. [p0.6] {heart}That's the heart of every neural network. [p0.4] {billions}Real ones just do it with billions of weights at once.", 0.8f),
-            new Line(RideLine.GuideTheProblem, G, "GUIDE",
-                "{xor}But in nineteen sixty-nine, researchers found a problem one neuron can never solve. [p1.0] {next_ride}That's our next ride.", 0.8f),
-            new Line(RideLine.CourseLocked, C, "AURA", "Course locked. Taking us home, for now.", 0.5f)
+            // Region 7, Right. The count and the accuracy are the bake's trainCount and testAccuracy (rounded down).
+            new Line(RideLine.RightBackInNetwork, "Back in the network. [p0.3] Same three. [p0.3] New weights."),
+            new Line(RideLine.RightItSays, "{right}It says... [p0.5] three. [p0.3] Right.", 0.6f),
+            new Line(RideLine.RightAccuracy, "{count}We showed it sixty thousand handwritten digits. [p0.4] {accuracy}Now it reads ninety-two percent of digits it has never seen.", 0.8f),
+            new Line(RideLine.RightWords, "{words}Do the same with words instead of pixels, [p0.2] with billions of weights, [p0.3] and you get the AI you can talk to.", 0.6f),
+            new Line(RideLine.RightNextLevel, "{next}That's where we're going next.", 0.8f),
         };
 
-        public static readonly RideLine[] IntroLines =
-        {
-            RideLine.ArchivalMoon, RideLine.AuraOffline, RideLine.GuideWakeAura, RideLine.GuideAuraBrain,
-            RideLine.GuideMakeItFire, RideLine.GuideWeights, RideLine.GuidePlan, RideLine.Launch
-        };
+        /// <summary>The intro at the dock: GO holds (two seconds of holding skips it). Then the dock says DockLine and GO goes live.</summary>
+        public static readonly RideLine[] IntroLines = { RideLine.PageLook, RideLine.PageOnlyNumbers, RideLine.PageFromInside };
 
-        /// <summary>
-        /// A hands-on beat: after its line starts, the intro waits for the rider to set a lever to at least a value,
-        /// or for the timeout (counted from the end of the line), so nobody gets stuck. Numbers only (RideScript.Beat).
-        /// </summary>
-        public struct RiderTask
-        {
-            public RideLine Line;
-            public string Control;
-            public float From;      // where the lever is set when the beat opens (ignored for GO, which the rider may be holding)
-            public float AtLeast;
-            public float TimeoutSeconds;
+        public const RideLine DockLine = RideLine.PagePullToDive;
 
-            public RiderTask(RideLine line, string control, float from, float atLeast, float timeoutSeconds)
-            {
-                Line = line;
-                Control = control;
-                From = from;
-                AtLeast = atLeast;
-                TimeoutSeconds = timeoutSeconds;
-            }
-        }
-
-        public static readonly RiderTask[] IntroTasks =
+        /// <summary>The sequences the segments play (NeuralRideBuilder.Flow refers to them by index, in this order).</summary>
+        public static readonly (string Name, RideLine[] Lines)[] Sequences =
         {
-            // Pull GO: AURA wakes, the network lights from the pod outward.
-            new RiderTask(RideLine.GuideWakeAura, RideControlIds.Action, 0f, 0.5f, 8f),
-            // Push the ROCK weight from 0 to +1.5 (three detents): the neuron on the explainer fires.
-            new RiderTask(RideLine.GuideMakeItFire, RideControlIds.Rock, 0f, 1.5f, 12f)
-        };
-
-        public static readonly RideLine[][] BriefingLines =
-        {
-            new[] { RideLine.ApolloLiftoff, RideLine.BriefingFirstNeuron },
-            new[] { RideLine.BriefingPerceptron },
-            new[] { RideLine.BriefingLearning }
-        };
-
-        public static readonly RideLine[] OutroLines =
-        {
-            RideLine.TargetingRestored, RideLine.GuideHeartOfNetworks, RideLine.GuideTheProblem, RideLine.CourseLocked
-        };
-
-        public static readonly NarrationLibrary.Chapter[] Chapters =
-        {
-            new NarrationLibrary.Chapter { year = "1943", title = "THE FIRST NEURON", blurb = "McCulloch and Pitts: add up the signals. Past the line? FIRE." },
-            new NarrationLibrary.Chapter { year = "1958", title = "THE PERCEPTRON", blurb = "Rosenblatt: every input gets its own weight, like a volume knob." },
-            new NarrationLibrary.Chapter { year = "1960", title = "LEARNING DOWNHILL", blurb = "Widrow and Hoff: measure the error, nudge every weight downhill." },
-            new NarrationLibrary.Chapter { year = "1969", title = "THE NEXT PROBLEM", blurb = "One neuron can never solve XOR. Next ride: hidden layers." }
+            ("Into the picture", new[] { RideLine.GridInsidePicture, RideLine.GridZeroAndOne, RideLine.GridSevenBySeven }),   // 0
+            ("One neuron", new[] { RideLine.NeuronThisIsOne, RideLine.NeuronWeights, RideLine.NeuronMultiplyAdd }),             // 1
+            ("Your turn", new[] { RideLine.NeuronYourTurn }),                                                                   // 2
+            ("To the network", new[] { RideLine.NetworkManyNeurons, RideLine.NetworkLayers }),                                  // 3
+            ("Send it through", new[] { RideLine.NetworkSendItThrough }),                                                       // 4
+            ("Wrong", new[] { RideLine.WrongItSays, RideLine.WrongNeverTaught }),                                               // 5
+            ("Rewind", new[] { RideLine.RewindBackwards, RideLine.RewindBackprop }),                                            // 6
+            ("Point at the blame", new[] { RideLine.RewindPointAtWires }),                                                      // 7
+            ("Downhill", new[] { RideLine.ValleyDownhill }),                                                                    // 8
+            ("Gradient descent", new[] { RideLine.ValleyGradientDescent }),                                                     // 9
+            ("Back in the network", new[] { RideLine.RightBackInNetwork }),                                                     // 10
+            ("Words", new[] { RideLine.RightWords, RideLine.RightNextLevel }),                                                  // 11
         };
 
         /// <summary>
-        /// The finale's credits: every voice, music and sound source with its license (master plan WP4, ADR-012). Four
-        /// short lines, so the type can be large enough to read (1.5 degrees) and still fit the finale's width.
+        /// The end card's credits: every voice, music, data and sound source with its licence (ADR-012). Short lines, so
+        /// the type can be large enough to read.
         /// </summary>
         public const string Credits =
-            "VOICES  Guide and AURA: Kokoro-82M text-to-speech, Apache 2.0\n"
-            + "(synthetic; no one's voice was cloned)  /  MUSIC  \"Telstar\"\n"
-            + "J.F.K., Rice University 1962: JFK Library, public domain\n"
-            + "Apollo 11 launch: NASA, Jack King  /  SOUND EFFECTS  Kenney, CC0";
+            "VOICE  Kokoro-82M text-to-speech (synthetic), Apache 2.0\n"
+            + "DIGITS  MNIST, Y. LeCun and C. Cortes, CC BY-SA 3.0\n"
+            + "MUSIC  \"Telstar\"    SOUND EFFECTS  Kenney, CC0";
 
         private static readonly Regex Pause = new Regex(@"\[p(\d+(?:\.\d+)?)\]", RegexOptions.Compiled);
         private static readonly Regex Cue = new Regex(@"\{([a-z0-9_, ]+)\}", RegexOptions.Compiled);
@@ -208,7 +159,6 @@ namespace Convergence.EditorTools
             clause = clause.Trim();
             if (clause.Length == 0) return;
 
-            // Weight is spoken words plus the pause, in words, so captions track the voice.
             float words = clause.Split(' ').Length;
             segments.Add(new NarrationLibrary.Segment { text = clause, weight = words + pauseAfter * WordsPerSecond, cues = cues });
         }
@@ -218,21 +168,6 @@ namespace Convergence.EditorTools
         /// <summary>The words as spoken, with the pause marks and cue tags removed.</summary>
         public static string PlainText(string text) => Regex.Replace(Cue.Replace(Pause.Replace(text, " "), " "), @"\s+", " ").Trim();
 
-        /// <summary>Every cue named anywhere in the script, so the builder can check each one has something to show.</summary>
-        public static HashSet<string> AllCues()
-        {
-            var all = new HashSet<string>();
-            foreach (Line line in Lines)
-            {
-                foreach (NarrationLibrary.Segment s in Segments(line.Text, out _))
-                {
-                    foreach (string c in s.cues) all.Add(c);
-                }
-            }
-
-            return all;
-        }
-
         /// <summary>Speaking time with no clip: words at a calm pace plus the pauses inside the line.</summary>
         public static float ReadSeconds(Line line)
         {
@@ -240,6 +175,44 @@ namespace Convergence.EditorTools
             Segments(line.Text, out float inner);
             int words = PlainText(line.Text).Split(' ').Length;
             return System.Math.Max(1.2f, words / WordsPerSecond + inner);
+        }
+
+        public static Line Get(RideLine id)
+        {
+            foreach (Line line in Lines)
+            {
+                if (line.Id == id) return line;
+            }
+
+            throw new KeyNotFoundException("RideNarrationData has no line " + id);
+        }
+
+        private static readonly string[] Ones =
+        {
+            "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve",
+            "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"
+        };
+
+        private static readonly string[] Tens = { "", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety" };
+
+        /// <summary>A whole number in words as the narrator says it ("ninety-two", "sixty thousand"), 0 to 999,999.</summary>
+        public static string Words(int n)
+        {
+            if (n < 0 || n > 999999) throw new System.ArgumentOutOfRangeException(nameof(n));
+            if (n >= 1000)
+            {
+                string head = Words(n / 1000) + " thousand";
+                return n % 1000 == 0 ? head : head + " " + Words(n % 1000);
+            }
+
+            if (n >= 100)
+            {
+                string head = Ones[n / 100] + " hundred";
+                return n % 100 == 0 ? head : head + " and " + Words(n % 100);
+            }
+
+            if (n < 20) return Ones[n];
+            return n % 10 == 0 ? Tens[n / 10] : Tens[n / 10] + "-" + Ones[n % 10];
         }
     }
 }

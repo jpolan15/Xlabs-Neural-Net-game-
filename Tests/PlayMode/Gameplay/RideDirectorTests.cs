@@ -1,33 +1,64 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using Convergence.Gameplay.Ride;
+using Convergence.Gameplay.Ride.Level1;
 
 namespace Convergence.Tests.PlayMode.Gameplay
 {
     /// <summary>
-    /// Plays the NeuralRide scene headless. The test moves levers only through the same channel call a hand or the
-    /// mouse makes, and uses the catalog's reference weights. It never sets a station to solved.
+    /// Plays Level 1 (the NeuralRide scene) headless. The tests touch the ride only the way a rider or operator does:
+    /// GO through its channel, taps through the puzzle's Cycle, Space through SkipNarration, G through GentleMode. They
+    /// never set a moment to done. Replaces the v3 tests of the three stops (trigger, OR gate, learning rate), whose
+    /// content Level 1 cut (TASK_LEVEL1_DIGITS_RESTRUCTURE, progress log).
     /// </summary>
     [TestFixture]
     public class RideDirectorTests
     {
+        private const int NeuronSegment = 1, NetworkSegment = 2, RewindSegment = 4, ValleySegment = 7;
+
+        private readonly List<string> _errors = new List<string>();
+
+        /// <summary>
+        /// The MCP-for-Unity editor bridge logs "[WebSocket] Connection failed" as an error whenever its server is
+        /// down, which has nothing to do with the ride. Ignore that one source; any other error still fails the test
+        /// in TearDown. The runner gives SetUp, the test body and TearDown separate log scopes, so the body turns
+        /// the runner's own check off in Load().
+        /// </summary>
+        [SetUp]
+        public void SetUp()
+        {
+            _errors.Clear();
+            Application.logMessageReceived += CollectError;
+        }
+
+        private void CollectError(string message, string stackTrace, LogType type)
+        {
+            if (type != LogType.Error && type != LogType.Exception && type != LogType.Assert) return;
+            if (message.Contains("MCP-FOR-UNITY")) return;
+            _errors.Add(type + ": " + message);
+        }
+
         [TearDown]
         public void TearDown()
         {
+            Application.logMessageReceived -= CollectError;
             Time.timeScale = 1f;
-            var director = UnityEngine.Object.FindFirstObjectByType<RideDirector>();
+            var director = UnityEngine.Object.FindAnyObjectByType<RideDirector>();
             if (director != null)
             {
                 director.StopAllCoroutines();
                 director.enabled = false;
             }
+
+            if (_errors.Count > 0) Assert.Fail("Errors logged during the ride:\n" + string.Join("\n", _errors));
         }
 
-        private static IEnumerator WaitFor(Func<bool> condition, string what, float realSeconds = 90f)
+        private static IEnumerator WaitFor(Func<bool> condition, string what, float realSeconds = 120f)
         {
             float end = Time.realtimeSinceStartup + realSeconds;
             while (!condition())
@@ -37,391 +68,246 @@ namespace Convergence.Tests.PlayMode.Gameplay
             }
         }
 
-        /// <summary>The ride opens with the narrated intro and holds GO. Skip it the way an operator does (Space).</summary>
-        private static IEnumerator SkipIntro(RideDirector director)
+        private static RideDirector _director;
+
+        private static IEnumerator Load()
         {
-            Assert.AreEqual(RideState.Intro, director.State, "The ride must open with the narrated intro");
-            director.SkipNarration();
-            yield return WaitFor(() => director.State == RideState.Dock, "the dock after the intro", 20f);
+            LogAssert.ignoreFailingMessages = true;
+            SceneManager.LoadScene("NeuralRide");
+            yield return null;
+            yield return null;
+            _director = UnityEngine.Object.FindAnyObjectByType<RideDirector>();
+            Assert.IsNotNull(_director, "RideDirector missing from NeuralRide");
         }
 
-        private static StationController Station(int number)
+        /// <summary>The ride opens with the narrated intro and holds GO. Skip it the way an operator does (Space), then pull GO.</summary>
+        private static IEnumerator Launch(float timeScale)
         {
-            foreach (StationController s in UnityEngine.Object.FindObjectsByType<StationController>(FindObjectsInactive.Include))
+            yield return Load();
+            Assert.AreEqual(RideState.Intro, _director.State, "The ride must open with the narrated intro");
+            _director.SkipNarration();
+            yield return WaitFor(() => _director.State == RideState.Dock, "the dock after the intro", 20f);
+            Time.timeScale = timeScale;
+            _director.Controls.Get(RideControlIds.Action).SetFromUser(1f);
+            yield return WaitFor(() => _director.State == RideState.Traveling, "launch from the dock", 20f);
+        }
+
+        private static T Moment<T>(string name) where T : RideMoment
+        {
+            foreach (T m in UnityEngine.Object.FindObjectsByType<T>(FindObjectsInactive.Include))
             {
-                if (s.name == "Station_" + number) return s;
+                if (m.name == name) return m;
             }
 
-            Assert.Fail("Station_" + number + " not found");
+            Assert.Fail(name + " moment missing");
             return null;
         }
 
-        [UnityTest]
-        public IEnumerator Ride_ReachesAndSolvesEveryStop_WithReferenceWeights()
-        {
-            SceneManager.LoadScene("NeuralRide");
-            yield return null;
-            yield return null;
-
-            var director = UnityEngine.Object.FindFirstObjectByType<RideDirector>();
-            Assert.IsNotNull(director, "RideDirector missing from NeuralRide");
-            RideControlSet controls = director.Controls;
-            yield return SkipIntro(director);
-            Time.timeScale = 10f;
-
-            // Dock: pull the launch lever.
-            controls.Get(RideControlIds.Action).SetFromUser(1f);
-            yield return WaitFor(() => director.State == RideState.AtStop && director.StopIndex == 0, "stop 1");
-
-            // Stop 1: a trigger of 2.0 lets the rock through, so it must not be solved yet.
-            StationController one = Station(1);
-            Assert.IsFalse(one.IsSolved, "Stop 1 must not start solved");
-            controls.Get(RideControlIds.Trigger).SetFromUser(-0.5f);
-            yield return new WaitForSeconds(1f);
-            Assert.IsFalse(one.IsSolved, "A trigger below zero zaps the drone and must not solve");
-            controls.Get(RideControlIds.Trigger).SetFromUser(0.5f);
-            yield return WaitFor(() => one.IsSolved, "stop 1 to solve");
-
-            // Stop 2: catalog reference weights 1, 1, bias -0.5 (trigger 0.5).
-            yield return WaitFor(() => director.State == RideState.AtStop && director.StopIndex == 1, "stop 2");
-            StationController two = Station(2);
-            Assert.IsFalse(two.IsSolved, "Stop 2 must not start solved");
-            controls.Get(RideControlIds.Rock).SetFromUser(1f);
-            controls.Get(RideControlIds.Ice).SetFromUser(1f);
-            controls.Get(RideControlIds.Trigger).SetFromUser(0.5f);
-            yield return WaitFor(() => two.IsSolved, "stop 2 to solve");
-
-            // Stop 3: pull LEARN with the learning rate on "good".
-            yield return WaitFor(() => director.State == RideState.AtStop && director.StopIndex == 2, "stop 3");
-            StationController three = Station(3);
-            Assert.IsFalse(three.IsSolved, "Stop 3 must not start solved");
-            controls.Get(RideControlIds.Action).SetFromUser(1f);
-            yield return WaitFor(() => three.IsSolved, "stop 3 to converge");
-            Assert.AreEqual(2.0 / 3.0, controls.Get(RideControlIds.Rock).Value, 0.05);
-            Assert.AreEqual(2.0 / 3.0, controls.Get(RideControlIds.Ice).Value, 0.05);
-
-            yield return WaitFor(() => director.State == RideState.Complete, "ride to complete");
-        }
-
-        [UnityTest]
-        public IEnumerator FollowingTheArrows_SolvesStops1And2_WithoutKnowingTheAnswer()
-        {
-            SceneManager.LoadScene("NeuralRide");
-            yield return null;
-            yield return null;
-
-            var director = UnityEngine.Object.FindFirstObjectByType<RideDirector>();
-            RideControlSet controls = director.Controls;
-            string hintId = null;
-            int hintDir = 0;
-            director.HintChanged += (id, dir) => { hintId = id; hintDir = dir; };
-            yield return SkipIntro(director);
-            Time.timeScale = 10f;
-
-            // The dock arrow points at GO.
-            yield return null;
-            controls.Get(RideControlIds.Action).SetFromUser(1f);
-            yield return WaitFor(() => director.State == RideState.AtStop && director.StopIndex == 0, "stop 1");
-
-            for (int stop = 0; stop < 2; stop++)
-            {
-                if (stop == 1) yield return WaitFor(() => director.State == RideState.AtStop && director.StopIndex == 1, "stop 2");
-                StationController station = Station(stop + 1);
-                if (stop == 1)
-                {
-                    // The situation that got a player stuck: every lever parked on zero.
-                    controls.Get(RideControlIds.Rock).SetFromUser(0f);
-                    controls.Get(RideControlIds.Ice).SetFromUser(0f);
-                    controls.Get(RideControlIds.Trigger).SetFromUser(0f);
-                    yield return null;
-                    Assert.IsNotNull(hintId, "With every lever on zero the arrow must still point somewhere");
-                }
-
-                int moves = 0;
-                while (!station.IsSolved && moves < 30)
-                {
-                    yield return null;
-                    if (hintId == null) { yield return new WaitForSeconds(0.2f); continue; }
-                    RideControlChannel ch = controls.Get(hintId);
-                    ch.SetFromUser(ch.Value + hintDir * ch.Step);
-                    moves++;
-                }
-
-                Assert.Less(moves, 30, "Following the arrows should solve stop " + (stop + 1));
-                yield return WaitFor(() => station.IsSolved, "stop " + (stop + 1) + " to hold its solve");
-            }
-        }
-
-        [UnityTest]
-        public IEnumerator Narration_EveryLineIsSpokenInItsOwnSection()
-        {
-            SceneManager.LoadScene("NeuralRide");
-            yield return null;
-            yield return null;
-
-            var director = UnityEngine.Object.FindFirstObjectByType<RideDirector>();
-            RideControlSet controls = director.Controls;
-            var heard = new System.Collections.Generic.List<(RideLine line, RideState state, int stop)>();
-            director.Said += line => heard.Add((line, director.State, director.StopIndex));
-            director.Narrated += line => heard.Add((line, director.State, director.StopIndex));
-            yield return SkipIntro(director);
-            Time.timeScale = 10f;
-
-            controls.Get(RideControlIds.Action).SetFromUser(1f);
-            yield return WaitFor(() => director.State == RideState.AtStop && director.StopIndex == 0, "stop 1");
-            controls.Get(RideControlIds.Trigger).SetFromUser(0.5f);
-            yield return WaitFor(() => Station(1).IsSolved, "stop 1 to solve");
-            yield return WaitFor(() => director.State == RideState.AtStop && director.StopIndex == 1, "stop 2");
-            controls.Get(RideControlIds.Rock).SetFromUser(1f);
-            controls.Get(RideControlIds.Ice).SetFromUser(1f);
-            controls.Get(RideControlIds.Trigger).SetFromUser(0.5f);
-            yield return WaitFor(() => Station(2).IsSolved, "stop 2 to solve");
-            yield return WaitFor(() => director.State == RideState.AtStop && director.StopIndex == 2, "stop 3");
-            controls.Get(RideControlIds.Action).SetFromUser(1f);
-            yield return WaitFor(() => Station(3).IsSolved, "stop 3 to solve");
-            yield return WaitFor(() => director.State == RideState.Complete, "the finish");
-
-            Assert.IsTrue(heard.Exists(h => h.line == RideLine.CourseLocked), "The closing line must play");
-            Assert.IsFalse(heard.Exists(h => h.line == RideLine.Converged), "The second stop-3 closing line was dropped to keep it concise");
-            foreach (var h in heard)
-            {
-                switch (h.line)
-                {
-                    case RideLine.Launch:
-                        Assert.AreEqual(RideState.Dock, h.state, "Launch line outside the dock"); break;
-                    case RideLine.NeuronIntro: case RideLine.LowerTrigger: case RideLine.DroneOops: case RideLine.WeightTimesInput:
-                        Assert.AreEqual(0, h.stop, h.line + " must be heard at stop 1"); Assert.AreEqual(RideState.AtStop, h.state); break;
-                    case RideLine.TwoSensors: case RideLine.TurnPipes: case RideLine.OrBuilt:
-                        Assert.AreEqual(1, h.stop, h.line + " must be heard at stop 2"); Assert.AreEqual(RideState.AtStop, h.state); break;
-                    case RideLine.PullLearn: case RideLine.HillIsError: case RideLine.GradientDescent: case RideLine.LrTooHigh:
-                        Assert.AreEqual(2, h.stop, h.line + " must be heard at stop 3"); Assert.AreEqual(RideState.AtStop, h.state); break;
-                    case RideLine.TargetingRestored:
-                        Assert.AreEqual(RideState.Traveling, h.state, "The finish line plays while the pod rolls on"); break;
-                }
-            }
-        }
-
-        [UnityTest]
-        public IEnumerator Stop3_CrazyLearningRate_Overshoots_AndDoesNotSolve()
-        {
-            SceneManager.LoadScene("NeuralRide");
-            yield return null;
-            yield return null;
-
-            var director = UnityEngine.Object.FindFirstObjectByType<RideDirector>();
-            RideControlSet controls = director.Controls;
-            yield return SkipIntro(director);
-            Time.timeScale = 10f;
-            controls.Get(RideControlIds.Action).SetFromUser(1f);
-            yield return WaitFor(() => director.State == RideState.AtStop && director.StopIndex == 0, "stop 1");
-            controls.Get(RideControlIds.Trigger).SetFromUser(0.5f);
-            yield return WaitFor(() => Station(1).IsSolved, "stop 1 to solve");
-            yield return WaitFor(() => director.State == RideState.AtStop && director.StopIndex == 1, "stop 2");
-            controls.Get(RideControlIds.Rock).SetFromUser(1f);
-            controls.Get(RideControlIds.Ice).SetFromUser(1f);
-            controls.Get(RideControlIds.Trigger).SetFromUser(0.5f);
-            yield return WaitFor(() => Station(2).IsSolved, "stop 2 to solve");
-            yield return WaitFor(() => director.State == RideState.AtStop && director.StopIndex == 2, "stop 3");
-
-            StationController three = Station(3);
-            bool overshot = false;
-            three.PhaseChanged += (kind, phase) => { if (phase == StationPhase.Overshoot) overshot = true; };
-            controls.Get(RideControlIds.Eta).SetFromUser(2f);
-            controls.Get(RideControlIds.Action).SetFromUser(1f);
-            yield return WaitFor(() => overshot, "the overshoot");
-            Assert.IsFalse(three.IsSolved, "A learning rate that is too high must not solve the stop");
-        }
+        private static Level1Data Data() => _director.GetComponent<Level1DataSource>().Data;
 
         [UnityTest]
         public IEnumerator Intro_ARiderTouchingGo_DoesNotLaunch_AndSkipOpensTheDock()
         {
-            SceneManager.LoadScene("NeuralRide");
-            yield return null;
-            yield return null;
+            yield return Load();
+            RideControlChannel go = _director.Controls.Get(RideControlIds.Action);
+            Assert.AreEqual(RideState.Intro, _director.State);
+            Assert.IsTrue(_director.IsNarrating, "The intro is narrated");
 
-            var director = UnityEngine.Object.FindFirstObjectByType<RideDirector>();
-            RideControlChannel go = director.Controls.Get(RideControlIds.Action);
-            Assert.AreEqual(RideState.Intro, director.State);
-            Assert.IsTrue(director.IsNarrating, "The intro is narrated");
-
-            // A short touch of GO is not a launch and not a skip.
             go.SetFromUser(1f);
             yield return new WaitForSecondsRealtime(0.5f);
             go.SetFromUser(0f);
             yield return new WaitForSecondsRealtime(0.3f);
-            Assert.AreEqual(RideState.Intro, director.State, "GO must not launch the ride during the intro");
+            Assert.AreEqual(RideState.Intro, _director.State, "GO must not launch the ride during the intro");
 
-            director.SkipNarration();
-            yield return WaitFor(() => director.State == RideState.Dock, "the dock after skipping", 20f);
-            Assert.IsFalse(director.IsNarrating);
-
+            _director.SkipNarration();
+            yield return WaitFor(() => _director.State == RideState.Dock, "the dock after skipping", 20f);
             go.SetFromUser(1f);
-            yield return WaitFor(() => director.State == RideState.Traveling, "launch from the dock", 20f);
+            yield return WaitFor(() => _director.State == RideState.Traveling && _director.SegmentIndex == 0, "launch from the dock", 20f);
         }
 
         [UnityTest]
         public IEnumerator Intro_HoldingGoForTwoSeconds_SkipsIt()
         {
-            SceneManager.LoadScene("NeuralRide");
-            yield return null;
-            yield return null;
-
-            var director = UnityEngine.Object.FindFirstObjectByType<RideDirector>();
-            Assert.AreEqual(RideState.Intro, director.State);
-            director.Controls.Get(RideControlIds.Action).SetFromUser(1f);
-            yield return WaitFor(() => director.State == RideState.Dock, "the dock after holding GO", 8f);
+            yield return Load();
+            Assert.AreEqual(RideState.Intro, _director.State);
+            _director.Controls.Get(RideControlIds.Action).SetFromUser(1f);
+            yield return WaitFor(() => _director.State == RideState.Dock, "the dock after holding GO", 8f);
         }
 
         [UnityTest]
-        public IEnumerator Intro_PullingGoToWakeAura_WakesHer_AndHoldingOnDoesNotSkip()
+        public IEnumerator Ride_RunsEndToEnd_WithNoInputButGo()
         {
-            SceneManager.LoadScene("NeuralRide");
-            yield return null;
-            yield return null;
+            // Nobody touches anything after GO: every moment must reach its end by its own timeout.
+            yield return Launch(25f);
+            var started = new List<int>();
+            bool completed = false;
+            _director.SegmentStarted += i => started.Add(i);
+            _director.RideCompleted += () => completed = true;
+            var paint = Moment<WeightPaintMoment>("WeightPaint");
+            var blame = Moment<BlameMoment>("Blame");
+            var valley = Moment<ValleyRunMoment>("ValleyRun");
+            yield return WaitFor(() => _director.State == RideState.Complete, "the end of the ride", 240f);
 
-            var director = UnityEngine.Object.FindFirstObjectByType<RideDirector>();
-            RideControlChannel go = director.Controls.Get(RideControlIds.Action);
-            string asked = null;
-            bool? wokenByRider = null;
-            director.RiderTaskStarted += (id, atLeast) => { if (asked == null) asked = id; };
-            director.RiderTaskDone += (id, byRider) => { if (id == RideControlIds.Action) wokenByRider = byRider; };
-
-            Time.timeScale = 3f; // the beats run on game time; the hold-to-skip timer runs on real time
-            yield return WaitFor(() => asked != null, "the first hands-on beat", 30f);
-            Assert.AreEqual(RideControlIds.Action, asked, "The first thing the rider does is pull GO to wake AURA");
-
-            go.SetFromUser(1f);
-            yield return WaitFor(() => wokenByRider.HasValue, "AURA to wake", 5f);
-            Assert.IsTrue(wokenByRider.Value, "The rider's pull should be what woke her");
-
-            // A first-timer keeps holding the lever. That must not read as the operator's two-second skip.
-            yield return new WaitForSecondsRealtime(2.6f);
-            Assert.AreEqual(RideState.Intro, director.State, "Holding GO after the wake pull must not skip the intro");
-            go.SetFromUser(0f);
-
-            // After a release the operator's hold-to-skip works again.
-            yield return null;
-            go.SetFromUser(1f);
-            yield return WaitFor(() => director.State == RideState.Dock, "the dock after a fresh two-second hold", 8f);
+            Assert.IsTrue(completed, "RideCompleted must fire");
+            var expected = new List<int>();
+            for (int i = 1; i < _director.SegmentCount; i++) expected.Add(i);
+            CollectionAssert.AreEqual(expected, started, "Every segment runs once, in order");
+            Assert.IsTrue(paint.Result.Passed, "The puzzle ends solved (Core's verdict), here by following its own hints");
+            Assert.IsFalse(paint.SolvedByRider);
+            for (int k = 0; k < blame.TopCount; k++) Assert.IsTrue(blame.IsNudged(k), "Blame wire " + k + " was never nudged");
+            Assert.Less(blame.HeroLoss, blame.StartLoss, "Nudging the blamed wires lowers the hero's real loss");
+            Assert.AreEqual(valley.HopCount - 1, valley.CurrentHop, "The Valley run reaches the last hop");
+            Assert.AreEqual(1f, _director.Progress01, 1e-4);
         }
 
         [UnityTest]
-        public IEnumerator Intro_MakeItFire_WaitsForTheWeightToReachTheLine()
+        public IEnumerator Puzzle_GatesTheNeuronStop_UntilCoreSaysEveryDigitIsRight()
         {
-            SceneManager.LoadScene("NeuralRide");
-            yield return null;
-            yield return null;
+            yield return Launch(8f);
+            var paint = Moment<WeightPaintMoment>("WeightPaint");
+            yield return WaitFor(() => paint.IsLive, "the puzzle to open", 60f);
+            Assert.AreEqual(NeuronSegment, _director.SegmentIndex);
+            Assert.IsFalse(paint.Result.Passed, "It must not open solved");
 
-            var director = UnityEngine.Object.FindFirstObjectByType<RideDirector>();
-            RideControlChannel go = director.Controls.Get(RideControlIds.Action);
-            RideControlChannel rock = director.Controls.Get(RideControlIds.Rock);
-            float fireAt = -1f;
-            bool? firedByRider = null;
-            director.RiderTaskStarted += (id, atLeast) =>
+            // Painting everything + is not a solution: the zeros fire too. The ride waits.
+            for (int c = 0; c < 49; c++) paint.Cycle(c);
+            Assert.IsFalse(paint.Result.Passed, "All plus must not pass");
+            yield return new WaitForSeconds(4f);
+            Assert.AreEqual(NeuronSegment, _director.SegmentIndex, "The ride must wait at the neuron while the puzzle is unsolved");
+            Assert.AreEqual(RideState.AtStop, _director.State);
+
+            // Back to empty (+ -> - -> 0), then the baked reference solution, tap by tap.
+            for (int c = 0; c < 49; c++)
             {
-                if (id == RideControlIds.Action) go.SetFromUser(1f); // wake AURA at once
-                if (id == RideControlIds.Rock) fireAt = atLeast;
-            };
-            director.RiderTaskDone += (id, byRider) =>
+                paint.Cycle(c);
+                paint.Cycle(c);
+            }
+
+            int[] reference = Data().File.puzzle.referenceSolution;
+            for (int c = 0; c < 49; c++)
             {
-                if (id == RideControlIds.Action) go.SetFromUser(0f);
-                if (id == RideControlIds.Rock) firedByRider = byRider;
-            };
+                if (reference[c] == 1) paint.Cycle(c);
+                else if (reference[c] == -1)
+                {
+                    paint.Cycle(c);
+                    paint.Cycle(c);
+                }
+            }
 
-            Time.timeScale = 3f;
-            yield return WaitFor(() => fireAt > 0f, "the make-it-fire beat", 40f);
-            Assert.IsFalse(rock.Locked, "The ROCK lever must be live for the make-it-fire beat");
-            Assert.Less(rock.Value, fireAt, "The neuron must start below its line, or there is nothing to do");
-
-            rock.SetFromUser(fireAt - rock.Step); // one detent short: not yet
-            yield return new WaitForSecondsRealtime(0.5f);
-            Assert.IsFalse(firedByRider.HasValue, "The beat must wait until the weight reaches the line");
-
-            rock.SetFromUser(fireAt);
-            yield return WaitFor(() => firedByRider.HasValue, "the neuron to fire", 5f);
-            Assert.IsTrue(firedByRider.Value, "The rider's weight should be what fired it");
-            yield return WaitFor(() => director.State == RideState.Dock, "the dock after the intro", 60f);
-            Assert.IsFalse(rock.Locked, "At the dock the ROCK weight is the rider's toy again");
+            Assert.IsTrue(paint.Result.Passed, "The reference weights solve it");
+            yield return WaitFor(() => _director.SegmentIndex == NetworkSegment, "the ride to move on after the solve", 60f);
+            Assert.IsTrue(paint.SolvedByRider);
         }
 
         [UnityTest]
-        public IEnumerator Intro_WithNobodyTouchingAnything_TimesOutAndStillReachesTheDock()
+        public IEnumerator FollowingTheHints_SolvesThePuzzle_WithoutKnowingTheAnswer()
         {
-            SceneManager.LoadScene("NeuralRide");
-            yield return null;
-            yield return null;
+            yield return Launch(8f);
+            var paint = Moment<WeightPaintMoment>("WeightPaint");
+            yield return WaitFor(() => paint.IsLive, "the puzzle to open", 60f);
+            int moves = 0;
+            while (!paint.Result.Passed)
+            {
+                yield return WaitFor(() => paint.HintCell >= 0 || paint.Result.Passed, "a hint after the rider goes quiet", 60f);
+                if (paint.Result.Passed) break;
+                int cell = paint.HintCell, target = paint.HintValue;
+                while (paint.Weights[cell] != target) paint.Cycle(cell);
+                Assert.LessOrEqual(++moves, 49, "The hints must converge");
+            }
 
-            var director = UnityEngine.Object.FindFirstObjectByType<RideDirector>();
-            var done = new System.Collections.Generic.List<(string id, bool byRider)>();
-            director.RiderTaskDone += (id, byRider) => done.Add((id, byRider));
-
-            Time.timeScale = 8f;
-            yield return WaitFor(() => director.State == RideState.Dock, "the dock with no input at all", 60f);
-            Assert.AreEqual(2, done.Count, "Both hands-on beats should end by timing out");
-            foreach (var d in done) Assert.IsFalse(d.byRider, d.id + " was marked as done by a rider who never touched it");
-            Assert.AreEqual(RideState.Dock, director.State);
+            Assert.IsTrue(paint.SolvedByRider, "Following the hints is the rider solving it");
         }
 
         [UnityTest]
-        public IEnumerator Briefing_PlaysDuringTravel_AndEndsBeforeTheStationGoesLive()
+        public IEnumerator ForwardPass_LightsWhatCoreComputes_AndTheUntrainedNetworkGuessesWrong()
         {
-            SceneManager.LoadScene("NeuralRide");
-            yield return null;
-            yield return null;
+            yield return Launch(12f);
+            var forward = Moment<ForwardPassMoment>("ForwardPassUntrained");
+            yield return WaitFor(() => forward.HasFinished, "the untrained forward pass", 150f);
+            Assert.AreEqual(Data().File.hero.untrainedGuess, forward.Guess);
+            Assert.AreNotEqual(Level1Data.HeroDigit, forward.Guess);
 
-            var director = UnityEngine.Object.FindFirstObjectByType<RideDirector>();
-            yield return SkipIntro(director);
-            Time.timeScale = 10f;
-
-            int briefingStarted = -1;
-            int briefingEnded = -1;
-            bool narratingAtArrival = true;
-            bool beganWhileNarrating = false;
-            director.BriefingStarted += i => briefingStarted = i;
-            director.BriefingEnded += i => briefingEnded = i;
-            director.StopReached += i => narratingAtArrival = director.IsNarrating;
-            Station(1).Began += kind => beganWhileNarrating |= director.IsNarrating;
-
-            director.Controls.Get(RideControlIds.Action).SetFromUser(1f);
-            yield return null;
-            Assert.AreEqual(0, briefingStarted, "The first briefing starts with the first travel");
-            Assert.IsTrue(director.IsNarrating);
-
-            yield return WaitFor(() => director.State == RideState.AtStop && director.StopIndex == 0, "stop 1");
-            Assert.AreEqual(0, briefingEnded, "The briefing must be over when the pod arrives");
-            Assert.IsFalse(narratingAtArrival, "No narration may still be running when the stop is reached");
-            Assert.IsFalse(beganWhileNarrating, "The station must not go live before its briefing ends");
+            // The node mesh the rider sees carries Core's activations (colour g) for the 49 pixels, 16 hidden and 10 answers.
+            Mesh nodes = GameObject.Find("Region_3").transform.Find("Network/Nodes").GetComponent<MeshFilter>().sharedMesh;
+            Color[] colors = nodes.colors;
+            double[] pixels = Data().File.hero.pixels7;
+            for (int i = 0; i < 49; i++) Assert.AreEqual(pixels[i], colors[i * 4].g, 1e-5, "pixel " + i);
+            for (int j = 0; j < 16; j++) Assert.AreEqual(forward.Hidden[j], colors[(49 + j) * 4].g, 1e-5, "hidden " + j);
+            for (int k = 0; k < 10; k++) Assert.AreEqual(forward.Outputs[k], colors[(65 + k) * 4].g, 1e-5, "answer " + k);
         }
 
         [UnityTest]
-        public IEnumerator Stop_LetsTheLineSaidAtTheSolveFinish_BeforeMovingOn()
+        public IEnumerator Rewind_RollsBackward_WhileTheRiderKeepsFacingTheNetwork()
         {
-            SceneManager.LoadScene("NeuralRide");
+            yield return Launch(25f);
+            yield return WaitFor(() => _director.SegmentIndex == RewindSegment && _director.State == RideState.Traveling, "the rewind", 200f);
+            float last = _director.Distance;
+            int backward = 0;
+            while (_director.State == RideState.Traveling && _director.SegmentIndex == RewindSegment)
+            {
+                yield return null;
+                if (_director.Distance < last - 1e-4f) backward++;
+                Assert.LessOrEqual(_director.Distance, last + 1e-4f, "The rewind never moves forward");
+                Assert.Greater(Vector3.Dot(_director.Pod.forward, Vector3.forward), 0.99f, "The rider keeps facing the network");
+                Assert.AreEqual(0f, _director.Pod.eulerAngles.x, 1e-3f, "No pitch");
+                Assert.AreEqual(0f, _director.Pod.eulerAngles.z, 1e-3f, "No roll");
+                last = _director.Distance;
+            }
+
+            Assert.Greater(backward, 5, "The pod rolled backward along the track");
+        }
+
+        [UnityTest]
+        public IEnumerator Valley_FollowsTheBakedHops_AndGentleModeHalvesTheDrop()
+        {
+            yield return Launch(25f);
+            var valley = Moment<ValleyRunMoment>("ValleyRun");
+            Level1Hop[] hops = Data().File.valley.hops;
+            var heights = new float[hops.Length];
+            float rimY = float.NaN;
+            valley.HopReached += k => heights[k] = _director.Pod.position.y;
+            yield return WaitFor(() => _director.SegmentIndex == ValleySegment, "the Valley", 220f);
+            rimY = _director.Pod.position.y;
+            _director.GentleMode = true;
+            yield return WaitFor(() => valley.HasFinished, "the drop", 120f);
+
+            const float metersPerLoss = 5f;
+            for (int k = 0; k < hops.Length; k++)
+            {
+                float expected = rimY + 0.5f * (float)(hops[k].loss - hops[0].loss) * metersPerLoss;
+                Assert.AreEqual(expected, heights[k], 0.05f, "hop " + k + " (step " + hops[k].step + ") in gentle mode");
+            }
+
+            Assert.Greater(heights[1], heights[0], "The first, too-big step overshoots up the far slope");
+            for (int k = 2; k < hops.Length; k++) Assert.Less(heights[k], heights[k - 1], "Hop " + k + " goes downhill");
+        }
+
+        [UnityTest]
+        public IEnumerator Valley_AtFullHeight_DropsTheRealLossTimesFive()
+        {
+            yield return Launch(25f);
+            var valley = Moment<ValleyRunMoment>("ValleyRun");
+            Level1Hop[] hops = Data().File.valley.hops;
+            float last = float.NaN;
+            float rimY = float.NaN;
+            yield return WaitFor(() => _director.SegmentIndex == ValleySegment, "the Valley", 220f);
+            rimY = _director.Pod.position.y;
+            yield return WaitFor(() => valley.HasFinished, "the drop", 120f);
+            last = _director.Pod.position.y;
+            Assert.AreEqual((float)(hops[hops.Length - 1].loss - hops[0].loss) * 5f, last - rimY, 0.05f);
+        }
+
+        [UnityTest]
+        public IEnumerator Skip_HurriesAMoment_SoAnOperatorCanAlwaysMoveOn()
+        {
+            yield return Launch(8f);
+            var paint = Moment<WeightPaintMoment>("WeightPaint");
+            yield return WaitFor(() => paint.IsLive, "the puzzle to open", 60f);
+            _director.SkipNarration(); // cuts "your turn" if it is still playing
             yield return null;
-            yield return null;
-
-            var director = UnityEngine.Object.FindFirstObjectByType<RideDirector>();
-            Assert.IsNotNull(director.Script, "The built ride runs on a RideScript");
-            float lineSeconds = director.Script.SecondsOf(RideLine.WeightTimesInput);
-            Assert.Greater(lineSeconds, 3f, "The stop 1 punchline is longer than the old fixed 3 s wait, so this test means something");
-            yield return SkipIntro(director);
-            Time.timeScale = 10f;
-
-            float saidAt = -1f;
-            float leftAt = -1f;
-            director.Said += line => { if (line == RideLine.WeightTimesInput) saidAt = Time.time; };
-            director.StateChanged += state => { if (state == RideState.Traveling && saidAt >= 0f && leftAt < 0f) leftAt = Time.time; };
-
-            RideControlSet controls = director.Controls;
-            controls.Get(RideControlIds.Action).SetFromUser(1f);
-            yield return WaitFor(() => director.State == RideState.AtStop && director.StopIndex == 0, "stop 1");
-            controls.Get(RideControlIds.Trigger).SetFromUser(0.5f);
-            yield return WaitFor(() => Station(1).IsSolved, "stop 1 to solve");
-            Assert.GreaterOrEqual(saidAt, 0f, "Solving stop 1 says its punchline");
-            yield return WaitFor(() => leftAt >= 0f, "the pod to leave stop 1");
-
-            Assert.GreaterOrEqual(leftAt - saidAt, lineSeconds - 0.05f,
-                "The pod left stop 1 before the punchline finished, so the next briefing would cut it off");
+            _director.SkipNarration(); // hurries the puzzle: it follows its own hints
+            yield return WaitFor(() => _director.SegmentIndex == NetworkSegment, "the ride to move on", 30f);
+            Assert.IsTrue(paint.Result.Passed, "Hurrying still ends on a real solution");
         }
     }
 }

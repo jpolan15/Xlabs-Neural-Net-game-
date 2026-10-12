@@ -9,22 +9,20 @@ using Convergence.Presentation.Ride;
 namespace Convergence.EditorTools
 {
     /// <summary>
-    /// Sightline, viewing-cone, and text-size check for the Neural Ride (TASK_IGNITE_RIDE_V3_MASTER_PLAN.md, WP2).
-    /// For each stop it puts a virtual eye on the pod seat at 1.15, 1.30 and 1.45 m and casts sight lines to the centre and
-    /// edges of every teaching panel and label that is live at that stop. A panel fails when real geometry (a triangle of
-    /// a pod or station mesh) is hit first. It also checks that each panel sits inside the viewing cone and that text is
-    /// big enough to read. It never moves or changes anything in the scene: the pod's meshes are placed at each stop by a
-    /// matrix. Development tooling only; game assemblies never reference it.
+    /// Sightline, viewing-cone, and text-size check for Level 1. At every viewpoint (RideViewpoint: the dock, each stop,
+    /// the rim, the drop, the end) it puts a virtual eye on the pod seat at 1.15, 1.30 and 1.45 m and casts sight lines
+    /// to the centre and edges of every panel and sign the rider must read there. A target fails when real geometry (a
+    /// triangle of a pod mesh or of a region the streamer shows at that segment) is hit first. Panels must sit inside
+    /// the viewing cone and text must be big enough to read. It never moves or changes anything in the scene: the pod's
+    /// meshes are placed at each viewpoint by a matrix. Development tooling only; game assemblies never reference it.
     ///
-    /// What counts as a blocker: solid pod and station meshes of the groups that are live at that stop (the StationReveal
-    /// flags for the stop's kind). What does not: additive glow quads, text, line renderers, the XR rig, the Finale and the
-    /// ChapterCard (hidden until their moment), other stations, and the Equation plate (a transient reveal that is meant to
-    /// sit in front of the core for a few seconds; it is still checked as a target).
+    /// What counts as a blocker: solid, non-additive meshes of the pod (minus panels that are hidden at that viewpoint
+    /// and the XR rig) and of the regions visible at that segment. Text, glows, and the target's own parts never block.
     /// </summary>
     public static class RideSightlines
     {
         /// <summary>When true, Assert() fails the build on any problem; when false it only logs a warning.</summary>
-        public const bool ThrowOnProblems = true;
+        public static readonly bool ThrowOnProblems = true;
 
         // The nominal eye the layout is built for (PodSeat lifts the rig so the real eye sits here) and the cone around it.
         private const float NominalEye = 1.30f;
@@ -81,11 +79,15 @@ namespace Convergence.EditorTools
         {
             var problems = new List<string>();
             GameObject pod = null;
-            var stations = new List<GameObject>();
+            RegionStreamer streamer = null;
+            var regions = new Dictionary<int, GameObject>();
+            var viewpoints = new List<RideViewpoint>();
             foreach (GameObject go in scene.GetRootGameObjects())
             {
                 if (go.name == "Pod") pod = go;
-                else if (StationNumber(go.name) > 0) stations.Add(go);
+                if (go.name.StartsWith("Region_", StringComparison.Ordinal) && int.TryParse(go.name.Substring(7), out int n)) regions[n] = go;
+                if (streamer == null) streamer = go.GetComponentInChildren<RegionStreamer>(true);
+                viewpoints.AddRange(go.GetComponentsInChildren<RideViewpoint>(true));
             }
 
             if (pod == null)
@@ -101,52 +103,78 @@ namespace Convergence.EditorTools
                 return problems;
             }
 
-            stations.Sort((a, b) => StationNumber(a.name).CompareTo(StationNumber(b.name)));
-            if (stations.Count == 0)
+            if (viewpoints.Count == 0)
             {
-                problems.Add("No 'Station_N' root objects in the open scene. Run Convergence > Build Neural Ride first.");
+                problems.Add("No RideViewpoint in the open scene. Run Convergence > Build Neural Ride first.");
                 return problems;
             }
 
             var meshCache = new Dictionary<Mesh, (Vector3[] vertices, int[] triangles)>();
-            foreach (GameObject station in stations) CheckStop(pod.transform, seat, station, meshCache, problems);
+            foreach (RideViewpoint vp in viewpoints) CheckViewpoint(pod.transform, seat, vp, streamer, regions, meshCache, problems);
             return problems;
         }
 
-        // ---------- one stop ----------
-
-        private static void CheckStop(Transform pod, Transform seat, GameObject station, Dictionary<Mesh, (Vector3[] vertices, int[] triangles)> meshCache, List<string> problems)
+        /// <summary>The regions the streamer shows at a viewpoint's segment (all of them when there is no streamer).</summary>
+        public static List<GameObject> VisibleRegions(RideViewpoint vp, RegionStreamer streamer, Dictionary<int, GameObject> regions)
         {
-            string stop = station.name;
-            Matrix4x4 podAtStop = Matrix4x4.TRS(station.transform.position, station.transform.rotation, Vector3.one);
-            Matrix4x4 podToStop = podAtStop * pod.worldToLocalMatrix;
-            List<GameObject> live = LiveGroups(station, problems, stop);
-
-            // Occluders: the pod placed at this stop, plus this stop's live groups.
-            var occluders = new List<Occluder>();
-            foreach (Renderer r in pod.GetComponentsInChildren<Renderer>(false))
+            int mask = streamer != null ? streamer.MaskFor(vp.segment) : ~0;
+            var visible = new List<GameObject>();
+            foreach (KeyValuePair<int, GameObject> r in regions)
             {
-                if (!CanBlock(r) || IsHiddenPodPart(r.transform, pod, seat)) continue;
+                if ((mask & (1 << r.Key)) != 0) visible.Add(r.Value);
+            }
+
+            return visible;
+        }
+
+        // ---------- one viewpoint ----------
+
+        private static void CheckViewpoint(Transform pod, Transform seat, RideViewpoint vp, RegionStreamer streamer, Dictionary<int, GameObject> regions,
+            Dictionary<Mesh, (Vector3[] vertices, int[] triangles)> meshCache, List<string> problems)
+        {
+            string stop = vp.label;
+            Matrix4x4 podAtStop = Matrix4x4.TRS(vp.transform.position, vp.transform.rotation, Vector3.one);
+            Matrix4x4 podToStop = podAtStop * pod.worldToLocalMatrix;
+
+            var occluders = new List<Occluder>();
+            foreach (Renderer r in pod.GetComponentsInChildren<Renderer>(true))
+            {
+                if (!CanBlock(r) || IsHiddenPodPart(r.transform, pod, seat, vp)) continue;
                 AddOccluder(occluders, r, podToStop * r.localToWorldMatrix, meshCache);
             }
 
-            foreach (GameObject group in live)
+            foreach (GameObject region in VisibleRegions(vp, streamer, regions))
             {
-                foreach (Renderer r in group.GetComponentsInChildren<Renderer>(false))
+                foreach (Renderer r in region.GetComponentsInChildren<Renderer>(true))
                 {
-                    if (!CanBlock(r) || IsUnder(r.transform, "Equation", station.transform)) continue;
-                    AddOccluder(occluders, r, r.localToWorldMatrix, meshCache);
+                    if (CanBlock(r)) AddOccluder(occluders, r, r.localToWorldMatrix, meshCache);
                 }
             }
 
-            // Targets: the dash and every live panel and label.
             var targets = new List<Target>();
             Transform screen = pod.Find("Dash/Screen");
             if (screen != null) AddGrid(targets, "dash screen", pod.Find("Dash"), screen, podToStop * screen.localToWorldMatrix, true);
-            foreach (GameObject group in live)
+            foreach (string path in vp.podPanels)
             {
-                AddPanels(targets, group, station.transform);
-                foreach (TMP_Text text in group.GetComponentsInChildren<TMP_Text>(false)) AddLabel(targets, text);
+                Transform panel = pod.Find(path);
+                if (panel == null)
+                {
+                    problems.Add(stop + ": the pod has no " + path + ".");
+                    continue;
+                }
+
+                int before = targets.Count;
+                AddPanel(targets, panel, podToStop);
+                // A pod panel is a hand panel (the weight grid at the lap) or the end card: the reading cone is for the world.
+                for (int i = before; i < targets.Count; i++) targets[i].IsDash = true;
+                foreach (TMP_Text text in panel.GetComponentsInChildren<TMP_Text>(true)) AddLabel(targets, text, podToStop);
+            }
+
+            foreach (Transform target in vp.targets)
+            {
+                if (target == null) continue;
+                AddPanel(targets, target, Matrix4x4.identity);
+                foreach (TMP_Text text in target.GetComponentsInChildren<TMP_Text>(true)) AddLabel(targets, text, Matrix4x4.identity);
             }
 
             Vector3 seatInPod = pod.InverseTransformPoint(seat.position);
@@ -158,47 +186,27 @@ namespace Convergence.EditorTools
             }
         }
 
-        // The groups StationReveal shows for this stop's kind (OneSignal, TwoSignals, Learns).
-        private static List<GameObject> LiveGroups(GameObject station, List<string> problems, string stop)
-        {
-            var live = new List<GameObject>();
-            var reveal = station.GetComponent<StationReveal>();
-            var controller = station.GetComponent<Convergence.Gameplay.Ride.StationController>();
-            if (reveal == null || controller == null)
-            {
-                problems.Add(stop + " has no StationReveal or StationController, so its live groups cannot be told apart.");
-                return live;
-            }
-
-            int kind = new SerializedObject(controller).FindProperty("kind").enumValueIndex;
-            string flag = kind == 0 ? "oneSignal" : kind == 1 ? "twoSignals" : "learns";
-            SerializedProperty groups = new SerializedObject(reveal).FindProperty("groups");
-            for (int i = 0; i < groups.arraySize; i++)
-            {
-                SerializedProperty e = groups.GetArrayElementAtIndex(i);
-                var root = e.FindPropertyRelative("root").objectReferenceValue as GameObject;
-                if (root != null && e.FindPropertyRelative(flag).boolValue) live.Add(root);
-            }
-
-            return live;
-        }
-
         // ---------- what can block, what is a target ----------
 
         private static bool CanBlock(Renderer r)
         {
             if (!r.enabled || r is LineRenderer || r.GetComponent<TMP_Text>() != null) return false;
             Material m = r.sharedMaterial;
-            bool additive = m != null && m.HasProperty("_DstBlend") && Mathf.Approximately(m.GetFloat("_DstBlend"), (float)UnityEngine.Rendering.BlendMode.One);
+            if (m == null) return false;
+            // The networks' wires and neurons, the rails and every glow are additive light: they never hide anything.
+            if (m.shader != null && m.shader.name.StartsWith("Convergence/Neural", StringComparison.Ordinal)) return false;
+            bool additive = m.HasProperty("_DstBlend") && Mathf.Approximately(m.GetFloat("_DstBlend"), (float)UnityEngine.Rendering.BlendMode.One);
             return !additive;
         }
 
-        // The finale, the chapter card and the explainer panel are hidden until their moment; the XR rig is the rider's own hardware.
-        private static bool IsHiddenPodPart(Transform t, Transform pod, Transform seat)
+        // The end card and the weight grid only show at their moment (a viewpoint lists them in podPanels when they are
+        // live); the XR rig is the rider's own hardware.
+        private static bool IsHiddenPodPart(Transform t, Transform pod, Transform seat, RideViewpoint vp)
         {
             for (Transform c = t; c != null && c != pod; c = c.parent)
             {
-                if (c.name == "Finale" || c.name == "ChapterCard" || c.name == "Explainer") return true;
+                if (c.name == "EndCard" && Array.IndexOf(vp.podPanels, "EndCard") < 0) return true;
+                if (c.name == "WeightGrid" && Array.IndexOf(vp.podPanels, "Dash/WeightGrid") < 0) return true;
                 if (c.parent == seat && c.GetComponentInChildren<Camera>(true) != null) return true;
             }
 
@@ -241,26 +249,77 @@ namespace Convergence.EditorTools
             list.Add(new Occluder { Renderer = r, Bounds = bounds, Triangles = triangles, Path = PathOf(r.transform) });
         }
 
-        private static void AddPanels(List<Target> targets, GameObject group, Transform station)
+        /// <summary>
+        /// A panel or a set piece the rider must see. A board (a child named Plate or Back) is sampled as a 3 by 3 grid on
+        /// its face; anything else by the centre and four points across its bounds.
+        /// </summary>
+        private static void AddPanel(List<Target> targets, Transform root, Matrix4x4 toWorld)
         {
-            switch (group.name)
+            Transform board = root.Find("Plate") ?? root.Find("Back");
+            if (board != null && board.GetComponent<MeshFilter>() != null)
             {
-                case "Diagram":
-                    AddGrid(targets, "network diagram panel", group.transform, group.transform.Find("Plate"), Matrix(group.transform.Find("Plate")), false);
-                    break;
-                case "Equation":
-                    AddGrid(targets, "equation panel", group.transform, group.transform.Find("Plate"), Matrix(group.transform.Find("Plate")), false);
-                    break;
-                case "Landscape":
-                    AddGrid(targets, "loss landscape", group.transform, group.transform.Find("Surface"), Matrix(group.transform.Find("Surface")), false);
-                    break;
-                case "Neuron":
-                    AddCore(targets, group.transform, station);
-                    break;
-                case "Board":
-                    AddBoard(targets, group.transform);
-                    break;
+                AddBoard(targets, root.name + " panel", root, board, toWorld * board.localToWorldMatrix);
+                return;
             }
+
+            Bounds? bounds = null;
+            foreach (Renderer r in root.GetComponentsInChildren<Renderer>(true))
+            {
+                if (!(r is MeshRenderer) || r.GetComponent<TMP_Text>() != null || !CanBlock(r)) continue;
+                if (bounds == null) bounds = r.bounds;
+                else
+                {
+                    Bounds b = bounds.Value;
+                    b.Encapsulate(r.bounds);
+                    bounds = b;
+                }
+            }
+
+            if (bounds == null) return;
+            Bounds box = bounds.Value;
+            var target = new Target { Label = root.name, Root = root, IsPanel = true, Center = toWorld.MultiplyPoint3x4(box.center) };
+            target.Points.Add(target.Center);
+            Vector3 e = box.extents * 0.6f;
+            foreach (Vector3 d in new[] { new Vector3(e.x, 0, 0), new Vector3(-e.x, 0, 0), new Vector3(0, e.y, 0), new Vector3(0, -e.y, 0) })
+            {
+                target.Points.Add(toWorld.MultiplyPoint3x4(box.center + d));
+            }
+
+            targets.Add(target);
+        }
+
+        // A 3 x 3 grid at 80% of a board's face (a scaled cube or quad): the face is the axis with the least world size.
+        private static void AddBoard(List<Target> targets, string label, Transform root, Transform board, Matrix4x4 toWorld)
+        {
+            Mesh mesh = board.GetComponent<MeshFilter>().sharedMesh;
+            Bounds b = mesh.bounds;
+            Vector3 scale = board.lossyScale;
+            Vector3 size = Vector3.Scale(b.size, new Vector3(Mathf.Abs(scale.x), Mathf.Abs(scale.y), Mathf.Abs(scale.z)));
+            int flat = size.x <= size.y && size.x <= size.z ? 0 : size.y <= size.z ? 1 : 2;
+            var target = new Target { Label = label, Root = root, IsPanel = true, Center = toWorld.MultiplyPoint3x4(b.center) };
+            for (int i = -1; i <= 1; i++)
+            {
+                for (int j = -1; j <= 1; j++)
+                {
+                    Vector3 local = b.center;
+                    int a = 0;
+                    for (int axis = 0; axis < 3; axis++)
+                    {
+                        if (axis == flat)
+                        {
+                            local[axis] = b.min[axis]; // the face toward the rider (boards face -z)
+                            continue;
+                        }
+
+                        local[axis] += (a == 0 ? i : j) * b.extents[axis] * 0.8f;
+                        a++;
+                    }
+
+                    target.Points.Add(toWorld.MultiplyPoint3x4(local));
+                }
+            }
+
+            targets.Add(target);
         }
 
         private static Matrix4x4 Matrix(Transform t) => t != null ? t.localToWorldMatrix : Matrix4x4.identity;
@@ -328,7 +387,7 @@ namespace Convergence.EditorTools
         }
 
         // Any text that already has words in it at build time, sampled at its centre and both ends.
-        private static void AddLabel(List<Target> targets, TMP_Text text)
+        private static void AddLabel(List<Target> targets, TMP_Text text, Matrix4x4 toWorld)
         {
             if (string.IsNullOrWhiteSpace(text.text)) return; // filled in at runtime: nothing to measure yet
             text.ForceMeshUpdate();
@@ -336,8 +395,8 @@ namespace Convergence.EditorTools
             if (local.size == Vector3.zero) return;
 
             Transform t = text.transform;
-            Vector3 centre = t.TransformPoint(local.center);
-            Vector3 along = t.right * local.extents.x * t.lossyScale.x * 0.9f;
+            Vector3 centre = toWorld.MultiplyPoint3x4(t.TransformPoint(local.center));
+            Vector3 along = toWorld.MultiplyVector(t.right) * local.extents.x * t.lossyScale.x * 0.9f;
             var target = new Target
             {
                 Label = "label '" + Shorten(text.text) + "'",
@@ -488,13 +547,6 @@ namespace Convergence.EditorTools
             return s.Length > 24 ? s.Substring(0, 24) + "..." : s;
         }
 
-        private static int StationNumber(string name)
-        {
-            const string prefix = "Station_";
-            if (!name.StartsWith(prefix, StringComparison.Ordinal)) return 0;
-            return int.TryParse(name.Substring(prefix.Length), NumberStyles.None, CultureInfo.InvariantCulture, out int n) ? n : 0;
-        }
-
         private static string PathOf(Transform t)
         {
             string path = t.name;
@@ -504,83 +556,76 @@ namespace Convergence.EditorTools
     }
 
     /// <summary>
-    /// Rough per-stop render budget for the Neural Ride (WP6, WP8): draw calls and triangles of what is visible at each
-    /// stop (the pod, that station's live groups, and the track). A renderer counts as one draw per material. The Quest 2
-    /// budget is 100 draw calls and 100k triangles for the whole scene. The device measurement (OVR Metrics) is the real
-    /// number; this catches regressions in the Editor.
+    /// Rough render budget per viewpoint of Level 1 (WP6, WP8): draw calls and triangles of what is visible there (the
+    /// pod without its hidden panels, the track, and the regions the streamer shows at that segment). A renderer counts
+    /// as one draw per material. The Quest 2 budget is 100 draw calls and 100k triangles. The device measurement (OVR
+    /// Metrics) is the real number; this catches regressions in the Editor.
     /// </summary>
     public static class RideBudget
     {
         public const int MaxDrawCalls = 100;
         public const int MaxTriangles = 100000;
 
-        /// <summary>When true, Report() fails the build over budget. Promote once the pod is under budget.</summary>
-        public const bool ThrowOverBudget = false;
+        /// <summary>When true, Report() fails the build over budget.</summary>
+        public const bool ThrowOverBudget = true;
 
-        public static void Report()
+        /// <summary>One line per viewpoint: "label: N draw calls, M triangles".</summary>
+        public static List<string> Measure(out List<string> over) => Measure(UnityEngine.SceneManagement.SceneManager.GetActiveScene(), out over);
+
+        /// <summary>The same on any loaded scene, for example one a test opens additively.</summary>
+        public static List<string> Measure(UnityEngine.SceneManagement.Scene scene, out List<string> over)
         {
-            GameObject pod = GameObject.Find("Pod");
-            GameObject track = GameObject.Find("Track");
-            if (pod == null)
+            over = new List<string>();
+            var lines = new List<string>();
+            GameObject pod = null, track = null;
+            RegionStreamer streamer = null;
+            var regions = new Dictionary<int, GameObject>();
+            var viewpoints = new List<RideViewpoint>();
+            foreach (GameObject go in scene.GetRootGameObjects())
             {
-                Debug.LogWarning("[RideBudget] No Pod in the open scene, so nothing was measured.");
-                return;
+                if (go.name == "Pod") pod = go;
+                if (go.name == "Track") track = go;
+                if (go.name.StartsWith("Region_", StringComparison.Ordinal) && int.TryParse(go.name.Substring(7), out int n)) regions[n] = go;
+                if (streamer == null) streamer = go.GetComponentInChildren<RegionStreamer>(true);
+                viewpoints.AddRange(go.GetComponentsInChildren<RideViewpoint>(true));
             }
 
-            var over = new List<string>();
-            foreach (GameObject go in UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects())
+            if (pod == null) return lines;
+            foreach (RideViewpoint vp in viewpoints)
             {
-                if (!go.name.StartsWith("Station_", StringComparison.Ordinal)) continue;
                 int draws = 0, triangles = 0;
-                Count(pod, ref draws, ref triangles, true);
-                if (track != null) Count(track, ref draws, ref triangles, false);
-                CountStation(go, ref draws, ref triangles);
+                Count(pod, ref draws, ref triangles, vp);
+                if (track != null) Count(track, ref draws, ref triangles, null);
+                foreach (GameObject region in RideSightlines.VisibleRegions(vp, streamer, regions)) Count(region, ref draws, ref triangles, null);
                 bool ok = draws <= MaxDrawCalls && triangles <= MaxTriangles;
-                string line = go.name + ": about " + draws + " draw calls and " + triangles + " triangles (" + (ok ? "within budget" : "OVER BUDGET")
-                    + "; Quest 2 budget " + MaxDrawCalls + " / " + MaxTriangles + ").";
-                Debug.Log("[RideBudget] " + line);
+                string line = vp.label + ": about " + draws + " draw calls and " + triangles + " triangles (" + (ok ? "within budget" : "OVER BUDGET") + ")";
+                lines.Add(line);
                 if (!ok) over.Add(line);
             }
 
-            if (ThrowOverBudget && over.Count > 0) throw new InvalidOperationException("Over the Quest 2 render budget: " + string.Join(" ", over));
+            return lines;
         }
 
-        private static void CountStation(GameObject station, ref int draws, ref int triangles)
+        public static void Report()
         {
-            var reveal = station.GetComponent<StationReveal>();
-            var controller = station.GetComponent<Convergence.Gameplay.Ride.StationController>();
-            if (reveal == null || controller == null)
+            List<string> lines = Measure(out List<string> over);
+            if (lines.Count == 0)
             {
-                Count(station, ref draws, ref triangles, false);
+                Debug.LogWarning("[RideBudget] No Pod or no viewpoints in the open scene, so nothing was measured.");
                 return;
             }
 
-            int kind = new SerializedObject(controller).FindProperty("kind").enumValueIndex;
-            string flag = kind == 0 ? "oneSignal" : kind == 1 ? "twoSignals" : "learns";
-            SerializedProperty groups = new SerializedObject(reveal).FindProperty("groups");
-            for (int i = 0; i < groups.arraySize; i++)
-            {
-                SerializedProperty e = groups.GetArrayElementAtIndex(i);
-                var root = e.FindPropertyRelative("root").objectReferenceValue as GameObject;
-                if (root != null && e.FindPropertyRelative(flag).boolValue) Count(root, ref draws, ref triangles, false);
-            }
+            Debug.Log("[RideBudget] Quest 2 budget " + MaxDrawCalls + " draw calls / " + MaxTriangles + " triangles per view:\n  " + string.Join("\n  ", lines));
+            if (ThrowOverBudget && over.Count > 0) throw new InvalidOperationException("Over the Quest 2 render budget: " + string.Join("; ", over));
         }
 
-        // Hidden-until-their-moment parts (Finale, ChapterCard, Explainer) and the XR rig are not drawn at a stop, so they are skipped.
-        private static void Count(GameObject root, ref int draws, ref int triangles, bool isPod)
+        // Panels hidden until their moment (end card, weight grid) and the XR rig are not drawn at a viewpoint that does not list them.
+        private static void Count(GameObject root, ref int draws, ref int triangles, RideViewpoint podAt)
         {
-            foreach (Renderer r in root.GetComponentsInChildren<Renderer>(false))
+            foreach (Renderer r in root.GetComponentsInChildren<Renderer>(true))
             {
                 if (!r.enabled) continue;
-                if (isPod && IsHiddenOrRig(r.transform, root.transform)) continue;
-                var line = r as LineRenderer;
-                if (line != null)
-                {
-                    draws++;
-                    triangles += Mathf.Max(0, line.positionCount - 1) * 2;
-                    continue;
-                }
-
+                if (podAt != null && IsHiddenOrRig(r.transform, root.transform, podAt)) continue;
                 var filter = r.GetComponent<MeshFilter>();
                 Mesh mesh = filter != null ? filter.sharedMesh : null;
                 draws += Mathf.Max(1, r.sharedMaterials.Length);
@@ -589,12 +634,13 @@ namespace Convergence.EditorTools
             }
         }
 
-        private static bool IsHiddenOrRig(Transform t, Transform pod)
+        private static bool IsHiddenOrRig(Transform t, Transform pod, RideViewpoint vp)
         {
             for (Transform c = t; c != null && c != pod; c = c.parent)
             {
-                if (c.name == "Finale" || c.name == "ChapterCard" || c.name == "Explainer") return true;
-                if (c.name == "SeatAnchor") return true; // the XR rig hangs under the seat anchor
+                if (c.name == "EndCard" && Array.IndexOf(vp.podPanels, "EndCard") < 0) return true;
+                if (c.name == "WeightGrid" && Array.IndexOf(vp.podPanels, "Dash/WeightGrid") < 0) return true;
+                if (c.name == "SeatAnchor") return true;
             }
 
             return false;

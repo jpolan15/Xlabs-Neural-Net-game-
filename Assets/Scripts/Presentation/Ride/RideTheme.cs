@@ -1,62 +1,60 @@
+using System;
 using UnityEngine;
 
 namespace Convergence.Presentation.Ride
 {
     /// <summary>
-    /// Every color and display number the ride views use, in one asset. Orange means "you can touch this"
-    /// and nothing else in the ride is orange.
+    /// Every colour and look number of the ride, in one asset (Assets/ScriptableObjects/RideTheme.asset), written by
+    /// the builder. Orange means "you can grab or press this" and nothing else may be orange.
     /// </summary>
     [CreateAssetMenu(menuName = "Convergence/Ride Theme", fileName = "RideTheme")]
     public sealed class RideTheme : ScriptableObject
     {
-        [Header("Palette")]
+        /// <summary>How one region looks and is named: its own sky, fog and tag, so a rider knows they crossed into it.</summary>
+        [Serializable]
+        public struct RegionLook
+        {
+            public string tag;
+            public Color background;
+            public Color fog;
+            public float fogDensity;
+        }
+
+        [Header("Shared")]
         public Color voidNavy = new Color(0.015f, 0.025f, 0.06f);
         public Color cyan = new Color(0.10f, 0.88f, 1.00f);
-        public Color amber = new Color(1.00f, 0.80f, 0.12f);
+        public Color amber = new Color(1.00f, 0.71f, 0.28f);
         public Color orange = new Color(1.00f, 0.40f, 0.04f);
         public Color offWhite = new Color(0.92f, 0.95f, 1.00f);
         public Color locked = new Color(0.36f, 0.40f, 0.48f);
-        public Color aura = new Color(0.72f, 0.52f, 1.00f);
         public Color violet = new Color(0.55f, 0.40f, 0.95f);
 
-        [Header("Data stream")]
-        public float streamSpeed = 1.2f;
-        public float spawnX = 3.8f;
-        public float scanX = 0f;
-        public float despawnX = -3.8f;
-        public float pulseTravelSeconds = 1.4f;
+        [Header("Level 1")]
+        public Color paper = new Color(0.984f, 0.965f, 0.925f);
+        public Color ink = new Color(0.106f, 0.106f, 0.184f);
+        public Color pillar = new Color(0.96f, 0.97f, 1.00f);
+        public Color networkBlue = new Color(0.31f, 0.76f, 1.00f);
+        public Color negativeWeight = new Color(0.70f, 0.53f, 1.00f);
+        public Color wrongRed = new Color(1.00f, 0.23f, 0.23f);
+        public Color rewindMagenta = new Color(1.00f, 0.17f, 0.84f);
+        public Color valleyPink = new Color(1.00f, 0.44f, 0.57f);
+        public Color valleyViolet = new Color(0.42f, 0.18f, 0.55f);
+        public Color gold = new Color(1.00f, 0.82f, 0.40f);
+        public Color right = new Color(0.40f, 1.00f, 0.62f);
 
-        [Header("Pipes")]
-        public float pipeHairline = 0.008f;
-        public float pipeWidthPerWeight = 0.05f;
+        [Tooltip("Regions 0 (The Page) to 7 (Right).")]
+        public RegionLook[] regions = new RegionLook[0];
 
-        [Header("Core tank")]
-        public float tankUnitsPerSum = 0.27f;
-        public float tankMaxSum = 3f;
-        public float tankFollow = 6f;
-
-        [Header("Loss landscape")]
-        public float landscapeSize = 4.4f;
-        public float heightPerLoss = 0.12f;
-        public float maxHeight = 1.1f;
-        public float marbleRadius = 0.09f;
-        public float contourEvery = 0.5f;
-
-        [Header("Big network")]
-        [Tooltip("Brightness of a connection that has not been lit by a solved stop yet.")]
-        [Range(0f, 1f)] public float networkDim = 0.22f;
-        [Tooltip("Meters between pulses racing along a connection.")]
+        [Header("Network")]
+        [Range(0f, 1f)] public float networkDim = 0.3f;
         public float pulseSpacing = 5f;
-        [Tooltip("Meters per second a pulse travels.")]
         public float pulseSpeed = 7f;
-        [Tooltip("How far past a solved stop the light reaches, as a share of the whole track.")]
-        public float lightReach = 0.12f;
-        public float lightFollowSeconds = 2.5f;
-        [Tooltip("How bright the network stays while a stop is live, so the teaching panels in front of it stay readable.")]
-        [Range(0.1f, 1f)] public float stopFocus = 0.25f;
-        public float igniteSeconds = 5f;
 
-        [Header("Text")]
-        public float instructionSeconds = 3.5f;
+        /// <summary>Region n's look, or the first one for an index out of range.</summary>
+        public RegionLook Region(int index)
+        {
+            if (regions == null || regions.Length == 0) return new RegionLook { tag = "", background = voidNavy, fog = voidNavy, fogDensity = 0.02f };
+            return regions[Mathf.Clamp(index, 0, regions.Length - 1)];
+        }
     }
 }
