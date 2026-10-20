@@ -7,6 +7,8 @@ using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using Convergence.Gameplay.Ride;
 using Convergence.Gameplay.Ride.Level1;
+using Convergence.Presentation.Ride;
+using Convergence.Presentation.Ride.Explainers;
 
 namespace Convergence.Tests.PlayMode.Gameplay
 {
@@ -14,12 +16,15 @@ namespace Convergence.Tests.PlayMode.Gameplay
     /// Plays Level 1 (the NeuralRide scene) headless. The tests touch the ride only the way a rider or operator does:
     /// GO through its channel, taps through the puzzle's Cycle, Space through SkipNarration, G through GentleMode. They
     /// never set a moment to done. Replaces the v3 tests of the three stops (trigger, OR gate, learning rate), whose
-    /// content Level 1 cut (TASK_LEVEL1_DIGITS_RESTRUCTURE, progress log).
+    /// content Level 1 cut (TASK_LEVEL1_DIGITS_RESTRUCTURE, progress log). Level 1 v4 (TASK_LEVEL1_V4_EXPLAINERS) pairs
+    /// every beat into an explain segment and a play segment; the explainers must reach their end state both by
+    /// playing and by the operator's skip, and the ride must still run from the dock to the end.
     /// </summary>
     [TestFixture]
     public class RideDirectorTests
     {
-        private const int NeuronSegment = 1, NetworkSegment = 2, RewindSegment = 4, ValleySegment = 7;
+        // NeuralRideBuilder.Explainers' Seg* constants: the puzzle, the explain stop after it, the rewind, the drop.
+        private const int PixelsSegment = 0, NeuronSegment = 3, NetworkSegment = 4, RewindSegment = 8, ValleySegment = 11;
 
         private readonly List<string> _errors = new List<string>();
 
@@ -160,6 +165,93 @@ namespace Convergence.Tests.PlayMode.Gameplay
             Assert.Less(blame.HeroLoss, blame.StartLoss, "Nudging the blamed wires lowers the hero's real loss");
             Assert.AreEqual(valley.HopCount - 1, valley.CurrentHop, "The Valley run reaches the last hop");
             Assert.AreEqual(1f, _director.Progress01, 1e-4);
+            AssertEveryExplainerEnded("played through");
+        }
+
+        private static List<Explainer> Explainers() => new List<Explainer>(UnityEngine.Object.FindObjectsByType<Explainer>(FindObjectsInactive.Include));
+
+        private static void AssertEveryExplainerEnded(string how)
+        {
+            List<Explainer> all = Explainers();
+            Assert.AreEqual(9, all.Count, "E0 to E8");
+            foreach (Explainer e in all)
+            {
+                Assert.IsTrue(e.IsFinished, e.GetType().Name + " did not reach its end state (" + how + ")");
+                Assert.IsTrue(e.HasUnfolded, e.GetType().Name + " never gave its region back (" + how + ")");
+                Assert.AreEqual(e.StepCount, e.StepsRun, e.GetType().Name + " skipped steps (" + how + ")");
+            }
+
+            var atmosphere = UnityEngine.Object.FindAnyObjectByType<RegionAtmosphere>();
+            Assert.IsFalse(atmosphere.IsBlackboard, "no explainer still holds the blackboard (" + how + ")");
+            foreach (string path in new[] { "Region_1/PixelField", "Region_2/Neuron", "Region_2/Panel" })
+            {
+                string[] parts = path.Split('/');
+                GameObject root = null;
+                foreach (GameObject r in SceneManager.GetActiveScene().GetRootGameObjects()) if (r.name == parts[0]) root = r;
+                Assert.IsNotNull(root, parts[0]);
+                Assert.IsTrue(root.transform.Find(parts[1]).gameObject.activeSelf, path + " is back after its unfold (" + how + ")");
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator Explain_StopsInTheDark_ThenUnfoldsThePixelsIntoTheField()
+        {
+            yield return Launch(6f);
+            var pixels = (PixelsExplainer)Explainers().Find(e => e is PixelsExplainer);
+            var atmosphere = UnityEngine.Object.FindAnyObjectByType<RegionAtmosphere>();
+            Transform field = GameObject.Find("Region_1").transform.Find("PixelField");
+            Assert.AreEqual(PixelsSegment, _director.SegmentIndex);
+            Assert.IsTrue(pixels.IsShowing, "E1 is on screen from its segment's start");
+            Assert.IsFalse(field.gameObject.activeSelf, "the field stays dark while E1 explains");
+            Assert.IsTrue(atmosphere.IsBlackboard, "the sky is the blackboard while E1 explains");
+            yield return WaitFor(() => pixels.StepsRun >= 5, "E1's numbers", 60f);
+            Assert.IsFalse(field.gameObject.activeSelf);
+            yield return WaitFor(() => pixels.HasUnfolded, "E1's unfold", 60f);
+            Assert.IsTrue(field.gameObject.activeSelf, "the field is there after the unfold");
+            Assert.AreEqual(PixelsSegment, _director.SegmentIndex, "the unfold plays while the pod still waits at the stop");
+            yield return WaitFor(() => !atmosphere.IsBlackboard, "the region's sky", 10f);
+            for (int r = 0; r < 7; r++) Assert.AreEqual(1f, field.Find("Row" + r).localScale.y, 1e-3f, "row " + r + " rose to its real height");
+        }
+
+        [UnityTest]
+        public IEnumerator SkippingTheIntro_JumpsTheDockExplainerToThePage()
+        {
+            yield return Load();
+            var dock = (DockExplainer)Explainers().Find(e => e is DockExplainer);
+            yield return WaitFor(() => dock.StepsRun >= 1, "the threes", 10f);
+            Assert.IsFalse(dock.IsFinished);
+            _director.SkipNarration();
+            yield return WaitFor(() => dock.IsFinished, "skip to land E0 in its final state", 5f);
+            Assert.IsTrue(GameObject.Find("Region_0").transform.Find("Page").gameObject.activeSelf, "the hero 3 became the Page");
+            Assert.IsTrue(GameObject.Find("Region_0").transform.Find("Page/Ink").gameObject.activeSelf);
+            yield return WaitFor(() => _director.State == RideState.Dock, "the dock after the intro", 20f);
+        }
+
+        [UnityTest]
+        public IEnumerator Ride_RunsDockToEnd_WhenTheOperatorSkipsEverything()
+        {
+            // Space at every line and every moment: each explainer must jump to its end, the region must come back,
+            // and the ride must still reach the end card.
+            yield return Load();
+            _director.SkipNarration();
+            yield return WaitFor(() => _director.State == RideState.Dock, "the dock after skipping the intro", 20f);
+            Time.timeScale = 6f;
+            _director.Controls.Get(RideControlIds.Action).SetFromUser(1f);
+            float end = Time.realtimeSinceStartup + 200f;
+            while (_director.State != RideState.Complete)
+            {
+                if (Time.realtimeSinceStartup > end) Assert.Fail("Timed out skipping through the ride at segment " + _director.SegmentIndex);
+                if (_director.IsNarrating || _director.ActiveMoment != null) _director.SkipNarration();
+                if (_director.State == RideState.AtStop && _director.SegmentIndex == PixelsSegment && !_director.IsNarrating)
+                {
+                    var pixels = Explainers().Find(e => e is PixelsExplainer);
+                    Assert.IsTrue(pixels.IsFinished, "skipping E1's lines lands it in its end state at once");
+                }
+
+                yield return null;
+            }
+
+            AssertEveryExplainerEnded("skipped");
         }
 
         [UnityTest]

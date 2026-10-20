@@ -158,7 +158,7 @@ namespace Convergence.Gameplay.Ride.Level1
 
             _live = false;
             LiveChanged?.Invoke(false);
-            Director.Narrate(RideLine.RewindWiresKnow);
+            Director.Narrate(RideLine.BackDone);
             yield return Director.WaitForSpeech();
         }
 

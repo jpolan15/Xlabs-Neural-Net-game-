@@ -7,7 +7,7 @@ namespace Convergence.EditorTools
 {
     /// <summary>
     /// Where everything in Level 1 sits. One switchback track in three legs:
-    /// Leg A runs from the dock through the Page, the Grid and the Neuron stop, then an S-curve (at most about 23°
+    /// Leg A runs from the dock through the Page, E1's stop in the dark, over the pixel field, to the Neuron stop, then an S-curve (at most about 23°
     /// of yaw, eased) to the switch J and on to the stop 30 m in front of the network, a giant diagram facing the rider
     /// (49 pixels on the left, 16 hidden in the middle, 10 answers on the right). Leg B is the straight line through J
     /// from a dead-end spur behind it to that stop: the cart rolls backward along it while the error flows back (the
@@ -36,7 +36,7 @@ namespace Convergence.EditorTools
             public readonly List<Vector3> LegB = new List<Vector3>();
             public readonly List<Vector3> LegC = new List<Vector3>();
 
-            public Pose PageAnchor, GridAnchor, NeuronStop, GridStop, GridApproach, NetViewStop, WrongStop, BlameStop, SpurEnd, Junction;
+            public Pose PageAnchor, GridAnchor, PixelField, NeuronStop, GridStop, GridApproach, NetViewStop, WrongStop, BlameStop, SpurEnd, Junction;
             public Pose BlueNetwork, Rim, ValleyFloor, RightView, EndStop, GoldNetwork;
             public Vector3 MidDrop;
 
@@ -69,9 +69,13 @@ namespace Convergence.EditorTools
 
                 L.PageAnchor = new Pose(new Vector3(0f, 0f, 10f), straight);
                 L.GridAnchor = new Pose(new Vector3(0f, -3.5f, 30f), straight);
-                L.GridStop = new Pose(new Vector3(0f, 0f, 36f), straight);
-                L.GridApproach = new Pose(new Vector3(0f, 0f, 13f), straight);
-                L.NeuronStop = new Pose(new Vector3(0f, 0f, 80f), straight);
+                // E1's explain stop in the dark just past the page, the pixel field ahead of it (the ride flies over it),
+                // and a point above the field for the fly-over view. The neuron stop is far enough on for the field to pass.
+                L.GridStop = new Pose(new Vector3(0f, 0f, 16f), straight);
+                // Far enough ahead and high enough that even a 1.15 m eye sees it rise over the dash from the stop.
+                L.PixelField = new Pose(new Vector3(0f, -3f, 41.5f), straight);
+                L.GridApproach = new Pose(new Vector3(0f, 0f, 37f), straight);
+                L.NeuronStop = new Pose(new Vector3(0f, 0f, 64f), straight);
                 L.Junction = new Pose(new Vector3(12f, 0f, 129f), straight);
                 L.NetViewStop = new Pose(new Vector3(12f, 0f, 145f), straight);
                 L.BlueNetwork = new Pose(new Vector3(12f, 0f, 145f + ViewDistance), straight);

@@ -69,6 +69,23 @@ namespace Convergence.Tests.EditMode.Core
         }
 
         [Test]
+        public void Gallery_IsTwentyDifferentRealThrees_NeverTheHero()
+        {
+            Level1Picture[] threes = _data.File.threes;
+            Assert.AreEqual(20, threes.Length, "E0 shows twenty real threes");
+            var seen = new HashSet<int>();
+            foreach (Level1Picture t in threes)
+            {
+                Assert.AreEqual(Level1Data.HeroDigit, t.label);
+                Assert.AreNotEqual(_data.File.hero.testIndex, t.testIndex, "the hero is shown on its own");
+                Assert.IsTrue(seen.Add(t.testIndex), "test #" + t.testIndex + " is in the gallery twice");
+                Assert.AreEqual(784, t.pixels28.Length);
+                Assert.IsTrue(t.pixels28.All(v => v >= 0.0 && v <= 1.0), "pixels are 0 (paper) to 1 (ink)");
+                Assert.Greater(t.pixels28.Sum(), 30.0, "a real three has ink");
+            }
+        }
+
+        [Test]
         public void FinaleDigits_CorePredictionsMatchTheBake()
         {
             var net = _data.CreateTrained();

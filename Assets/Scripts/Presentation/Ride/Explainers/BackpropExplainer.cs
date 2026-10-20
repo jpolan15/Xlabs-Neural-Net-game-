@@ -1,0 +1,11 @@
+namespace Convergence.Presentation.Ride.Explainers
+{
+    // WP1 gives this beat its stage (the region pieces it keeps dark until its unfold cue, written by the builder in
+    // NeuralRideBuilder.Explainers) and its unfold cue; WP3 to WP5 add the steps, declared like PixelsExplainer's:
+    //     s.At("neuron", () => new[] { Anim.GrowFromCenter(neuron, Vector3.one) });
+    /// <summary>E5, backpropagation: the blame wires come on with {back}, the wish flowing backwards (WP4).</summary>
+    public sealed class BackpropExplainer : Explainer
+    {
+        protected override void Declare(Steps s) => s.Unfold("back");
+    }
+}

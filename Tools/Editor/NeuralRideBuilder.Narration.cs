@@ -98,10 +98,10 @@ namespace Convergence.EditorTools
                 if (!spoken.Contains(words)) problems.Add(line + " must say \"" + words + "\" (from the bake) but says \"" + spoken + "\"");
             }
 
-            Expect(RideLine.WrongItSays, RideNarrationData.Words(_data.File.hero.untrainedGuess));
-            Expect(RideLine.RightAccuracy, RideNarrationData.Words(_data.File.trainCount));
-            Expect(RideLine.RightAccuracy, RideNarrationData.Words(_data.TestAccuracyPercent) + " percent");
-            Expect(RideLine.RightItSays, RideNarrationData.Words(Convergence.Gameplay.Ride.Level1.Level1Data.HeroDigit));
+            Expect(RideLine.WrongSays, "says... " + RideNarrationData.Words(_data.File.hero.untrainedGuess));
+            Expect(RideLine.RightTraining, RideNarrationData.Words(_data.File.trainCount));
+            Expect(RideLine.RightAccuracy, RideNarrationData.Words(_data.TestAccuracyPercent) + " out of a hundred");
+            Expect(RideLine.RightSays, "says... " + RideNarrationData.Words(Convergence.Gameplay.Ride.Level1.Level1Data.HeroDigit));
             if (problems.Count > 0) throw new InvalidOperationException("Narration disagrees with the bake: " + string.Join("; ", problems) + ". Fix Tools/Editor/RideNarrationData.cs.");
         }
 

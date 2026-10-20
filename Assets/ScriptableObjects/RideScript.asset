@@ -15,140 +15,174 @@ MonoBehaviour:
   intro:
     name: Intro
     beats:
-    - line: 32
-      seconds: 6.2999997
-    - line: 33
-      seconds: 5.24
-    - line: 34
-      seconds: 5.17
-  dockLine: 35
+    - line: 64
+      seconds: 6.083333
+    - line: 65
+      seconds: 6.4166665
+    - line: 66
+      seconds: 5.7
+  dockLine: 67
   sequences:
-  - name: Into the picture
+  - name: 'E1 pixels: explain'
     beats:
-    - line: 36
-      seconds: 5.15
-    - line: 37
-      seconds: 7.29
-    - line: 38
-      seconds: 8.46
-  - name: One neuron
+    - line: 68
+      seconds: 5.683333
+    - line: 69
+      seconds: 6.2
+    - line: 70
+      seconds: 6.6166663
+    - line: 71
+      seconds: 2.0666666
+  - name: 'E2 neuron: explain'
     beats:
-    - line: 39
-      seconds: 5.06
-    - line: 40
-      seconds: 7.68
-    - line: 41
-      seconds: 7.69
-  - name: Your turn
+    - line: 72
+      seconds: 8.383333
+    - line: 73
+      seconds: 4.9666667
+    - line: 74
+      seconds: 7.0333333
+    - line: 75
+      seconds: 7.3499994
+  - name: 'E2 neuron: your turn'
     beats:
-    - line: 42
-      seconds: 8.04
-  - name: To the network
+    - line: 76
+      seconds: 8.7
+  - name: 'E3 network: explain'
     beats:
-    - line: 46
-      seconds: 7.08
-    - line: 47
-      seconds: 8.660001
-  - name: Send it through
+    - line: 80
+      seconds: 6.933333
+    - line: 81
+      seconds: 4.65
+    - line: 82
+      seconds: 6.5166664
+  - name: 'E3 network: send it through'
     beats:
-    - line: 48
-      seconds: 4.1
-  - name: Wrong
+    - line: 83
+      seconds: 3.9333332
+  - name: 'E4 wrong: explain'
     beats:
-    - line: 49
-      seconds: 2.888
-    - line: 50
-      seconds: 5.87
-  - name: Rewind
+    - line: 84
+      seconds: 2.15
+    - line: 85
+      seconds: 4.5333333
+    - line: 86
+      seconds: 4.8666663
+    - line: 87
+      seconds: 8.7
+  - name: 'E5 backprop: explain'
     beats:
-    - line: 51
-      seconds: 5.08
-    - line: 52
-      seconds: 6.69
-  - name: Point at the blame
+    - line: 88
+      seconds: 5.7999997
+    - line: 89
+      seconds: 4.85
+    - line: 90
+      seconds: 3.9333334
+  - name: 'E5 backprop: grab'
     beats:
-    - line: 53
-      seconds: 2.89
-  - name: Downhill
+    - line: 91
+      seconds: 3.6166666
+  - name: 'E6 descent: explain'
     beats:
-    - line: 55
-      seconds: 6.8399997
-  - name: Gradient descent
+    - line: 93
+      seconds: 8.599999
+    - line: 94
+      seconds: 6.1
+    - line: 95
+      seconds: 7.3499994
+    - line: 96
+      seconds: 3.6166666
+  - name: 'E8 tokens: explain'
     beats:
-    - line: 56
-      seconds: 7.86
-  - name: Back in the network
-    beats:
-    - line: 59
-      seconds: 4.99
-  - name: Words
-    beats:
-    - line: 62
-      seconds: 8.13
-    - line: 63
-      seconds: 2.47
+    - line: 102
+      seconds: 6.2166667
+    - line: 103
+      seconds: 4.8666663
+    - line: 104
+      seconds: 5.8999996
+    - line: 105
+      seconds: 4.633333
   lines:
-  - line: 32
-    seconds: 6.2999997
-  - line: 33
-    seconds: 5.24
-  - line: 34
-    seconds: 5.17
-  - line: 35
-    seconds: 3.87
-  - line: 36
-    seconds: 5.15
-  - line: 37
-    seconds: 7.29
-  - line: 38
-    seconds: 8.46
-  - line: 39
-    seconds: 5.06
-  - line: 40
-    seconds: 7.68
-  - line: 41
-    seconds: 7.69
-  - line: 42
-    seconds: 8.04
-  - line: 43
-    seconds: 7.32
-  - line: 44
-    seconds: 4.3
-  - line: 45
-    seconds: 6.88
-  - line: 46
-    seconds: 7.08
-  - line: 47
-    seconds: 8.660001
-  - line: 48
-    seconds: 4.1
-  - line: 49
-    seconds: 2.888
-  - line: 50
-    seconds: 5.87
-  - line: 51
-    seconds: 5.08
-  - line: 52
-    seconds: 6.69
-  - line: 53
-    seconds: 2.89
-  - line: 54
-    seconds: 3.06
-  - line: 55
-    seconds: 6.8399997
-  - line: 56
-    seconds: 7.86
-  - line: 57
-    seconds: 4.2599998
-  - line: 58
-    seconds: 6.5699997
-  - line: 59
-    seconds: 4.99
-  - line: 60
-    seconds: 4.15
-  - line: 61
-    seconds: 8.4
-  - line: 62
-    seconds: 8.13
-  - line: 63
-    seconds: 2.47
+  - line: 64
+    seconds: 6.083333
+  - line: 65
+    seconds: 6.4166665
+  - line: 66
+    seconds: 5.7
+  - line: 67
+    seconds: 2.9999998
+  - line: 68
+    seconds: 5.683333
+  - line: 69
+    seconds: 6.2
+  - line: 70
+    seconds: 6.6166663
+  - line: 71
+    seconds: 2.0666666
+  - line: 72
+    seconds: 8.383333
+  - line: 73
+    seconds: 4.9666667
+  - line: 74
+    seconds: 7.0333333
+  - line: 75
+    seconds: 7.3499994
+  - line: 76
+    seconds: 8.7
+  - line: 77
+    seconds: 7.2499995
+  - line: 78
+    seconds: 6.833333
+  - line: 79
+    seconds: 4.6499996
+  - line: 80
+    seconds: 6.933333
+  - line: 81
+    seconds: 4.65
+  - line: 82
+    seconds: 6.5166664
+  - line: 83
+    seconds: 3.9333332
+  - line: 84
+    seconds: 2.15
+  - line: 85
+    seconds: 4.5333333
+  - line: 86
+    seconds: 4.8666663
+  - line: 87
+    seconds: 8.7
+  - line: 88
+    seconds: 5.7999997
+  - line: 89
+    seconds: 4.85
+  - line: 90
+    seconds: 3.9333334
+  - line: 91
+    seconds: 3.6166666
+  - line: 92
+    seconds: 4.6499996
+  - line: 93
+    seconds: 8.599999
+  - line: 94
+    seconds: 6.1
+  - line: 95
+    seconds: 7.3499994
+  - line: 96
+    seconds: 3.6166666
+  - line: 97
+    seconds: 1.9499999
+  - line: 98
+    seconds: 4.833333
+  - line: 99
+    seconds: 5.333333
+  - line: 100
+    seconds: 4.6499996
+  - line: 101
+    seconds: 6.8333335
+  - line: 102
+    seconds: 6.2166667
+  - line: 103
+    seconds: 4.8666663
+  - line: 104
+    seconds: 5.8999996
+  - line: 105
+    seconds: 4.633333

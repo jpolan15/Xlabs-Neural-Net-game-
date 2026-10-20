@@ -53,12 +53,12 @@ namespace Convergence.Gameplay.Ride.Level1
                 HopReached?.Invoke(k);
                 if (k == 1)
                 {
-                    Director.Narrate(RideLine.ValleyOvershoot);
+                    Director.Narrate(RideLine.DescentOvershoot);
                     if (!_hurry) yield return Director.WaitForSpeech();
                 }
                 else if (k == 2)
                 {
-                    Director.Narrate(RideLine.ValleySmallerSteps);
+                    Director.Narrate(RideLine.DescentSettle);
                 }
 
                 float held = 0f;

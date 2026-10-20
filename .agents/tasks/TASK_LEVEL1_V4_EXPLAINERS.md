@@ -229,6 +229,74 @@ Fixed cockpit frame; reverse and drop keep their limits; `G` gentle mode stays.
 
 (newest last; each WP adds commands run and real results)
 
+### 2026-10-20 — WP1: story + kit + stage, E0 and E1 built (Claude)
+
+**Built.**
+- **Script and flow.** `RideLine` 64–105 for every section-3 line (1–63 reserved; the four v3 names v4 reuses are now
+  `V3NeuronYourTurn`, `V3NeuronMissedOne`, `V3NeuronSolved`, `V3RightAccuracy`). `RideNarrationData` holds the
+  section-3 script verbatim, intro E0 (Threes, MeetPixel, PixelBrain), dock line PullGo, 10 sequences, and
+  `MomentLines`. The bake check now expects "says... one", "sixty thousand" (RightTraining) and "ninety-two out of a
+  hundred". Moments rewired: WeightPaint → NeuronLitForZero/NeuronMissedOne/NeuronSolved, Blame → BackDone, Valley →
+  DescentOvershoot/DescentSettle, trained pass → RightSays, RightTraining, RightAccuracy. Fourteen segments
+  (`NeuralRideBuilder.Flow`; numbers = `Seg*` in `NeuralRideBuilder.Explainers`): 0 E1 explain (+2.5 s hold for the
+  unfold), 1 fly over the field, 2 E2 explain, 3 your turn + paint, 4 E3 explain, 5 send + forward pass, 6 E4, 7 E5
+  explain, 8 rewind + blame, 9 back to the switch, 10 E6 explain at the rim, 11 Valley, 12 trained pass (E7), 13 E8.
+  Same track and legs; E1's stop is z = 16, the neuron stop moved to z = 64, the pixel field is at z 31–52.
+  `RideDirector.Segment.hold` (skippable) added. Region tags are topic names in CMU Serif (PIXELS, NEURON → WEIGHTS on
+  {wires}, NEURAL NETWORK, LOSS, BACKPROPAGATION, GRADIENT DESCENT, TRAINING → TOKENS on {sentence}).
+- **Kit** (`Assets/Scripts/Presentation/Ride/Explainers/`): `Rate` (smooth, rush_into, rush_from, there_and_back,
+  lingering, Lagged; manim's definitions), `Tween`/`Timeline` (game clock), `Anim` (Write, Create, FadeIn/FadeOut with
+  shift, FadeTo, TransformShape, MoveTo, Indicate, Flash, GrowFromCenter, GrowUp, FadeRenderers, Tint, FadeText,
+  LaggedStart/Each), `ShapeBatch` + `Convergence/ExplainerFlat` shader (many anti-aliased rounded shapes/lines/pictures
+  in one draw), and `Explainer` (steps keyed to cues of its own lines via `DashScreenView.SegmentShown`, to a clause, or
+  to `@begin`/`@arrive`; a later cue completes missed steps; skip / leaving its segments → `JumpToEnd`; `ResetToStart`).
+- **Stage + unfold**: an explainer keeps its region's pieces off while it explains and holds the blackboard
+  (`RegionAtmosphere.HoldBlackboard`: #0B0E14, no colour cast, faint BLUE grid `Pod/Blackboard` 7 m below); its unfold
+  step plays the declared `unfolds` (Morph: piece flies into the region object's pose/scale and is replaced by it;
+  Grow; GrowUp; Show) with a cascade, then releases the sky.
+- **E0** (dock): 20 real MNIST test threes (new `threes` in the bake, `bake_level1.py` re-run: only `meta.date` and
+  `threes` changed) in one atlas around the rider, BLUE lines to one CMU "3", the crowd steps back, the hero 3 glides
+  to the centre, and on {go} it flies out, darkens to ink and becomes the Page's ink while the sheet grows behind it.
+  `PixelAnchor` + `StepRan` hooks for Pixel (WP2). PageView's ink kept its 7.5 m size (it was being reset to 1 m).
+- **E1** (pixels): the 3 waits in the dark beyond the page, a 28×28 grid draws over it, it becomes squares, PIXELS,
+  a lens lifts a real 5×5 patch with its numbers, {zero}/{one} Indicate, the 28×28 merge into the bake's real 7×7,
+  49 circles fly into a column (the input layer), and on {unfold} the 7×7 lies down and grows into the pillar field
+  (`Region_1/PixelField`, 7 row meshes, height = brightness) the ride flies over. Old 28×28 wall, "49 NUMBERS" wall and
+  the "the cat sat on the mat" teaser removed.
+- **E2–E8**: one component each with its stage and unfold cue (E2 {paint}: Neuron + Panel grow; E3 {race}: Network
+  grows; E5 {back}: Blame shows; E6 {landscape}: Ground rises, Deck/Sign/Sun grow; E4/E7/E8 no stage yet).
+- Font: CMU Serif SDF + Italic SDF (static 512² atlases, LiberationSans fallback for ₁ and ≈; CMU has neither, so
+  write `w<sub>1</sub>`), credit added to `RideNarrationData.Credits`.
+- Tools: `RideLiveShot.ShootWhen/AutoPilot/Status` (plans shots by explainer step, survive the Play Mode reload);
+  `RideBudget` counts an explainer's pieces only in its own segments; sightlines ignore ExplainerFlat overlays.
+
+**Results.**
+- Builder (`NeuralRideBuilder.Build()`): "Narration: 42 lines, 233 s spoken in all; intro 18 s. Voice clips bound: 0 of
+  42." RideSightlines: "Clear at 1.15, 1.30 and 1.45 m for every stop; every panel is inside the viewing cone and the
+  text is readable." RideBudget (final build): dock 41 draws / 3,656 tris; pixels 75 / 5,608; pixel_flyover 66 /
+  6,250; neuron 63 / 6,060; network 55 / 16,782; wrong 57 / 16,812; blame 57 / 30,082; rim 63 / 23,702;
+  valley_mid_drop and valley_floor 61 / 30,804; right 61 / 30,804; end 57 / 24,326 (all within budget).
+- EditMode (MCP run_tests): 129 total, 128 passed, 0 failed, 1 skipped:
+  `EveryLevel1Line_HasAVoiceClipMatchingTheScript` is `[Ignore]`d until WP6 installs the v4 voice (stated in the test).
+- PlayMode (all): 26 total, 26 passed (RideDirectorTests 13 incl. new Explain_StopsInTheDark_ThenUnfoldsThePixels
+  IntoTheField, SkippingTheIntro_JumpsTheDockExplainerToThePage, Ride_RunsDockToEnd_WhenTheOperatorSkipsEverything;
+  the end-to-end test now also checks every explainer finished).
+- `Validate-RepositoryLayout.ps1` exit 0 (46 passed, 0 violations); `Validate-CoreBoundaries.ps1` exit 0 (Core untouched).
+- Captures: Play Mode `Documentation/Design/captures/level1_v4/` (e0_1…e0_5, e1_1…e1_11, eye 1.15/1.45 variants);
+  seat sheets re-shot in `Documentation/Design/captures/level1/` (old grid/grid_approach/finale_words removed).
+  vr-qa review of the first set (blockers: dock sky popping to neutral grey with a brown desk, threes clipped beyond
+  ±35°, GO lever out of view): fixed the first two (dock sky is navy, desk dark, threes inside ±42°) and its
+  should-fixes for the {zero} highlight, the merge finishing late, the dash tag size and blown-out pillars; captures
+  re-shot and checked after the fixes. Tests above re-run on the final build (same results).
+
+**Open.**
+- Voice for lines 64–105 (WP6); until then silent reading time.
+- Pixel (WP2) is not there: E0's {pixel}/{brain} steps only fire `StepRan`; `Region_0/Explainer_E0/PixelAnchor`.
+- E2–E8 explain on an empty blackboard (WP3–WP5). The neuron stop's old panel and the end card still have the v3 look.
+- GO lever sits low-left on the dash; at a level gaze it is outside a 70° capture when "Pull the orange lever" is
+  said (the hint arrow is on it). Worth a look in WP2/WP7.
+- The 7×7 3 is soft (real 4×4 averages) and the field is seen at a low angle; it reads as a relief, not as a 3.
+
 ## 9. Level 2 outline (later, not this task): "Pixel learns words"
 
 Tokens (chopping text) → embeddings (each token is a point; similar meanings sit close: classic king − man + woman ≈ queen)

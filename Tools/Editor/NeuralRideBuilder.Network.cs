@@ -426,11 +426,7 @@ namespace Convergence.EditorTools
 
             BuildDigitWalls(root.transform);
 
-            // The teaser: the same machinery, reading words.
-            Transform words = Make("Words", root.transform, new Vector3(0f, 1.3f, -6f)).transform;
-            TextMeshPro wordText = Text("Text", words, Vector3.zero, "the  cat  sat  on  the  mat", 0.9f, _theme.offWhite, 16f, bold: true);
-            LabelBacking(wordText, "the  cat  sat  on  the  mat", 0.3f);
-            FaceToward(words, layout.EndStop.position + Vector3.up * 1.3f);
+            // (The old "the cat sat on the mat" teaser is gone: E8, the tokens explainer, tells it now.)
             return root;
         }
 

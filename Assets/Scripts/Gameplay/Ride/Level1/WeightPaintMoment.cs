@@ -137,7 +137,7 @@ namespace Convergence.Gameplay.Ride.Level1
                         _lastReact = now;
                         if (_result.FirstWrong(out bool firedWrongly) >= 0)
                         {
-                            Director.Say(firedWrongly ? RideLine.NeuronFiredForZero : RideLine.NeuronMissedOne);
+                            Director.Say(firedWrongly ? RideLine.NeuronLitForZero : RideLine.NeuronMissedOne);
                         }
                     }
                 }

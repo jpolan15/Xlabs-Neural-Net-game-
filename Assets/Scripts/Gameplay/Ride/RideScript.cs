@@ -44,7 +44,7 @@ namespace Convergence.Gameplay.Ride
         public Sequence intro;
 
         [Tooltip("Said when the dock opens and GO goes live.")]
-        public RideLine dockLine = RideLine.PagePullToDive;
+        public RideLine dockLine = RideLine.PullGo;
 
         [Tooltip("The sequences segments play, by index (RideDirector.Segment.travel and arrival).")]
         public Sequence[] sequences = new Sequence[0];

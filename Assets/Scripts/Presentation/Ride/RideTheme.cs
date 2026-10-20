@@ -42,6 +42,16 @@ namespace Convergence.Presentation.Ride
         public Color gold = new Color(1.00f, 0.82f, 0.40f);
         public Color right = new Color(0.40f, 1.00f, 0.62f);
 
+        [Header("Explainers (3Blue1Brown-inspired; orange stays for grabbable things)")]
+        [Tooltip("The sky while an explainer explains: near-black navy, no colour cast, faint distant grid.")]
+        public RegionLook blackboard = new RegionLook { tag = "", background = new Color(0.043f, 0.055f, 0.078f), fog = new Color(0.043f, 0.055f, 0.078f), fogDensity = 0.002f };
+        public Color explainBlue = new Color(0.345f, 0.769f, 0.867f);
+        public Color explainYellow = new Color(0.957f, 0.827f, 0.271f);
+        public Color explainGreen = new Color(0.514f, 0.757f, 0.404f);
+        public Color explainRed = new Color(0.988f, 0.384f, 0.333f);
+        public Color explainWhite = new Color(0.925f, 0.925f, 0.925f);
+        public Color explainGrey = new Color(0.533f, 0.533f, 0.533f);
+
         [Tooltip("Regions 0 (The Page) to 7 (Right).")]
         public RegionLook[] regions = new RegionLook[0];
 

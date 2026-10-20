@@ -14,7 +14,9 @@ namespace Convergence.Gameplay.Ride
     /// <summary>
     /// The narration lines. The number is the file suffix (vo_ride_NN) and never changes. 1 to 31 belonged to the v3
     /// ride (AURA, JFK, Apollo), which Level 1 cut; their numbers stay reserved so old files can never be mistaken for
-    /// new ones. Level 1's lines are appended from 32 (TASK_LEVEL1_DIGITS_RESTRUCTURE, approved script).
+    /// new ones. 32 to 63 were the first Level 1 script (TASK_LEVEL1_DIGITS_RESTRUCTURE); v4 rewrote it as Explain,
+    /// Unfold, Play (TASK_LEVEL1_V4_EXPLAINERS section 3), so those numbers are reserved too (the four whose names v4
+    /// reuses carry a V3 prefix) and the v4 lines are appended from 64.
     /// </summary>
     public enum RideLine
     {
@@ -61,10 +63,10 @@ namespace Convergence.Gameplay.Ride
         NeuronThisIsOne = 39,
         NeuronWeights = 40,
         NeuronMultiplyAdd = 41,
-        NeuronYourTurn = 42,
+        V3NeuronYourTurn = 42,
         NeuronFiredForZero = 43,
-        NeuronMissedOne = 44,
-        NeuronSolved = 45,
+        V3NeuronMissedOne = 44,
+        V3NeuronSolved = 45,
         NetworkManyNeurons = 46,
         NetworkLayers = 47,
         NetworkSendItThrough = 48,
@@ -80,9 +82,69 @@ namespace Convergence.Gameplay.Ride
         ValleySmallerSteps = 58,
         RightBackInNetwork = 59,
         RightItSays = 60,
-        RightAccuracy = 61,
+        V3RightAccuracy = 61,
         RightWords = 62,
-        RightNextLevel = 63
+        RightNextLevel = 63,
+
+        // Level 1 v4, "Teach Pixel to read". E0 the dock.
+        Threes = 64,
+        MeetPixel = 65,
+        PixelBrain = 66,
+        PullGo = 67,
+
+        // E1 pixels.
+        PixelsSquares = 68,
+        PixelsNumbers = 69,
+        PixelsFortyNine = 70,
+        PixelsFly = 71,
+
+        // E2 one neuron.
+        NeuronHolds = 72,
+        NeuronWires = 73,
+        NeuronGreenRed = 74,
+        NeuronAdds = 75,
+        NeuronYourTurn = 76,
+        NeuronLitForZero = 77,
+        NeuronMissedOne = 78,
+        NeuronSolved = 79,
+
+        // E3 the network.
+        NetworkTeam = 80,
+        NetworkAnswers = 81,
+        NetworkWire = 82,
+        NetworkSend = 83,
+
+        // E4 wrong, and the loss.
+        WrongSays = 84,
+        WrongRandom = 85,
+        WrongWanted = 86,
+        WrongLoss = 87,
+
+        // E5 backpropagation.
+        BackWish = 88,
+        BackFlows = 89,
+        BackHot = 90,
+        BackGrab = 91,
+        BackDone = 92,
+
+        // E6 gradient descent.
+        DescentHill = 93,
+        DescentStep = 94,
+        DescentTooBig = 95,
+        DescentRealHill = 96,
+        DescentOvershoot = 97,
+        DescentSettle = 98,
+
+        // E7 right, and training.
+        RightSays = 99,
+        RightTraining = 100,
+        RightAccuracy = 101,
+
+        // E8 tokens.
+        TokensWords = 102,
+        TokensNumbers = 103,
+        TokensPredict = 104,
+        TokensNext = 105
     }
 
     /// <summary>Stable ids for the pod's control channels. Level 1 has one: GO.</summary>

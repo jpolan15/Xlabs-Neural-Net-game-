@@ -93,14 +93,22 @@ namespace Convergence.EditorTools
         {
             new Model("pod", "The rider's cart: tub, seat and the dash with GO, the subtitle screen and the region tag.", "Pod", "Pod")
             {
-                Skip = new[] { "SeatAnchor", "EndCard", "Dash/WeightGrid" }
+                Skip = new[] { "SeatAnchor", "EndCard", "Dash/WeightGrid", "Blackboard" }
             },
             new Model("weight_grid", "Region 2: the 7x7 weight grid on the dash the rider paints (+ cyan, - amber, orange frame = press).", "Viewpoints/neuron", "Pod/Dash/WeightGrid"),
             new Model("end_card", "The end card with the next level and the credits.", "Viewpoints/end", "Pod/EndCard"),
             new Model("rails", "The two slate rails under every leg of the track.", "Viewpoints/dock", "Track"),
             new Model("page", "Region 0: the sheet with the real handwritten 3 (test digit) on its desk.", "Viewpoints/dock", "Region_0/Page", "Region_0/Desk"),
-            new Model("pixel_field", "Region 1: the 3's 784 pixels as pillars, height = ink, with three values.", "Viewpoints/grid_approach", "Region_1/PixelField"),
-            new Model("input_grid_7x7", "Region 1: the 49 numbers the machine gets (4x4 averages) and their sign.", "Viewpoints/grid", "Region_1/InputGrid7"),
+            new Model("blackboard_grid", "The explainers' blackboard: the faint distant BLUE grid 7 m under the pod (shown while an explainer explains).", "Viewpoints/pixels", "Pod/Blackboard"),
+            new Model("explainer_e0", "E0 at the dock: twenty real MNIST threes around the rider, the lines to one 3, the hero 3 (it becomes the Page's ink), Pixel's anchor.", "Viewpoints/dock", "Region_0/Explainer_E0")
+            {
+                ShowHidden = true
+            },
+            new Model("explainer_e1", "E1 pixels: the hero 3, its 28x28 grid and squares, the lens with the numbers, the 7x7, the column of 49 (the input layer), PIXELS.", "Viewpoints/pixels", "Region_1/Explainer_E1")
+            {
+                ShowHidden = true
+            },
+            new Model("pixel_field", "Region 1: the hero 3's real 7x7 as pillars on the ground the ride flies over, height = brightness (E1 unfolds into it).", "Viewpoints/pixel_flyover", "Region_1/PixelField"),
             new Model("neuron_amber", "Region 2: the big amber neuron with its 49 dendrites.", "Viewpoints/neuron", "Region_2/Neuron"),
             new Model("why_readout", "Region 2: the why panel: the digit on show, ink x weight, the total against the line, all eight digits.", "Viewpoints/neuron", "Region_2/Panel"),
             new Model("network_untrained", "Region 3: the real 49-16-10 network with its untrained weights, wires by sign and size, neurons by activation.", "Viewpoints/network", "Region_3/Network"),
@@ -118,7 +126,6 @@ namespace Convergence.EditorTools
             new Model("network_trained", "Region 7: the same network with its trained weights, in gold.", "Viewpoints/right", "Region_7/Network"),
             new Model("finale_digits", "Region 7: 60 real test digits with the trained network's real answers (wrong ones red).", "Viewpoints/right", "Region_7/DigitWall"),
             new Model("accuracy_sign", "Region 7: the real accuracy and training count.", "Viewpoints/right", "Region_7/AccuracySign"),
-            new Model("words", "Region 7: the teaser, the same machinery with words.", "Viewpoints/end", "Region_7/Words"),
         };
 
         /// <summary>Renderable ride objects that are not models, by scene path, with the reason. Keep this short.</summary>

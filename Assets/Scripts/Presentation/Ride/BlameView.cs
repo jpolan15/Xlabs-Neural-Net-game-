@@ -49,7 +49,7 @@ namespace Convergence.Presentation.Ride
 
         private void OnCue(RideLine line, int index, NarrationLibrary.Segment segment)
         {
-            if (NarrationLibrary.HasCue(segment, "backwards") && _flowStarted < 0f) _flowStarted = Time.time;
+            if (NarrationLibrary.HasCue(segment, "back") && _flowStarted < 0f) _flowStarted = Time.time;
         }
 
         private void Update()

@@ -12,8 +12,8 @@ using Convergence.Presentation.Ride;
 namespace Convergence.EditorTools
 {
     /// <summary>
-    /// Regions 0 to 2 of Level 1 and the track: the Page (the real handwritten 3 on paper), the Grid (its 784 pixels as
-    /// pillars, then the 49 numbers the machine gets), and One Neuron (the big amber neuron and the "why" panel). All
+    /// Regions 0 to 2 of Level 1 and the track: the Page (the real handwritten 3 on paper), the pixel field (the 49
+    /// numbers the machine gets, as pillars the ride flies over; E1 unfolds into it), and One Neuron (the big amber neuron and the "why" panel). All
     /// geometry is built here from the baked data, so the scene and every capture show the real digit.
     /// </summary>
     public static partial class NeuralRideBuilder
@@ -119,11 +119,12 @@ namespace Convergence.EditorTools
                 c.a = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(ink * 1.25f));
                 return c;
             }, FilterMode.Bilinear);
+            // The ink turns into its 28x28 pixels as it lifts toward the rider: still ink-dark, so they read against the page.
             Texture2D pixels = PageTexture("InkPixels", 28, (u, v) =>
             {
                 int col = Mathf.Clamp((int)(u * 28f), 0, 27), row = Mathf.Clamp((int)((1f - v) * 28f), 0, 27);
                 float ink = (float)hero[row * 28 + col];
-                Color c = Color.Lerp(_theme.paper, Color.white, 0.2f);
+                Color c = _theme.ink;
                 c.a = ink;
                 return c;
             }, FilterMode.Point);
@@ -131,7 +132,7 @@ namespace Convergence.EditorTools
             M("PaperBack", _theme.paper, Kind.Alpha);
             M("InkSmooth", Color.white, Kind.Alpha, smooth);
             M("InkPixels", Color.white, Kind.Alpha, pixels);
-            M("Desk", Color.Lerp(_theme.paper, new Color(0.55f, 0.43f, 0.30f), 0.55f));
+            M("Desk", new Color(0.075f, 0.085f, 0.11f)); // a dark table in the navy room: the lit page is the only bright thing
         }
 
         private static float SampleBilinear(double[] img, int n, float u, float v)
@@ -225,78 +226,38 @@ namespace Convergence.EditorTools
 
         // ---------- region 1: the grid ----------
 
+        /// <summary>Region 1's pixel field: the cell pitch, the pillar width, and pillar height per unit of brightness.</summary>
+        private const float FieldPitch = 3f, PillarWidth = 2.7f, PillarBase = 0.2f, PillarPerInk = 2.4f;
+
         /// <summary>
-        /// A relief wall of n × n pixels facing the viewer: each pixel a block standing out of a dark backing by its ink
-        /// (0..1), so the digit reads face on and the heights read from the side as the cart passes. Row 0 is the top.
+        /// Region 1, the pixel field E1 unfolds into: the hero 3's real 7×7 (4×4 averages from the bake) lying on the
+        /// ground ahead, one pillar per pixel, height = brightness, row 0 (the top of the digit) farthest. The track
+        /// runs over the middle at its own height, so the ride flies low over the pillar tops. Each row is its own mesh
+        /// whose origin is the floor, so the unfold can raise the rows one after another (7 draw calls).
         /// </summary>
-        private static Transform ReliefWall(string name, Transform parent, Vector3 centre, Vector3 viewer, double[] pixels, int n, float pitch,
-            float maxDepth, float label = 0f)
-        {
-            Transform wall = Make(name, parent, centre).transform;
-            FaceToward(wall, viewer);
-            var blocks = new TileMesh();
-            float face = pitch * 0.86f;
-            for (int r = 0; r < n; r++)
-            {
-                for (int c = 0; c < n; c++)
-                {
-                    float ink = (float)pixels[r * n + c];
-                    float depth = 0.06f + maxDepth * ink;
-                    Color color = Color.Lerp(new Color(0.16f, 0.18f, 0.24f, 0f), _theme.pillar, ink);
-                    color.a = ink;
-                    Vector3 o = new Vector3((c - (n - 1) / 2f) * pitch, ((n - 1) / 2f - r) * pitch, -depth / 2f);
-                    Vector3 h = new Vector3(face / 2f, face / 2f, depth / 2f);
-                    Vector3 P(float x, float y, float z) => o + new Vector3(x * h.x, y * h.y, z * h.z);
-                    blocks.Quad(P(-1, -1, -1), P(1, -1, -1), P(1, 1, -1), P(-1, 1, -1), Vector3.back, color);
-                    blocks.Quad(P(-1, 1, -1), P(1, 1, -1), P(1, 1, 1), P(-1, 1, 1), Vector3.up, color);
-                    blocks.Quad(P(-1, -1, 1), P(1, -1, 1), P(1, -1, -1), P(-1, -1, -1), Vector3.down, color);
-                    blocks.Quad(P(-1, -1, 1), P(-1, -1, -1), P(-1, 1, -1), P(-1, 1, 1), Vector3.left, color);
-                    blocks.Quad(P(1, -1, -1), P(1, -1, 1), P(1, 1, 1), P(1, 1, -1), Vector3.right, color);
-                }
-            }
-
-            TileObject("Blocks", wall, blocks, "TilesBright");
-            Board("Back", wall, Vector3.zero, new Vector2(n * pitch + 0.4f, n * pitch + 0.4f), "Slate", 0.2f);
-            return wall;
-        }
-
         private static GameObject BuildGrid(Layout layout)
         {
             GameObject root = RegionRoot(1, new Pose(Vector3.zero, Quaternion.identity));
-            double[] hero = _data.File.hero.pixels28;
             double[] pooled = _data.File.hero.pixels7;
-
-            // Inside the picture: the 3's 784 pixels as a relief wall on the left, facing the cart as it comes through the
-            // page. Blank paper is a flat block (0), full ink stands 1.8 m out (1). Seen face on it is the 3; from the side,
-            // as the cart passes, the heights.
-            Vector3 approach = layout.GridApproach.position + Vector3.up * 1.3f;
-            const float pitch = 0.45f, depth = 1.8f;
-            Transform pixelField = ReliefWall("PixelField", root.transform, new Vector3(-9.5f, 4.2f, 34f), new Vector3(0f, 1.3f, 8f), hero, 28, pitch, depth);
-
-            // Three pixels carry their number, so "every pixel became one number" has a picture.
-            int brightest = 0, middle = 0;
-            for (int i = 0; i < hero.Length; i++)
+            Transform field = Make("PixelField", root.transform, Vector3.zero).transform;
+            field.SetPositionAndRotation(layout.PixelField.position, layout.PixelField.rotation);
+            Board("Base", field, new Vector3(0f, -0.06f, 0f), new Vector2(7f * FieldPitch + 0.6f, 7f * FieldPitch + 0.6f), "Slate", 0.1f)
+                .transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+            for (int r = 0; r < 7; r++)
             {
-                if (hero[i] > hero[brightest]) brightest = i;
-                if (Mathf.Abs((float)hero[i] - 0.5f) < Mathf.Abs((float)hero[middle] - 0.5f)) middle = i;
+                Transform row = Make("Row" + r, field, new Vector3(0f, 0f, (3 - r) * FieldPitch)).transform;
+                var pillars = new TileMesh();
+                for (int c = 0; c < 7; c++)
+                {
+                    float ink = (float)pooled[r * 7 + c];
+                    Color color = Color.Lerp(new Color(0.16f, 0.18f, 0.24f, 0f), _theme.pillar, ink);
+                    color.a = ink;
+                    pillars.Box(new Vector3((c - 3) * FieldPitch, 0f, 0f), new Vector3(PillarWidth, PillarBase + PillarPerInk * ink, PillarWidth), color);
+                }
+
+                TileObject("Pillars", row, pillars, "FieldTiles");
             }
 
-            int blank = 13 * 28 + 3; // blank paper, left of the digit's middle
-            Transform values = Make("Values", pixelField, Vector3.zero).transform;
-            foreach (int i in new[] { brightest, middle, blank })
-            {
-                int r = i / 28, c = i % 28;
-                float stand = 0.06f + depth * (float)hero[i];
-                TextMeshPro label = Text("Value_" + r + "_" + c, values, new Vector3((c - 13.5f) * pitch, (13.5f - r) * pitch, -depth - 0.5f),
-                    hero[i].ToString("0.0", System.Globalization.CultureInfo.InvariantCulture), 0.8f, _theme.cyan, 2.2f, bold: true);
-                LabelBacking(label, "0.0", 0.2f);
-            }
-
-            // The 49 numbers the machine gets: 4×4 blocks averaged, as a coarse relief ahead on the right.
-            Vector3 stop = layout.GridStop.position + Vector3.up * 1.3f;
-            Transform inputGrid = ReliefWall("InputGrid7", root.transform, new Vector3(7.8f, 3.6f, 56f), stop, pooled, 7, 1.4f, 2.2f);
-            TextMeshPro title = Text("Title", inputGrid, new Vector3(0f, 5.5f, -0.4f), "49 NUMBERS", 1.0f, _theme.offWhite, 10f, bold: true);
-            LabelBacking(title, "49 NUMBERS", 0.25f);
             return root;
         }
 

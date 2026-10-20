@@ -7,6 +7,7 @@
         "Convergence.Core.Training",
         "Convergence.Core.Puzzles",
         "Convergence.Gameplay",
+        "Convergence.Presentation",
         "Convergence.XR",
         "Unity.XR.Interaction.Toolkit"
     ],

@@ -89,6 +89,8 @@ namespace Convergence.Gameplay.Ride.Level1
             Require(f.valley != null && f.valley.loss != null && f.valley.loss.Length == f.valley.rows * f.valley.columns, "valley.loss");
             Require(f.valley.hops != null && f.valley.hops.Length >= 3, "valley.hops");
             Require(f.finale != null && f.finale.digits != null && f.finale.digits.Length > 0, "finale.digits");
+            Require(f.threes != null && f.threes.Length >= 12, "threes (the dock's gallery)");
+            foreach (var t in f.threes) Require(t != null && t.label == HeroDigit && t.pixels28 != null && t.pixels28.Length == 784, "a gallery three's pixels28");
         }
 
         private static void CheckWeights(Level1Weights w, Level1DataFile f, string name)
@@ -118,6 +120,9 @@ namespace Convergence.Gameplay.Ride.Level1
         public Level1Puzzle puzzle;
         public Level1Valley valley;
         public Level1Finale finale;
+
+        /// <summary>The dock's gallery (E0): real test threes, all different, never the hero.</summary>
+        public Level1Picture[] threes;
     }
 
     /// <summary>Where the data came from.</summary>
@@ -151,6 +156,14 @@ namespace Convergence.Gameplay.Ride.Level1
         public bool shouldFire;
         public double confidence;
         public double[] pixels7;
+    }
+
+    /// <summary>One real test digit at full size, 28×28, row 0 at the top, 0 = paper, 1 = ink.</summary>
+    [Serializable]
+    public sealed class Level1Picture
+    {
+        public int testIndex, label;
+        public double[] pixels28;
     }
 
     /// <summary>The neuron puzzle's digits and line. referenceSolution is for tests only.</summary>

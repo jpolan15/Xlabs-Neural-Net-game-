@@ -8,6 +8,7 @@ using UnityEngine.XR.Interaction.Toolkit.Filtering;
 using Convergence.Gameplay.Ride;
 using Convergence.Gameplay.Ride.Level1;
 using Convergence.Presentation.Ride;
+using Convergence.Presentation.Ride.Explainers;
 using Convergence.XR.Ride;
 
 namespace Convergence.EditorTools
@@ -116,7 +117,13 @@ namespace Convergence.EditorTools
             subtitle.rectTransform.sizeDelta = new Vector2(0.72f, 0.13f);
             TextMeshPro readout = Text("Readout", dash.transform, new Vector3(0, 0.125f, -0.012f), "", 0.026f, _theme.cyan, 1.1f, bold: true);
             readout.rectTransform.sizeDelta = new Vector2(1.2f, 0.04f);
-            TextMeshPro regionTag = Text("RegionTag", dash.transform, new Vector3(-0.29f, 0.335f, -0.012f), "0 · THE PAGE", 0.024f, _theme.offWhite, 0.6f, TextAlignmentOptions.Left, true);
+            // The topic tag (PIXELS, NEURON, ...): CMU Serif, letter-spaced, like the explainers' titles.
+            TextMeshPro regionTag = Text("RegionTag", dash.transform, new Vector3(-0.29f, 0.335f, -0.012f), "MEET PIXEL", 0.032f, _theme.explainWhite, 0.6f, TextAlignmentOptions.Left);
+            regionTag.font = ExplainerFont();
+            regionTag.characterSpacing = 4f;
+            regionTag.enableAutoSizing = true;
+            regionTag.fontSizeMin = 0.2f;
+            regionTag.fontSizeMax = 0.32f;
             regionTag.rectTransform.sizeDelta = new Vector2(0.6f, 0.035f);
 
             var channels = new List<Object>();
@@ -172,6 +179,19 @@ namespace Convergence.EditorTools
             var tagView = pod.AddComponent<RegionTagView>();
             Ref(tagView, "theme", _theme);
             Ref(tagView, "label", regionTag);
+            Ref(tagView, "dash", screen);
+            Set(tagView, "cueTags", p =>
+            {
+                var tags = new[] { ("neuron", "NEURON"), ("wires", "WEIGHTS"), ("connect", "NEURAL NETWORK"), ("oops", "LOSS"), ("sentence", "TOKENS") };
+                p.arraySize = tags.Length;
+                for (int i = 0; i < tags.Length; i++)
+                {
+                    p.GetArrayElementAtIndex(i).FindPropertyRelative("cue").stringValue = tags[i].Item1;
+                    p.GetArrayElementAtIndex(i).FindPropertyRelative("tag").stringValue = tags[i].Item2;
+                }
+            });
+
+            BuildBlackboardGrid(pod.transform);
 
             var seatScript = pod.AddComponent<PodSeat>();
             Ref(seatScript, "seatAnchor", seat);
@@ -292,7 +312,7 @@ namespace Convergence.EditorTools
             Ref(gridView, "frameLive", Mat("Orange"));
             Ref(gridView, "frameLocked", Mat("Locked"));
             Ref(gridView, "hintRing", grid.Find("HintRing"));
-            Int(gridView, "showFromSegment", NeuronSegment);
+            Int(gridView, "showFromSegment", SegNeuronPlay);
             Float(gridView, "cellPitch", CellPitch);
             foreach (WeightCellInteractable cell in grid.GetComponentsInChildren<WeightCellInteractable>(true))
             {
@@ -300,6 +320,54 @@ namespace Convergence.EditorTools
             }
 
             WireSfx(pod, director, moments);
+        }
+
+        /// <summary>
+        /// The blackboard's very faint, distant coordinate grid (3Blue1Brown's number plane, far below): BLUE lines every
+        /// 3 m on a floor 7 m under the pod, fading out with distance. One mesh; RegionAtmosphere fades it in and out.
+        /// </summary>
+        private static void BuildBlackboardGrid(Transform pod)
+        {
+            var lines = new List<Shape>();
+            const float extent = 60f, spacing = 3f, y = -7f;
+            const int pieces = 10;
+            Color blue = _theme.explainBlue;
+            for (float o = -extent; o <= extent + 0.01f; o += spacing)
+            {
+                for (int k = 0; k < pieces; k++)
+                {
+                    float a = -extent + 2f * extent * k / pieces, b = -extent + 2f * extent * (k + 1) / pieces;
+                    foreach (bool alongZ in new[] { true, false })
+                    {
+                        Vector3 from = alongZ ? new Vector3(o, y, a) : new Vector3(a, y, o);
+                        Vector3 to = alongZ ? new Vector3(o, y, b) : new Vector3(b, y, o);
+                        float d = new Vector2((from.x + to.x) * 0.5f, (from.z + to.z) * 0.5f).magnitude / extent;
+                        float fade = Mathf.Clamp01(1f - d) * Mathf.Clamp01(d * 3f + 0.2f);
+                        if (fade < 0.03f) continue;
+                        lines.Add(new Shape
+                        {
+                            kind = Shape.Kind.Line, position = from, end = to, size = new Vector2(0.05f, 0.05f),
+                            rotation = Quaternion.Euler(90f, 0f, 0f), color = new Color(blue.r, blue.g, blue.b, fade * fade), round = 1f
+                        });
+                    }
+                }
+            }
+
+            // Built once with a ShapeBatch and saved as a mesh asset: the grid never changes, only its alpha.
+            var go = Make("Blackboard", pod, Vector3.zero);
+            var filter = go.AddComponent<MeshFilter>();
+            var r = go.AddComponent<MeshRenderer>();
+            r.sharedMaterial = Mat("BlackboardGrid");
+            r.shadowCastingMode = ShadowCastingMode.Off;
+            r.receiveShadows = false;
+            r.sortingOrder = -10;
+            var batch = go.AddComponent<ShapeBatch>();
+            batch.SetShapes(lines);
+            Mesh mesh = Object.Instantiate(filter.sharedMesh);
+            mesh.name = "BlackboardGrid";
+            mesh.hideFlags = HideFlags.None;
+            Object.DestroyImmediate(batch);
+            filter.sharedMesh = SaveMesh(mesh, "BlackboardGrid");
         }
 
         private static void BuildTub(Transform pod)

@@ -7,6 +7,8 @@ namespace Convergence.Gameplay.Ride
 {
     /// <summary>
     /// Runs Level 1 as one continuous ride: a narrated intro that holds GO, the dock, then an ordered list of segments.
+    /// Level 1 v4 pairs them: an explain segment stops in the dark while its explainer plays on the narration's cues
+    /// (Presentation), holds while it unfolds into the place, and the play segment that follows runs the moment.
     /// Each segment moves the pod along one leg of track to a distance (forward, or backward for the rewind), plays
     /// its travel lines on the way and its arrival lines once stopped, then runs its moment (the puzzle, the forward
     /// pass, the blame, the Valley drop) and waits for it to finish and for the last line to end before moving on.
@@ -54,6 +56,9 @@ namespace Convergence.Gameplay.Ride
 
             [Tooltip("Runs after the arrival lines; the ride moves on when it finishes.")]
             public RideMoment moment;
+
+            [Tooltip("Seconds the pod stays after the lines and the moment (an explainer unfolds into the place). Skippable.")]
+            public float hold;
         }
 
         [SerializeField] private Transform pod;
@@ -84,6 +89,8 @@ namespace Convergence.Gameplay.Ride
         private bool _narrating;
         private bool _skipRequested;
         private bool _skippedThisLeg;
+        private bool _holding;
+        private bool _skipHold;
         private float _holdSeconds;
         private RideMoment _moment;
         private bool _gentle;
@@ -213,6 +220,11 @@ namespace Convergence.Gameplay.Ride
         {
             if (_narrating) _skipRequested = true;
             else if (_moment != null) _moment.Hurry();
+            else if (_holding)
+            {
+                _skipHold = true;
+                NarrationSkipped?.Invoke();
+            }
         }
 
         // ---------- what moments use ----------
@@ -342,6 +354,21 @@ namespace Convergence.Gameplay.Ride
             }
 
             yield return WaitForSpeech();
+            if (s.hold > 0f)
+            {
+                _holding = true;
+                _skipHold = false;
+                float held = 0f;
+                while (held < s.hold && !_skipHold)
+                {
+                    held += Time.deltaTime;
+                    yield return null;
+                }
+
+                _holding = false;
+                _skipHold = false;
+            }
+
             SegmentEnded?.Invoke(index);
         }
 

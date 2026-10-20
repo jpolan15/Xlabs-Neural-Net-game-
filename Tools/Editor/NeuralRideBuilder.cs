@@ -96,18 +96,29 @@ namespace Convergence.EditorTools
             theme.right = Hex("#66FF9E");
             theme.networkDim = 0.3f;
 
-            // Each region its own sky: the page is the only bright one. No region's sky is orange (orange = press this).
+            // Each region its own sky and its topic's name on the dash. No region's sky is orange (orange = press this).
+            // The dock is the blackboard's own dark navy (a shade lighter), so the lit page reads like 3Blue1Brown's figures
+            // on the dark and the unfold does not change the sky.
             theme.regions = new[]
             {
-                Look("THE PAGE", "#D9CDB6", "#E8DEC9", 0.010f),
-                Look("THE GRID", "#030407", "#030407", 0.018f),
-                Look("ONE NEURON", "#140B04", "#1C1006", 0.020f),
-                Look("THE NETWORK", "#061024", "#061024", 0.011f),
-                Look("WRONG", "#1C0407", "#2C060A", 0.014f),
-                Look("REWIND", "#16041C", "#22062C", 0.013f),
-                Look("THE VALLEY", "#3B1640", "#6B2D5E", 0.009f),
-                Look("RIGHT", "#140F04", "#1E1606", 0.011f),
+                Look("MEET PIXEL", "#0E1118", "#0E1118", 0.010f),
+                Look("PIXELS", "#030407", "#030407", 0.018f),
+                Look("NEURON", "#140B04", "#1C1006", 0.020f),
+                Look("NEURAL NETWORK", "#061024", "#061024", 0.011f),
+                Look("LOSS", "#1C0407", "#2C060A", 0.014f),
+                Look("BACKPROPAGATION", "#16041C", "#22062C", 0.013f),
+                Look("GRADIENT DESCENT", "#3B1640", "#6B2D5E", 0.009f),
+                Look("TRAINING", "#140F04", "#1E1606", 0.011f),
             };
+
+            // The explainers' blackboard and palette (TASK_LEVEL1_V4_EXPLAINERS section 2).
+            theme.blackboard = Look("", "#0B0E14", "#0B0E14", 0.002f);
+            theme.explainBlue = Hex("#58C4DD");
+            theme.explainYellow = Hex("#F4D345");
+            theme.explainGreen = Hex("#83C167");
+            theme.explainRed = Hex("#FC6255");
+            theme.explainWhite = Hex("#ECECEC");
+            theme.explainGrey = Hex("#888888");
             EditorUtility.SetDirty(theme);
             return theme;
         }
@@ -321,6 +332,7 @@ namespace Convergence.EditorTools
             // Level 1.
             Tiles("Tiles", Color.white, 0.55f, t.cyan, 0.25f);
             Tiles("TilesBright", Color.white, 0.9f, Color.white, 0.2f);
+            Tiles("FieldTiles", new Color(0.85f, 0.88f, 0.92f), 0.22f, t.explainBlue, 0.55f);
             H("NeuronAmber", t.amber * 0.8f, 0.5f, 0.9f, Color.white, t.amber * 0.55f);
             H("SumFires", t.amber, 0.3f, 0.4f, Color.white, t.amber * 0.6f);
             H("SumQuiet", new Color(0.30f, 0.33f, 0.40f), 0.6f, 0.3f, t.locked);
@@ -331,6 +343,7 @@ namespace Convergence.EditorTools
             MakePageMaterials();
             MakeNetworkMaterials();
             MakeValleyMaterials();
+            MakeExplainerMaterials();
             AssetDatabase.SaveAssets();
         }
 
@@ -436,6 +449,7 @@ namespace Convergence.EditorTools
         {
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             Layout layout = Layout.Make(_data);
+            _layout = layout;
 
             RideTheme.RegionLook dock = _theme.Region(0);
             RenderSettings.fog = true;
@@ -496,9 +510,10 @@ namespace Convergence.EditorTools
             Set(moments.Right, "trained", p => p.boolValue = true);
             Set(moments.Right, "revealLines", p =>
             {
-                p.arraySize = 2;
-                p.GetArrayElementAtIndex(0).intValue = (int)RideLine.RightItSays;
-                p.GetArrayElementAtIndex(1).intValue = (int)RideLine.RightAccuracy;
+                p.arraySize = 3;
+                p.GetArrayElementAtIndex(0).intValue = (int)RideLine.RightSays;
+                p.GetArrayElementAtIndex(1).intValue = (int)RideLine.RightTraining;
+                p.GetArrayElementAtIndex(2).intValue = (int)RideLine.RightAccuracy;
             });
             Set(moments.Valley, "hopDistances", p =>
             {

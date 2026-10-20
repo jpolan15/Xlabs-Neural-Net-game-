@@ -3,7 +3,8 @@
 Everything that glows in Level 1 comes from this file's output: a 49 -> 16 -> 10 network (7x7 pixels in,
 16 sigmoid hidden neurons, 10 softmax outputs) trained offline with plain full-batch gradient descent on the
 60,000 MNIST training digits. The JSON holds the untrained and trained weights, the hero "3", the neuron puzzle's
-digits, the real loss landscape the Valley is built from, and the finale's digits with their real predictions.
+digits, the real loss landscape the Valley is built from, the finale's digits with their real predictions, and a
+gallery of twenty real test threes (28x28) for the dock's opening.
 
 Run (NumPy only, deterministic, fails loudly on any broken check):
     uv run --with numpy python -I ArtSource/training/bake_level1.py --out Assets/_Project/Data/Level1/level1_digits.json
@@ -51,6 +52,8 @@ WALL_HALF_WIDTH = 30.0  # how far sideways the walls look, in weight-space units
 SEED_WALL = 1
 PUZZLE_THRESHOLD = 2.0
 FINALE_COUNT = 60
+GALLERY_COUNT = 20       # the dock's cloud of real threes (E0), 28x28 each
+GALLERY_DEC = 2          # decimals kept for gallery pixels (display only)
 SEED_FINALE = 2026
 
 W_DEC = 9                # decimals kept for weights
@@ -284,6 +287,18 @@ def main():
     untrained_guess = int(p_untrained[0].argmax())
     check(untrained_guess != 3 and int(p_trained[0].argmax()) == 3, "hero checks failed")
 
+    # ---- the dock's gallery: real test threes, all different (thin, thick, slanted), never the hero.
+    # Ranked by ink and taken at evenly spaced ranks from the 5th to the 95th percentile, so it is deterministic and
+    # shows the spread of how people write a 3.
+    others = [int(i) for i in threes if int(i) != hero]
+    by_ink = sorted(others, key=lambda i: (float(test_raw[i].sum()), i))
+    ranks = np.linspace(0.05, 0.95, GALLERY_COUNT) * (len(by_ink) - 1)
+    gallery_idx = [by_ink[int(round(r))] for r in ranks]
+    check(len(set(gallery_idx)) == GALLERY_COUNT, "gallery threes repeat")
+    gallery = [{"testIndex": i, "label": 3,
+                "pixels28": np.round(test_raw[i].astype(np.float64).ravel() / 255.0, GALLERY_DEC).tolist()}
+               for i in gallery_idx]
+
     # ---- neuron puzzle: 4 clear ones, 4 clear zeros, a line the reference clears with margin
     ref = reference_solution()
     ones = np.nonzero(test_y == 1)[0]
@@ -426,6 +441,7 @@ def main():
             "hops": hops,
         },
         "finale": {"digits": finale, "correct": finale_right},
+        "threes": gallery,
     }
     os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
     with open(args.out, "w", encoding="utf-8", newline="\n") as f:
@@ -446,6 +462,7 @@ def main():
     print(f"| valley walls (side min - centre) | min {wall_rise[0]:+.3f}, median {wall_rise[1]:+.3f}, max {wall_rise[2]:+.3f} |")
     print(f"| big first step | {seg[0]:.3f} -> dips to {dip:.3f} -> climbs to {seg[-1]:.3f} |")
     print(f"| finale | {finale_right}/{FINALE_COUNT} right |")
+    print(f"| gallery | {GALLERY_COUNT} real test threes (28x28): " + ", ".join(f"#{g['testIndex']}" for g in gallery) + " |")
     print("| hops (step:real steps:loss) | " +
           "; ".join(f"{h['step']}:{h['realSteps']}:{h['loss']:.3f}" for h in hops) + " |")
 

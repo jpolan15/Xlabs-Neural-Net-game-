@@ -25,6 +25,7 @@ namespace Convergence.Presentation.Ride
         private static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
         private MaterialPropertyBlock _block;
         private Vector3 _inkHome;
+        private Vector3 _inkScale = Vector3.one;
         private float _liftedAt = -1f;
         private Color[] _paperColors;
         private Color _inkColor;
@@ -37,6 +38,7 @@ namespace Convergence.Presentation.Ride
             if (ink != null)
             {
                 _inkHome = ink.transform.localPosition;
+                _inkScale = ink.transform.localScale;
                 _inkColor = inkSmooth.GetColor(BaseColor);
             }
         }
@@ -68,7 +70,7 @@ namespace Convergence.Presentation.Ride
             float lift = _liftedAt < 0f ? 0f : Mathf.Clamp01((Time.time - _liftedAt) / liftSeconds);
             float e = lift * lift * (3f - 2f * lift);
             ink.transform.localPosition = _inkHome + Vector3.back * (liftMeters * e);
-            ink.transform.localScale = Vector3.one * (1f + 0.15f * e);
+            ink.transform.localScale = _inkScale * (1f + 0.15f * e);
             ink.sharedMaterial = lift >= pixelateAt ? inkPixels : inkSmooth;
             SetAlpha(ink, _inkColor, alpha);
         }

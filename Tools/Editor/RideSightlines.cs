@@ -195,6 +195,9 @@ namespace Convergence.EditorTools
             if (m == null) return false;
             // The networks' wires and neurons, the rails and every glow are additive light: they never hide anything.
             if (m.shader != null && m.shader.name.StartsWith("Convergence/Neural", StringComparison.Ordinal)) return false;
+            // The explainers' shapes are a passing overlay on the blackboard: they are gone (unfolded) before the place's
+            // panels are there to read, so they never count as blocking them.
+            if (m.shader != null && m.shader.name == "Convergence/ExplainerFlat") return false;
             bool additive = m.HasProperty("_DstBlend") && Mathf.Approximately(m.GetFloat("_DstBlend"), (float)UnityEngine.Rendering.BlendMode.One);
             return !additive;
         }
@@ -581,6 +584,7 @@ namespace Convergence.EditorTools
             RegionStreamer streamer = null;
             var regions = new Dictionary<int, GameObject>();
             var viewpoints = new List<RideViewpoint>();
+            var explainers = new List<Convergence.Presentation.Ride.Explainers.Explainer>();
             foreach (GameObject go in scene.GetRootGameObjects())
             {
                 if (go.name == "Pod") pod = go;
@@ -588,6 +592,7 @@ namespace Convergence.EditorTools
                 if (go.name.StartsWith("Region_", StringComparison.Ordinal) && int.TryParse(go.name.Substring(7), out int n)) regions[n] = go;
                 if (streamer == null) streamer = go.GetComponentInChildren<RegionStreamer>(true);
                 viewpoints.AddRange(go.GetComponentsInChildren<RideViewpoint>(true));
+                explainers.AddRange(go.GetComponentsInChildren<Convergence.Presentation.Ride.Explainers.Explainer>(true));
             }
 
             if (pod == null) return lines;
@@ -596,7 +601,15 @@ namespace Convergence.EditorTools
                 int draws = 0, triangles = 0;
                 Count(pod, ref draws, ref triangles, vp);
                 if (track != null) Count(track, ref draws, ref triangles, null);
-                foreach (GameObject region in RideSightlines.VisibleRegions(vp, streamer, regions)) Count(region, ref draws, ref triangles, null);
+                // An explainer's pieces are on only during its own segments (it shows and hides them).
+                var off = new List<Transform>();
+                foreach (var e in explainers)
+                {
+                    bool on = e.Content != null && vp.segment >= e.ExplainSegment && vp.segment <= e.LastSegment;
+                    if (e.Content != null && !on) off.Add(e.Content.transform);
+                }
+
+                foreach (GameObject region in RideSightlines.VisibleRegions(vp, streamer, regions)) Count(region, ref draws, ref triangles, null, off);
                 bool ok = draws <= MaxDrawCalls && triangles <= MaxTriangles;
                 string line = vp.label + ": about " + draws + " draw calls and " + triangles + " triangles (" + (ok ? "within budget" : "OVER BUDGET") + ")";
                 lines.Add(line);
@@ -620,15 +633,24 @@ namespace Convergence.EditorTools
         }
 
         // Panels hidden until their moment (end card, weight grid) and the XR rig are not drawn at a viewpoint that does not list them.
-        private static void Count(GameObject root, ref int draws, ref int triangles, RideViewpoint podAt)
+        private static void Count(GameObject root, ref int draws, ref int triangles, RideViewpoint podAt, List<Transform> off = null)
         {
             foreach (Renderer r in root.GetComponentsInChildren<Renderer>(true))
             {
                 if (!r.enabled) continue;
+                if (off != null && off.Exists(t => r.transform.IsChildOf(t))) continue;
                 if (podAt != null && IsHiddenOrRig(r.transform, root.transform, podAt)) continue;
                 var filter = r.GetComponent<MeshFilter>();
                 Mesh mesh = filter != null ? filter.sharedMesh : null;
                 draws += Mathf.Max(1, r.sharedMaterials.Length);
+                // An explainer's shapes build their mesh only when shown: count two triangles per shape.
+                var shapes = r.GetComponent<Convergence.Presentation.Ride.Explainers.ShapeBatch>();
+                if (shapes != null && (mesh == null || !r.gameObject.activeInHierarchy))
+                {
+                    triangles += shapes.Count * 2;
+                    continue;
+                }
+
                 if (mesh == null) continue;
                 for (int sub = 0; sub < mesh.subMeshCount; sub++) triangles += (int)(mesh.GetIndexCount(sub) / 3);
             }
