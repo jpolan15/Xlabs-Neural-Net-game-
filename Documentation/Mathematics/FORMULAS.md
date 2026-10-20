@@ -106,6 +106,23 @@ Full Chamber 04 implementation spec: `Assets/Puzzles/Chamber04_Attention/`.
 
 ---
 
+## 5b. Ride v4 (ADR-016)
+
+**Softmax with temperature.** $p_i = \text{Softmax}(z / T)_i$, $T > 0$. Low $T$ sharpens toward the largest logit; high $T$ flattens toward uniform. `ActivationFunctions.Softmax(logits, temperature)`.
+
+**Word vectors.** `VectorMath`: $a + b$, $a - b$, $a \cdot b$, $\cos(a, b) = \frac{a \cdot b}{|a||b|}$ (0 when either length is 0), and `Nearest` = the row with the smallest Euclidean distance, skipping excluded rows, ties to the lower index.
+Analogy "$a$ is to $b$ as $c$ is to ?": the word nearest $v_c + v_b - v_a$, never $a$, $b$ or $c$. `WordSpace.CreateRideTable()` is a hand-made 3-D table (5 clusters × 4 words) where every ride analogy resolves. In the Word Space stop a round also needs the tip within `AnalogyPuzzle.ReachRadius` = 0.15 of the answer.
+
+**Toy next-word model.** `NextTokenModel`: 8 hand-set embedding features (thing, person, plural, action, function, tool, silly, pronoun); one head with $Q = W_q e$, $K = W_k e$ over [thing, person, plural, action] ($W_q$ gain 6, a function word queries "action"); each word attends only to earlier words (the first word to itself); $h = e_{\text{last}} + \sum_k \alpha_k e_k$; logits $= R h$ over 8 output words; probabilities $= \text{Softmax}(\text{logits}/T)$. Measured: "it" → "rock" ≈ 0.74; after "rock ahead , fire the", P(laser) ≈ 0.87 at $T = 1$, > 0.99 at $T = 0.2$, ≈ 0.51 at $T = 2$.
+
+**XOR with a helper.** Round 1 is one step neuron, which reaches at most 3/4 (checked over the lever grid). Round 2 is 2-2-1: main = step(w·x − t), helper = step(x₁ + x₂ − t_h), output = step(main − 2·helper − 0.5). It passes with t_h ∈ (1, 2].
+
+**Agent safety.** `AgentStepEvaluator`: a laser aimed at a friend (drone, drones, friend, helper, pilot, captain, ship) is unsafe; every other step is safe. An episode is won when the goal step ran and no unsafe step ran.
+
+**Rider vs trainer.** `ManualDescentScore` keeps the lowest mean loss the rider reached by hand (ties → fewer mistakes); a mistake is an output on the wrong side of 0.5. Losses within $10^{-9}$ tie.
+
+---
+
 ## 6. Numerical Tolerances
 
 | Comparison | Tolerance ($\epsilon$) | Notes |
