@@ -23,6 +23,7 @@ Canonical decisions live in `Documentation/Architecture/ADRs/`.
 | ADR-013 | Ride v3 rendering: HoloLit shader, the two-mesh network, per-camera Quest overrides, angle-based panel layout enforced by a sightline check | Accepted | [`ADR-013-ride-v3-rendering.md`](../Documentation/Architecture/ADRs/ADR-013-ride-v3-rendering.md) |
 | ADR-014 | Narration you can see ({cue} tags → explainer panel, network and arrows act out each clause), a stop waits for its punchline, the dock's hands-on weight, solid reading screens, sound effects levelled by measured loudness, credits | Accepted | [`ADR-014-ride-narration-you-can-see.md`](../Documentation/Architecture/ADRs/ADR-014-ride-narration-you-can-see.md) |
 | ADR-015 | Hands-on opening (intro beats that wait for a lever or time out: wake AURA, make a neuron fire; JFK cold open), and the network as the star (weight hierarchy in the link shader, dim unlit network, scaffolding on its own dim mesh, `_Reveal`) | Accepted | [`ADR-015-ride-interactive-opening.md`](../Documentation/Architecture/ADRs/ADR-015-ride-interactive-opening.md) |
+| ADR-016 | Ride v4: six stops from one neuron to agents, each Clip → Handoff → Minigame → Payoff; minus yellow `#FFEB00`; video module | Accepted | [`ADR-016-ride-v4-neuron-to-agents.md`](../Documentation/Architecture/ADRs/ADR-016-ride-v4-neuron-to-agents.md) |
 
 ---
 

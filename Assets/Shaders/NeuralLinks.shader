@@ -15,7 +15,7 @@ Shader "Convergence/NeuralLinks"
     Properties
     {
         _PosColor ("Positive Weight", Color) = (0.1, 0.88, 1, 1)
-        _NegColor ("Negative Weight", Color) = (1, 0.8, 0.12, 1)
+        _NegColor ("Negative Weight", Color) = (1, 0.922, 0, 1)
         _Width ("Width (m)", Float) = 0.14
         _MinPixels ("Minimum Width (pixels)", Float) = 1.6
         _MaxPixels ("Maximum Width (pixels)", Float) = 4
