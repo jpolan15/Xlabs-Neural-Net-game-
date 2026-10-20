@@ -47,7 +47,7 @@ namespace Convergence.EditorTools
             // E0, the dock: what is this? (intro and dock line)
             new Line(RideLine.Threes, "{threes}Look! [p0.3] Lots of threes. [p0.3] All different. [p0.3] And you know every one.", 0.6f),
             new Line(RideLine.MeetPixel, "{pixel}This is Pixel. [p0.3] Pixel is a little robot, [p0.2] and Pixel can't read yet.", 0.5f),
-            new Line(RideLine.PixelBrain, "{brain}Let's go inside Pixel's brain, [p0.2] and teach it to read a three.", 0.5f),
+            new Line(RideLine.PixelBrain, "{brain}Let's go inside Pixel's brain, [p0.2] and teach it to read threes.", 0.5f),
             new Line(RideLine.PullGo, "{go}Pull the orange lever. [p0.2] Let's go!", 0.3f),
 
             // E1, pixels.
@@ -81,7 +81,7 @@ namespace Convergence.EditorTools
             // E5, backpropagation.
             new Line(RideLine.BackWish, "{wish}The three wants to be brighter. [p0.3] {dim}The one wants to be dimmer."),
             new Line(RideLine.BackFlows, "{back}That wish flows backwards, [p0.2] through every wire. [p0.3] That's backpropagation.", 0.6f),
-            new Line(RideLine.BackHot, "{hot}The wires that caused the mistake glow hot.", 0.6f),
+            new Line(RideLine.BackHot, "{hot}The wires that caused this mistake glow hot.", 0.6f),
             new Line(RideLine.BackGrab, "{grab}Grab the hot wires, [p0.2] and nudge them!"),
             new Line(RideLine.BackDone, "Nice! [p0.3] Now every wire knows which way to change.", 0.6f),
 
@@ -89,7 +89,7 @@ namespace Convergence.EditorTools
             new Line(RideLine.DescentHill, "{hill}Think of the loss as a hill. [p0.3] {ball}High up means lots of mistakes. [p0.3] Down low means hardly any."),
             new Line(RideLine.DescentStep, "{slope}Feel which way is down, [p0.2] and take a step. [p0.3] That's gradient descent.", 0.6f),
             new Line(RideLine.DescentTooBig, "{bigstep}Take too big a step, [p0.2] and you fly past the bottom. [p0.3] {smallsteps}Small steps settle in.", 0.6f),
-            new Line(RideLine.DescentRealHill, "{landscape}Now, the real hill. [p0.3] Hold on tight!", 0.4f),
+            new Line(RideLine.DescentRealHill, "{landscape}And now, the real hill. [p0.3] Hold on tight!", 0.4f),
             new Line(RideLine.DescentOvershoot, "Whoa! [p0.3] Too far!", 0.4f),
             new Line(RideLine.DescentSettle, "Small steps now. [p0.3] Down... [p0.3] and down... [p0.3] and down.", 0.6f),
 

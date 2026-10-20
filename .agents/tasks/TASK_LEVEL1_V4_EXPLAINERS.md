@@ -67,7 +67,7 @@ come from the bake (untrained guess "one", sixty thousand, ninety-two) must be c
 |---|---|
 | Threes | `{threes}Look! [p0.3] Lots of threes. [p0.3] All different. [p0.3] And you know every one.` |
 | MeetPixel | `{pixel}This is Pixel. [p0.3] Pixel is a little robot, [p0.2] and Pixel can't read yet.` |
-| PixelBrain | `{brain}Let's go inside Pixel's brain, [p0.2] and teach it to read a three.` |
+| PixelBrain | `{brain}Let's go inside Pixel's brain, [p0.2] and teach it to read threes.` |
 | PullGo | `{go}Pull the orange lever. [p0.2] Let's go!` |
 
 Explainer: a cloud of ~20 real MNIST threes (bake them) drifts around the rider; each says "3" the same way; one hero 3
@@ -135,7 +135,7 @@ Explainer: beside the 10 real output brightnesses, the wanted ones appear (3 = 1
 |---|---|
 | BackWish | `{wish}The three wants to be brighter. [p0.3] {dim}The one wants to be dimmer.` |
 | BackFlows | `{back}That wish flows backwards, [p0.2] through every wire. [p0.3] That's backpropagation.` |
-| BackHot | `{hot}The wires that caused the mistake glow hot.` |
+| BackHot | `{hot}The wires that caused this mistake glow hot.` |
 | BackGrab | `{grab}Grab the hot wires, [p0.2] and nudge them!` |
 | BackDone | `Nice! [p0.3] Now every wire knows which way to change.` |
 
@@ -150,7 +150,7 @@ Play = existing blame wires, kid version: touch/point at a hot wire → it cools
 | DescentHill | `{hill}Think of the loss as a hill. [p0.3] {ball}High up means lots of mistakes. [p0.3] Down low means hardly any.` |
 | DescentStep | `{slope}Feel which way is down, [p0.2] and take a step. [p0.3] That's gradient descent.` |
 | DescentTooBig | `{bigstep}Take too big a step, [p0.2] and you fly past the bottom. [p0.3] {smallsteps}Small steps settle in.` |
-| DescentRealHill | `{landscape}Now, the real hill. [p0.3] Hold on tight!` |
+| DescentRealHill | `{landscape}And now, the real hill. [p0.3] Hold on tight!` |
 | DescentOvershoot | `Whoa! [p0.3] Too far!` |
 | DescentSettle | `Small steps now. [p0.3] Down... [p0.3] and down... [p0.3] and down.` |
 
@@ -296,6 +296,22 @@ Fixed cockpit frame; reverse and drop keep their limits; `G` gentle mode stays.
 - GO lever sits low-left on the dash; at a level gaze it is outside a 70° capture when "Pull the orange lever" is
   said (the hint arrow is on it). Worth a look in WP2/WP7.
 - The 7×7 3 is soft (real 4×4 averages) and the field is seen at a low angle; it reads as a relief, not as a 3.
+
+### 2026-10-20 — WP6: voice for lines 64–105 (Claude)
+
+- Rendered with `render_voices.py` (Kokoro `bm_fable`, speed 0.9; `uv run --python 3.13 --with kokoro-onnx==0.6.1 ...`),
+  verified with Whisper `small.en` (venv `~/.cache/archival/venv`), installed into `Assets/_Project/Audio/Voice/`.
+- Verify fixes in `words()`: a literal backspace byte had broken the "a hundred" = "100" rule; US/UK "practiced";
+  "back propagation" joined back to the script word.
+- Three lines re-worded because the voice could not say them clearly (tested 10+ spellings each):
+  PixelBrain "teach it to read threes." (was "read a three": heard "Rader 3"), BackHot "caused **this** mistake"
+  (the voice dropped the -d), DescentRealHill "**And** now, the real hill." (heard "It's now").
+- `verify`: 40 of 42 at ≤ 10 % WER. Two flag only in context: PixelBrain (heard "RAID 3s"; its second clause alone
+  is heard "and teach it to read threes.") and WrongSays "Pixel says... one?" (the "one?" is there, louder than the
+  rest; transcribed alone it is "1"). Both checked by transcribing the clause by itself; owner to confirm by ear.
+- Builder: "Narration: 42 lines, 242 s spoken in all; intro 18 s. Voice clips bound: 42 of 42." Sightlines clear.
+- `EveryLevel1Line_HasAVoiceClipMatchingTheScript` un-ignored. EditMode (MCP run_tests): 129 total, 129 passed.
+- The warmer second voice for comparison was not rendered (the earlier job left none); bm_fable stays.
 
 ## 9. Level 2 outline (later, not this task): "Pixel learns words"
 

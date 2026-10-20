@@ -376,6 +376,7 @@ def words(text: str) -> list[str]:
     text = text.lower().replace("-", " ").replace("’", "'")
     # Numerals the transcriber writes for spoken words: "92%" is "ninety-two percent", "60,000" is "sixty thousand".
     text = re.sub(r"%", " percent", text)
+    text = re.sub(r"\b(?:a |one )?100\b", "a hundred", text)  # "a hundred" and "one hundred" are both written "100"
     text = re.sub(r"\b(\d{1,2}),000\b", lambda m: m.group(1) + " thousand", text)
     text = re.sub(r"\b(1[0-9])(\d\d)\b", lambda m: two_digits(int(m.group(1))) + " " + two_digits(int(m.group(2))), text)
     text = re.sub(r"\b(\d{1,2})\b", lambda m: two_digits(int(m.group(1))), text)
@@ -383,18 +384,28 @@ def words(text: str) -> list[str]:
     text = re.sub(r"[^a-z0-9' ]", " ", text)
     # "trigger's" and "triggers" sound the same, so 's is joined, not expanded; the rest are expanded both sides.
     text = re.sub(r"'s\b", "s", text).replace("'re", " are").replace("'ll", " will").replace("n't", " not")
-    same = {"woah": "whoa", "ok": "okay", "mcculloch": "mcculloch"}
+    same = {"woah": "whoa", "ok": "okay", "mcculloch": "mcculloch", "practiced": "practised"}  # US/UK spelling
     return [same.get(w, w) for w in text.replace("'", "").split()]
 
 
 def split_compounds(ref: list[str], hyp: list[str]) -> list[str]:
-    """A transcriber sometimes writes two spoken words as one ("an or gate" -> "an orgate"). That is a spelling choice,
-    not a missing word, so a hyp word equal to two adjacent script words joined is split back. Nothing else is forgiven."""
+    """A transcriber sometimes writes two spoken words as one ("an or gate" -> "an orgate") or one as two ("back
+    propagation"). That is a spelling choice, not a missing word, so it is split or joined back to match the script.
+    Nothing else is forgiven."""
     joined = {ref[i] + ref[i + 1]: (ref[i], ref[i + 1]) for i in range(len(ref) - 1)}
     out = []
     for w in hyp:
         out.extend(joined.get(w, (w,)))
-    return out
+    # The reverse: one script word written as two ("backpropagation" -> "back propagation") is joined back.
+    single, merged, i = set(ref), [], 0
+    while i < len(out):
+        if i + 1 < len(out) and out[i] + out[i + 1] in single and out[i] not in single:
+            merged.append(out[i] + out[i + 1])
+            i += 2
+        else:
+            merged.append(out[i])
+            i += 1
+    return merged
 
 
 def wer(ref: list[str], hyp: list[str]) -> float:

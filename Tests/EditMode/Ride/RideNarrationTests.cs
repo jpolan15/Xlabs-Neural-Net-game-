@@ -87,8 +87,6 @@ namespace Convergence.Tests.EditMode.Ride
         }
 
         [Test]
-        [Ignore("The v4 lines (64 and up) are voiced by WP6 of TASK_LEVEL1_V4_EXPLAINERS (render_voices.py, then install); "
-            + "until then they play silently for their reading time. Un-ignore when WP6 installs the clips.")]
         public void EveryLevel1Line_HasAVoiceClipMatchingTheScript()
         {
             // The builder binds a clip only when its sidecar says the approved words, so a missing clip here means a
