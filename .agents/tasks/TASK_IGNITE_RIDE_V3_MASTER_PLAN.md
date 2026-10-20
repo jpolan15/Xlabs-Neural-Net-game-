@@ -281,7 +281,7 @@ flowchart LR
 ## 6. How to work fast without breaking things
 
 - **Parallel:** WP7 (pilot) touches only `ArtSource/`, `Tools/ArtPipeline/` and `.claude/agents/`, so it can run in its own session while WP1–WP3 run here. WP4 audio waits on the human's pick.
-- **Unity access:** the Unity CLI (`unity status`, `unity command eval`, `unity command capture_game_view`; see `.agents/skills/unity-cli/`).
+- **Unity access:** the Unity CLI (`unity status`, `unity command eval`, `unity command capture_game_view`; `unity --help` for details).
   For MCP for Unity, the human clicks **Window > MCP for Unity > Start Server** (port 8080, `.mcp.json`). Do **not** upgrade the package to v10 without an ADR.
 
 ---

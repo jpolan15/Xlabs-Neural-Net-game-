@@ -11,7 +11,7 @@ Rules first (from `AGENTS.md` and the master plan):
 
 Steps:
 1. Copy `ArtSource/<id>/clean/*` into `Assets/_Project/Models/<AssetId>/`; set import: scale 1, no cameras/lights, ASTC textures ≤ 1024, mesh compression medium.
-2. Drive the open Editor with the Unity CLI (`unity status`, `unity command eval`, `unity command capture_game_view`; see `.agents/skills/unity-cli/`) or MCP for Unity if its server is running.
+2. Drive the open Editor with the Unity CLI (`unity status`, `unity command eval`, `unity command capture_game_view`; `unity --help` for details) or MCP for Unity if its server is running.
 3. Render the model from front/left/back/right with an orthographic camera on a plain background plus alpha masks → `ArtSource/<id>/verify/turntable_<view>.png`; build `side_by_side.png`.
 4. Hand off to `asset-verifier` (Gate B). After PASS, add it to the builder, rebuild, and hand off to `vr-qa`.
 Report every command run and its output.

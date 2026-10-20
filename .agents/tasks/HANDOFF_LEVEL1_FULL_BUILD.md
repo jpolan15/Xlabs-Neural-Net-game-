@@ -120,7 +120,7 @@ unity list                                      # every command the Editor expos
 - After `unity recompile`, a domain reload follows: poll `unity status` until `ready` before the next call.
 - `unity test ...` **refuses** while the Editor has the project open. Use `unity command run_tests`.
 - Play Mode on an unfocused Editor can freeze at frame 1–2. Run `unity command set_autotick` first and check
-  `Time.frameCount` advances (`.agents/skills/unity-cli/references/playmode-verification-loop.md`).
+  `Time.frameCount` advances.
 - Build the ride: `unity command eval 'Convergence.EditorTools.NeuralRideBuilder.Build(); return "built";' --result-only -- --timeout 600000`.
   It throws on any failed assertion (sightlines, audio levels, model-sheet coverage): read the message, fix the cause.
   Each build recreates mesh assets (new GUIDs), so prefab diffs after a build are expected.
