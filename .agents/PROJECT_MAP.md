@@ -30,7 +30,8 @@ Last updated: 2026-10-12 (Level 1 digits ride, ADR-016)
 | `.agents/PROJECT_MAP.md` | This file |
 | `.agents/WORKFLOW.md` | Agent operating procedure (before/during/after) |
 | `.agents/DECISIONS_INDEX.md` | Index table linking to ADRs in Documentation/Architecture/ADRs/ |
-| `.agents/tasks/` | Active task files: BACKLOG, BLOCKED, COMPLETED, IN_PROGRESS |
+| `.agents/tasks/` | Active task files: Level 1 plan + handoff, BACKLOG, BLOCKED, COMPLETED, IN_PROGRESS |
+| `.agents/tasks/archive/` | Finished or superseded tasks and handoffs (history only, don't load) |
 | `.agents/templates/TASK_TEMPLATE.md` | Standard task file format |
 | `.agents/templates/HANDOFF_TEMPLATE.md` | Standard task report / handoff format |
 | `.agents/skills/unity-cli/` | Unity CLI skill: drive the open Editor, capture, test, build |

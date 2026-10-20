@@ -1,126 +1,31 @@
-# AGENTS.md — Convergence Repository Rules
+# AGENTS.md — Convergence
 
-## Project
+Educational VR puzzle game. Unity (`ProjectSettings/ProjectVersion.txt`), Meta Quest 2, OpenXR, URP, XR Interaction Toolkit.
 
-Convergence is an educational VR puzzle game built with Unity.
+## Current job
 
-- Unity version: see `ProjectSettings/ProjectVersion.txt`
-- Primary device: Meta Quest 2
-- Runtime standard: OpenXR
-- Render pipeline: URP
-- Interaction authority: XR Interaction Toolkit
-- Desktop test environment: Meta XR Simulator
+Level 1 digits ride (pixels → neuron → network → backprop → gradient descent). Ignite demo April 2027.
+Plan: `.agents/tasks/TASK_LEVEL1_DIGITS_RESTRUCTURE.md`. Open work: `.agents/tasks/LEVEL1_REMAINING_WORK.md`.
+Read only the section you need; don't read whole handoffs up front. Old tasks are in `.agents/tasks/archive/` — ignore them.
 
-## Current priority (2026-10)
+## Where things live
 
-The active plan is `.agents/tasks/TASK_LEVEL1_DIGITS_RESTRUCTURE.md`: Level 1 as one continuous ride on handwritten digits (pixels → neuron → network → backprop → gradient descent), teacher demo 2026-10-20, live **Ignite** demo April 2027. Read it before any ride work; the full build steps and definition of done are in `.agents/tasks/HANDOFF_LEVEL1_FULL_BUILD.md`. Its infrastructure rules (builder, sightlines, captures, audio levels) come from `.agents/tasks/TASK_IGNITE_RIDE_V3_MASTER_PLAN.md`, whose story content is superseded. New 3D assets go through the Asset Forge skill (`.agents/skills/asset-forge/SKILL.md`, subagents in `.claude/agents/`). Raw art lives in `ArtSource/`, never in `Assets/`.
+Map: `.agents/PROJECT_MAP.md`. Workflow: `.agents/WORKFLOW.md`. ADRs: `Documentation/Architecture/ADRs/`.
+Math: `Documentation/Mathematics/FORMULAS.md`. Raw art: `ArtSource/` (never `Assets/`). New 3D assets: `asset-forge` skill.
+Code beats stale prose.
 
-## Agent startup procedure
+## Hard rules
 
-Before changing any file:
+- Assemblies: Core.Math → Neural → Training → Puzzles → Gameplay → XR / Presentation. `Core.*` has no UnityEngine.
+- XR turns input into commands; Presentation only displays. Neither decides puzzle correctness.
+- Meta code only in `Assets/Scripts/XR/Meta/` or `Tools/`. Dev tooling never referenced by runtime assemblies.
+- Stay inside the task's allowed paths; no new top-level dirs; no package bumps without an ADR.
+- Never hardcode puzzle completion or delete failing tests.
 
-1. Read this file.
-2. Read `.agents/PROJECT_MAP.md`.
-3. Read `.agents/WORKFLOW.md`.
-4. Read the applicable task file in `.agents/tasks/`.
-5. Read the nearest directory-level `AGENTS.md` for the files being changed.
-6. Confirm the task's allowed paths before touching anything.
+## Validation
 
-Do not scan the entire repository unless the task explicitly requires it.
+1. Run the narrowest tests; report commands and real output.
+2. Core changed → `pwsh Tools/Validation/Validate-CoreBoundaries.ps1`. Dirs/instruction files changed → `Validate-RepositoryLayout.ps1`.
+3. Ride visuals changed → seat captures (`Convergence/Capture Ride Seat Views`) + `vr-qa` review; new model → `RideModelSheets.Models` entry.
 
-## Source-of-truth rules
-
-- Architecture rules → `Documentation/Architecture/`
-- Architecture decisions (ADRs) → `Documentation/Architecture/ADRs/`
-- Mathematical definitions → `Documentation/Mathematics/FORMULAS.md`
-- Test requirements → `Documentation/Testing/TEST_STRATEGY.md`
-- Development tooling → `Documentation/Operations/`
-- Agent operating procedure → `.agents/WORKFLOW.md`
-- Agent decision index → `.agents/DECISIONS_INDEX.md` (links to ADRs; does not copy them)
-- Active task tracking → `.agents/tasks/`
-- Code is authoritative over prose when prose is stale.
-
-Do not create duplicate architecture documents.
-Do not create new top-level directories without updating this file and `.agents/PROJECT_MAP.md`.
-
-## Dependency rules
-
-Allowed dependency direction (assembly graph):
-
-```
-Convergence.Core.Math
-        ↓
-Convergence.Core.Neural
-        ↓
-Convergence.Core.Training
-        ↓
-Convergence.Core.Puzzles
-        ↓
-Convergence.Gameplay
-        ↓
-Convergence.XR
-Convergence.Presentation
-```
-
-- `Core.*` assemblies must not reference UnityEngine, MonoBehaviour, ScriptableObject, XR APIs, Meta SDK, Audio, or rendering APIs.
-- `Core.*` must compile as ordinary C# without Unity DLLs.
-- `Gameplay` may reference Core but must not implement neural-network mathematics.
-- `XR` converts physical input into gameplay commands. It must not evaluate puzzles.
-- `Presentation` observes state and displays it. It must not decide puzzle correctness.
-- Meta-specific code must remain under `Assets/Scripts/XR/Meta/` or `Tools/`.
-- Development tooling (MCP, XR Operator, validators) must not be referenced by Core, Gameplay, XR, or Presentation assemblies.
-
-## Ownership rules
-
-An agent may only modify files explicitly listed in the task's allowed paths.
-
-If a change crosses subsystem boundaries:
-1. Stop.
-2. Describe the required handoff in the task file.
-3. Do not silently modify another subsystem.
-
-## Required validation
-
-Before reporting completion:
-
-1. Run the narrowest relevant tests.
-2. Run `pwsh Tools/Validation/Validate-CoreBoundaries.ps1` when Core changes.
-3. Run `pwsh Tools/Validation/Validate-RepositoryLayout.ps1` when directories or instruction files change.
-4. Report every command run and its exact output.
-5. Do not claim a test passed if it was not run.
-6. After any visual or layout change to the ride, look at it from more than one angle, and get a second pair of eyes:
-   capture rider-eye views (dock, each stop, during a briefing, finale) at eye heights 1.15 / 1.30 / 1.45 m and gaze
-   yaw −30° / 0° / +30° (`Tools/Editor/RideLiveShot.cs` in Play Mode, `Convergence/Capture Ride Seat Views` in edit
-   mode), then have the `vr-qa` subagent (`.claude/agents/vr-qa.md`) read the images and list what is blocked, hard
-   to read or hard to tell apart. Generated 3D assets additionally pass Asset Forge Gates A to C
-   (`.agents/skills/asset-forge/SKILL.md`: a 4-view turnaround, the Unity render from the same 4 angles, silhouette
-   IoU ≥ 0.80 per view, reviewed by `asset-verifier`).
-7. Every model the ride uses is also shot on its own from every side: `Convergence/Capture Model Sheets`
-   (`Tools/Editor/RideModelSheets.cs`, 8 views around it, top, low hero, rider eye, in the world) into
-   `Documentation/Design/captures/model_sheets/`. Look at the sheet of every new or changed model and fix what looks
-   wrong from any side. A new set piece gets a `RideModelSheets.Models` entry in the same change; the builder fails
-   without one (`.agents/tasks/TASK_LEVEL1_DIGITS_RESTRUCTURE.md`, section 6).
-
-## Development tooling: Unity MCP
-
-The third-party "MCP for Unity" package (`com.coplaydev.unity-mcp`, pinned v9.7.3) lets agents drive the open Unity Editor over MCP. The decision record lives in `Documentation/Architecture/ADRs/`.
-
-- Server name: `unityMCP`. Its tools appear in Cursor under that namespace, configured in the project's `.cursor/mcp.json` once installed.
-- Prerequisite: the Unity Editor must be open on this project with the MCP for Unity bridge started (Window > MCP for Unity > Start Server / connect). If the `unityMCP` tools are unavailable, report that instead of guessing.
-- Development-only tooling: it must never be referenced by Core, Gameplay, XR, or Presentation assemblies (see Dependency rules).
-- When the Editor is already open, prefer `unityMCP` over Unity batchmode for compiling and reading the console, running tests, and building scenes (menu `Convergence/Build Level 1 — The Awakening Gate`). Batchmode cannot open a project the Editor holds locked.
-- All ownership, allowed-path, and validation rules in this file still apply to anything done through MCP.
-
-## Prohibited behavior
-
-Do not:
-
-- Move files only to make the tree look cleaner without updating all references.
-- Add UnityEngine references to `Core.*` assemblies.
-- Hardcode puzzle completion in any layer.
-- Add a second input or interaction abstraction alongside XRI.
-- Modify package versions without recording the reason in an ADR.
-- Modify generated Unity files manually unless explicitly required.
-- Delete failing tests to make validation pass.
-- Touch files outside the task's allowed paths.
-- Describe a planned directory or file location as if it already exists.
+Unity Editor open → use `UnityMCP` tools (batchmode can't open a locked project).

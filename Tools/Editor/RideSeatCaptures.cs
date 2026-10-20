@@ -1,4 +1,4 @@
-// Level 1 seat views (AGENTS.md validation item 6, TASK_LEVEL1_DIGITS_RESTRUCTURE section 5).
+// Level 1 seat views (AGENTS.md validation item 3, TASK_LEVEL1_DIGITS_RESTRUCTURE section 5).
 // Edit mode only. For every RideViewpoint (dock, each stop, the rim, the middle of the drop, the valley floor, the end)
 // the Pod is moved onto the viewpoint, only the regions the streamer shows at that segment are active, the fog and sky
 // are that region's, and pod panels that are hidden there are hidden. Each viewpoint is rendered at eye heights 1.15,

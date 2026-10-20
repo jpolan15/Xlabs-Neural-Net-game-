@@ -1,20 +1,18 @@
 # Agent Workflow — Convergence
 
 This is the operating procedure for all agents working in this repository.  
-Follow every step in order. Do not skip steps.
+Keep context small: read only what the change needs.
 
 ---
 
 ## Before editing
 
-1. Read `.agents/PROJECT_MAP.md` — understand directory purpose and what ships.
-2. Read `.agents/DECISIONS_INDEX.md` — know what has already been decided.
-3. Read the applicable task file in `.agents/tasks/`.
-4. Read the nearest directory-level `AGENTS.md` for every directory you will touch.
-5. Inspect the relevant `.asmdef` file — confirm allowed assembly references.
-6. Search for existing implementations before creating new ones.
-7. Identify tests that currently cover the requested behavior.
-8. Confirm your allowed paths match the task file. If they do not match, stop and file a handoff.
+1. Read the section of the active task you are working on (see root `AGENTS.md`), not the whole file.
+2. Read the nearest directory `AGENTS.md` and `.asmdef` for code you touch.
+3. Search for an existing implementation and the tests that cover it.
+4. Out of the task's allowed paths? Stop and file a handoff.
+
+Look things up on demand: `.agents/PROJECT_MAP.md` (where), `.agents/DECISIONS_INDEX.md` (why).
 
 ---
 
