@@ -48,6 +48,12 @@ namespace Convergence.Presentation.Ride
         [SerializeField] private AudioSource beeper;
         [SerializeField] private Vector3 home = new Vector3(0.98f, 0.95f, 1.02f);
         [SerializeField] private LineMood[] lineMoods = new LineMood[0];
+        [Tooltip("Pixel's size at the dock, where it floats farther away and is introduced.")]
+        [SerializeField] private float dockScale = 1.5f;
+        [Tooltip("Pixel's size riding beside the pod.")]
+        [SerializeField] private float rideScale = 0.85f;
+        [Tooltip("How long Pixel looks at the board when a new clause starts, before it turns back to the rider.")]
+        [SerializeField] private float glanceSeconds = 1.6f;
 
         [Header("Moments")]
         [SerializeField] private WeightPaintMoment paint;
@@ -105,9 +111,9 @@ namespace Convergence.Presentation.Ride
         private Mood _mood = Mood.Happy;
         private Face _faceFrom, _face;
         private float _faceT = 1f;
-        private float _clock, _blinkAt, _moodSince;
+        private float _clock, _blinkAt, _moodSince, _glanceUntil = -1f;
         private bool _met, _atRider, _riding;
-        private float _hop, _spin, _shake, _droop, _grow;
+        private float _hop, _spin, _shake, _droop, _grow, _size = 1.5f;
         private Vector3 _vel;
         private Transform _rider;
         private Vector3 _pointAt;
@@ -231,6 +237,8 @@ namespace Convergence.Presentation.Ride
 
         private void OnClause(RideLine line, int clause, NarrationLibrary.Segment segment)
         {
+            // A new idea on the board: Pixel glances at it, then back at the rider (a buddy watching with you, face on).
+            _glanceUntil = _clock + glanceSeconds;
             if (NarrationLibrary.HasCue(segment, "pixel")) Meet();
             if (NarrationLibrary.HasCue(segment, "go")) _riding = true;
             for (int i = 0; i < lineMoods.Length; i++)
@@ -326,7 +334,9 @@ namespace Convergence.Presentation.Ride
 
             // Grow in.
             _grow = Mathf.MoveTowards(_grow, 1f, dt * 1.8f);
-            body.localScale = Vector3.one * Rate.Smooth(_grow) * (1f + 0.12f * Mathf.Sin(_hop * Mathf.PI));
+            // Bigger when it meets the rider at the dock (farther away, and the star of that moment); normal size riding.
+            _size = Mathf.MoveTowards(_size, _riding ? rideScale : dockScale, dt * 0.6f);
+            body.localScale = Vector3.one * (Rate.Smooth(_grow) * _size * (1f + 0.12f * Mathf.Sin(_hop * Mathf.PI)));
 
             // Float: follow the target softly, bob, and hop.
             Vector3 target = Target();
@@ -347,8 +357,9 @@ namespace Convergence.Presentation.Ride
             // Look: at the hint, at the rider, or ahead with the rider.
             Vector3 lookWorld;
             if (_pointing && hintRing != null && hintRing.gameObject.activeInHierarchy) lookWorld = _pointAt;
-            else if ((_atRider || !_riding) && _rider != null) lookWorld = _rider.position;
-            else lookWorld = transform.TransformPoint(new Vector3(0f, 1.6f, 9f));
+            else if (_clock < _glanceUntil && !_atRider) lookWorld = transform.TransformPoint(new Vector3(0f, 1.6f, 6f));
+            else if (_rider != null) lookWorld = _rider.position;
+            else lookWorld = transform.TransformPoint(new Vector3(0f, 1.6f, 6f));
             if (_rider != null && _mood == Mood.Celebrate) lookWorld = _rider.position;
             Vector3 dir = lookWorld - body.position;
             if (dir.sqrMagnitude > 1e-4f)

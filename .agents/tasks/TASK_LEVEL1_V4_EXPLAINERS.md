@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | **Active.** Written 2026-10-20 from the owner's direction. Branch `jonathan/level1-explainers` (from `jonathan/polishing-level-1`). |
+| Status | **Built (WP1–WP7), awaiting the owner's listen and headset ride.** Written 2026-10-20 from the owner's direction. Branch `jonathan/level1-explainers` (from `jonathan/polishing-level-1`). |
 | Builds on | `TASK_LEVEL1_DIGITS_RESTRUCTURE.md` (the digits ride, ADR-016): same track, bake, Core puzzle, director, builder, tools. Its infrastructure rules still apply (generated scene, sightlines, seat captures, model sheets, audio levels). |
 | Goal | Elegant and fun. **A 4-year-old follows it, and an adult leaves knowing how a neural network learns.** |
 
@@ -349,7 +349,24 @@ Fixed cockpit frame; reverse and drop keep their limits; `G` gentle mode stays.
 - PlayMode (MCP run_tests): 27 total, 27 passed (new: `Pixel_RidesAlong_PointsAtTheHint_AndCelebratesTheSolve`).
 - `Validate-CoreBoundaries.ps1` exit 0; `Validate-RepositoryLayout.ps1` exit 0.
 
-**Open.** Play Mode captures of every explainer and the vr-qa review (WP7); ADR-017; PROJECT_MAP/DECISIONS_INDEX.
+**Open.** See WP7 below.
+
+### 2026-10-20 — WP7: Play Mode review, fixes, ADR-017 (Claude)
+
+- Two full hands-free Play Mode runs (`RideLiveShot` plans + `AutoPilot`; `Application.runInBackground` and
+  `Time.timeScale = 4` at run time only, because the editor barely ticks in the background). Captures in
+  `Documentation/Design/captures/level1_v4/` (`p0_*`, `e2_*` … `e8_*`). The ride ran dock → end card both times.
+- Fixed from my own review: Pixel bigger at the dock (1.5×), 0.85× riding, faces the rider and only glances at the
+  board for 1.6 s per new clause; WEIGHTS title under the wire fan; E3 diagram labels fade so 0–9 never show twice;
+  E4/E5/E7/E8 on near-opaque dark cards drawn after the far network; E6 overshoot arc 1.5 m high; E7 closer/bigger.
+- `vr-qa` review: `vr_qa_review_v4.md`. Acted on: E6 comfort (the curve clears before the Valley rises, ground
+  delayed 0.9 s), E2 4 m instead of 5 m, E8 number squares bigger. Left for later (judged minor or older content):
+  the neuron puzzle panel's small text (ADR-016 panel), sample-wire thinning, fading the 92% banner during E8.
+- ADR-017 written; DECISIONS_INDEX and PROJECT_MAP updated.
+- Final: builder green (42/42 voice, sightlines clear, worst view 80 draws / 40.9k tris); EditMode 129/129;
+  PlayMode 27/27; `Validate-CoreBoundaries.ps1` and `Validate-RepositoryLayout.ps1` exit 0.
+- Owner to do: listen to the voice (PixelBrain and WrongSays clauses checked by transcription only), ride it on
+  the Quest 2.
 
 ## 9. Level 2 outline (later, not this task): "Pixel learns words"
 

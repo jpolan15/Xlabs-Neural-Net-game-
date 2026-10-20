@@ -28,6 +28,9 @@ namespace Convergence.Presentation.Ride.Explainers
         /// <summary>Strokes in the big step's arc (the builder draws that many).</summary>
         public const int ArcStrokes = 8;
 
+        /// <summary>How high the too-big step flies over the curve (the builder draws the same arc).</summary>
+        public const float BigLift = 1.5f;
+
         // Marks: 0..2 the slope arrow (shaft, head, head), then the big step's arc strokes, then the small steps' dots.
         private const int Slope = 0, BigArc = 3, Dots = BigArc + ArcStrokes;
         private float _x;
@@ -126,7 +129,7 @@ namespace Convergence.Presentation.Ride.Explainers
             // "Take too big a step, and you fly past the bottom." A big RED arc up the far side.
             s.At("bigstep", () =>
             {
-                var list = new List<Tween> { Hop(1.9f, 1.3f, 0.9f) };
+                var list = new List<Tween> { Hop(1.9f, 1.3f, BigLift) };
                 for (int i = BigArc; i < Dots; i++)
                 {
                     float d = 0.1f + 1.1f * (i - BigArc) / ArcStrokes;
@@ -168,7 +171,7 @@ namespace Convergence.Presentation.Ride.Explainers
                     Anim.FadeText(low, 0f, 0.6f),
                     Anim.FadeOut(ball, 0, Vector3.down * 0.6f, 0.9f),
                 };
-                for (int i = 0; i < curve.Count; i++) list.Add(Anim.FadeOut(curve, i, Vector3.down * 0.8f, 0.9f).After(0.015f * i));
+                for (int i = 0; i < curve.Count; i++) list.Add(Anim.FadeOut(curve, i, Vector3.down * 0.8f, 0.6f).After(0.005f * i));
                 for (int i = 0; i < marks.Count; i++) list.Add(Anim.FadeTo(marks, i, 0f, 0.5f));
                 return list;
             });

@@ -2,7 +2,7 @@
 
 Read this before scanning the repository. Each entry is a one-line description of the directory's purpose.
 
-Last updated: 2026-10-12 (Level 1 digits ride, ADR-016)
+Last updated: 2026-10-20 (Level 1 v4 explainers and Pixel, ADR-017)
 
 ---
 
@@ -64,7 +64,7 @@ Last updated: 2026-10-12 (Level 1 digits ride, ADR-016)
 | `Assets/Scripts/XR/` | XR input translation — converts interaction to gameplay commands |
 | `Assets/Scripts/XR/Ride/` | Pod lever, pod seat (eye-height normalisation), and desktop fallback with operator keys: Space skips narration, R restarts (ADR-011) |
 | `Assets/Scripts/XR/Meta/` | Meta-specific adapters only (isolated from Core and Gameplay) |
-| `Assets/Scripts/Presentation/` | Visualization, audio, haptics — observes state, never decides it. `Ride/` holds the ride views, `NarrationLibrary`, `ChapterCardView` and `NeuralCoreView` (the big network) |
+| `Assets/Scripts/Presentation/` | Visualization, audio, haptics — observes state, never decides it. `Ride/` holds the ride views, `NarrationLibrary`, `PixelBuddyView` (the buddy); `Ride/Explainers/` the explainer kit (Rate, Tween, Anim, ShapeBatch) and E0–E8 (ADR-017) |
 | `Assets/Scripts/Infrastructure/` | Cross-cutting utilities: logging, events, telemetry contracts |
 
 > Note: `Assets/Scripts/Visualization/` and `Assets/Scripts/Audio/` are being consolidated into `Assets/Scripts/Presentation/` in a future migration task. Do not move files yet.
@@ -103,7 +103,7 @@ Last updated: 2026-10-12 (Level 1 digits ride, ADR-016)
 
 | Path | Purpose |
 |---|---|
-| `Tools/Editor/` | Unity Editor tooling: validation, build scripts, project map generation. The ride builder is split into partial files: `NeuralRideBuilder.cs` (pod, station, scene), `.Pod.cs` (tub, layout helpers), `.Narration.cs`, `.Network.cs`; plus `RideNarrationData.cs` (the script), `RideSightlines.cs` (sightline, cone and text check, and the draw-call report), `RideSeatCaptures.cs` and `RideLiveShot.cs` (screenshots), `RideModelSheets.cs` (every model from every side; the builder checks each model has a sheet) |
+| `Tools/Editor/` | Unity Editor tooling: validation, build scripts, project map generation. The ride builder is split into partial files: `NeuralRideBuilder.cs` (pod, station, scene), `.Pod.cs` (tub, layout helpers), `.Narration.cs`, `.Network.cs`, `.Explainers.cs` (E0–E8), `.Pixel.cs` (the buddy); plus `RideNarrationData.cs` (the script), `RideSightlines.cs` (sightline, cone and text check, and the draw-call report), `RideSeatCaptures.cs` and `RideLiveShot.cs` (screenshots), `RideModelSheets.cs` (every model from every side; the builder checks each model has a sheet) |
 | `Tools/Validation/` | PowerShell validators for boundaries and repository layout |
 | `Tools/AgentBridge/` | MCP / XR Operator integration; NOT a runtime dependency |
 

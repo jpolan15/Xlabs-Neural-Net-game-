@@ -125,10 +125,12 @@ namespace Convergence.Presentation.Ride.Explainers
             });
 
             // "Let's send our three through." The diagram grows along the line of sight into the giant network.
-            s.Unfold("race", () => new[]
+            s.Unfold("race", () =>
             {
-                Anim.FadeText(layerTitle, 0f, 0.5f),
-                Anim.FadeText(title, 0f, 0.5f),
+                var list = new List<Tween> { Anim.FadeText(layerTitle, 0f, 0.5f), Anim.FadeText(title, 0f, 0.5f) };
+                // The giant network brings its own 0 to 9; the diagram's fade so they never show twice.
+                foreach (TMP_Text l in labels) list.Add(Anim.FadeText(l, 0f, 0.4f));
+                return list;
             });
         }
 

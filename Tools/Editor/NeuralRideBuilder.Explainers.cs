@@ -244,10 +244,10 @@ namespace Convergence.EditorTools
                 null, new[] { Child(6, "Ground"), Child(6, "Deck"), Child(6, "Sign"), Child(6, "Sun") },
                 new List<UnfoldSpec>
                 {
-                    new UnfoldSpec(null, T(6, "Ground"), Explainer.UnfoldStyle.GrowUp, 0f, 1.8f),
-                    new UnfoldSpec(null, T(6, "Deck"), grow, 0.2f, 1f),
-                    new UnfoldSpec(null, T(6, "Sign"), grow, 0.5f, 1f),
-                    new UnfoldSpec(null, T(6, "Sun"), grow, 0.8f, 1.5f),
+                    new UnfoldSpec(null, T(6, "Ground"), Explainer.UnfoldStyle.GrowUp, 0.9f, 2.2f),
+                    new UnfoldSpec(null, T(6, "Deck"), grow, 1.1f, 1f),
+                    new UnfoldSpec(null, T(6, "Sign"), grow, 1.4f, 1f),
+                    new UnfoldSpec(null, T(6, "Sun"), grow, 1.7f, 1.5f),
                 }), regions[6]);
             BuildTraining(Add<TrainingExplainer>(new[] { RideLine.RightSays, RideLine.RightTraining, RideLine.RightAccuracy }, SegRight, SegRight, false, null, null, null), regions[7]);
             BuildTokens(Add<TokensExplainer>(new[] { RideLine.TokensWords, RideLine.TokensNumbers, RideLine.TokensPredict, RideLine.TokensNext }, SegTokens, SegTokens, false, null, null, null), regions[7]);
@@ -531,7 +531,7 @@ namespace Convergence.EditorTools
 
             Transform content = Make("Explainer_E2", region.transform, Vector3.zero).transform;
             // The board 5 m ahead of the stop's eye: the digit on the left, the neuron in the middle-right, the glass right.
-            Transform stage = Make("Stage", content, new Vector3(0f, EyePoint.y + 0.1f, 5f)).transform;
+            Transform stage = Make("Stage", content, new Vector3(0f, EyePoint.y + 0.1f, 4f)).transform;
             const float pitch = 0.3f, diameter = 0.9f, glassH = 1.6f, glassW = 0.36f;
             Vector3 digitCentre = new Vector3(-1.9f, 0.1f, 0f), neuronAt = new Vector3(0.85f, 0.1f, -0.05f), glassAt = new Vector3(2.35f, 0.1f, 0f);
             Vector3 Cell(int i) => digitCentre + new Vector3((i % 7 - 3) * pitch, (3 - i / 7) * pitch, 0f);
@@ -588,7 +588,7 @@ namespace Convergence.EditorTools
             value.verticalAlignment = VerticalAlignmentOptions.Geometry;
             TextMeshPro title = Serif("Title", stage, neuronAt + new Vector3(0f, 0.85f, -0.05f), "NEURON", 0.3f, white, 3f);
             title.characterSpacing = 14f;
-            TextMeshPro wTitle = Serif("WeightsTitle", stage, digitCentre + new Vector3(0f, 1.35f, -0.05f), "WEIGHTS", 0.3f, white, 3f);
+            TextMeshPro wTitle = Serif("WeightsTitle", stage, new Vector3((digitCentre.x + 3.5f * pitch + neuronAt.x - diameter * 0.5f) * 0.5f, -0.72f, -0.05f), "WEIGHTS", 0.26f, white, 3f);
             wTitle.characterSpacing = 14f;
             TextMeshPro formula = Serif("Formula", stage, new Vector3(0.4f, -1.25f, -0.05f),
                 "<i>w</i><sub>1</sub><i>a</i><sub>1</sub> + <i>w</i><sub>2</sub><i>a</i><sub>2</sub> + ... + <i>w</i><sub>49</sub><i>a</i><sub>49</sub>", 0.24f, white, 5f);
@@ -731,7 +731,7 @@ namespace Convergence.EditorTools
 
             const float rowPitch = 0.27f, barH = 0.17f, length = 2.2f, x0 = -1.5f;
             float RowY(int k) => (4.5f - k) * rowPitch;
-            var card = new List<Shape> { new Shape { kind = Shape.Kind.Quad, position = new Vector3(0.05f, 0f, 0.05f), size = new Vector2(4.3f, 3.25f), round = 0.06f, color = new Color(0.04f, 0.05f, 0.08f, 0.88f) } };
+            var card = new List<Shape> { new Shape { kind = Shape.Kind.Quad, position = new Vector3(0.05f, 0f, 0.05f), size = new Vector2(4.3f, 3.25f), round = 0.06f, color = new Color(0.04f, 0.05f, 0.08f, 0.97f) } };
             var bars = new List<Shape>();
             var marks = new List<Shape>();
             var gaps = new List<Shape>();
@@ -759,19 +759,19 @@ namespace Convergence.EditorTools
                 y += gap;
             }
 
-            Batch("Card", stage, card, "ExplainerFlat", 0);
-            ShapeBatch bBars = Batch("Bars", stage, bars, "ExplainerFlat", 1);
-            ShapeBatch bMarks = Batch("Marks", stage, marks, "ExplainerFlat", 3);
-            ShapeBatch bGaps = Batch("Gaps", stage, gaps, "ExplainerFlat", 2);
+            Batch("Card", stage, card, "ExplainerFlat", 20);
+            ShapeBatch bBars = Batch("Bars", stage, bars, "ExplainerFlat", 21);
+            ShapeBatch bMarks = Batch("Marks", stage, marks, "ExplainerFlat", 23);
+            ShapeBatch bGaps = Batch("Gaps", stage, gaps, "ExplainerFlat", 22);
             var labels = new List<Object>();
             for (int k = 0; k < 10; k++)
             {
-                TextMeshPro t = Serif("Label" + k, stage, new Vector3(x0 - 0.22f, RowY(k), -0.02f), k.ToString(), 0.2f, white, 0.3f, TextAlignmentOptions.Center, 4);
+                TextMeshPro t = Serif("Label" + k, stage, new Vector3(x0 - 0.22f, RowY(k), -0.02f), k.ToString(), 0.2f, white, 0.3f, TextAlignmentOptions.Center, 24);
                 t.verticalAlignment = VerticalAlignmentOptions.Geometry;
                 labels.Add(t);
             }
 
-            TextMeshPro loss = Serif("LossTitle", stage, new Vector3(1.45f, y + 0.25f, -0.02f), "LOSS", 0.26f, red, 1.6f, TextAlignmentOptions.Center, 4);
+            TextMeshPro loss = Serif("LossTitle", stage, new Vector3(1.45f, y + 0.25f, -0.02f), "LOSS", 0.26f, red, 1.6f, TextAlignmentOptions.Center, 24);
             loss.characterSpacing = 12f;
 
             Ref(e, "content", content.gameObject);
@@ -811,7 +811,7 @@ namespace Convergence.EditorTools
             stage.rotation = Quaternion.LookRotation(stage.position - eye, Vector3.up);
             const float rowPitch = 0.27f, barH = 0.17f, length = 2.2f, x0 = -1.5f;
             float RowY(int k) => (4.5f - k) * rowPitch;
-            var card = new List<Shape> { new Shape { kind = Shape.Kind.Quad, position = new Vector3(0.05f, 0f, 0.05f), size = new Vector2(4.3f, 3.25f), round = 0.06f, color = new Color(0.04f, 0.05f, 0.08f, 0.88f) } };
+            var card = new List<Shape> { new Shape { kind = Shape.Kind.Quad, position = new Vector3(0.05f, 0f, 0.05f), size = new Vector2(4.3f, 3.25f), round = 0.06f, color = new Color(0.04f, 0.05f, 0.08f, 0.97f) } };
             var bars = new List<Shape>();
             double biggest = 1e-9;
             for (int k = 0; k < 10; k++) biggest = System.Math.Max(biggest, System.Math.Abs(outputs[k] - (k == wanted ? 1.0 : 0.0)));
@@ -833,12 +833,12 @@ namespace Convergence.EditorTools
                 arrows.Add(Segment(b, b + new Vector3(-dir * head, -head, 0f), 0.05f, c));
             }
 
-            Batch("Card", stage, card, "ExplainerFlat", 0);
-            ShapeBatch bBars = Batch("Bars", stage, bars, "ExplainerFlat", 1);
+            Batch("Card", stage, card, "ExplainerFlat", 20);
+            ShapeBatch bBars = Batch("Bars", stage, bars, "ExplainerFlat", 21);
             var labels = new List<Object>();
             for (int k = 0; k < 10; k++)
             {
-                TextMeshPro t = Serif("Label" + k, stage, new Vector3(x0 - 0.22f, RowY(k), -0.02f), k.ToString(), 0.2f, white, 0.3f, TextAlignmentOptions.Center, 4);
+                TextMeshPro t = Serif("Label" + k, stage, new Vector3(x0 - 0.22f, RowY(k), -0.02f), k.ToString(), 0.2f, white, 0.3f, TextAlignmentOptions.Center, 24);
                 t.verticalAlignment = VerticalAlignmentOptions.Geometry;
                 labels.Add(t);
             }
@@ -848,7 +848,7 @@ namespace Convergence.EditorTools
             Vector3 outputsAt = Vector3.zero;
             for (int k = 0; k < 10; k++) outputsAt += OutputPosition(k) / 10f;
 
-            Batch("Arrows", stage, arrows, "ExplainerFlat", 3);
+            Batch("Arrows", stage, arrows, "ExplainerFlat", 23);
             Batch("Sparks", content, sparks, "ExplainerFlat", 4);
             TextMeshPro title = Serif("Title", content, new Vector3(0f, 15.6f, -0.6f), "BACKPROPAGATION", 1.7f, white, 30f);
             title.characterSpacing = 12f;
@@ -911,7 +911,7 @@ namespace Convergence.EditorTools
             marks.Add(Segment(b, b + back - side, 0.04f, yellow));
             // The big step's arc (the same path the ball's hop takes).
             float bx0 = startX + 0.55f, bx1 = 1.9f;
-            Vector3 Arc(float t) => On(Mathf.Lerp(bx0, bx1, t)) + Vector3.up * 0.9f * Mathf.Sin(t * Mathf.PI);
+            Vector3 Arc(float t) => On(Mathf.Lerp(bx0, bx1, t)) + Vector3.up * DescentExplainer.BigLift * Mathf.Sin(t * Mathf.PI);
             for (int k = 0; k < DescentExplainer.ArcStrokes; k++) marks.Add(Segment(Arc(k / (float)DescentExplainer.ArcStrokes), Arc((k + 1) / (float)DescentExplainer.ArcStrokes), 0.03f, red));
             // The small steps' footprints.
             foreach (float x in new[] { 1.35f, 0.9f, 0.55f, 0.3f, 0.12f, 0.03f })
@@ -949,12 +949,12 @@ namespace Convergence.EditorTools
             Pose view = _layout.RightView;
             Vector3 eye = view.position + Vector3.up * EyePoint.y;
             Transform stage = Make("Stage", content, Vector3.zero).transform;
-            stage.SetPositionAndRotation(eye + view.rotation * new Vector3(0f, 0.1f, 6f), view.rotation);
+            stage.SetPositionAndRotation(eye + view.rotation * new Vector3(0f, 0.1f, 4.6f), view.rotation);
 
             // Real test digits (the finale's), one after another, as 7×7 pictures; they fly into the network's middle.
             Level1Digit[] real = _data.File.finale.digits;
             int count = Mathf.Min(24, real.Length);
-            const float pitch = 0.05f;
+            const float pitch = 0.07f;
             var stream = new List<Shape>();
             Vector3 spawn = new Vector3(-2.1f, -0.75f, 0f);
             for (int d = 0; d < count; d++)
@@ -992,13 +992,16 @@ namespace Convergence.EditorTools
                 dots.Add(new Shape { kind = Shape.Kind.Quad, position = new Vector3(0.75f + (i % 10) * 0.12f, 0.15f - (i / 10) * 0.12f, 0f), size = Vector2.one * 0.09f, round = 1f, color = ok ? green : red });
             }
 
-            ShapeBatch bStream = Batch("Stream", stage, stream, "ExplainerFlat", 2);
-            ShapeBatch bBar = Batch("LossBar", stage, bar, "ExplainerFlat", 1);
-            ShapeBatch bDots = Batch("Dots", stage, dots, "ExplainerFlat", 1);
-            TextMeshPro counter = Serif("Counter", stage, new Vector3(-0.85f, 0.05f, -0.02f), "0 digits", 0.26f, white, 3f);
-            TextMeshPro lossLabel = Serif("LossLabel", stage, new Vector3(-1.95f, -0.3f, -0.02f), "LOSS", 0.18f, red, 1f);
+            // A dark card under the numbers, so the digit walls on both sides never compete with them.
+            var card = new List<Shape> { new Shape { kind = Shape.Kind.Quad, position = new Vector3(-0.05f, -0.17f, 0.05f), size = new Vector2(4.4f, 1.75f), round = 0.08f, color = new Color(0.04f, 0.05f, 0.08f, 0.94f) } };
+            Batch("Card", stage, card, "ExplainerFlat", 20);
+            ShapeBatch bStream = Batch("Stream", stage, stream, "ExplainerFlat", 22);
+            ShapeBatch bBar = Batch("LossBar", stage, bar, "ExplainerFlat", 21);
+            ShapeBatch bDots = Batch("Dots", stage, dots, "ExplainerFlat", 21);
+            TextMeshPro counter = Serif("Counter", stage, new Vector3(-0.85f, 0.1f, -0.02f), "0 digits", 0.32f, white, 3.2f, TextAlignmentOptions.Center, 24);
+            TextMeshPro lossLabel = Serif("LossLabel", stage, new Vector3(-1.98f, -0.3f, -0.02f), "LOSS", 0.2f, red, 1f, TextAlignmentOptions.Center, 24);
             lossLabel.characterSpacing = 10f;
-            TextMeshPro score = Serif("Score", stage, new Vector3(1.29f, 0.42f, -0.02f), right + " out of 100", 0.22f, white, 2.4f);
+            TextMeshPro score = Serif("Score", stage, new Vector3(1.29f, 0.45f, -0.02f), right + " out of 100", 0.28f, white, 3.4f, TextAlignmentOptions.Center, 24);
 
             Ref(e, "content", content.gameObject);
             Ref(e, "stream", bStream);
@@ -1052,7 +1055,7 @@ namespace Convergence.EditorTools
                 for (int r = 0; r < perToken; r++)
                 {
                     float v = (float)rng.NextDouble();
-                    vectors.Add(Square(new Vector3(chipX[k], chipY - 0.36f - r * 0.13f, 0f), 0.11f, Color.Lerp(BoardDark, white, v), 0.12f));
+                    vectors.Add(Square(new Vector3(chipX[k], chipY - 0.4f - r * 0.17f, 0f), 0.15f, Color.Lerp(BoardDark, white, 0.15f + 0.85f * v), 0.12f));
                 }
             }
 
@@ -1071,15 +1074,17 @@ namespace Convergence.EditorTools
             var sparks = new List<Shape>();
             for (int i = 0; i < 12; i++) sparks.Add(Segment(Vector3.zero, Vector3.right * 0.1f, 0.025f, yellow));
 
-            ShapeBatch bChips = Batch("Chips", stage, chips, "ExplainerFlat", 1);
-            ShapeBatch bVectors = Batch("Vectors", stage, vectors, "ExplainerFlat", 2);
-            ShapeBatch bNet = Batch("Net", stage, net, "ExplainerFlat", 1);
-            ShapeBatch bSparks = Batch("Sparks", stage, sparks, "ExplainerFlat", 3);
-            TextMeshPro sentence = Serif("Sentence", stage, new Vector3(-0.6f, chipY, -0.02f), "The cat sat on the", 0.26f, white, 4f);
+            var card = new List<Shape> { new Shape { kind = Shape.Kind.Quad, position = new Vector3(0.35f, -0.08f, 0.05f), size = new Vector2(5.6f, 2.0f), round = 0.08f, color = new Color(0.04f, 0.05f, 0.08f, 0.92f) } };
+            Batch("Card", stage, card, "ExplainerFlat", 20);
+            ShapeBatch bChips = Batch("Chips", stage, chips, "ExplainerFlat", 21);
+            ShapeBatch bVectors = Batch("Vectors", stage, vectors, "ExplainerFlat", 22);
+            ShapeBatch bNet = Batch("Net", stage, net, "ExplainerFlat", 21);
+            ShapeBatch bSparks = Batch("Sparks", stage, sparks, "ExplainerFlat", 23);
+            TextMeshPro sentence = Serif("Sentence", stage, new Vector3(-0.6f, chipY, -0.02f), "The cat sat on the", 0.3f, white, 4f, TextAlignmentOptions.Center, 24);
             var words = new List<Object>();
             for (int k = 0; k < tokens.Length; k++)
             {
-                TextMeshPro t = Serif("Word" + k, stage, new Vector3(chipX[k], chipY, -0.03f), tokens[k], 0.2f, white, widths[k], TextAlignmentOptions.Center, 4);
+                TextMeshPro t = Serif("Word" + k, stage, new Vector3(chipX[k], chipY, -0.03f), tokens[k], 0.22f, white, widths[k], TextAlignmentOptions.Center, 24);
                 t.verticalAlignment = VerticalAlignmentOptions.Geometry;
                 words.Add(t);
             }

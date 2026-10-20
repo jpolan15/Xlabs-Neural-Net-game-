@@ -24,6 +24,7 @@ Canonical decisions live in `Documentation/Architecture/ADRs/`.
 | ADR-014 | Narration you can see ({cue} tags → explainer panel, network and arrows act out each clause), a stop waits for its punchline, the dock's hands-on weight, solid reading screens, sound effects levelled by measured loudness, credits | Accepted | [`ADR-014-ride-narration-you-can-see.md`](../Documentation/Architecture/ADRs/ADR-014-ride-narration-you-can-see.md) |
 | ADR-015 | Hands-on opening (intro beats that wait for a lever or time out: wake AURA, make a neuron fire; JFK cold open), and the network as the star (weight hierarchy in the link shader, dim unlit network, scaffolding on its own dim mesh, `_Reveal`) | Accepted | [`ADR-015-ride-interactive-opening.md`](../Documentation/Architecture/ADRs/ADR-015-ride-interactive-opening.md) |
 | ADR-016 | Level 1 as one continuous ride on real MNIST digits (8 regions, one narrator, segment director, Core-graded weight-paint puzzle); Valley ribbon of real loss instead of a PCA plane, 21 m overshoot hop, diagram network, 40° branch | Accepted | [`ADR-016-level1-digits-ride.md`](../Documentation/Architecture/ADRs/ADR-016-level1-digits-ride.md) |
+| ADR-017 | Level 1 v4: every idea is explained on a blackboard (3B1B-style kit, ShapeBatch) and unfolds into its region; real bake numbers; E3 diagram on the eye line grows into the network; Pixel the buddy (beeps, six moods) | Accepted | [`ADR-017-level1-explainers-and-pixel.md`](../Documentation/Architecture/ADRs/ADR-017-level1-explainers-and-pixel.md) |
 
 ---
 
