@@ -34,7 +34,6 @@ Last updated: 2026-10-12 (Level 1 digits ride, ADR-016)
 | `.agents/tasks/archive/` | Finished or superseded tasks and handoffs (history only, don't load) |
 | `.agents/templates/TASK_TEMPLATE.md` | Standard task file format |
 | `.agents/templates/HANDOFF_TEMPLATE.md` | Standard task report / handoff format |
-| `.agents/skills/unity-cli/` | Unity CLI skill: drive the open Editor, capture, test, build |
 | `.agents/skills/asset-forge/` | Concept art → multi-view → 3D → verified Unity import (gated pipeline) |
 
 ---
