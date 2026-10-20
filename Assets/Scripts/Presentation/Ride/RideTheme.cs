@@ -12,7 +12,7 @@ namespace Convergence.Presentation.Ride
         [Header("Palette")]
         public Color voidNavy = new Color(0.015f, 0.025f, 0.06f);
         public Color cyan = new Color(0.10f, 0.88f, 1.00f);
-        public Color amber = new Color(1.00f, 0.80f, 0.12f);
+        public Color amber = new Color(1.00f, 0.922f, 0.00f); // #FFEB00, 35° from orange (ADR-016)
         public Color orange = new Color(1.00f, 0.40f, 0.04f);
         public Color offWhite = new Color(0.92f, 0.95f, 1.00f);
         public Color locked = new Color(0.36f, 0.40f, 0.48f);

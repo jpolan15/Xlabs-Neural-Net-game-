@@ -142,5 +142,29 @@ namespace Convergence.Core.Math
 
             return probabilities;
         }
+
+        /// <summary>
+        /// Softmax with temperature: Softmax(z / T). Low T sharpens toward the largest logit,
+        /// high T flattens toward uniform. T must be greater than zero.
+        /// </summary>
+        public static double[] Softmax(double[] logits, double temperature)
+        {
+            if (logits == null)
+            {
+                throw new ArgumentNullException(nameof(logits));
+            }
+            if (!(temperature > 0.0) || double.IsInfinity(temperature))
+            {
+                throw new ArgumentOutOfRangeException(nameof(temperature), "Temperature must be a finite number above zero.");
+            }
+
+            var scaled = new double[logits.Length];
+            for (int i = 0; i < logits.Length; i++)
+            {
+                scaled[i] = logits[i] / temperature;
+            }
+
+            return Softmax(scaled);
+        }
     }
 }
