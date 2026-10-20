@@ -95,7 +95,7 @@ namespace Convergence.Presentation.Ride
                 float ink = (float)puzzle.Pixel(d, c);
                 Fill(_pixelColors, c, new Color(ink, ink, ink, ink));
                 float share = (float)result.Contribution(d, c);
-                Color tint = share >= 0f ? theme.cyan : theme.amber;
+                Color tint = share >= 0f ? theme.explainGreen : theme.explainRed;
                 float strength = Mathf.Abs(share) / Mathf.Max(1f, biggest);
                 Color dark = new Color(0.06f, 0.07f, 0.10f, 0f);
                 Color cell = Color.Lerp(dark, tint, Mathf.Clamp01(strength));
@@ -120,9 +120,9 @@ namespace Convergence.Presentation.Ride
             if (sumText != null) sumText.text = "TOTAL " + sum.ToString("0.0") + "\nLINE " + puzzle.Threshold.ToString("0.0");
             if (verdictText != null)
             {
-                string act = fired ? "FIRES" : "QUIET";
+                string act = fired ? "LIGHTS UP" : "STAYS DARK";
                 bool right = fired == should;
-                verdictText.text = "A " + (should ? "1" : "0") + ": " + act + (right ? " - RIGHT" : " - WRONG");
+                verdictText.text = "A " + (should ? "1" : "0") + ": " + act + (right ? " - YES!" : " - OOPS");
                 verdictText.color = right ? theme.right : theme.wrongRed;
             }
 

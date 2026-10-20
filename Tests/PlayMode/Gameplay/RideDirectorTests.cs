@@ -46,7 +46,9 @@ namespace Convergence.Tests.PlayMode.Gameplay
         {
             if (type != LogType.Error && type != LogType.Exception && type != LogType.Assert) return;
             if (message.Contains("MCP-FOR-UNITY")) return;
-            _errors.Add(type + ": " + message);
+            // The first frame of the stack says where it happened.
+            string at = stackTrace != null ? stackTrace.Split('\n')[0] : "";
+            _errors.Add(type + ": " + message + (at.Length > 0 ? " (at " + at.Trim() + ")" : ""));
         }
 
         [TearDown]
@@ -310,6 +312,31 @@ namespace Convergence.Tests.PlayMode.Gameplay
             }
 
             Assert.IsTrue(paint.SolvedByRider, "Following the hints is the rider solving it");
+        }
+
+        [UnityTest]
+        public IEnumerator Pixel_RidesAlong_PointsAtTheHint_AndCelebratesTheSolve()
+        {
+            yield return Launch(8f);
+            var pixel = UnityEngine.Object.FindAnyObjectByType<PixelBuddyView>();
+            Assert.IsNotNull(pixel, "Pixel missing from NeuralRide");
+            Assert.IsTrue(pixel.IsShowing, "Pixel rides along once the ride starts, even when the intro was skipped");
+
+            var paint = Moment<WeightPaintMoment>("WeightPaint");
+            yield return WaitFor(() => paint.IsLive, "the puzzle to open", 60f);
+            yield return WaitFor(() => paint.HintCell >= 0, "a hint after the rider goes quiet", 60f);
+            Assert.IsTrue(pixel.IsPointing, "Pixel points at the cell the hint wants");
+
+            while (!paint.Result.Passed)
+            {
+                yield return WaitFor(() => paint.HintCell >= 0 || paint.Result.Passed, "the next hint", 60f);
+                if (paint.Result.Passed) break;
+                int cell = paint.HintCell, target = paint.HintValue;
+                while (paint.Weights[cell] != target) paint.Cycle(cell);
+            }
+
+            yield return null;
+            Assert.AreEqual(PixelBuddyView.Mood.Celebrate, pixel.CurrentMood, "Pixel celebrates when the rider teaches the neuron");
         }
 
         [UnityTest]

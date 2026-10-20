@@ -93,9 +93,10 @@ namespace Convergence.EditorTools
         {
             new Model("pod", "The rider's cart: tub, seat and the dash with GO, the subtitle screen and the region tag.", "Pod", "Pod")
             {
-                Skip = new[] { "SeatAnchor", "EndCard", "Dash/WeightGrid", "Blackboard" }
+                Skip = new[] { "SeatAnchor", "EndCard", "Dash/WeightGrid", "Blackboard", "Pixel" }
             },
-            new Model("weight_grid", "Region 2: the 7x7 weight grid on the dash the rider paints (+ cyan, - amber, orange frame = press).", "Viewpoints/neuron", "Pod/Dash/WeightGrid"),
+            new Model("pixel_buddy", "Pixel, the buddy: white egg body, face screen (happy face), side rings, antennae, thruster glow; rides beside the pod.", "Viewpoints/dock", "Pod/Pixel/Body"),
+            new Model("weight_grid", "Region 2: the 7x7 weight grid on the dash the rider paints (+ GREEN, - RED, orange frame = press).", "Viewpoints/neuron", "Pod/Dash/WeightGrid"),
             new Model("end_card", "The end card with the next level and the credits.", "Viewpoints/end", "Pod/EndCard"),
             new Model("rails", "The two slate rails under every leg of the track.", "Viewpoints/dock", "Track"),
             new Model("page", "Region 0: the sheet with the real handwritten 3 (test digit) on its desk.", "Viewpoints/dock", "Region_0/Page", "Region_0/Desk"),
@@ -105,6 +106,34 @@ namespace Convergence.EditorTools
                 ShowHidden = true
             },
             new Model("explainer_e1", "E1 pixels: the hero 3, its 28x28 grid and squares, the lens with the numbers, the 7x7, the column of 49 (the input layer), PIXELS.", "Viewpoints/pixels", "Region_1/Explainer_E1")
+            {
+                ShowHidden = true
+            },
+            new Model("explainer_e2", "E2 neuron: a real 1 of the puzzle, its 49 wires (green/red by the reference weights), the neuron with its number, the glass with the line, the formula.", "Viewpoints/neuron", "Region_2/Explainer_E2")
+            {
+                ShowHidden = true
+            },
+            new Model("explainer_e3", "E3 network: the 3B1B diagram of the real 49-16-10 network (inputs = the 3, untrained wires by sign and size, answers 0 to 9), a fifth of the giant network's size on the eye line.", "Viewpoints/network", "Region_3/Explainer_E3")
+            {
+                ShowHidden = true
+            },
+            new Model("explainer_e4", "E4 loss: Pixel's ten real untrained answers for the 3 as bars, GREEN marks for what we wanted, RED gaps that stack into the LOSS bar, on a dark card left of the answers.", "Viewpoints/wrong", "Region_4/Explainer_E4")
+            {
+                ShowHidden = true
+            },
+            new Model("explainer_e5", "E5 backprop: the real output gradients as GREEN up / RED down arrows beside the answers, the sparks that run back, BACKPROPAGATION.", "Viewpoints/blame", "Region_5/Explainer_E5")
+            {
+                ShowHidden = true
+            },
+            new Model("explainer_e6", "E6 descent: the loss curve, the ball, the slope arrow, the big RED overshoot arc and the small GREEN steps, GRADIENT DESCENT.", "Viewpoints/rim", "Region_6/Explainer_E6")
+            {
+                ShowHidden = true
+            },
+            new Model("explainer_e7", "E7 training: real test digits streaming in, the counter to the real training count, the shrinking LOSS bar, 100 dots by the real accuracy.", "Viewpoints/right", "Region_7/Explainer_E7")
+            {
+                ShowHidden = true
+            },
+            new Model("explainer_e8", "E8 tokens: The cat sat on the, its token chips, their number columns, a little network, and the next word mat.", "Viewpoints/end", "Region_7/Explainer_E8")
             {
                 ShowHidden = true
             },

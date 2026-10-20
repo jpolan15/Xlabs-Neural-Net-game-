@@ -313,6 +313,44 @@ Fixed cockpit frame; reverse and drop keep their limits; `G` gentle mode stays.
 - `EveryLevel1Line_HasAVoiceClipMatchingTheScript` un-ignored. EditMode (MCP run_tests): 129 total, 129 passed.
 - The warmer second voice for comparison was not rendered (the earlier job left none); bm_fable stays.
 
+### 2026-10-20 — WP2 to WP5: Pixel and the explainers E2 to E8 (Claude)
+
+**Built.**
+- **Pixel** (`PixelBuddyView`, `NeuralRideBuilder.Pixel`): our robot from the scout-drone concept, built from
+  primitives and combined into one mesh per material (5 renderers, 7.6k tris), a cyan face drawn by a ShapeBatch
+  (eyes as two strokes each, a four-stroke mouth, open mouth, cheeks) with six moods (happy, curious, confused, sad,
+  celebrate, thinking) that ease into each other, blinks, beeps made in code (no files). It meets the rider at the
+  dock's `PixelAnchor` on {pixel}, rides from GO at the pod's front right (0.98, 0.95, 1.02: placed where the
+  sightline check passes at every stop), looks at the rider when the line is about Pixel, points (YELLOW line) at the
+  paint hint's cell, blips on every tap and nudge, celebrates the solve. Line moods: `PixelMoods` table.
+- **E2 neuron**: a real 1 of the puzzle, its 49 wires, the puzzle's reference weights as GREEN/RED (the classic
+  picture: a green stroke down the middle, a red ring), the products fly into a glass that fills to the real sum
+  (3.54) past the line (2.0); the neuron lights. Unfold: the weight picture flies onto the dash grid, the circle grows
+  into the big neuron.
+- **E3 network**: the 3B1B diagram of the real 49-16-10 network (untrained weights by sign and size) at a fifth of
+  the giant network's size on the eye line, so the Morph unfold grows it exactly into the network.
+- **E4 loss**: a chart of the ten real untrained answers, GREEN wanted marks, RED gaps that stack into LOSS
+  (sum of |output - wanted|, what the line says; training itself uses cross-entropy).
+- **E5 backprop**: the same chart with arrows as long as the real output gradients (output - wanted), sparks that
+  run back through the network, BACKPROPAGATION; the blame wires light as before.
+- **E6 descent**: curve, ball, slope arrow, a RED overshoot arc, GREEN small steps; the Valley unfolds as before.
+- **E7 training**: 24 real test digits stream into the gold network, a counter to the real training count, the LOSS
+  bar shrinks by the bake's real first/last hop loss, 100 dots coloured by the real accuracy (92).
+- **E8 tokens**: The cat sat on the → chips → number columns (illustrative) → a little network → "mat".
+- Kid puzzle: weights GREEN (+) / RED (-) on the dash grid and the panel; panel says LIGHT UP / STAYS DARK, YES! / OOPS.
+- Fixes found on the way: Pixel's dock anchor reference; NetworkExplainer's field `hidden` clashed with the base
+  class's `hidden` (renamed `layer`); a loop variable captured by a TransformShape target in E7. The PlayMode tests now
+  print where an error was logged.
+
+**Results.**
+- Builder: narration 42 of 42 bound; RideSightlines clear at 1.15/1.30/1.45 m; RideBudget worst view 80 draws
+  (pixels), 40,938 tris (right), all within budget. Model sheets: pixel_buddy, explainer_e2 to explainer_e8.
+- EditMode (MCP run_tests): 129 total, 129 passed.
+- PlayMode (MCP run_tests): 27 total, 27 passed (new: `Pixel_RidesAlong_PointsAtTheHint_AndCelebratesTheSolve`).
+- `Validate-CoreBoundaries.ps1` exit 0; `Validate-RepositoryLayout.ps1` exit 0.
+
+**Open.** Play Mode captures of every explainer and the vr-qa review (WP7); ADR-017; PROJECT_MAP/DECISIONS_INDEX.
+
 ## 9. Level 2 outline (later, not this task): "Pixel learns words"
 
 Tokens (chopping text) → embeddings (each token is a point; similar meanings sit close: classic king − man + woman ≈ queen)

@@ -36,8 +36,8 @@ namespace Convergence.Presentation.Ride
             _mesh = Instantiate(cells.sharedMesh);
             cells.sharedMesh = _mesh;
             _colors = _mesh.colors32;
-            _plus = (Color)theme.cyan;
-            _minus = (Color)theme.amber;
+            _plus = (Color)theme.explainGreen;
+            _minus = (Color)theme.explainRed;
             _zero = new Color(0.10f, 0.13f, 0.20f, 0f);
             _mark = new Color(0.02f, 0.03f, 0.06f, 0f);
             if (hintRing != null) hintRing.gameObject.SetActive(false);

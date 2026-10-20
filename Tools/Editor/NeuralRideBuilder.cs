@@ -9,6 +9,7 @@ using UnityEngine.Rendering.Universal;
 using Convergence.Gameplay.Ride;
 using Convergence.Gameplay.Ride.Level1;
 using Convergence.Presentation.Ride;
+using Convergence.Presentation.Ride.Explainers;
 using Convergence.XR.Ride;
 
 namespace Convergence.EditorTools
@@ -537,6 +538,8 @@ namespace Convergence.EditorTools
 
             WireDirector(rd, pod, layout, moments, regions);
             WirePod(pod, rd, moments);
+            BuildPixel(pod, rd, dash, moments);
+            Ref(rd.GetComponentInChildren<NeuronExplainer>(true), "paintGrid", pod.transform.Find("Dash/WeightGrid"));
             BuildViewpoints(layout, regions);
 
             AssertOnlyRideRootsRender();
