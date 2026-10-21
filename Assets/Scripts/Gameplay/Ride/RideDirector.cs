@@ -218,13 +218,35 @@ namespace Convergence.Gameplay.Ride
         /// </summary>
         public void SkipNarration()
         {
-            if (_narrating) _skipRequested = true;
-            else if (_moment != null) _moment.Hurry();
-            else if (_holding)
+            if (!SkipLines() && _moment != null) _moment.Hurry();
+        }
+
+        /// <summary>
+        /// Cuts the running lines (or a hold) short and nothing else: a running puzzle is left for the rider to play.
+        /// Returns true when it skipped something.
+        /// </summary>
+        public bool SkipLines()
+        {
+            if (_narrating)
+            {
+                _skipRequested = true;
+                return true;
+            }
+
+            if (_moment == null && _holding)
             {
                 _skipHold = true;
                 NarrationSkipped?.Invoke();
+                return true;
             }
+
+            return false;
+        }
+
+        /// <summary>Hurries the running moment to its end (the puzzle follows its own hints). No-op between moments.</summary>
+        public void HurryMoment()
+        {
+            if (_moment != null) _moment.Hurry();
         }
 
         // ---------- what moments use ----------

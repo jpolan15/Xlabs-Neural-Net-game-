@@ -10,9 +10,9 @@ namespace Convergence.XR.Ride
 {
     /// <summary>
     /// Plays the ride from the desk when no headset is running: hold the right mouse button to look around the
-    /// cockpit, click and drag a lever with the left button, click a weight cell or a glowing wire. The moment a
+    /// cockpit, click and drag a lever with the left button, click a weight cell or a glowing wire, click Pixel to pet it. The moment a
     /// headset or XR display is running it gives the camera back to tracking. The mouse uses the same APIs a hand does.
-    /// Operator keys work with or without a headset: Space skips the lines (or hurries a moment), R restarts, G toggles
+    /// Operator keys work with or without a headset: Space skips the lines, Shift+Space hurries (solves) the running puzzle, R restarts, G toggles
     /// gentle mode (half the drop, slower travel).
     /// </summary>
     public sealed class DesktopSeat : MonoBehaviour
@@ -76,7 +76,12 @@ namespace Convergence.XR.Ride
             if (keyboard.spaceKey.wasPressedThisFrame)
             {
                 if (_director == null) _director = FindAnyObjectByType<RideDirector>();
-                if (_director != null) _director.SkipNarration();
+                if (_director != null)
+                {
+                    // Space only skips lines; solving a puzzle for the rider takes a deliberate Shift+Space.
+                    if (keyboard.shiftKey.isPressed) _director.HurryMoment();
+                    else _director.SkipLines();
+                }
             }
 
             if (keyboard.rKey.wasPressedThisFrame) SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
@@ -130,7 +135,12 @@ namespace Convergence.XR.Ride
                 PodLeverInteractable lever = hit.collider.GetComponentInParent<PodLeverInteractable>();
                 WeightCellInteractable cell = hit.collider.GetComponent<WeightCellInteractable>();
                 BlameWireInteractable wire = hit.collider.GetComponentInParent<BlameWireInteractable>();
-                if (lever != null && lever.isActiveAndEnabled && hit.distance <= reach)
+                IPettable pettable = hit.collider.GetComponentInParent<IPettable>();
+                if (pettable != null)
+                {
+                    pettable.Pet();
+                }
+                else if (lever != null && lever.isActiveAndEnabled && hit.distance <= reach)
                 {
                     _dragged = lever;
                     _dragged.BeginGrab(_dragged.FractionFromRay(ray));

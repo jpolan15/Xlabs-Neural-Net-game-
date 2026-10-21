@@ -14,7 +14,7 @@ namespace Convergence.Presentation.Ride
     /// hint wants. It meets the rider at the dock's anchor on {pixel} and rides along from GO. Display only: every
     /// reaction follows a narration clause or a moment event; nothing here decides anything.
     /// </summary>
-    public sealed class PixelBuddyView : MonoBehaviour
+    public sealed class PixelBuddyView : MonoBehaviour, IPettable
     {
         public enum Mood
         {
@@ -119,7 +119,8 @@ namespace Convergence.Presentation.Ride
         private Vector3 _pointAt;
         private bool _pointing;
         private float _pointerAlpha;
-        private AudioClip _chirp, _blip, _sad, _huh, _yay, _hmm;
+        private AudioClip _chirp, _blip, _sad, _huh, _yay, _hmm, _pettedCoo;
+        private float _pet, _lastPetCoo = -10f;
         private MaterialPropertyBlock _block;
 
         public Mood CurrentMood => _mood;
@@ -149,6 +150,24 @@ namespace Convergence.Presentation.Ride
             }
 
             if (beep) Beep(ClipFor(mood));
+        }
+
+        /// <summary>
+        /// The rider pets Pixel: it leans in, blushes, wiggles and purrs. Cosmetic only; ignored until Pixel has
+        /// been met, and a quick tap-tap-tap does not stack more than one coo every 0.35 seconds.
+        /// </summary>
+        public void Pet()
+        {
+            if (!_met || body == null || !body.gameObject.activeSelf) return;
+            if (_mood != Mood.Happy && _mood != Mood.Celebrate) React(Mood.Happy, false);
+            _atRider = true;
+            _glanceUntil = -1f;
+            _pet = 1f;
+            _hop = Mathf.Max(_hop, 0.45f);
+            _shake = Mathf.Max(_shake, 0.35f);
+            if (_clock - _lastPetCoo < 0.35f) return;
+            _lastPetCoo = _clock;
+            Beep(_pettedCoo);
         }
 
         private AudioClip ClipFor(Mood mood)
@@ -181,7 +200,16 @@ namespace Convergence.Presentation.Ride
             _huh = Tones("PixelHuh", new[] { 700f, 560f, 820f }, 0.08f);
             _yay = Tones("PixelYay", new[] { 784f, 988f, 1175f, 1568f }, 0.075f);
             _hmm = Tones("PixelHmm", new[] { 520f, 540f }, 0.12f);
+            _pettedCoo = Tones("PixelCoo", new[] { 988f, 1109f, 1319f, 1109f }, 0.06f);
             if (pointer != null) pointer.enabled = false;
+
+            // Something to click or touch: a small sphere on the body (the body scales, so this scales with it).
+            if (body != null && body.GetComponentInChildren<Collider>() == null)
+            {
+                var hit = body.gameObject.AddComponent<SphereCollider>();
+                hit.radius = 0.2f;
+                hit.isTrigger = false;
+            }
         }
 
         private void OnEnable()
@@ -381,6 +409,16 @@ namespace Convergence.Presentation.Ride
             // Face: ease to the mood, blink now and then.
             _faceT = Mathf.MoveTowards(_faceT, 1f, dt / 0.35f);
             _face = Face.Lerp(_faceFrom, FaceFor(_mood), Rate.Smooth(_faceT));
+            _pet = Mathf.MoveTowards(_pet, 0f, dt * 0.45f);
+            if (_pet > 0f)
+            {
+                // Petted: happy ^ ^ eyes, a big smile and full blush that fade out over a couple of seconds.
+                float p = Mathf.Min(1f, _pet * 2f);
+                _face.chevron = Mathf.Max(_face.chevron, p);
+                _face.smile = Mathf.Max(_face.smile, p);
+                _face.blush = Mathf.Max(_face.blush, p);
+            }
+
             if (_clock - _blinkAt > 0.14f && UnityEngine.Random.value < dt / 3.2f) _blinkAt = _clock;
             float blink = _clock - _blinkAt < 0.14f ? 1f - Mathf.Sin((_clock - _blinkAt) / 0.14f * Mathf.PI) : 1f;
             DrawFace(blink);
