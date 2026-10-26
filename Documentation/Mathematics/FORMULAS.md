@@ -98,7 +98,22 @@ layer-wide softmax (`LayerModel.Backward`) this becomes $\partial L / \partial z
 - Weight-paint neuron (`Core.Puzzles.WeightPaintPuzzle`): weights $w_i \in \{-1, 0, +1\}$, total
   $s = \sum_i x_i w_i$, fires when $s \ge T$. A digit is right when it fires exactly when it should. The hint is the
   single weight change that maximises (digits right, then $\sum_d m_d$) with margin $m_d = s_d - T$ for digits that
-  should fire and $T - s_d$ for the others.
+  should fire and $T - s_d$ for the others. Since v5 the digits are 4 threes (fire) and one each of 0, 1, 7, 4 (stay
+  dark), $T = 2.5$; the bake's reference is $+1$ where the mean training 3 has more than 0.1 more ink than the mean of
+  the others, $-1$ where it has more than 0.1 less. A brush stroke sets $w_i \leftarrow b$ ($b = +1$ right hand,
+  $-1$ left), or $0$ when $w_i = b$ already (`PaintValue`).
+
+### Level 1 v5 mini-games (`Core.Puzzles`)
+
+- **Draw the 3** (`DrawPuzzle`): outline $O = \{i : x_i \ge 0.3\}$ of the hero 3's 7×7. Passes when
+  $|I \cap O| \ge \lceil 0.75\,|O| \rceil$ and $|I \setminus O| \le 3$ for the inked set $I$.
+- **Plug the strings** (`PlugPuzzle`): answer scores start at the untrained network's real logits for the hero 3,
+  $z_k = b^{(2)}_k + \sum_j W^{(2)}_{kj} h_j$. Plugging string $s$ (hidden neuron $j_s$, brightness $h_{j_s}$) into answer
+  $k$ adds $P\,h_{j_s}$ to $z_k$, $P = 1.5$. Won when $\arg\max_k z_k = 3$. The glow is $\mathrm{softmax}(z)$.
+- **Roll it down** (`DescentGame`): $L(x) = c\,(x - x^*)^2 + L_0$ with $c = 0.5$, $x^* = 2$, $L_0 = 0.3$, start
+  $x_0 = -2.5$; a step is $x \leftarrow x - \eta\,L'(x)$, $L'(x) = 2c\,(x - x^*)$. Buttons $\eta \in \{0.12, 0.7, 1.85\}$:
+  $\eta > 1/(2c)$ lands past the bottom, $\eta > 1/c$ climbs. Won when $|x - x^*| \le 0.15$; 3 stars within 6 steps.
+  This hill is an illustration; the Valley drop after it is the real loss.
 
 ---
 

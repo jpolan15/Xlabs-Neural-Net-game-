@@ -132,7 +132,8 @@ namespace Convergence.EditorTools
             var set = pod.AddComponent<RideControlSet>();
             Refs(set, "channels", channels);
 
-            BuildWeightGrid(dash.transform);
+            BuildGameTable(pod.transform);
+            BuildStamp(pod.transform);
 
             var speaker = Make("DashSpeaker", dash.transform, new Vector3(0, 0.25f, -0.05f)).AddComponent<AudioSource>();
             speaker.playOnAwake = false;
@@ -209,9 +210,9 @@ namespace Convergence.EditorTools
         /// The rider's 7×7 weight grid: one mesh (tile + two bars per cell, recoloured by WeightGridView), an orange
         /// frame (live) and an orange hint ring, and 49 colliders with a poke filter, one per cell.
         /// </summary>
-        private static void BuildWeightGrid(Transform dash)
+        private static Transform BuildWeightGrid(Transform parent)
         {
-            Transform grid = Make("WeightGrid", dash, new Vector3(0.08f, -0.12f, -0.006f)).transform;
+            Transform grid = Make("WeightGrid", parent, new Vector3(0.08f, -0.12f, -0.006f)).transform;
             Board("Back", grid, new Vector3(0, 0, 0.002f), new Vector2(CellPitch * 7 + 0.05f, CellPitch * 7 + 0.05f), "PodDark", 0.01f);
             Quad("Frame", grid, new Vector3(0, 0, -0.001f), new Vector2(CellPitch * 7 + 0.03f, CellPitch * 7 + 0.03f), "Orange");
             Quad("Inner", grid, new Vector3(0, 0, -0.002f), new Vector2(CellPitch * 7 + 0.006f, CellPitch * 7 + 0.006f), "PodDark");
@@ -234,14 +235,17 @@ namespace Convergence.EditorTools
             for (int c = 0; c < 49; c++)
             {
                 var cell = Make("Cell" + c, colliders, new Vector3((c % 7 - 3) * CellPitch, (3 - c / 7) * CellPitch, -0.004f));
+                // 3.6 cm deep and standing out in front of the tile (toward the rider, -z), so a fingertip or a ray meets the
+                // cell before it could reach the board behind it; neighbours stay 4% apart so each press is one cell.
                 var box = cell.AddComponent<BoxCollider>();
-                box.size = new Vector3(CellPitch * 0.96f, CellPitch * 0.96f, 0.02f);
-                box.center = new Vector3(0, 0, 0.006f);
+                box.size = new Vector3(CellPitch * 0.96f, CellPitch * 0.96f, 0.036f);
+                box.center = new Vector3(0, 0, -0.012f);
                 var interactable = cell.AddComponent<WeightCellInteractable>();
                 interactable.SetCell(c);
                 cell.AddComponent<XRPokeFilter>();
             }
 
+            return grid;
         }
 
         private static Lever MakeLever(Transform dash, string id, string name, float x, float zeroFraction, List<Object> channels)
@@ -301,10 +305,12 @@ namespace Convergence.EditorTools
             Ref(pod.GetComponent<RideMusic>(), "director", director);
             Ref(pod.GetComponent<RegionTagView>(), "director", director);
 
-            Transform grid = pod.transform.Find("Dash/WeightGrid");
+            Transform grid = pod.transform.Find("GameTable/WeightGrid");
             var gridView = pod.AddComponent<WeightGridView>();
             Ref(gridView, "director", director);
             Ref(gridView, "moment", moments.Paint);
+            Ref(gridView, "draw", moments.Draw);
+            Int(gridView, "drawSegment", SegPixels);
             Ref(gridView, "theme", _theme);
             Ref(gridView, "grid", grid.gameObject);
             Ref(gridView, "cells", grid.Find("Cells").GetComponent<MeshFilter>());
@@ -314,11 +320,6 @@ namespace Convergence.EditorTools
             Ref(gridView, "hintRing", grid.Find("HintRing"));
             Int(gridView, "showFromSegment", SegNeuronPlay);
             Float(gridView, "cellPitch", CellPitch);
-            foreach (WeightCellInteractable cell in grid.GetComponentsInChildren<WeightCellInteractable>(true))
-            {
-                UnityEventTools.AddPersistentListener(cell.Tapped, moments.Paint.Cycle);
-            }
-
             WireSfx(pod, director, moments);
         }
 

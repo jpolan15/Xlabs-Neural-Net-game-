@@ -373,10 +373,16 @@ namespace Convergence.EditorTools
 
             GameObject links = AddMeshObject("BlameLinks", blame, SaveMesh(ToLinkMesh(all), "L1_BlameLinks"), "BlameLinks");
 
-            // The brightest few: thick, pulsing, and pointable. A nudged one cools (BlameView).
-            int top = Mathf.Min(6, wires.Count);
+            // The brightest few: thick, pulsing, and grabbable by a laser. The rider drags each one's loose end to the 3; the wire
+            // dims where it hangs and a cable follows the hand (BlameView). A connected wire cools.
+            int top = Mathf.Min(4, wires.Count);
             var targets = new Ribbons();
             Transform pointables = Make("Targets", blame, Vector3.zero).transform;
+            Transform steer = Make("Steer", blame, Vector3.zero).transform;
+            Vector3 socketAt = OutputPosition(Level1Data.HeroDigit);
+            var origins = new List<Object>();
+            var ends = new List<Object>();
+            var cables = new List<Object>();
             for (int k = 0; k < top; k++)
             {
                 BlameMoment.Wire w = wires[k];
@@ -387,14 +393,45 @@ namespace Convergence.EditorTools
                 var capsule = target.AddComponent<CapsuleCollider>();
                 capsule.direction = 2;
                 capsule.height = Vector3.Distance(a, b);
-                capsule.radius = 0.55f;
+                capsule.radius = 0.8f;
                 var interactable = target.AddComponent<BlameWireInteractable>();
                 interactable.SetWire(k);
-                UnityEventTools.AddPersistentListener(interactable.Pointed, moment.Nudge);
+                Ref(interactable, "moment", moment);
+
+                // A generous grip on the loose end: seen from the stop it is a few degrees wide, so a hand's wobble still grabs it.
+                var grip = Make("Grip", target.transform, Vector3.zero);
+                grip.transform.position = pointables.TransformPoint(b);
+                grip.AddComponent<SphereCollider>().radius = 1.3f;
+
+                origins.Add(Make("Origin" + k, steer, a).transform);
+                ends.Add(Make("End" + k, steer, b).transform);
+                LineRenderer cable = Make("Cable" + k, steer, Vector3.zero).AddComponent<LineRenderer>();
+                cable.useWorldSpace = true;
+                cable.positionCount = 24;
+                cable.widthMultiplier = 0.16f;
+                cable.numCapVertices = 3;
+                cable.sharedMaterial = Mat("Laser");
+                cable.shadowCastingMode = ShadowCastingMode.Off;
+                cable.receiveShadows = false;
+                cable.enabled = false;
+                cables.Add(cable);
             }
 
             GameObject topWires = AddMeshObject("TopWires", blame, SaveMesh(ToLinkMesh(targets), "L1_BlameTop"), "BlameTop");
             Int(moment, "topCount", top);
+
+            // The 3 the wires are dragged to, and every glow of the hunt (the wire handles, the pulses along the cables, the 3's
+            // glow and flash): one mesh the view fills with camera-facing squares, so the hunt costs one draw call.
+            Transform socket = Make("Socket3", blame, socketAt).transform;
+            GameObject glows = Make("Glows", steer, Vector3.zero);
+            glows.AddComponent<MeshFilter>();
+            var glowRenderer = glows.AddComponent<MeshRenderer>();
+            glowRenderer.sharedMaterial = Mat("Spark");
+            glowRenderer.shadowCastingMode = ShadowCastingMode.Off;
+            glowRenderer.receiveShadows = false;
+            ParticleSystem sparks = BuildSparks(steer, socketAt);
+            Ref(moment, "socket", socket);
+            Float(moment, "snapDegrees", 3f);
 
             var view = root.AddComponent<BlameView>();
             Ref(view, "director", director);
@@ -403,6 +440,11 @@ namespace Convergence.EditorTools
             Ref(view, "blameLinks", links.GetComponent<Renderer>());
             Ref(view, "topWires", topWires.GetComponent<MeshFilter>());
             Int(view, "vertsPerWire", 16);
+            Refs(view, "origins", origins);
+            Refs(view, "ends", ends);
+            Refs(view, "cables", cables);
+            Ref(view, "glows", glows.GetComponent<MeshFilter>());
+            Ref(view, "sparks", sparks);
             return root;
         }
 

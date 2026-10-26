@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Convergence.Gameplay.Ride;
 using Convergence.Gameplay.Ride.Level1;
@@ -11,7 +12,9 @@ namespace Convergence.Presentation.Ride
     /// Pixel, the little robot the rider teaches to read (TASK_LEVEL1_V4_EXPLAINERS, section 2). Pixel floats beside the
     /// pod, looks at the rider or at what the narrator is talking about, shows how it feels on its face screen (happy,
     /// curious, confused, sad, celebrate, thinking), beeps (no voice: there is one narrator), and points at the cell a
-    /// hint wants. It meets the rider at the dock's anchor on {pixel} and rides along from GO. Display only: every
+    /// hint wants. It meets the rider at the dock's anchor on {pixel} and rides along from GO. It can be petted: a
+    /// fingertip rubbing inside a forgiving volume around its head (a hand that stops short of a solid body still
+    /// counts), or a laser press, makes it squeal happily (see <see cref="PlayPetReaction"/>). Display only: every
     /// reaction follows a narration clause or a moment event; nothing here decides anything.
     /// </summary>
     public sealed class PixelBuddyView : MonoBehaviour, IPettable
@@ -54,6 +57,17 @@ namespace Convergence.Presentation.Ride
         [SerializeField] private float rideScale = 0.85f;
         [Tooltip("How long Pixel looks at the board when a new clause starts, before it turns back to the rider.")]
         [SerializeField] private float glanceSeconds = 1.6f;
+
+        [Header("Petting")]
+        [Tooltip("The petting volume is this many times Pixel's head, so a hand that stops short of the body still reaches it.")]
+        [SerializeField] private float petZoneScale = 1.8f;
+        [Tooltip("A fingertip must move this far (metres) across the volume to count as a rub.")]
+        [SerializeField] private float rubDistance = 0.08f;
+        [Tooltip("The shortest time between two pet reactions, so a long rub chains smoothly instead of stacking sounds.")]
+        [SerializeField] private float petCooldown = 1.2f;
+        [SerializeField] private float petSeconds = 1.5f;
+        [SerializeField] private float purrAmplitude = 0.25f;
+        [SerializeField] private float purrSeconds = 0.2f;
 
         [Header("Moments")]
         [SerializeField] private WeightPaintMoment paint;
@@ -119,11 +133,20 @@ namespace Convergence.Presentation.Ride
         private Vector3 _pointAt;
         private bool _pointing;
         private float _pointerAlpha;
-        private AudioClip _chirp, _blip, _sad, _huh, _yay, _hmm, _pettedCoo;
-        private float _pet, _lastPetCoo = -10f;
+        private AudioClip _chirp, _blip, _sad, _huh, _yay, _hmm, _petChirp;
+        private float _pet, _petHoldUntil, _lastPet = -10f;
+        private float _petRoll, _petBounce, _petGlow;
+        private Coroutine _petRoutine;
+        private readonly bool[] _rubbing = new bool[2];
+        private readonly Vector3[] _rubFrom = new Vector3[2];
+        private readonly float[] _rubPath = new float[2];
+        private Transform _petZone;
         private MaterialPropertyBlock _block;
 
         public Mood CurrentMood => _mood;
+
+        /// <summary>How many pet reactions have started (a long rub starts one per cooldown). For the tests and the log.</summary>
+        public int PetReactions { get; private set; }
         public bool IsShowing => body != null && body.gameObject.activeSelf;
         public bool IsPointing => _pointing;
 
@@ -153,21 +176,114 @@ namespace Convergence.Presentation.Ride
         }
 
         /// <summary>
-        /// The rider pets Pixel: it leans in, blushes, wiggles and purrs. Cosmetic only; ignored until Pixel has
-        /// been met, and a quick tap-tap-tap does not stack more than one coo every 0.35 seconds.
+        /// The rider pets Pixel with a laser press or a click. Cosmetic only; ignored until Pixel has been met. Pets that
+        /// come faster than <c>petCooldown</c> keep it glowing without starting another reaction.
         /// </summary>
-        public void Pet()
+        public void Pet() => PlayPet(-1);
+
+        private void PlayPet(int hand)
         {
             if (!_met || body == null || !body.gameObject.activeSelf) return;
-            if (_mood != Mood.Happy && _mood != Mood.Celebrate) React(Mood.Happy, false);
             _atRider = true;
             _glanceUntil = -1f;
+            if (_clock - _lastPet < petCooldown)
+            {
+                _petHoldUntil = Mathf.Max(_petHoldUntil, _clock + 0.5f);
+                _pet = 1f;
+                return;
+            }
+
+            _lastPet = _clock;
+            PetReactions++;
+            if (_petRoutine != null) StopCoroutine(_petRoutine);
+            _petRoutine = StartCoroutine(PlayPetReaction(hand));
+        }
+
+        /// <summary>
+        /// Pixel loves it: ^ ^ eyes and a big smile for petSeconds, blush and a warm pink-coral glow, a damped wiggle
+        /// (a roll of Sin(t·25)·8 degrees that settles) with a little bounce as it leans into the pet, a cheerful
+        /// R2-style chirp, and a soft purr in the petting hand.
+        /// </summary>
+        private IEnumerator PlayPetReaction(int hand)
+        {
+            if (_mood != Mood.Happy && _mood != Mood.Celebrate) React(Mood.Happy, false);
             _pet = 1f;
+            _petHoldUntil = _clock + petSeconds;
             _hop = Mathf.Max(_hop, 0.45f);
-            _shake = Mathf.Max(_shake, 0.35f);
-            if (_clock - _lastPetCoo < 0.35f) return;
-            _lastPetCoo = _clock;
-            Beep(_pettedCoo);
+            Beep(_petChirp, 0.95f, 1.08f);
+            if (hand >= 0) RideAim.Buzz(hand, purrAmplitude, purrSeconds);
+
+            for (float t = 0f; t < petSeconds; t += Time.deltaTime)
+            {
+                float settle = 1f - t / petSeconds;
+                _petRoll = Mathf.Sin(t * 25f) * 8f * settle;
+                _petBounce = Mathf.Abs(Mathf.Sin(t * 11f)) * 0.035f * settle;
+                _petGlow = Mathf.Sin(Mathf.Clamp01(t / petSeconds) * Mathf.PI);
+                yield return null;
+            }
+
+            _petRoll = _petBounce = _petGlow = 0f;
+            _petRoutine = null;
+        }
+
+        /// <summary>A fingertip is inside the petting volume (called by the volume).</summary>
+        private void HandEntered(Collider other)
+        {
+            IHandTip tip = other.GetComponentInParent<IHandTip>();
+            if (tip == null || tip.Hand < 0 || tip.Hand >= _rubbing.Length) return;
+            _rubbing[tip.Hand] = true;
+            _rubFrom[tip.Hand] = tip.Position;
+            _rubPath[tip.Hand] = 0f;
+        }
+
+        /// <summary>A fingertip moves inside the volume: enough sideways travel across it is a rub.</summary>
+        private void HandStayed(Collider other)
+        {
+            IHandTip tip = other.GetComponentInParent<IHandTip>();
+            if (tip == null || tip.Hand < 0 || tip.Hand >= _rubbing.Length) return;
+            int hand = tip.Hand;
+            if (!_rubbing[hand])
+            {
+                HandEntered(other);
+                return;
+            }
+
+            Vector3 step = tip.Position - _rubFrom[hand];
+            _rubFrom[hand] = tip.Position;
+            // Only sideways travel counts: pushing toward Pixel or pulling away is not a stroke.
+            Vector3 toHead = _petZone != null ? _petZone.position - tip.Position : Vector3.zero;
+            if (toHead.sqrMagnitude > 1e-6f) step = Vector3.ProjectOnPlane(step, toHead.normalized);
+            _rubPath[hand] += step.magnitude;
+            if (_rubPath[hand] < rubDistance) return;
+            _rubPath[hand] = 0f;
+            PlayPet(hand);
+        }
+
+        private void HandLeft(Collider other)
+        {
+            IHandTip tip = other.GetComponentInParent<IHandTip>();
+            if (tip != null && tip.Hand >= 0 && tip.Hand < _rubbing.Length) _rubbing[tip.Hand] = false;
+        }
+
+        /// <summary>Lives on the petting volume, where Unity sends the trigger events, and passes them to Pixel.</summary>
+        private sealed class PetZone : MonoBehaviour
+        {
+            public PixelBuddyView Owner;
+
+            private void OnTriggerEnter(Collider other)
+            {
+                if (Owner != null) Owner.HandEntered(other);
+            }
+
+            private void OnTriggerStay(Collider other)
+            {
+                if (Owner != null) Owner.HandStayed(other);
+            }
+
+            private void OnTriggerExit(Collider other)
+            {
+                if (Owner != null) Owner.HandLeft(other);
+            }
         }
 
         private AudioClip ClipFor(Mood mood)
@@ -183,10 +299,10 @@ namespace Convergence.Presentation.Ride
             }
         }
 
-        private void Beep(AudioClip clip)
+        private void Beep(AudioClip clip, float minPitch = 0.96f, float maxPitch = 1.05f)
         {
             if (beeper == null || clip == null || !beeper.isActiveAndEnabled) return;
-            beeper.pitch = UnityEngine.Random.Range(0.96f, 1.05f);
+            beeper.pitch = UnityEngine.Random.Range(minPitch, maxPitch);
             beeper.PlayOneShot(clip);
         }
 
@@ -200,15 +316,22 @@ namespace Convergence.Presentation.Ride
             _huh = Tones("PixelHuh", new[] { 700f, 560f, 820f }, 0.08f);
             _yay = Tones("PixelYay", new[] { 784f, 988f, 1175f, 1568f }, 0.075f);
             _hmm = Tones("PixelHmm", new[] { 520f, 540f }, 0.12f);
-            _pettedCoo = Tones("PixelCoo", new[] { 988f, 1109f, 1319f, 1109f }, 0.06f);
+            _petChirp = Tones("PixelPetChirp", new[] { 988f, 1319f, 1175f, 1568f, 1319f }, 0.055f);
             if (pointer != null) pointer.enabled = false;
 
-            // Something to click or touch: a small sphere on the body (the body scales, so this scales with it).
-            if (body != null && body.GetComponentInChildren<Collider>() == null)
+            // Something to pet, click or aim at: a trigger sphere a little above and ahead of the head, petZoneScale times the
+            // head's size (the head is about 0.2 m in the body's space; the body scales, so this scales with it). It is a
+            // trigger on purpose: a hand that stops short of a solid body is the common case, and it must still count.
+            if (body != null && body.GetComponentInChildren<Collider>(true) == null)
             {
-                var hit = body.gameObject.AddComponent<SphereCollider>();
-                hit.radius = 0.2f;
-                hit.isTrigger = false;
+                var zone = new GameObject("PetZone");
+                zone.transform.SetParent(body, false);
+                zone.transform.localPosition = new Vector3(0f, 0.06f, 0.08f);
+                var sphere = zone.AddComponent<SphereCollider>();
+                sphere.isTrigger = true;
+                sphere.radius = 0.2f * petZoneScale;
+                zone.AddComponent<PetZone>().Owner = this;
+                _petZone = zone.transform;
             }
         }
 
@@ -378,7 +501,7 @@ namespace Convergence.Presentation.Ride
             _hop = Mathf.MoveTowards(_hop, 0f, dt * 1.6f);
             _shake = Mathf.MoveTowards(_shake, 0f, dt * 1.4f);
             _droop = Mathf.MoveTowards(_droop, _mood == Mood.Sad ? 1f : 0f, dt * 1.5f);
-            float bob = Mathf.Sin(_clock * 1.7f) * 0.025f + Mathf.Sin(_hop * Mathf.PI) * 0.12f - _droop * 0.06f;
+            float bob = Mathf.Sin(_clock * 1.7f) * 0.025f + Mathf.Sin(_hop * Mathf.PI) * 0.12f - _droop * 0.06f + _petBounce;
             Vector3 goal = target + Vector3.up * bob;
             body.localPosition = Vector3.SmoothDamp(body.localPosition, goal, ref _vel, 0.35f, 4f, dt);
 
@@ -394,7 +517,7 @@ namespace Convergence.Presentation.Ride
             {
                 Quaternion look = Quaternion.LookRotation(dir, transform.up);
                 float roll = _mood == Mood.Confused ? 14f : _mood == Mood.Thinking ? -8f : 0f;
-                roll += Mathf.Sin(_clock * 18f) * 10f * _shake;
+                roll += Mathf.Sin(_clock * 18f) * 10f * _shake + _petRoll;
                 float pitch = _mood == Mood.Curious ? 8f : _mood == Mood.Sad ? 12f : 0f;
                 float yawSpin = Rate.Smooth(1f - _spin) * 360f;
                 look = look * Quaternion.Euler(pitch, _spin > 0f ? yawSpin : 0f, roll);
@@ -409,7 +532,7 @@ namespace Convergence.Presentation.Ride
             // Face: ease to the mood, blink now and then.
             _faceT = Mathf.MoveTowards(_faceT, 1f, dt / 0.35f);
             _face = Face.Lerp(_faceFrom, FaceFor(_mood), Rate.Smooth(_faceT));
-            _pet = Mathf.MoveTowards(_pet, 0f, dt * 0.45f);
+            if (_clock >= _petHoldUntil) _pet = Mathf.MoveTowards(_pet, 0f, dt * 0.45f);
             if (_pet > 0f)
             {
                 // Petted: happy ^ ^ eyes, a big smile and full blush that fade out over a couple of seconds.
@@ -426,9 +549,10 @@ namespace Convergence.Presentation.Ride
             // The glow (antennae, rings, thruster) breathes, and flashes on a celebration.
             if (glow != null)
             {
-                float g = 1f + 0.25f * Mathf.Sin(_clock * 2.4f) + 1.4f * _hop * (_mood == Mood.Celebrate ? 1f : 0.3f);
+                float g = 1f + 0.25f * Mathf.Sin(_clock * 2.4f) + 1.4f * _hop * (_mood == Mood.Celebrate ? 1f : 0.3f) + 0.6f * _petGlow;
                 glow.GetPropertyBlock(_block);
                 Color c = theme != null ? theme.cyan : new Color(0.1f, 0.88f, 1f);
+                c = Color.Lerp(c, new Color(1f, 0.45f, 0.55f), _petGlow); // petted: a warm pink-coral glow
                 _block.SetColor("_Emission", c * g);
                 glow.SetPropertyBlock(_block);
             }

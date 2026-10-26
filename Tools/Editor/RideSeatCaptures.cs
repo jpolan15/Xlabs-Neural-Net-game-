@@ -64,10 +64,15 @@ namespace Convergence.EditorTools
             var regionWasActive = new Dictionary<GameObject, bool>();
             foreach (GameObject r in regions.Values) regionWasActive[r] = r.activeSelf;
             var podPanels = new Dictionary<Transform, bool>();
-            foreach (string path in new[] { "EndCard", "Dash/WeightGrid" })
+            var panelPaths = new Dictionary<Transform, string>();
+            var paths = new List<string> { "EndCard", "GameTable" };
+            foreach (string board in RideViewpoint.GameBoards) paths.Add("GameTable/" + board);
+            foreach (string path in paths)
             {
                 Transform t = podT.Find(path);
-                if (t != null) podPanels[t] = t.gameObject.activeSelf;
+                if (t == null) continue;
+                podPanels[t] = t.gameObject.activeSelf;
+                panelPaths[t] = path;
             }
 
             bool fog = RenderSettings.fog;
@@ -100,7 +105,7 @@ namespace Convergence.EditorTools
                     foreach (KeyValuePair<int, GameObject> r in regions) r.Value.SetActive((mask & (1 << r.Key)) != 0);
                     foreach (KeyValuePair<Transform, bool> panel in podPanels)
                     {
-                        string path = panel.Key.name == "WeightGrid" ? "Dash/WeightGrid" : panel.Key.name;
+                        string path = panelPaths[panel.Key];
                         panel.Key.gameObject.SetActive(System.Array.IndexOf(vp.podPanels, path) >= 0);
                     }
 

@@ -2,7 +2,7 @@
 
 Read this before scanning the repository. Each entry is a one-line description of the directory's purpose.
 
-Last updated: 2026-10-20 (Level 1 v4 explainers and Pixel, ADR-017)
+Last updated: 2026-10-21 (ride feel pass: table ergonomics, fingertips, wire dragging, Pixel petting, boot fade, ADR-019)
 
 ---
 
@@ -60,11 +60,11 @@ Last updated: 2026-10-20 (Level 1 v4 explainers and Pixel, ADR-017)
 | Path | Purpose |
 |---|---|
 | `Assets/Scripts/Core/` | Engine-independent C# — Math, Neural, Training, Puzzles |
-| `Assets/Scripts/Gameplay/` | MonoBehaviour orchestration — chamber state, blast doors, facility. `Ride/` is the Neural Ride segment director, `RideScript` and moments; `Ride/Level1/` loads the bake (`Level1Data`) and holds Level 1's moments (weight paint, forward pass, blame, valley run) |
+| `Assets/Scripts/Gameplay/` | MonoBehaviour orchestration — chamber state, blast doors, facility. `Ride/` is the Neural Ride segment director, `RideScript` and moments; `RideGame` is the mini-game base (score, stars, win, pull GO), `ZapGame` the noise specks; `Ride/Level1/` loads the bake (`Level1Data`) and holds Level 1's moments (draw, weight paint, plug, forward pass, blame hunt, descent, valley run) |
 | `Assets/Scripts/XR/` | XR input translation — converts interaction to gameplay commands |
-| `Assets/Scripts/XR/Ride/` | Pod lever, pod seat (eye-height normalisation), and desktop fallback with operator keys: Space skips narration, R restarts (ADR-011) |
+| `Assets/Scripts/XR/Ride/` | Hand lasers (`RideHandLasers`: trigger/A fires, right green / left red), `HandPolarityController` (hand colour, fingertip orb and touch trigger), pod lever, pod seat (eye-height normalisation), and desktop fallback with operator keys: Space skips narration, R restarts (ADR-011) |
 | `Assets/Scripts/XR/Meta/` | Meta-specific adapters only (isolated from Core and Gameplay) |
-| `Assets/Scripts/Presentation/` | Visualization, audio, haptics — observes state, never decides it. `Ride/` holds the ride views, `NarrationLibrary`, `PixelBuddyView` (the buddy); `Ride/Explainers/` the explainer kit (Rate, Tween, Anim, ShapeBatch) and E0–E8 (ADR-017) |
+| `Assets/Scripts/Presentation/` | Visualization, audio, haptics — observes state, never decides it. `Ride/` holds the ride views, `NarrationLibrary`, `PixelBuddyView` (the buddy, pettable), `BlameView` (the wires you drag to the 3), `RideBoot` (black fade + warm-up before the ride starts); `Ride/Explainers/` the explainer kit (Rate, Tween, Anim, ShapeBatch) and E0–E8 (ADR-017) |
 | `Assets/Scripts/Infrastructure/` | Cross-cutting utilities: logging, events, telemetry contracts |
 
 > Note: `Assets/Scripts/Visualization/` and `Assets/Scripts/Audio/` are being consolidated into `Assets/Scripts/Presentation/` in a future migration task. Do not move files yet.

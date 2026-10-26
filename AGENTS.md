@@ -5,7 +5,7 @@ Educational VR puzzle game. Unity (`ProjectSettings/ProjectVersion.txt`), Meta Q
 ## Current job
 
 Level 1 digits ride (pixels → neuron → network → backprop → gradient descent). Ignite demo April 2027.
-Plan: `.agents/tasks/TASK_LEVEL1_V4_EXPLAINERS.md` (v4: explainers + Pixel, builds on `TASK_LEVEL1_DIGITS_RESTRUCTURE.md`).
+Plan: `.agents/tasks/TASK_LEVEL1_V5_GAMEPLAY.md` (v5: every stop a mini-game, ADR-018), on `TASK_LEVEL1_V4_EXPLAINERS.md` (explainers + Pixel).
 Read only the section you need; don't read whole handoffs up front. Old tasks are in `.agents/tasks/archive/` — ignore them.
 
 ## Where things live

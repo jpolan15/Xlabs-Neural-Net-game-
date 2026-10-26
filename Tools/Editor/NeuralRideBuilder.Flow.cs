@@ -7,7 +7,9 @@ using Convergence.Presentation.Ride;
 namespace Convergence.EditorTools
 {
     /// <summary>
-    /// The order of Level 1 v4 (TASK_LEVEL1_V4_EXPLAINERS): every beat is Explain, Unfold, Play. An explain segment
+    /// The order of Level 1 v5 (TASK_LEVEL1_V5_GAMEPLAY, on v4's TASK_LEVEL1_V4_EXPLAINERS): every beat is Explain,
+    /// Unfold, Play, and Play is a mini-game on the game table (draw the 3, teach one neuron, plug the strings, the
+    /// hot-wire hunt, roll it down) that ends with "STOP CLEAR!" and a pull of GO; between stops the rider zaps noise. An explain segment
     /// stops the pod (in the dark: its explainer holds the blackboard and keeps its region's pieces off) and plays its
     /// lines while the explainer follows their cues; it unfolds into the place on its last cue, and the play segment
     /// after it runs the moment (the puzzle, the forward pass, the blame, the drop). Fourteen segments over the three
@@ -39,9 +41,9 @@ namespace Convergence.EditorTools
             // Travel / Arrival are RideNarrationData.Sequences indices (-1: none).
             var list = new List<SegmentSpec>
             {
-                // E1: through the page into the dark, explain the pixels, unfold the 7x7 into the field.
-                new SegmentSpec { Name = "E1 pixels: explain", Region = 1, Leg = A, To = L.GridStop, Cruise = 3f, MinSeconds = 8f, Travel = -1, Arrival = 0, Hold = 2.5f, Mask = R(0, 1) },
-                new SegmentSpec { Name = "E1 pixels: fly over them", Region = 1, Leg = A, To = L.NeuronStop, Cruise = 4f, MinSeconds = 12f, Travel = -1, Arrival = -1, Mask = R(1, 2) },
+                // E1: through the page into the dark, explain the pixels, unfold the 7x7 into the field, then draw the 3.
+                new SegmentSpec { Name = "E1 pixels: explain, then draw the 3", Region = 1, Leg = A, To = L.GridStop, Cruise = 3f, MinSeconds = 8f, Travel = -1, Arrival = 0, Hold = 0.5f, Moment = m.Draw, Mask = R(0, 1) },
+                new SegmentSpec { Name = "E1 to the neuron: zap the noise", Region = 1, Leg = A, To = L.NeuronStop, Cruise = 6f, MinSeconds = 7f, Travel = -1, Arrival = -1, Mask = R(1, 2) },
                 // E2: one neuron, then paint its weights.
                 new SegmentSpec { Name = "E2 neuron: explain", Region = 2, Leg = A, To = L.NeuronStop, Cruise = 3f, MinSeconds = 0f, Travel = -1, Arrival = 1, Mask = R(2) },
                 new SegmentSpec { Name = "E2 neuron: your turn", Region = 2, Leg = A, To = L.NeuronStop, Cruise = 3f, MinSeconds = 0f, Travel = -1, Arrival = 2, Moment = m.Paint, Mask = R(2) },
@@ -49,13 +51,13 @@ namespace Convergence.EditorTools
                 new SegmentSpec { Name = "E3 network: explain", Region = 3, Leg = A, To = L.NetViewStop, Cruise = 6f, MinSeconds = 10f, Travel = -1, Arrival = 3, Mask = R(2, 3) },
                 new SegmentSpec { Name = "E3 network: send it through", Region = 3, Leg = A, To = L.NetViewStop, Cruise = 4f, MinSeconds = 0f, Travel = -1, Arrival = 4, Moment = m.Forward, Mask = R(3) },
                 // E4: wrong, and the loss.
-                new SegmentSpec { Name = "E4 wrong: explain", Region = 4, Leg = A, To = L.WrongStop, Cruise = 4f, MinSeconds = 0f, Travel = -1, Arrival = 5, Mask = R(3, 4) },
+                new SegmentSpec { Name = "E4 wrong: explain, then plug the strings", Region = 4, Leg = A, To = L.WrongStop, Cruise = 4f, MinSeconds = 0f, Travel = -1, Arrival = 5, Moment = m.Plug, Mask = R(3, 4) },
                 // E5: backpropagation, then the rewind with the hot wires.
                 new SegmentSpec { Name = "E5 backprop: explain", Region = 5, Leg = B, To = L.NetViewStop, Cruise = 1.2f, MinSeconds = 0f, Travel = -1, Arrival = 6, Mask = R(3, 5) },
-                new SegmentSpec { Name = "E5 backprop: rewind and grab", Region = 5, Leg = B, To = L.BlameStop, Cruise = 1.2f, MinSeconds = 8f, Travel = -1, Arrival = 7, Moment = m.Blame, Mask = R(3, 5) },
+                new SegmentSpec { Name = "E5 backprop: rewind, hot-wire hunt", Region = 5, Leg = B, To = L.BlameStop, Cruise = 1.2f, MinSeconds = 8f, Travel = -1, Arrival = 7, Moment = m.Blame, Mask = R(3, 5) },
                 new SegmentSpec { Name = "Back to the switch", Region = 5, Leg = B, To = L.SpurEnd, Cruise = 3.5f, MinSeconds = 7f, Travel = -1, Arrival = -1, Mask = R(3, 5) },
                 // E6: gradient descent at the rim, then the drop.
-                new SegmentSpec { Name = "E6 descent: explain", Region = 6, Leg = C, To = L.Rim, Cruise = 4.5f, MinSeconds = 10f, Travel = -1, Arrival = 8, Mask = R(3, 6) },
+                new SegmentSpec { Name = "E6 descent: explain, then roll it down", Region = 6, Leg = C, To = L.Rim, Cruise = 4.5f, MinSeconds = 10f, Travel = -1, Arrival = 8, Moment = m.Descent, Mask = R(3, 6) },
                 new SegmentSpec { Name = "E6 descent: the Valley", Region = 6, Leg = C, To = L.Rim, Cruise = 1f, MinSeconds = 0f, Travel = -1, Arrival = -1, Moment = m.Valley, Mask = R(6, 7) },
                 // E7: the trained pass (its moment says the lines), and E8: tokens, then the end card.
                 new SegmentSpec { Name = "E7 right: trained", Region = 7, Leg = C, To = L.RightView, Cruise = 4f, MinSeconds = 8f, Travel = -1, Arrival = -1, Moment = m.Right, Mask = R(6, 7) },
@@ -171,13 +173,13 @@ namespace Convergence.EditorTools
 
             var valleyRotation = L.Rim.rotation;
             Point("dock", -1, new Pose(L.LegA[0], Quaternion.identity), null, Find(0, "Page"));
-            Point("pixels", SegPixels, L.GridStop, null, Find(1, "Explainer_E1/Stage/Title"));
+            Point("pixels", SegPixels, L.GridStop, new[] { "GameTable", "GameTable/WeightGrid" }, Find(1, "Explainer_E1/Stage/Title"));
             Point("pixel_flyover", SegOverPixels, L.GridApproach, null);
-            Point("neuron", SegNeuronPlay, L.NeuronStop, new[] { "Dash/WeightGrid" }, Find(2, "Panel"), Find(2, "Neuron"));
+            Point("neuron", SegNeuronPlay, L.NeuronStop, new[] { "GameTable", "GameTable/WeightGrid" }, Find(2, "Panel"), Find(2, "Neuron"));
             Point("network", SegNetworkSend, L.NetViewStop, null, Find(3, "Network/Signs"), Find(3, "Network/Outputs"));
-            Point("wrong", SegWrong, L.WrongStop, null, Find(4, "GuessSign"));
-            Point("blame", SegRewind, L.BlameStop, null);
-            Point("rim", SegRim, L.Rim, null);
+            Point("wrong", SegWrong, L.WrongStop, new[] { "GameTable", "GameTable/PlugBoard" }, Find(4, "GuessSign"));
+            Point("blame", SegRewind, L.BlameStop, new[] { "GameTable", "GameTable/HuntBoard" });
+            Point("rim", SegRim, L.Rim, new[] { "GameTable", "GameTable/DescentBoard" });
             Point("valley_mid_drop", SegValley, new Pose(L.MidDrop, valleyRotation), null, Find(6, "Sign"));
             Point("valley_floor", SegValley, L.ValleyFloor, null);
             Point("right", SegRight, L.RightView, null, Find(7, "AccuracySign"));

@@ -113,7 +113,7 @@ namespace Convergence.EditorTools
             Ref(view, "pointer", pointer);
             Ref(view, "beeper", beeper);
             Ref(view, "paint", moments.Paint);
-            Ref(view, "hintRing", pod.transform.Find("Dash/WeightGrid/HintRing"));
+            Ref(view, "hintRing", pod.transform.Find("GameTable/WeightGrid/HintRing"));
             Ref(view, "blame", moments.Blame);
             Ref(view, "valley", moments.Valley);
             Set(view, "lineMoods", p =>
@@ -148,12 +148,14 @@ namespace Convergence.EditorTools
             PM(RideLine.PullGo, 0, Mood.Happy),
             PM(RideLine.PixelsSquares, 0, Mood.Curious),
             PM(RideLine.PixelsFortyNine, 2, Mood.Thinking, true), // "It's all Pixel ever sees."
-            PM(RideLine.PixelsFly, 0, Mood.Celebrate),
+            PM(RideLine.DrawYourTurn, 0, Mood.Happy, true),
+            PM(RideLine.DrawDone, 0, Mood.Celebrate, true),
+            PM(RideLine.ZapIntro, 0, Mood.Happy, true),
             PM(RideLine.NeuronHolds, 0, Mood.Curious),
             PM(RideLine.NeuronAdds, 1, Mood.Happy),
             PM(RideLine.NeuronYourTurn, 0, Mood.Happy, true),
-            PM(RideLine.NeuronLitForZero, 0, Mood.Confused, true),
-            PM(RideLine.NeuronMissedOne, 0, Mood.Confused, true),
+            PM(RideLine.NeuronLitForOther, 0, Mood.Confused, true),
+            PM(RideLine.NeuronMissedThree, 0, Mood.Confused, true),
             PM(RideLine.NeuronSolved, 0, Mood.Celebrate, true),
             PM(RideLine.NetworkTeam, 0, Mood.Curious),
             PM(RideLine.NetworkWire, 2, Mood.Happy, true),       // "This is Pixel's brain!"
@@ -161,11 +163,18 @@ namespace Convergence.EditorTools
             PM(RideLine.WrongSays, 0, Mood.Thinking),
             PM(RideLine.WrongRandom, 0, Mood.Sad, true),
             PM(RideLine.WrongLoss, 0, Mood.Confused),
+            PM(RideLine.PlugYourTurn, 0, Mood.Happy, true),
+            PM(RideLine.PlugWrong, 0, Mood.Confused, true),
+            PM(RideLine.PlugDone, 0, Mood.Celebrate, true),
+            PM(RideLine.PlugTooMany, 0, Mood.Thinking),
             PM(RideLine.BackWish, 0, Mood.Thinking),
             PM(RideLine.BackGrab, 0, Mood.Happy, true),
             PM(RideLine.BackDone, 0, Mood.Celebrate, true),
             PM(RideLine.DescentHill, 0, Mood.Curious),
-            PM(RideLine.DescentRealHill, 0, Mood.Happy, true),
+            PM(RideLine.DescentYourTurn, 0, Mood.Happy, true),
+            PM(RideLine.DescentGameOvershoot, 0, Mood.Confused, true),
+            PM(RideLine.DescentRealHill, 0, Mood.Celebrate, true),
+            PM(RideLine.StopClear, 0, Mood.Celebrate, true),
             PM(RideLine.DescentOvershoot, 0, Mood.Confused),
             PM(RideLine.DescentSettle, 0, Mood.Happy),
             PM(RideLine.RightSays, 0, Mood.Thinking),

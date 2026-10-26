@@ -164,6 +164,15 @@ namespace Convergence.Gameplay.Ride
         public event Action<bool> GentleModeChanged;
         public event Action RideCompleted;
 
+        /// <summary>The ride's total score changed (every mini-game and every zapped speck adds to it).</summary>
+        public event Action<int> ScoreChanged;
+
+        /// <summary>The whole ride's points.</summary>
+        public int Score { get; private set; }
+
+        /// <summary>True while GO is lit after a win, waiting for the rider to move on.</summary>
+        public bool WaitingForGo { get; private set; }
+
         private void Start()
         {
             if (pod == null || controls == null || legs.Length == 0 || segments.Length == 0)
@@ -186,6 +195,30 @@ namespace Convergence.Gameplay.Ride
                 return;
             }
 
+            if (StartHeld) _routine = StartCoroutine(BeginWhenReleased());
+            else BeginRide();
+        }
+
+        /// <summary>
+        /// True while something asked the ride to wait at its first frame (the boot sequence warms things up behind a black
+        /// fade). Held before the director's Start (every Awake runs first), released with <see cref="ReleaseStart"/>.
+        /// </summary>
+        public bool StartHeld { get; private set; }
+
+        /// <summary>Asks the ride to wait before it begins. Only works before the ride has started.</summary>
+        public void HoldStart() => StartHeld = true;
+
+        /// <summary>Lets a held ride begin (the intro, then the dock).</summary>
+        public void ReleaseStart() => StartHeld = false;
+
+        private IEnumerator BeginWhenReleased()
+        {
+            while (StartHeld) yield return null;
+            BeginRide();
+        }
+
+        private void BeginRide()
+        {
             if (script != null && !script.intro.IsEmpty) _routine = StartCoroutine(IntroThenDock());
             else EnterDock(true);
         }
@@ -228,6 +261,12 @@ namespace Convergence.Gameplay.Ride
         public bool SkipLines()
         {
             if (_narrating)
+            {
+                _skipRequested = true;
+                return true;
+            }
+
+            if (WaitingForGo)
             {
                 _skipRequested = true;
                 return true;
@@ -288,6 +327,37 @@ namespace Convergence.Gameplay.Ride
             Leg l = legs[leg];
             if (_gentle && l.gentleFrom >= 0f && distance >= l.gentleFrom) p.y = l.gentleBaseY + (p.y - l.gentleBaseY) * gentleScale;
             return p;
+        }
+
+        /// <summary>Adds points to the ride's total.</summary>
+        public void AddScore(int points)
+        {
+            if (points == 0) return;
+            Score += points;
+            ScoreChanged?.Invoke(Score);
+        }
+
+        /// <summary>
+        /// After a win: GO lights up and waits for the rider to pull it (or press A), so moving on is their choice.
+        /// After the timeout the ride moves on anyway, so nobody is stuck.
+        /// </summary>
+        public IEnumerator WaitForGo(float timeout)
+        {
+            if (_action == null) yield break;
+            WaitingForGo = true;
+            _action.Configure(0f, 1f, 1f, 0f, false, true);
+            HintChanged?.Invoke(RideControlIds.Action, 1);
+            float waited = 0f;
+            while (waited < timeout && _action.Value < 0.5f && !_skipRequested)
+            {
+                waited += Time.deltaTime;
+                yield return null;
+            }
+
+            _skipRequested = false;
+            HintChanged?.Invoke(null, 0);
+            _action.Configure(0f, 1f, 1f, 1f, true, true);
+            WaitingForGo = false;
         }
 
         // ---------- flow ----------

@@ -342,6 +342,7 @@ namespace Convergence.EditorTools
             H("HopPost", t.valleyPink, 0.4f, 0.5f, Color.white, t.valleyPink * 0.5f);
             H("Sun", new Color(1f, 0.55f, 0.65f), 0f, 0f, Color.white, new Color(1f, 0.45f, 0.6f));
             MakePageMaterials();
+            MakeGameMaterials();
             MakeNetworkMaterials();
             MakeValleyMaterials();
             MakeExplainerMaterials();
@@ -502,7 +503,10 @@ namespace Convergence.EditorTools
             Ref(source, "data", dataAsset);
             var moments = new Moments
             {
+                Draw = MakeMoment<DrawMoment>(directorObject.transform, "Draw", source),
                 Paint = MakeMoment<WeightPaintMoment>(directorObject.transform, "WeightPaint", source),
+                Plug = MakeMoment<PlugMoment>(directorObject.transform, "Plug", source),
+                Descent = Make("Descent", directorObject.transform, Vector3.zero).AddComponent<DescentMoment>(),
                 Forward = MakeMoment<ForwardPassMoment>(directorObject.transform, "ForwardPassUntrained", source),
                 Blame = MakeMoment<BlameMoment>(directorObject.transform, "Blame", source),
                 Valley = MakeMoment<ValleyRunMoment>(directorObject.transform, "ValleyRun", source),
@@ -539,8 +543,11 @@ namespace Convergence.EditorTools
             WireDirector(rd, pod, layout, moments, regions);
             WirePod(pod, rd, moments);
             BuildPixel(pod, rd, dash, moments);
-            Ref(rd.GetComponentInChildren<NeuronExplainer>(true), "paintGrid", pod.transform.Find("Dash/WeightGrid"));
+            Ref(rd.GetComponentInChildren<NeuronExplainer>(true), "paintGrid", pod.transform.Find("GameTable/WeightGrid"));
+            WireGames(pod, rd, moments, rig);
+            ConfigureGames(moments);
             BuildViewpoints(layout, regions);
+            BuildBoot(pod, rd, regions);
 
             AssertOnlyRideRootsRender();
             AssertRideAudioLevels(pod);
@@ -552,9 +559,33 @@ namespace Convergence.EditorTools
             SetBuildScenes();
         }
 
+        /// <summary>
+        /// The boot gate (RideBoot): black over the eyes and no sound until everything that is hidden at the start (the regions,
+        /// the game table, the stamp, the end card) has been drawn once and every clip loaded, so none of that stalls the ride.
+        /// </summary>
+        private static void BuildBoot(GameObject pod, RideDirector rd, GameObject[] regions)
+        {
+            var boot = pod.AddComponent<RideBoot>();
+            Ref(boot, "director", rd);
+            Ref(boot, "library", _library);
+            Ref(boot, "sfx", pod.GetComponent<RideSfxView>());
+            Ref(boot, "coverMaterial", Mat("BootCover"));
+            var roots = new List<Object>(regions);
+            foreach (string path in new[] { "GameTable", "Stamp", "EndCard", "Popup" })
+            {
+                Transform t = pod.transform.Find(path);
+                if (t != null) roots.Add(t.gameObject);
+            }
+
+            Refs(boot, "warmRoots", roots);
+        }
+
         private sealed class Moments
         {
+            public DrawMoment Draw;
             public WeightPaintMoment Paint;
+            public PlugMoment Plug;
+            public DescentMoment Descent;
             public ForwardPassMoment Forward;
             public BlameMoment Blame;
             public ValleyRunMoment Valley;

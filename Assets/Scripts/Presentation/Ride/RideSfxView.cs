@@ -32,6 +32,9 @@ namespace Convergence.Presentation.Ride
         [SerializeField] private WeightPaintMoment puzzle;
         [SerializeField] private BlameMoment blame;
         [SerializeField] private ValleyRunMoment valley;
+        [SerializeField] private ZapGame zap;
+        [SerializeField] private PlugMoment plug;
+        [SerializeField] private DescentMoment descent;
 
         [Header("Sources")]
         [SerializeField] private AudioSource hum;
@@ -58,6 +61,11 @@ namespace Convergence.Presentation.Ride
         [SerializeField] private Cue solved;
         [SerializeField] private Cue solvedShimmer;
         [SerializeField] private Cue wrong;
+        [SerializeField] private Cue fire;
+        [SerializeField] private Cue pop;
+        [SerializeField] private Cue plugIn;
+        [SerializeField] private Cue win;
+        [SerializeField] private Cue winShimmer;
         [SerializeField] private Cue nudge;
         [SerializeField] private Cue hop;
         [SerializeField] private Cue finale;
@@ -80,12 +88,16 @@ namespace Convergence.Presentation.Ride
             if (dash != null) dash.SegmentShown += OnCue;
             if (puzzle != null)
             {
-                puzzle.Changed += OnPainted;
+                puzzle.Stroked += OnStroked;
                 puzzle.Solved += OnSolved;
             }
 
-            if (blame != null) blame.Nudged += OnNudged;
+            if (blame != null) blame.Connected += OnConnected;
             if (valley != null) valley.HopReached += OnHop;
+            if (zap != null) zap.SpeckZapped += OnZapped;
+            if (plug != null) plug.Plugged += OnPlugged;
+            if (descent != null) descent.Stepped += OnStepped;
+            RideAim.Fired += OnFired;
         }
 
         private void OnDisable()
@@ -101,12 +113,53 @@ namespace Convergence.Presentation.Ride
             if (dash != null) dash.SegmentShown -= OnCue;
             if (puzzle != null)
             {
-                puzzle.Changed -= OnPainted;
+                puzzle.Stroked -= OnStroked;
                 puzzle.Solved -= OnSolved;
             }
 
-            if (blame != null) blame.Nudged -= OnNudged;
+            if (blame != null) blame.Connected -= OnConnected;
             if (valley != null) valley.HopReached -= OnHop;
+            if (zap != null) zap.SpeckZapped -= OnZapped;
+            if (plug != null) plug.Plugged -= OnPlugged;
+            if (descent != null) descent.Stepped -= OnStepped;
+            RideAim.Fired -= OnFired;
+            WatchGame(null);
+        }
+
+        private RideGame _game;
+
+        private void WatchGame(RideGame game)
+        {
+            if (game == _game) return;
+            if (_game != null) _game.Won -= OnWon;
+            _game = game;
+            if (_game != null) _game.Won += OnWon;
+        }
+
+        private void OnWon(int stars, bool byRider)
+        {
+            Play(win, 1f);
+            Play(winShimmer, 1f);
+        }
+
+        private void OnFired(int hand, bool hit) => Play(fire, hit ? 1.15f : 0.9f);
+
+        private void OnZapped(Vector3 where) => Play(pop, 1.3f);
+
+        private void OnPlugged(int s, int k) => Play(plugIn, k == 3 ? 1.2f : 0.85f);
+
+        private void OnStepped(double from, double to, int button) => Play(hop, button == 0 ? 1.4f : button == 1 ? 1.1f : 0.8f);
+
+        /// <summary>Adds every clip this view can play to a list (the boot loads them before the ride starts).</summary>
+        public void CollectClips(System.Collections.Generic.List<AudioClip> into)
+        {
+            foreach (Cue cue in new[] { launch, launchRumble, region, tick, solved, solvedShimmer, wrong, fire, pop, plugIn, win, winShimmer, nudge, hop, finale, finaleShimmer, skip })
+            {
+                if (cue.clip != null) into.Add(cue.clip);
+            }
+
+            if (hum != null && hum.clip != null) into.Add(hum.clip);
+            if (engine != null && engine.clip != null) into.Add(engine.clip);
         }
 
         private void Start()
@@ -117,6 +170,7 @@ namespace Convergence.Presentation.Ride
 
         private void Update()
         {
+            if (director != null) WatchGame(director.ActiveMoment as RideGame);
             float duck = dash != null && dash.IsSpeaking ? duckUnderVoice : 1f;
             float step = Time.deltaTime * 0.6f;
             if (hum != null) hum.volume = Mathf.MoveTowards(hum.volume, humVolume * duck, step * humVolume);
@@ -150,9 +204,14 @@ namespace Convergence.Presentation.Ride
 
         private void OnSkipped() => Play(skip, 1f);
 
-        private void OnPainted(WeightPaintResult result)
+        // The right hand paints +, green, with a bright high click; the left paints −, red, with a lower one; a rub-out
+        // (the same colour again) is a soft middle tick. The pitch also climbs a little as more digits come out right.
+        private void OnStroked(int cell, int brush, int value, bool byRider)
         {
-            if (puzzle != null && puzzle.IsLive) Play(tick, Mathf.Lerp(0.9f, 1.25f, result.CorrectCount / 8f));
+            if (puzzle == null || !puzzle.IsLive) return;
+            float hand = value == 0 ? 1f : brush > 0 ? 1.4f : 0.75f;
+            float progress = puzzle.Result != null ? puzzle.Result.CorrectCount / 8f : 0f;
+            Play(tick, hand * Mathf.Lerp(0.95f, 1.1f, Mathf.Clamp01(progress)));
         }
 
         private void OnSolved(bool byRider)
@@ -167,7 +226,14 @@ namespace Convergence.Presentation.Ride
             if (NarrationLibrary.HasCue(segment, "right")) Play(solvedShimmer, 1.1f);
         }
 
-        private void OnNudged(int k, double before, double after) => Play(nudge, 1f + 0.05f * k);
+        // Each wire that snaps onto the 3 rings a little higher than the last (1.00x, 1.12x, 1.25x, 1.40x ...), with a
+        // plug-in click under it, so finishing the set sounds like climbing a scale.
+        private void OnConnected(int k, int hand, int order)
+        {
+            float pitch = Mathf.Min(1.8f, Mathf.Pow(1.12f, order));
+            Play(nudge, pitch);
+            Play(plugIn, pitch);
+        }
 
         private void OnHop(int k)
         {

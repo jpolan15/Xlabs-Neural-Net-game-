@@ -7,18 +7,18 @@ using UnityEngine;
 namespace Convergence.Gameplay.Ride.Level1
 {
     /// <summary>
-    /// Region 2: the rider paints one neuron's 7×7 weights (tap: 0 → + → −) until it fires for every real "1" and for
-    /// no real "0". Core's <see cref="WeightPaintPuzzle"/> decides; this only routes taps, raises what changed, says a
-    /// reaction when the neuron gets a digit wrong, shows Core's hint after the rider goes quiet, and, so nobody gets
-    /// stuck, starts following the hints itself (one visible move at a time) after a long timeout or an operator skip.
+    /// Region 2, a mini-game: the rider paints one neuron's 7×7 weights, right hand green (+1), left hand red (−1), the
+    /// same colour again clears, until it fires for every real "3" and for none of the other real digits. Core's
+    /// <see cref="WeightPaintPuzzle"/> decides; this only routes strokes, raises what changed, scores each digit the
+    /// neuron gets right, says a reaction when it gets one wrong, and shows Core's hint after the rider goes quiet. So
+    /// nobody gets stuck, it starts following the hints itself (one visible move at a time) after
+    /// <see cref="RideGame.giveUpAfter"/> or an operator hurry. Stars come from how few strokes it took.
     /// </summary>
-    public sealed class WeightPaintMoment : RideMoment
+    public sealed class WeightPaintMoment : RideGame
     {
         [SerializeField] private Level1DataSource source;
         [Tooltip("Seconds without a tap before Core's hint lights a cell.")]
         [SerializeField] private float hintAfterIdle = 8f;
-        [Tooltip("Seconds after the puzzle opens when the ride starts following the hints itself.")]
-        [SerializeField] private float autoSolveAfter = 75f;
         [SerializeField] private float autoStepSeconds = 0.9f;
         [Tooltip("A reaction line waits this long after the last tap, and comes at most this often.")]
         [SerializeField] private float reactAfter = 1.5f;
@@ -36,6 +36,8 @@ namespace Convergence.Gameplay.Ride.Level1
         private bool _reactPending;
         private int _hintCell = -1;
         private int _hintValue;
+        private int _strokes;
+        private int _bestCorrect;
 
         /// <summary>The puzzle (null before the moment first runs).</summary>
         public WeightPaintPuzzle Puzzle => _puzzle;
@@ -63,6 +65,12 @@ namespace Convergence.Gameplay.Ride.Level1
 
         public event Action<bool> LiveChanged;
 
+        /// <summary>
+        /// A cell was painted: its index, the brush that did it (+1 green right hand, −1 red left hand), the value it now
+        /// holds (−1, 0 or +1; 0 is a rub-out by the same colour) and whether the rider did it (false: the ride's own hint move).
+        /// </summary>
+        public event Action<int, int, int, bool> Stroked;
+
         /// <summary>Every digit is right. True when the rider did it.</summary>
         public event Action<bool> Solved;
 
@@ -81,16 +89,45 @@ namespace Convergence.Gameplay.Ride.Level1
         public void Cycle(int cell)
         {
             if (!_live || _auto || cell < 0 || cell >= _weights.Length) return;
-            _lastTouch = Time.time;
-            SetHint(-1, 0);
-            Apply(cell, WeightPaintPuzzle.NextValue(_weights[cell]), true);
+            int next = WeightPaintPuzzle.NextValue(_weights[cell]);
+            Stroke(cell, next, next != 0 ? next : _weights[cell]);
         }
+
+        /// <summary>The real digit test digit d is (3, or one of the others).</summary>
+        public int DigitLabel(int d) => source != null ? source.Data.File.puzzle.digits[d].label : -1;
+
+        /// <summary>A brush stroke on a cell: +1 green (right hand), −1 red (left hand); the same colour again clears it.</summary>
+        public bool Press(int cell, int brush)
+        {
+            if (!_live || _auto || cell < 0 || cell >= _weights.Length) return false;
+            Stroke(cell, WeightPaintPuzzle.PaintValue(_weights[cell], brush), brush);
+            return true;
+        }
+
+        private void Stroke(int cell, int value, int brush)
+        {
+            _lastTouch = Time.time;
+            _strokes++;
+            SetHint(-1, 0);
+            Apply(cell, value, true, brush);
+        }
+
+        protected override int StarsEarned()
+        {
+            int best = source != null ? Mathf.Max(1, source.Data.File.puzzle.hintMovesFromEmpty) : 4;
+            return _strokes <= best * 2 ? 3 : _strokes <= best * 4 ? 2 : 1;
+        }
+
+        protected override bool PlayedItself => !SolvedByRider;
 
         public override void Hurry() => _hurry = true;
 
-        protected override IEnumerator Run()
+        protected override IEnumerator Play()
         {
             Prepare();
+            _strokes = 0;
+            _bestCorrect = _result != null ? _result.CorrectCount : 0;
+            Progress = _result != null ? (float)_result.CorrectCount / Mathf.Max(1, _puzzle.DigitCount) : 0f;
             _solved = false;
             _hurry = false;
             _auto = false;
@@ -104,7 +141,7 @@ namespace Convergence.Gameplay.Ride.Level1
             while (!_solved)
             {
                 float now = Time.time;
-                if (!_auto && (_hurry || now - opened > autoSolveAfter))
+                if (!_auto && (_hurry || now - opened > giveUpAfter))
                 {
                     _auto = true;
                     nextAuto = now;
@@ -119,7 +156,7 @@ namespace Convergence.Gameplay.Ride.Level1
                         if (hint.HasValue)
                         {
                             SetHint(hint.Value.Cell, hint.Value.Value);
-                            Apply(hint.Value.Cell, hint.Value.Value, false);
+                            Apply(hint.Value.Cell, hint.Value.Value, false, hint.Value.Value != 0 ? hint.Value.Value : _weights[hint.Value.Cell]);
                         }
                     }
                 }
@@ -137,7 +174,7 @@ namespace Convergence.Gameplay.Ride.Level1
                         _lastReact = now;
                         if (_result.FirstWrong(out bool firedWrongly) >= 0)
                         {
-                            Director.Say(firedWrongly ? RideLine.NeuronLitForZero : RideLine.NeuronMissedOne);
+                            Director.Say(firedWrongly ? RideLine.NeuronLitForOther : RideLine.NeuronMissedThree);
                         }
                     }
                 }
@@ -148,17 +185,24 @@ namespace Convergence.Gameplay.Ride.Level1
             _live = false;
             LiveChanged?.Invoke(false);
             SetHint(-1, 0);
-            Director.Narrate(RideLine.NeuronSolved);
             Solved?.Invoke(SolvedByRider);
-            yield return Director.WaitForSpeech();
         }
 
-        private void Apply(int cell, int value, bool byRider)
+        private void Apply(int cell, int value, bool byRider, int brush)
         {
             _weights[cell] = value;
             _result = _puzzle.Evaluate(_weights);
             _reactPending = byRider;
+            Progress = (float)_result.CorrectCount / Mathf.Max(1, _puzzle.DigitCount);
+            if (_result.CorrectCount > _bestCorrect)
+            {
+                if (byRider) AddScore(50 * (_result.CorrectCount - _bestCorrect), Vector3.zero);
+                _bestCorrect = _result.CorrectCount;
+            }
+
+            Stroked?.Invoke(cell, brush, value, byRider);
             Changed?.Invoke(_result);
+            Refresh();
             if (_result.Passed && !_solved)
             {
                 _solved = true;

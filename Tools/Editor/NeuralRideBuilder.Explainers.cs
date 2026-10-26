@@ -228,7 +228,7 @@ namespace Convergence.EditorTools
             // E0, E1: the quality reference.
             BuildDock(Add<DockExplainer>(new[] { RideLine.Threes, RideLine.MeetPixel, RideLine.PixelBrain, RideLine.PullGo }, -1, SegPixels, true,
                 null, new[] { Child(0, "Page"), Child(0, "Desk") }, null), regions[0]);
-            BuildPixels(Add<PixelsExplainer>(new[] { RideLine.PixelsSquares, RideLine.PixelsNumbers, RideLine.PixelsFortyNine, RideLine.PixelsFly }, SegPixels, SegPixels, true,
+            BuildPixels(Add<PixelsExplainer>(new[] { RideLine.PixelsSquares, RideLine.PixelsNumbers, RideLine.PixelsFortyNine, RideLine.DrawYourTurn }, SegPixels, SegPixels, true,
                 null, new[] { Child(1, "PixelField") }, null), regions[1]);
 
             // E2 to E8: stage and unfold cue now; their pieces come with WP3 to WP5.

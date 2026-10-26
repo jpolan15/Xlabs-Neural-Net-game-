@@ -122,7 +122,7 @@ namespace Convergence.Presentation.Ride
             {
                 string act = fired ? "LIGHTS UP" : "STAYS DARK";
                 bool right = fired == should;
-                verdictText.text = "A " + (should ? "1" : "0") + ": " + act + (right ? " - YES!" : " - OOPS");
+                verdictText.text = "A " + moment.DigitLabel(d) + ": " + act + (right ? " - YES!" : " - OOPS");
                 verdictText.color = right ? theme.right : theme.wrongRed;
             }
 

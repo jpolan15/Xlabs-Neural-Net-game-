@@ -288,9 +288,9 @@ namespace Convergence.EditorTools
 
             // The "why" panel, 2.6 m ahead at eye height: the digit on show, ink × weight, the total against the line,
             // the verdict, and all eight digits with a check or a cross.
-            Transform panel = Make("Panel", root.transform, new Vector3(0f, 1.35f, 2.6f)).transform;
+            Transform panel = Make("Panel", root.transform, new Vector3(0f, 1.42f, 2.6f)).transform;
             Board("Plate", panel, Vector3.zero, new Vector2(2.36f, 1.1f), "PlateWarm");
-            Text("Title", panel, new Vector3(0f, 0.44f, -0.01f), "LIGHT UP FOR 1s  -  STAY DARK FOR 0s", 0.1f, _theme.offWhite, 2.3f, bold: true);
+            Text("Title", panel, new Vector3(0f, 0.44f, -0.01f), "LIGHT UP FOR 3s  -  DARK FOR THE OTHERS", 0.1f, _theme.offWhite, 2.3f, bold: true);
 
             const float tile = 0.07f;
             var pixels = new TileMesh();
@@ -314,9 +314,9 @@ namespace Convergence.EditorTools
             var bar = Prim(PrimitiveType.Cube, "Bar", barRoot, new Vector3(0f, 0.08f, 0f), new Vector3(0.1f, 0.16f, 0.02f), "SumQuiet");
             Prim(PrimitiveType.Cube, "Zero", barRoot, Vector3.zero, new Vector3(0.16f, 0.006f, 0.022f), "Locked");
             Prim(PrimitiveType.Cube, "Line", barRoot, new Vector3(0f, (float)puzzle.Threshold * 0.08f, -0.005f), new Vector3(0.2f, 0.012f, 0.024f), "LineMark");
-            TextMeshPro sum = Text("SumText", panel, new Vector3(1.0f, 0.06f, -0.01f), "TOTAL 0.0\nLINE 2.0", 0.108f, _theme.offWhite, 0.5f, TextAlignmentOptions.Left);
+            TextMeshPro sum = Text("SumText", panel, new Vector3(1.0f, 0.06f, -0.01f), "TOTAL 0.0\nLINE " + puzzle.Threshold.ToString("0.0"), 0.108f, _theme.offWhite, 0.5f, TextAlignmentOptions.Left);
             sum.rectTransform.sizeDelta = new Vector2(0.5f, 0.3f);
-            TextMeshPro verdict = Text("Verdict", panel, new Vector3(0f, -0.32f, -0.01f), "A 1: STAYS DARK - OOPS", 0.11f, _theme.offWhite, 2.2f, bold: true);
+            TextMeshPro verdict = Text("Verdict", panel, new Vector3(0f, -0.32f, -0.01f), "A 3: STAYS DARK - OOPS", 0.11f, _theme.offWhite, 2.2f, bold: true);
 
             // The eight digits.
             var thumbs = new TileMesh();

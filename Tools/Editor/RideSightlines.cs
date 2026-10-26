@@ -152,7 +152,8 @@ namespace Convergence.EditorTools
             }
 
             var targets = new List<Target>();
-            Transform screen = pod.Find("Dash/Screen");
+            // While the game table is up it carries the subtitles itself (SubtitleMirror), so the dash screen may be behind it.
+            Transform screen = Array.IndexOf(vp.podPanels, "GameTable") >= 0 ? null : pod.Find("Dash/Screen");
             if (screen != null) AddGrid(targets, "dash screen", pod.Find("Dash"), screen, podToStop * screen.localToWorldMatrix, true);
             foreach (string path in vp.podPanels)
             {
@@ -209,7 +210,7 @@ namespace Convergence.EditorTools
             for (Transform c = t; c != null && c != pod; c = c.parent)
             {
                 if (c.name == "EndCard" && Array.IndexOf(vp.podPanels, "EndCard") < 0) return true;
-                if (c.name == "WeightGrid" && Array.IndexOf(vp.podPanels, "Dash/WeightGrid") < 0) return true;
+                if (RideViewpoint.HiddenGamePart(c, vp)) return true;
                 if (c.parent == seat && c.GetComponentInChildren<Camera>(true) != null) return true;
             }
 
@@ -661,7 +662,7 @@ namespace Convergence.EditorTools
             for (Transform c = t; c != null && c != pod; c = c.parent)
             {
                 if (c.name == "EndCard" && Array.IndexOf(vp.podPanels, "EndCard") < 0) return true;
-                if (c.name == "WeightGrid" && Array.IndexOf(vp.podPanels, "Dash/WeightGrid") < 0) return true;
+                if (RideViewpoint.HiddenGamePart(c, vp)) return true;
                 if (c.name == "SeatAnchor") return true;
             }
 

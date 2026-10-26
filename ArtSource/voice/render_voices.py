@@ -44,7 +44,7 @@ VOICE_DIR = REPO / "Assets" / "_Project" / "Audio" / "Voice"
 SR = 48000
 TARGET_LUFS = -16.0
 CEILING_DBTP = -1.0
-SENTENCE_GAP = {"guide": 0.34, "aura": 0.26}
+SENTENCE_GAP = {"guide": 0.2, "aura": 0.26}
 
 # How broken AURA sounds, by line, in ride order: she is offline at the start and heals as the player teaches her.
 AURA_GLITCH = {"AuraOffline": 1.0, "DroneOops": 0.8, "TwoSensors": 0.6, "LrTooHigh": 0.4, "Converged": 0.25}
@@ -58,6 +58,7 @@ SPOKEN = [
     (r"^Whoa, ", "Whoa! "),  # its own beat; at one breath the transcription heard "use aptadrone"
     (r"\bgo lever\b", "go-lever"),  # run together it was heard as "GoLaver"
     (r"\borange lever\b", "orange-lever"),  # "Pull the orange lever" was heard as "orange laver" (WER 7.7 %)
+    (r"\bpress A\b", "press, A"),  # the A button, said as the letter, not the article
 ]
 
 # Where AURA's stutter lands is seeded; on these lines the default seed put it inside a word the transcription then
@@ -248,7 +249,7 @@ class Kokoro:
     pitch range, because nobody on the build side can listen. A human listen is still the final word.
     """
 
-    VOICES = {"guide": ("bm_fable", 0.90, "en-gb"), "aura": ("af_heart", 1.0, "en-us")}
+    VOICES = {"guide": ("af_heart", 1.10, "en-us"), "aura": ("af_heart", 1.0, "en-us")}
 
     # Lines at their own speed because the transcription check heard different words otherwise: "Too big a step"
     # became "two biggest step" at 0.95 and above; a lone "Lower." became "slower" below 1.0.

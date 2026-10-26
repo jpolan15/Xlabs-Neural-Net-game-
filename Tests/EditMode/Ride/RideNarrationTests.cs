@@ -29,7 +29,9 @@ namespace Convergence.Tests.EditMode.Ride
         // Lines said by moments, not by a sequence (RideNarrationData.MomentLines).
         private static readonly RideLine[] MomentLines =
         {
-            RideLine.NeuronLitForZero, RideLine.NeuronMissedOne, RideLine.NeuronSolved, RideLine.BackDone,
+            RideLine.NeuronLitForOther, RideLine.NeuronMissedThree, RideLine.NeuronSolved, RideLine.BackDone, RideLine.BackHurry,
+            RideLine.DrawHint, RideLine.DrawDone, RideLine.ZapIntro, RideLine.PlugWrong, RideLine.PlugDone, RideLine.StopClear,
+            RideLine.DescentGameOvershoot, RideLine.DescentGameSlow, RideLine.DescentRealHill,
             RideLine.DescentOvershoot, RideLine.DescentSettle, RideLine.RightSays, RideLine.RightTraining, RideLine.RightAccuracy
         };
 

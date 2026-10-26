@@ -10,7 +10,9 @@ namespace Convergence.XR.Ride
 {
     /// <summary>
     /// Plays the ride from the desk when no headset is running: hold the right mouse button to look around the
-    /// cockpit, click and drag a lever with the left button, click a weight cell or a glowing wire, click Pixel to pet it. The moment a
+    /// cockpit, click and drag a lever with the left button; a left click fires the right hand's laser at what is under
+    /// the mouse (a cell, a speck, a string, a socket, a step button, a wire, Pixel) and Ctrl + click fires the left
+    /// hand's; the A key is the A button (pulls GO when it is live). The moment a
     /// headset or XR display is running it gives the camera back to tracking. The mouse uses the same APIs a hand does.
     /// Operator keys work with or without a headset: Space skips the lines, Shift+Space hurries (solves) the running puzzle, R restarts, G toggles
     /// gentle mode (half the drop, slower travel).
@@ -130,29 +132,37 @@ namespace Convergence.XR.Ride
             if (mouse == null) return;
 
             Ray ray = _camera.ScreenPointToRay(mouse.position.ReadValue());
-            if (mouse.leftButton.wasPressedThisFrame && Physics.Raycast(ray, out RaycastHit hit, wireReach))
+            Keyboard keyboard = Keyboard.current;
+            int hand = keyboard != null && keyboard.ctrlKey.isPressed ? RideHand.Left : RideHand.Right;
+            bool aimed = Physics.Raycast(ray, out RaycastHit hit, wireReach, ~0, QueryTriggerInteraction.Collide);
+            RideAim.Set(RideHand.Right, ray.origin, aimed ? hit.point : ray.GetPoint(6f), true);
+            RideAim.Set(RideHand.Left, ray.origin, aimed ? hit.point : ray.GetPoint(6f), true);
+            if (keyboard != null && keyboard.aKey.wasPressedThisFrame && !(aimed && RideTargeting.Fire(hit.collider, RideHand.Right)))
+            {
+                PodLeverInteractable go = RideTargeting.FindGo();
+                if (go != null && go.Channel != null && !go.Channel.Locked && go.Channel.Value < go.Channel.Max) go.Tap();
+            }
+
+            if (mouse.leftButton.wasPressedThisFrame && aimed)
             {
                 PodLeverInteractable lever = hit.collider.GetComponentInParent<PodLeverInteractable>();
-                WeightCellInteractable cell = hit.collider.GetComponent<WeightCellInteractable>();
-                BlameWireInteractable wire = hit.collider.GetComponentInParent<BlameWireInteractable>();
-                IPettable pettable = hit.collider.GetComponentInParent<IPettable>();
-                if (pettable != null)
-                {
-                    pettable.Pet();
-                }
-                else if (lever != null && lever.isActiveAndEnabled && hit.distance <= reach)
+                if (lever != null && lever.isActiveAndEnabled && hit.distance <= reach)
                 {
                     _dragged = lever;
                     _dragged.BeginGrab(_dragged.FractionFromRay(ray));
                 }
-                else if (cell != null && cell.isActiveAndEnabled && hit.distance <= reach)
+                else
                 {
-                    cell.Tap();
+                    RideTargeting.Fire(hit.collider, hand);
                 }
-                else if (wire != null && wire.isActiveAndEnabled)
-                {
-                    wire.Point();
-                }
+            }
+
+            if (mouse.leftButton.wasReleasedThisFrame && _dragged == null)
+            {
+                if (aimed) RideTargeting.Release(hit.collider, hand);
+                // A wire carried with the mouse is dropped, whichever hand's colour picked it up.
+                RideAim.RaiseReleased(RideHand.Left);
+                RideAim.RaiseReleased(RideHand.Right);
             }
 
             if (_dragged != null)

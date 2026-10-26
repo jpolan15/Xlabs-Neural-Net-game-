@@ -63,6 +63,9 @@ namespace Convergence.Core.Puzzles
         /// <summary>The value a tap moves a weight to: 0 → +1 → −1 → 0.</summary>
         public static int NextValue(int weight) => weight == 0 ? 1 : weight == 1 ? -1 : 0;
 
+        /// <summary>The value a brush stroke moves a weight to: the brush's value (+1 green, −1 red), or 0 if it already has it.</summary>
+        public static int PaintValue(int weight, int brush) => brush == 0 || weight == brush ? 0 : System.Math.Sign(brush);
+
         /// <summary>
         /// Runs every digit through the neuron with the given weights (each −1, 0 or +1).
         /// </summary>

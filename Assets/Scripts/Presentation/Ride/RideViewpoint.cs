@@ -21,5 +21,24 @@ namespace Convergence.Presentation.Ride
 
         [Tooltip("Pod-mounted panels that are live here (for example the weight grid).")]
         public string[] podPanels = new string[0];
+
+        /// <summary>The game table's boards: only one shows at a time, the one its game uses.</summary>
+        public static readonly string[] GameBoards = { "WeightGrid", "PlugBoard", "DescentBoard", "HuntBoard" };
+
+        /// <summary>
+        /// True for a part of the game table that is not up at this viewpoint: the whole table unless "GameTable" is
+        /// listed, and each board unless "GameTable/&lt;board&gt;" is listed. The stamp and the +N popup only flash.
+        /// </summary>
+        public static bool HiddenGamePart(Transform t, RideViewpoint vp)
+        {
+            if (t.name == "Stamp" || t.name == "Popup") return true;
+            if (t.name == "GameTable") return System.Array.IndexOf(vp.podPanels, "GameTable") < 0;
+            if (t.parent != null && t.parent.name == "GameTable" && System.Array.IndexOf(GameBoards, t.name) >= 0)
+            {
+                return System.Array.IndexOf(vp.podPanels, "GameTable/" + t.name) < 0;
+            }
+
+            return false;
+        }
     }
 }

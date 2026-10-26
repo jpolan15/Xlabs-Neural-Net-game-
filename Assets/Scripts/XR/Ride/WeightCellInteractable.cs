@@ -3,13 +3,16 @@ using UnityEngine.Events;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
+using Convergence.Gameplay.Ride;
+using Convergence.Gameplay.Ride.Level1;
 
 namespace Convergence.XR.Ride
 {
     /// <summary>
-    /// One cell of the rider's 7×7 weight grid: a collider, no renderer (the grid is one mesh). A poke with a fingertip,
-    /// a ray select, or a mouse click raises <see cref="Tapped"/> with the cell index; the scene wires that to the
-    /// puzzle moment's Cycle, which decides what the tap does. A short pulse in the hand confirms it.
+    /// One cell of the rider's 7×7 grid: a collider, no renderer (the grid is one mesh). A laser shot, a poke with a
+    /// fingertip, a grip select, or a mouse click presses it with a hand; the cell passes the press to the dash grid
+    /// (<see cref="DashGridInput"/>), which gives it to the live game (draw the 3, or paint the weights), and that game
+    /// decides what it does. A poke or grip counts as the right hand unless it came from the left controller.
     /// </summary>
     public sealed class WeightCellInteractable : XRSimpleInteractable
     {
@@ -19,6 +22,7 @@ namespace Convergence.XR.Ride
         [Tooltip("Ignore a second select on the same cell within this many seconds (a poke can bounce).")]
         [SerializeField] private float debounceSeconds = 0.25f;
         [SerializeField] private UnityEvent<int> tapped = new UnityEvent<int>();
+        [SerializeField] private DashGridInput grid;
 
         private float _lastTap = -10f;
 
@@ -30,12 +34,19 @@ namespace Convergence.XR.Ride
         /// <summary>Sets the index. Used by the scene builder.</summary>
         public void SetCell(int index) => cell = index;
 
-        /// <summary>A tap from any source (poke, ray, mouse).</summary>
-        public void Tap()
+        /// <summary>Sets the grid the presses go to. Used by the scene builder.</summary>
+        public void SetGrid(DashGridInput input) => grid = input;
+
+        /// <summary>A tap with the right hand (mouse, poke).</summary>
+        public void Tap() => Press(RideHand.Right);
+
+        /// <summary>A press with a hand. Returns true when the live game used it.</summary>
+        public bool Press(int hand)
         {
-            if (Time.unscaledTime - _lastTap < debounceSeconds) return;
+            if (Time.unscaledTime - _lastTap < debounceSeconds) return false;
             _lastTap = Time.unscaledTime;
             tapped.Invoke(cell);
+            return grid != null && grid.Press(cell, hand);
         }
 
         protected override void OnHoverEntered(HoverEnterEventArgs args)
@@ -47,8 +58,21 @@ namespace Convergence.XR.Ride
         protected override void OnSelectEntered(SelectEnterEventArgs args)
         {
             base.OnSelectEntered(args);
-            Tap();
+            bool left = args.interactorObject is Component c && IsLeft(c.transform);
+            Press(left ? RideHand.Left : RideHand.Right);
             if (args.interactorObject is XRBaseInputInteractor input) input.SendHapticImpulse(tapHaptic, 0.04f);
+        }
+
+        /// <summary>True when an interactor's transform sits under a controller named "Left…".</summary>
+        internal static bool IsLeft(Transform t)
+        {
+            for (; t != null; t = t.parent)
+            {
+                if (t.name.StartsWith("Left")) return true;
+                if (t.name.StartsWith("Right")) return false;
+            }
+
+            return false;
         }
     }
 }

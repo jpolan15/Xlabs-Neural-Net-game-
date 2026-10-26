@@ -96,7 +96,7 @@ namespace Convergence.Gameplay.Ride
         PixelsSquares = 68,
         PixelsNumbers = 69,
         PixelsFortyNine = 70,
-        PixelsFly = 71,
+        // 71 was PixelsFly, cut in v5 (reserved).
 
         // E2 one neuron.
         NeuronHolds = 72,
@@ -104,8 +104,8 @@ namespace Convergence.Gameplay.Ride
         NeuronGreenRed = 74,
         NeuronAdds = 75,
         NeuronYourTurn = 76,
-        NeuronLitForZero = 77,
-        NeuronMissedOne = 78,
+        NeuronLitForOther = 77,
+        NeuronMissedThree = 78,
         NeuronSolved = 79,
 
         // E3 the network.
@@ -144,7 +144,22 @@ namespace Convergence.Gameplay.Ride
         TokensWords = 102,
         TokensNumbers = 103,
         TokensPredict = 104,
-        TokensNext = 105
+        TokensNext = 105,
+
+        // Level 1 v5, the mini-games (TASK_LEVEL1_V5_GAMEPLAY). 71 (PixelsFly) is cut; its number stays reserved.
+        StopClear = 106,
+        DrawYourTurn = 107,
+        DrawHint = 108,
+        DrawDone = 109,
+        ZapIntro = 110,
+        PlugYourTurn = 111,
+        PlugWrong = 112,
+        PlugDone = 113,
+        PlugTooMany = 114,
+        BackHurry = 115,
+        DescentYourTurn = 116,
+        DescentGameOvershoot = 117,
+        DescentGameSlow = 118
     }
 
     /// <summary>Stable ids for the pod's control channels. Level 1 has one: GO.</summary>

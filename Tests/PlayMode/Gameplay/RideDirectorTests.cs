@@ -87,6 +87,12 @@ namespace Convergence.Tests.PlayMode.Gameplay
             yield return null;
             _director = UnityEngine.Object.FindAnyObjectByType<RideDirector>();
             Assert.IsNotNull(_director, "RideDirector missing from NeuralRide");
+
+            // The ride starts behind a black fade (RideBoot warms the scene up first); play begins when it lifts.
+            var boot = UnityEngine.Object.FindAnyObjectByType<RideBoot>();
+            if (boot != null) yield return WaitFor(() => !boot.IsBooting, "the boot fade to lift", 60f);
+            yield return null;
+            yield return null;
         }
 
         /// <summary>The ride opens with the narrated intro and holds GO. Skip it the way an operator does (Space), then pull GO.</summary>

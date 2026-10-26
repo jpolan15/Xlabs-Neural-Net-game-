@@ -50,7 +50,9 @@ SAMPLES_PER_HOP = 16     # ribbon rows per hop
 WALL_SAMPLES = 13        # ribbon columns across
 WALL_HALF_WIDTH = 30.0  # how far sideways the walls look, in weight-space units
 SEED_WALL = 1
-PUZZLE_THRESHOLD = 2.0
+PUZZLE_THRESHOLD = 2.5
+PUZZLE_OTHERS = [0, 1, 7, 4]   # the neuron puzzle: threes fire, one each of these stays dark
+PUZZLE_CUT = 0.1         # reference: + where threes have this much more ink on average than the others, - where less
 FINALE_COUNT = 60
 GALLERY_COUNT = 20       # the dock's cloud of real threes (E0), 28x28 each
 GALLERY_DEC = 2          # decimals kept for gallery pixels (display only)
@@ -212,16 +214,11 @@ def solve_by_hints(digits, should_fire, threshold, limit=49):
     return None, weights
 
 
-def reference_solution():
-    """+ down the middle column, - on the ring a zero draws (the 5x5 square's border minus the middle column)."""
-    w = np.zeros((7, 7))
-    w[1:6, 3] = 1
-    for r in range(1, 6):
-        for c in range(1, 6):
-            on_border = r in (1, 5) or c in (1, 5)
-            if on_border and c != 3:
-                w[r, c] = -1
-    return w.ravel()
+def reference_solution(train_x, train_y):
+    """+ where the average training 3 has clearly more ink than the average of the other puzzle digits, - where it has
+    clearly less, 0 elsewhere: the 3's top bar, middle bump and bottom curve green, its open left side red."""
+    diff = train_x[train_y == 3].mean(axis=0) - np.mean([train_x[train_y == d].mean(axis=0) for d in PUZZLE_OTHERS], axis=0)
+    return np.where(diff > PUZZLE_CUT, 1.0, np.where(diff < -PUZZLE_CUT, -1.0, 0.0))
 
 
 # ---------------------------------------------------------------- bake
@@ -299,20 +296,20 @@ def main():
                 "pixels28": np.round(test_raw[i].astype(np.float64).ravel() / 255.0, GALLERY_DEC).tolist()}
                for i in gallery_idx]
 
-    # ---- neuron puzzle: 4 clear ones, 4 clear zeros, a line the reference clears with margin
-    ref = reference_solution()
-    ones = np.nonzero(test_y == 1)[0]
-    zeros = np.nonzero(test_y == 0)[0]
-    one_scores = test_x[ones] @ ref
-    zero_scores = test_x[zeros] @ ref
-    # the clearest examples, but not the extremes: take ranks spread through the clear half
-    ones_sorted = ones[np.argsort(-one_scores)]
-    zeros_sorted = zeros[np.argsort(zero_scores)]
-    pick_ones = [int(ones_sorted[k]) for k in (40, 120, 200, 280)]
-    pick_zeros = [int(zeros_sorted[k]) for k in (40, 120, 200, 280)]
-    puzzle_idx = pick_ones + pick_zeros
-    puzzle_x = test_x[puzzle_idx]
+    # ---- neuron puzzle: 4 clear threes, one clear 0, 1, 7 and 4, a line the reference clears with margin
+    ref = reference_solution(train_x, train_y)
+    threes_all = np.nonzero(test_y == 3)[0]
+    three_scores = test_x[threes_all] @ ref
+    # the clearest examples, but not the extremes: take ranks spread through the clear half (never the hero)
+    threes_sorted = [int(i) for i in threes_all[np.argsort(-three_scores)] if int(i) != hero]
+    pick_threes = [threes_sorted[k] for k in (40, 120, 200, 280)]
+    pick_others = []
+    for d in PUZZLE_OTHERS:
+        idx = np.nonzero(test_y == d)[0]
+        pick_others.append(int(idx[np.argsort(test_x[idx] @ ref)][120]))
+    puzzle_idx = pick_threes + pick_others
     should_fire = np.array([True] * 4 + [False] * 4)
+    puzzle_x = test_x[puzzle_idx]
     T = PUZZLE_THRESHOLD
     c_empty, _, _ = puzzle_eval(np.zeros(49), puzzle_x, should_fire, T)
     c_plus, _, _ = puzzle_eval(np.ones(49), puzzle_x, should_fire, T)

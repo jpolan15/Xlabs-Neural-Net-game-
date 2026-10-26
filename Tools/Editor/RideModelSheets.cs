@@ -93,10 +93,10 @@ namespace Convergence.EditorTools
         {
             new Model("pod", "The rider's cart: tub, seat and the dash with GO, the subtitle screen and the region tag.", "Pod", "Pod")
             {
-                Skip = new[] { "SeatAnchor", "EndCard", "Dash/WeightGrid", "Blackboard", "Pixel" }
+                Skip = new[] { "SeatAnchor", "EndCard", "GameTable", "Stamp", "Popup", "Blackboard", "Pixel" }
             },
             new Model("pixel_buddy", "Pixel, the buddy: white egg body, face screen (happy face), side rings, antennae, thruster glow; rides beside the pod.", "Viewpoints/dock", "Pod/Pixel/Body"),
-            new Model("weight_grid", "Region 2: the 7x7 weight grid on the dash the rider paints (+ GREEN, - RED, orange frame = press).", "Viewpoints/neuron", "Pod/Dash/WeightGrid"),
+            new Model("game_table", "The game table every mini-game is played on (rises out of the dash): HUD strip, the 7x7 grid (draw the 3, paint + GREEN / - RED), the plug board and the descent hill (hidden until their games).", "Viewpoints/neuron", "Pod/GameTable"),
             new Model("end_card", "The end card with the next level and the credits.", "Viewpoints/end", "Pod/EndCard"),
             new Model("rails", "The two slate rails under every leg of the track.", "Viewpoints/dock", "Track"),
             new Model("page", "Region 0: the sheet with the real handwritten 3 (test digit) on its desk.", "Viewpoints/dock", "Region_0/Page", "Region_0/Desk"),
@@ -173,7 +173,7 @@ namespace Convergence.EditorTools
         private const float RiderEyeHeight = 1.30f;
         private const float RiderFov = 68f;   // the seat captures' field of view (RideSeatCaptures)
         private static readonly string[] RootNames = { "Pod", "Track" };
-        private static readonly string[] RuntimeOnlyPanels = { "Pod/EndCard", "Pod/Dash/WeightGrid" };
+        private static readonly string[] RuntimeOnlyPanels = { "Pod/EndCard", "Pod/GameTable" };
 
         private sealed class Tile
         {
