@@ -76,7 +76,7 @@ PASS only if:
 ## Gate C — in the game (vr-qa)
 
 - The builder places the asset (never a hand edit). Re-run `Convergence > Build Neural Ride`.
-- Capture the seat views (rules: `.agents/tasks/archive/TASK_IGNITE_RIDE_V3_MASTER_PLAN.md` section 8; tool: `Convergence/Capture Ride Seat Views`). The asset must look right at play distance and must not break sightlines.
+- Capture the seat views (tool: `Convergence/Capture Ride Seat Views`, eye 1.15 / 1.30 / 1.45 m, yaw -30 / 0 / +30). The asset must look right at play distance and must not break sightlines.
 - Add the asset to `RideModelSheets.Models` and shoot its model sheet (`Convergence/Capture Model Sheets`): it must hold up from all 8 sides, the top and the low hero angle, not only from the 4 Gate B views.
 - Scene totals stay ≤ 100 draw calls and ≤ 100k tris.
 - **The human approves hero assets** by looking at `side_by_side.png` and `seat_view.png`.

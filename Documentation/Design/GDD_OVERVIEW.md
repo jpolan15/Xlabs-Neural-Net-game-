@@ -1,7 +1,7 @@
 # Game Design Overview: Convergence, Level 1 ("Teach Pixel to read")
 
 Current as of Level 1 v7 (2026-10-28). Decisions: ADR-016 to ADR-021. Live plan: `.agents/tasks/TASK_LEVEL1_V7_DEMO.md`.
-Older versions (the A.U.R.A. spaceship ride, Chamber 01) are in git history and `.agents/tasks/archive/`.
+Older versions (the A.U.R.A. spaceship ride, Chamber 01) are only in git history.
 
 ## Premise
 

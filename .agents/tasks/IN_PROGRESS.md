@@ -12,4 +12,4 @@ first unticked box.
 | [`TASK_LEVEL1_V4_EXPLAINERS.md`](TASK_LEVEL1_V4_EXPLAINERS.md) | Built (ADR-017): 3Blue1Brown-style explainers, Pixel. Background; its section 9 outlines Level 2. |
 
 Everything older (Chamber 01, asteroid defense, ride v3 and its master plan, the first digits restructure and its
-handoff) is in `archive/`: history only, don't load it unless a task names it.
+handoff) was deleted on 2026-10-28; it is only in git history.

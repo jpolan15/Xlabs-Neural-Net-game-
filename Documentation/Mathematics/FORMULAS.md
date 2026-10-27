@@ -132,7 +132,6 @@ $$\text{Attention}(Q, K, V) = \text{Softmax}\left(\frac{Q K^T}{\sqrt{d_k}}\right
 
 Where $Q$ is \([\text{queryCount}, d_k]\), $K$ is \([\text{keyCount}, d_k]\), and $V$ is \([\text{keyCount}, d_v]\). A false mask entry replaces that logit with \(-\infty\) before softmax. Each attention row sums to 1 within \(10^{-6}\). Implementation: `Attention.ScaledDotProduct`.
 
-Full Chamber 04 implementation spec: `Assets/Puzzles/Chamber04_Attention/`.
 
 ---
 

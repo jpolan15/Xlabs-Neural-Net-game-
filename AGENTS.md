@@ -6,7 +6,7 @@ Educational VR puzzle game. Unity (`ProjectSettings/ProjectVersion.txt`), Meta Q
 
 Level 1 digits ride (pixels → neuron → network → backprop → gradient descent). Ignite demo April 2027.
 Plan: `.agents/tasks/TASK_LEVEL1_V7_DEMO.md` (v7 teacher-demo polish; its section 3 is the live checklist), on `TASK_LEVEL1_V6_TRAIN.md` (v6: your own 3, trained live, ADR-020), `TASK_LEVEL1_V5_GAMEPLAY.md` (games, ADR-018) and `TASK_LEVEL1_V4_EXPLAINERS.md` (explainers + Pixel).
-Read only the section you need; don't read whole handoffs up front. Old tasks are in `.agents/tasks/archive/` — ignore them.
+Read only the section you need; don't read whole handoffs up front. Older plans (spaceship, Chamber 01, ride v3) were deleted; they live only in git history.
 
 ## Where things live
 

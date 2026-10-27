@@ -12,7 +12,7 @@ Last updated: 2026-10-27 (Level 1 v7: blast the 3s, intro roadmap, what training
 |---|---|
 | `.agents/` | Agent-only: workflow, task tracking, decision index, templates, skills |
 | `.claude/` | Claude Code config: `agents/` (Asset Forge subagents), `skills/` (entry points to `.agents/skills/`) |
-| `ArtSource/` | Source art outside Unity's import: concept art, raw/clean meshes, verify renders, voice bake-off, the narration pipeline (`voice/`), archival clips (`archival/`), effect derivation (`sfx/`), the Level 1 MNIST bake (`training/`) (see `ArtSource/AGENTS.md`) |
+| `ArtSource/` | Source art outside Unity's import: concept art, raw/clean meshes, verify renders, the narration pipeline (`voice/`), effect derivation (`sfx/`), the Level 1 MNIST bake (`training/`) (see `ArtSource/AGENTS.md`) |
 | `Assets/` | All Unity asset content for the shipped game |
 | `Builds/` | Release agent output; not committed to source control |
 | `Documentation/` | Canonical architecture, mathematics, testing, and operations docs |
@@ -30,8 +30,7 @@ Last updated: 2026-10-27 (Level 1 v7: blast the 3s, intro roadmap, what training
 | `.agents/PROJECT_MAP.md` | This file |
 | `.agents/WORKFLOW.md` | Agent operating procedure (before/during/after) |
 | `.agents/DECISIONS_INDEX.md` | Index table linking to ADRs in Documentation/Architecture/ADRs/ |
-| `.agents/tasks/` | Active task files: start at `IN_PROGRESS.md` (it names the live plan and its checklist); BACKLOG, BLOCKED, COMPLETED |
-| `.agents/tasks/archive/` | Finished or superseded tasks and handoffs (history only, don't load) |
+| `.agents/tasks/` | Task files: start at `IN_PROGRESS.md` (it names the live plan and its checklist); `BACKLOG.md` for what comes after. Older plans are only in git history |
 | `.agents/templates/TASK_TEMPLATE.md` | Standard task file format |
 | `.agents/templates/HANDOFF_TEMPLATE.md` | Standard task report / handoff format |
 | `.agents/skills/asset-forge/` | Concept art → multi-view → 3D → verified Unity import (gated pipeline) |

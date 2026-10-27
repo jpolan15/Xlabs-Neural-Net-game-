@@ -83,9 +83,11 @@ direction, the rider only the step size), with a leaderboard for Ignite.
 ### 3b. Look pass and cleanup (owner, 2026-10-28 night: "scenes shouldn't be all black, make everything look awesome";
 "clean up old stuff so new agents don't read unnecessary context; keep it readable and working")
 
-Cleanup (move, don't destroy: everything stays in git history)
-- [x] Stale task files to `.agents/tasks/archive/` (v3 master plan, digits restructure, its handoff and remaining-work);
-      `IN_PROGRESS.md` and `BACKLOG.md` rewritten to today's state; live references (skills, READMEs) point to archive.
+Cleanup (deleted outright on the owner's word; everything stays in git history)
+- [x] Stale task files deleted, with the whole `.agents/tasks/archive/` (33 old plans), `COMPLETED.md`, `BLOCKED.md`,
+      unused art (`synapse_pod`, `neural_core`, `gradient_valley`, `archival`, `voice_bakeoff`), ADR-008/010/015 and the
+      empty Chamber 02-04 puzzle folders (all in git history; v3 master plan, digits restructure, handoff, remaining-work);
+      `IN_PROGRESS.md` and `BACKLOG.md` rewritten to today's state; every live reference (skills, agents, READMEs, AGENTS.md files) fixed.
 - [x] `Documentation/Design`: `GDD_OVERVIEW.md` rewritten as the current Level 1 overview; superseded design docs
       (v3 story, Chamber 01 level design and art bible) removed; old capture folders of cut versions removed.
 - [x] Nothing breaks: layout validator 46/0, recompile 0 errors, EditMode 148/148 (PlayMode runs with the look pass).

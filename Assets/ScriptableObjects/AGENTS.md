@@ -6,11 +6,9 @@ Create, version, and manage data-driven assets that define puzzle test cases, hy
 
 ## Owns
 
-- Directory structure under `Assets/ScriptableObjects/`:
-  - `Puzzles/`: `Chamber01_Config.asset`, `Chamber02_XOR_Config.asset`, etc.
-  - `Datasets/`: Training and validation datasets for Chamber 3.
-  - `JournalEntries/`: Lore, schematics, and concept unlock data for the engineer's tablet.
-  - `XRProfiles/`: Haptic duration and intensity curves, rotary detent angles.
+- `RideTheme.asset` (every colour and look number), `RideScript.asset` (narration pacing) and
+  `NarrationLibrary.asset` (subtitles, clips): all written by the ride builder; change the builder, not the asset.
+- The Level 1 network and digits are not here: `Assets/_Project/Data/Level1/level1_digits.json` (from the bake).
 
 ## Invariants
 
