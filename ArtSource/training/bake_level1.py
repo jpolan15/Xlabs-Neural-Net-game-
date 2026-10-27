@@ -51,9 +51,10 @@ SAMPLES_PER_HOP = 16     # ribbon rows per hop
 WALL_SAMPLES = 13        # ribbon columns across
 WALL_HALF_WIDTH = 30.0  # how far sideways the walls look, in weight-space units
 SEED_WALL = 1
-PUZZLE_THRESHOLD = 2.5
+PUZZLE_THRESHOLD = 5.0   # owner, 2026-10-27: at 2.5 four green cells won ("it doesn't look like a 3"); at 5 it takes 8+ in a 3 shape
 PUZZLE_OTHERS = [0, 1, 7, 4]   # the neuron puzzle: threes fire, one each of these stays dark
-PUZZLE_CUT = 0.1         # reference: + where threes have this much more ink on average than the others, - where less
+PUZZLE_CUT = 0.1         # ranking pattern: + where threes have this much more ink on average than the others, - where less
+PUZZLE_SHOWN_PLUS_CUT = 0.03   # the reference the tests and E2 use: a fuller green 3 (same red), so it clears the line of 5
 FINALE_COUNT = 60
 GALLERY_COUNT = 20       # the dock's cloud of real threes (E0), 28x28 each
 GALLERY_DEC = 2          # decimals kept for gallery pixels (display only)
@@ -268,11 +269,11 @@ def solve_by_hints(digits, should_fire, threshold, limit=49):
     return None, weights
 
 
-def reference_solution(train_x, train_y):
+def reference_solution(train_x, train_y, plus_cut=PUZZLE_CUT):
     """+ where the average training 3 has clearly more ink than the average of the other puzzle digits, - where it has
     clearly less, 0 elsewhere: the 3's top bar, middle bump and bottom curve green, its open left side red."""
     diff = train_x[train_y == 3].mean(axis=0) - np.mean([train_x[train_y == d].mean(axis=0) for d in PUZZLE_OTHERS], axis=0)
-    return np.where(diff > PUZZLE_CUT, 1.0, np.where(diff < -PUZZLE_CUT, -1.0, 0.0))
+    return np.where(diff > plus_cut, 1.0, np.where(diff < -PUZZLE_CUT, -1.0, 0.0))
 
 
 # ---------------------------------------------------------------- bake
@@ -382,6 +383,9 @@ def main():
     T = PUZZLE_THRESHOLD
     c_empty, _, _ = puzzle_eval(np.zeros(49), puzzle_x, should_fire, T)
     c_plus, _, _ = puzzle_eval(np.ones(49), puzzle_x, should_fire, T)
+    # The digits are picked with the ranking pattern above (unchanged, so the same eight digits); the reference that must
+    # solve the puzzle is the fuller one.
+    ref = reference_solution(train_x, train_y, PUZZLE_SHOWN_PLUS_CUT)
     c_ref, _, ref_sums = puzzle_eval(ref, puzzle_x, should_fire, T)
     check(c_empty < 8, "the empty grid already solves the puzzle")
     check(c_plus < 8, "painting everything + already solves the puzzle")

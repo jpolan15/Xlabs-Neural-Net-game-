@@ -5,6 +5,7 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
+using Convergence.Core.Puzzles;
 using Convergence.Gameplay.Ride;
 using Convergence.Gameplay.Ride.Level1;
 using Convergence.Presentation.Ride;
@@ -271,18 +272,37 @@ namespace Convergence.Tests.PlayMode.Gameplay
             Assert.AreEqual(NeuronSegment, _director.SegmentIndex);
             Assert.IsFalse(paint.Result.Passed, "It must not open solved");
 
-            // Painting everything + is not a solution: the zeros fire too. The ride waits.
-            for (int c = 0; c < 49; c++) paint.Cycle(c);
+            // Painting everything + is not a solution: the zeros fire too. The ride waits. A win sticks the moment every
+            // digit is right, so the cells go + in an order that never passes on the way (with the line at 5.0, painting
+            // them in index order does: the 3s fire before the 7 and the 4): the dark digits' ink first.
+            WeightPaintPuzzle puzzle = paint.Puzzle;
+            var order = new List<int>();
+            for (int c = 0; c < 49; c++) order.Add(c);
+            double DarkInk(int c)
+            {
+                double s = 0;
+                for (int d = 0; d < puzzle.DigitCount; d++) if (!puzzle.ShouldFire(d)) s += puzzle.Pixel(d, c);
+                return s;
+            }
+
+            order.Sort((a, b) => DarkInk(b).CompareTo(DarkInk(a)));
+            foreach (int c in order)
+            {
+                paint.Cycle(c);
+                Assert.IsFalse(paint.Result.Passed, "Painting + toward all plus passed on the way at cell " + c);
+            }
+
             Assert.IsFalse(paint.Result.Passed, "All plus must not pass");
             yield return new WaitForSeconds(4f);
             Assert.AreEqual(NeuronSegment, _director.SegmentIndex, "The ride must wait at the neuron while the puzzle is unsolved");
             Assert.AreEqual(RideState.AtStop, _director.State);
 
-            // Back to empty (+ -> - -> 0), then the baked reference solution, tap by tap.
-            for (int c = 0; c < 49; c++)
+            // Back to empty (+ -> - -> 0, in reverse, which never passes either), then the baked reference solution, tap by tap.
+            for (int i = order.Count - 1; i >= 0; i--)
             {
-                paint.Cycle(c);
-                paint.Cycle(c);
+                paint.Cycle(order[i]);
+                paint.Cycle(order[i]);
+                Assert.IsFalse(paint.Result.Passed, "Clearing the grid passed on the way at cell " + order[i]);
             }
 
             int[] reference = Data().File.puzzle.referenceSolution;

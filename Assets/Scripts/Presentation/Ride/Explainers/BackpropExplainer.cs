@@ -9,7 +9,8 @@ namespace Convergence.Presentation.Ride.Explainers
     /// E5, backpropagation (the classic: 3Blue1Brown's "nudges"). Pixel's ten answers come back as E4's chart, and an
     /// arrow on each bar shows what that answer wishes: the 3 a GREEN arrow to brighter, the others RED arrows to
     /// dimmer, each as long as the real gradient at that answer (the bake's untrained output minus what we wanted).
-    /// On {back} the wish flows backwards:
+    /// While the card is up the network's layer names are off (they showed through it). On {back} the card fades and
+    /// the wish flows backwards:
     /// sparks run from the answers to the hidden layer and on to the pixels, the network's real blame lights up
     /// behind them (BlameView, the Show unfold), and BACKPROPAGATION writes itself above.
     /// </summary>
@@ -21,6 +22,8 @@ namespace Convergence.Presentation.Ride.Explainers
         [SerializeField] private ShapeBatch arrows;
         [SerializeField] private ShapeBatch sparks;
         [SerializeField] private TMP_Text title;
+        [Tooltip("The network's layer names: they showed through the card (owner, 2026-10-27), so they are off while it is up.")]
+        [SerializeField] private GameObject coveredSigns;
         [SerializeField] private int wanted = 3;
         [Tooltip("Where the sparks go: the 16 hidden neurons, then the 49 pixels (sparks' space).")]
         [SerializeField] private Vector3[] hiddenAt = new Vector3[16];
@@ -44,6 +47,7 @@ namespace Convergence.Presentation.Ride.Explainers
 
             title.gameObject.SetActive(false);
             title.alpha = 1f;
+            if (coveredSigns != null) coveredSigns.SetActive(true);
         }
 
         private static void Hide(ShapeBatch b)
@@ -78,7 +82,7 @@ namespace Convergence.Presentation.Ride.Explainers
             // "The three wants to be brighter." The answers come back as bars; the 3's arrow points to brighter.
             s.At("wish", () =>
             {
-                var list = new List<Tween> { Anim.FadeIn(card, 0, Vector3.zero, 0.5f) };
+                var list = new List<Tween> { Anim.FadeIn(card, 0, Vector3.zero, 0.5f), new Tween(0.01f, _ => SetSigns(false)) };
                 for (int k = 0; k < bars.Count; k++) list.Add(Anim.FadeIn(bars, k, Vector3.zero, 0.5f).After(0.05f * k));
                 for (int k = 0; k < labels.Length; k++) list.Add(Anim.Write(labels[k], 0.4f).After(0.05f * k));
                 list.AddRange(Arrow(wanted, 0.8f));
@@ -100,10 +104,12 @@ namespace Convergence.Presentation.Ride.Explainers
                 return list;
             });
 
-            // "That wish flows backwards, through every wire." Sparks run back to the hidden layer, then to the pixels.
+            // "That wish flows backwards, through every wire." The card steps aside (it hid the network, owner 2026-10-27)
+            // and sparks run back to the hidden layer, then to the pixels.
             s.Unfold("back", () =>
             {
-                var list = new List<Tween>();
+                var list = StepAside(0.6f);
+                list.Add(new Tween(0.01f, _ => SetSigns(true)).After(0.6f));
                 for (int j = 0; j < 16; j++)
                 {
                     int i = j;
@@ -118,11 +124,6 @@ namespace Convergence.Presentation.Ride.Explainers
                     list.Add(Spark(i, from, inputAt[p], 1.4f + 0.02f * p, 1.3f));
                 }
 
-                for (int k = 0; k < 10; k++)
-                {
-                    for (int j = 0; j < 3; j++) list.Add(Anim.FadeTo(arrows, Shaft(k) + j, 0.35f, 0.8f).After(3f));
-                }
-
                 return list;
             });
 
@@ -132,12 +133,25 @@ namespace Convergence.Presentation.Ride.Explainers
             // "Grab the hot wires, and nudge them!" The title and arrows step aside for the play.
             s.At("grab", () =>
             {
-                var list = new List<Tween> { Anim.FadeText(title, 0f, 0.8f), Anim.FadeTo(card, 0, 0f, 0.8f) };
-                for (int i = 0; i < arrows.Count; i++) list.Add(Anim.FadeTo(arrows, i, 0f, 0.8f));
-                for (int i = 0; i < bars.Count; i++) list.Add(Anim.FadeTo(bars, i, 0f, 0.8f));
-                foreach (TMP_Text t in labels) list.Add(Anim.FadeText(t, 0f, 0.8f));
+                var list = StepAside(0.8f);
+                list.Add(Anim.FadeText(title, 0f, 0.8f));
                 return list;
             });
+        }
+
+        /// <summary>The card, its bars, arrows and digits fade out.</summary>
+        private List<Tween> StepAside(float seconds)
+        {
+            var list = new List<Tween> { Anim.FadeTo(card, 0, 0f, seconds) };
+            for (int i = 0; i < arrows.Count; i++) list.Add(Anim.FadeTo(arrows, i, 0f, seconds));
+            for (int i = 0; i < bars.Count; i++) list.Add(Anim.FadeTo(bars, i, 0f, seconds));
+            foreach (TMP_Text t in labels) list.Add(Anim.FadeText(t, 0f, seconds));
+            return list;
+        }
+
+        private void SetSigns(bool on)
+        {
+            if (coveredSigns != null) coveredSigns.SetActive(on);
         }
 
         private Tween Spark(int i, Vector3 from, Vector3 to, float delay, float duration)

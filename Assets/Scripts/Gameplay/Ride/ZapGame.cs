@@ -39,6 +39,9 @@ namespace Convergence.Gameplay.Ride
         [SerializeField] private float side = 2.6f;
         [SerializeField] private Vector2 height = new Vector2(1.0f, 2.4f);
 
+        [Tooltip("Legs with no digits: the rewind, where the rider watches the network and its wires (they covered it).")]
+        [SerializeField] private int[] quietSegments = new int[0];
+
         private ZapSpeck[] _pool;
         private float _nextSpawn;
         private bool _saidIntro;
@@ -102,7 +105,8 @@ namespace Convergence.Gameplay.Ride
             }
         }
 
-        private bool Running => director.State == RideState.Traveling && director.ActiveMoment == null && director.SegmentIndex >= 0;
+        private bool Running => director.State == RideState.Traveling && director.ActiveMoment == null && director.SegmentIndex >= 0
+            && System.Array.IndexOf(quietSegments, director.SegmentIndex) < 0;
 
         private void Update()
         {

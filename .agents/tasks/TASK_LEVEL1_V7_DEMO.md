@@ -135,8 +135,24 @@ Found live in the owner's Link session (UnityMCP reads the running headset game)
       Narration cap raised 270 -> 300 s for it (now 284 s).
 - [x] Build (sightlines, text >= 1.5 degrees, draw calls) passes; EditMode 148/148, PlayMode 31/31 on the final build.
       Play Mode shots of the draw and 3-detector boards checked (arrow, trace 3, GLOW/DARK columns).
-- [ ] Owner: ride it again on the Quest (Link or APK). Not verifiable on desktop: aim help feel, the re-seat on Link,
-      the arrow's size in the headset.
+- [x] Owner rode it again over Link (2026-10-27, watched live: head view and status every 25 s): every game played
+      and won by the rider, score 3000, no errors. Owner: "pretty good".
+
+Second ride's notes (owner + what the live watch showed):
+- [x] The 3 detector won with 4 green cells ("doesn't look like a 3"): the line is now 5.0 (was 2.5) and the reference
+      a fuller green 3 (`PUZZLE_SHOWN_PLUS_CUT`); the smallest win is 8 cells in a 3 shape, hints take 9. Re-baked:
+      only `puzzle.threshold`, `referenceSolution` and `hintMovesFromEmpty` changed (same eight digits).
+- [x] Backprop "stuff covering each other": the wishes card hid the network (its layer names showed through it, and
+      the backwards sparks ran behind it), then hung in the network through the rewind; flying digits crossed the
+      network on the rewind. The card now fades on {back}, the layer names are off while it is up, and the rewind leg
+      has no digits (`ZapGame.quietSegments`).
+- [x] Seat: re-centres when 0.3 m forward/back/sideways too (head still, no game); the owner sat 42 cm back.
+- [x] "HOT-WIRE HUNT" overlapped SCORE: now "WIRE HUNT". Recap rows bigger (0.19-0.2 m type at 5 m), shorter lines.
+      The accuracy sign is hidden when the end card pops (it peeked over it).
+- [x] Build passes; EditMode 148/148, PlayMode 31/31. `RideDirectorTests` puzzle gate now paints toward all-plus in an
+      order that never passes on the way (a win sticks; at line 5.0 index order passed at cell 32). Play Mode shots
+      checked: the card up (no labels through it), {back} (card gone, sparks over the network), the rewind (no
+      digits), the recap rows, the end card. Not yet ridden on the Quest.
 
 ## 4. Progress log
 

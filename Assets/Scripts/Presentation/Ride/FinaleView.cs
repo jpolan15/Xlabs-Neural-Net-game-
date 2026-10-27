@@ -16,6 +16,8 @@ namespace Convergence.Presentation.Ride
         [SerializeField] private float popSeconds = 0.6f;
         [SerializeField] private float continuedDelay = 2.5f;
         [SerializeField] private float creditsDelay = 5f;
+        [Tooltip("Signs behind the end card that would peek out around it (the accuracy sign); off when it pops up.")]
+        [SerializeField] private GameObject[] hideWhenDone = new GameObject[0];
 
         private float _age = -1f;
 
@@ -37,6 +39,10 @@ namespace Convergence.Presentation.Ride
             _age = 0f;
             panel.transform.localScale = Vector3.zero;
             panel.SetActive(true);
+            foreach (GameObject sign in hideWhenDone)
+            {
+                if (sign != null) sign.SetActive(false);
+            }
         }
 
         private void Update()

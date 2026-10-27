@@ -327,8 +327,10 @@ namespace Convergence.EditorTools
             BuildNetworkDiagram(Add<NetworkExplainer>(new[] { RideLine.NetworkTeam, RideLine.NetworkAnswers, RideLine.NetworkWire, RideLine.NetworkSend },
                 SegNetworkExplain, SegNetworkSend, true, null, new[] { Child(3, "Network") }, null), regions[3]);
             BuildLoss(Add<LossExplainer>(new[] { RideLine.WrongSays, RideLine.WrongWanted, RideLine.WrongLoss }, SegWrong, SegWrong, false, null, null, null), regions[4]);
-            BuildBackprop(Add<BackpropExplainer>(new[] { RideLine.BackWish, RideLine.BackFlows, RideLine.BackGrab }, SegBackExplain, SegRewind, false,
-                null, new[] { Child(5, "Blame") }, new List<UnfoldSpec> { new UnfoldSpec(null, T(5, "Blame"), Explainer.UnfoldStyle.Show, 0f, 0.1f) }), regions[5]);
+            var backprop = Add<BackpropExplainer>(new[] { RideLine.BackWish, RideLine.BackFlows, RideLine.BackGrab }, SegBackExplain, SegRewind, false,
+                null, new[] { Child(5, "Blame") }, new List<UnfoldSpec> { new UnfoldSpec(null, T(5, "Blame"), Explainer.UnfoldStyle.Show, 0f, 0.1f) });
+            BuildBackprop(backprop, regions[5]);
+            Ref(backprop, "coveredSigns", regions[3].transform.Find("Network/Signs").gameObject);
             BuildDescent(Add<DescentExplainer>(new[] { RideLine.DescentHill, RideLine.DescentStep, RideLine.DescentTooBig, RideLine.TrainYourTurn }, SegRim, SegValley, true,
                 null, new[] { Child(6, "Ground"), Child(6, "Deck"), Child(6, "Sign"), Child(6, "Sun") },
                 new List<UnfoldSpec>
@@ -1225,25 +1227,28 @@ namespace Convergence.EditorTools
             string[] recapWhat =
             {
                 "your 3 became " + Convergence.Core.Training.DigitNetwork.Inputs + " numbers",
-                "weigh the pixels, add them up, squish",
+                "weigh the pixels, add, squish",
                 Convergence.Core.Training.DigitNetwork.Hidden + " neurons, " + Convergence.Core.Training.DigitNetwork.Outputs + " answers, " + weights + " weights",
-                "measure the loss, send the blame backwards",
+                "measure the loss, blame flows back",
                 "step downhill, again and again",
             };
-            const float rowTop = 0.4f, rowPitch = 0.3f, rowLeft = -2.05f;
+            // Big enough to read from the seat at 5 m (owner, 2026-10-27: the first ones were too small).
+            const float rowTop = 0.45f, rowPitch = 0.34f, rowLeft = -2.05f;
             var recapBars = new List<Shape>();
             var recapNameTexts = new List<Object>();
             var recapWhatTexts = new List<Object>();
             for (int k = 0; k < recapNames.Length; k++)
             {
                 float y = rowTop - k * rowPitch;
-                recapBars.Add(new Shape { kind = Shape.Kind.Quad, position = new Vector3(0.35f, y, 0f), size = new Vector2(5.2f, 0.25f), round = 0.5f, color = new Color(0.08f, 0.1f, 0.16f, 0.95f), stroke = yellow, strokeWidth = 0.012f });
-                recapNameTexts.Add(Serif("RecapName" + k, stage, new Vector3(rowLeft + 0.8f, y, -0.02f), (k + 1) + "   " + recapNames[k], 0.16f, yellow, 1.6f, TextAlignmentOptions.Left, 24));
-                recapWhatTexts.Add(Serif("RecapWhat" + k, stage, new Vector3(-0.3f + 1.7f, y, -0.02f), recapWhat[k], 0.14f, white, 3.4f, TextAlignmentOptions.Left, 24));
+                recapBars.Add(new Shape { kind = Shape.Kind.Quad, position = new Vector3(0.35f, y, 0f), size = new Vector2(5.2f, 0.29f), round = 0.5f, color = new Color(0.08f, 0.1f, 0.16f, 0.95f), stroke = yellow, strokeWidth = 0.012f });
+                recapNameTexts.Add(Serif("RecapName" + k, stage, new Vector3(rowLeft + 0.8f, y, -0.02f), (k + 1) + "  " + recapNames[k], 0.2f, yellow, 1.6f, TextAlignmentOptions.Left, 24));
+                TextMeshPro what = Serif("RecapWhat" + k, stage, new Vector3(-0.3f + 1.7f, y, -0.02f), recapWhat[k], 0.19f, white, 3.4f, TextAlignmentOptions.Left, 24);
+                what.textWrappingMode = TextWrappingModes.NoWrap;
+                recapWhatTexts.Add(what);
             }
 
             ShapeBatch bRecap = Batch("Recap", stage, recapBars, "ExplainerFlat", 21);
-            TextMeshPro recapTitle = Serif("RecapTitle", stage, new Vector3(0.35f, rowTop + 0.33f, -0.02f), "FIVE STOPS", 0.2f, white, 4f, TextAlignmentOptions.Center, 24);
+            TextMeshPro recapTitle = Serif("RecapTitle", stage, new Vector3(0.35f, rowTop + 0.3f, -0.02f), "FIVE STOPS", 0.22f, white, 4f, TextAlignmentOptions.Center, 24);
             ShapeBatch bChips = Batch("Chips", stage, chips, "ExplainerFlat", 21);
             ShapeBatch bVectors = Batch("Vectors", stage, vectors, "ExplainerFlat", 22);
             ShapeBatch bNet = Batch("Net", stage, net, "ExplainerFlat", 21);

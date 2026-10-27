@@ -301,11 +301,15 @@ namespace Convergence.EditorTools
         }
 
         /// <summary>Wires the pod's views to the scene's director and moments (the prefab cannot hold scene references).</summary>
-        private static void WirePod(GameObject pod, RideDirector director, Moments moments)
+        private static void WirePod(GameObject pod, RideDirector director, Moments moments, GameObject[] regions)
         {
             Ref(pod.GetComponent<DashScreenView>(), "director", director);
             Ref(pod.GetComponent<HintArrowView>(), "director", director);
             Ref(pod.GetComponent<FinaleView>(), "director", director);
+            // The accuracy sign stands right behind the end card and peeked out over it.
+            Transform accuracy = regions[7].transform.Find("AccuracySign");
+            if (accuracy == null) throw new System.InvalidOperationException("Region_7/AccuracySign is missing; the end card hides it.");
+            Refs(pod.GetComponent<FinaleView>(), "hideWhenDone", new List<Object> { accuracy.gameObject });
             Ref(pod.GetComponent<RideMusic>(), "director", director);
             Ref(pod.GetComponent<RegionTagView>(), "director", director);
 

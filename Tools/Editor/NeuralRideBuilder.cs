@@ -572,7 +572,7 @@ namespace Convergence.EditorTools
             regions[7] = BuildRightRegion(layout, rd, dash, moments.Right);
 
             WireDirector(rd, pod, layout, moments, regions);
-            WirePod(pod, rd, moments);
+            WirePod(pod, rd, moments, regions);
             BuildPixel(pod, rd, dash, moments);
             Ref(rd.GetComponentInChildren<NeuronExplainer>(true), "paintGrid", pod.transform.Find("GameTable/WeightGrid"));
             WireGames(pod, rd, moments, rig);

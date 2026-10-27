@@ -28,6 +28,8 @@ namespace Convergence.XR.Ride
         [SerializeField] private float driftTolerance = 0.35f;
         [Tooltip("...for this many seconds in a row.")]
         [SerializeField] private float driftSeconds = 3f;
+        [Tooltip("...or this far forward, back or sideways of the seat, metres.")]
+        [SerializeField] private float sideTolerance = 0.3f;
         [Tooltip("Re-seat, even mid-game, when the eye has been this far from the seat (up/down or sideways)...")]
         [SerializeField] private float resetTolerance = 0.6f;
         [Tooltip("...for this many seconds in a row.")]
@@ -116,8 +118,9 @@ namespace Convergence.XR.Ride
             lastHead = headCamera.localPosition;
             if (director == null) director = FindAnyObjectByType<RideDirector>();
             bool busy = speed > 0.15f || (director != null && (director.ActiveMoment is RideGame || director.WaitingForGo));
-            float error = Mathf.Abs(EyeAboveFloor() - targetEyeHeight);
-            if (error < driftTolerance || busy) driftSince = -1f;
+            // Off by height, or sitting back or forward of the seat (the owner sat 42 cm back: the table at 1.1 m, not 0.7).
+            bool drifted = Mathf.Abs(eye.y - targetEyeHeight) >= driftTolerance || new Vector2(eye.x, eye.z).magnitude >= sideTolerance;
+            if (!drifted || busy) driftSince = -1f;
             else if (driftSince < 0f) driftSince = Time.unscaledTime;
             else if (Time.unscaledTime - driftSince > driftSeconds) NormalizeEyeHeight();
         }
@@ -156,8 +159,6 @@ namespace Convergence.XR.Ride
             InputDevice head = InputDevices.GetDeviceAtXRNode(XRNode.Head);
             return !head.isValid || !head.TryGetFeatureValue(CommonUsages.userPresence, out bool present) || present;
         }
-
-        private float EyeAboveFloor() => headCamera.position.y - seatAnchor.position.y;
 
         private void NormalizeEyeHeight()
         {

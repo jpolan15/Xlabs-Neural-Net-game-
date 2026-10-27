@@ -731,6 +731,11 @@ namespace Convergence.EditorTools
                 for (int i = 0; i < targets.Length; i++) p.GetArrayElementAtIndex(i).intValue = targets[i].label;
             });
             Int(zap, "targetLabel", Level1Data.HeroDigit);
+            Set(zap, "quietSegments", p =>
+            {
+                p.arraySize = 1;
+                p.GetArrayElementAtIndex(0).intValue = SegRewind;
+            });
             BuildBlaster(pod, zap, targets.Length);
 
             // HUD and stamp.
@@ -799,7 +804,7 @@ namespace Convergence.EditorTools
 
             Game(m.Draw, "DRAW YOUR 3", "Hold the trigger and draw a 3", RideLine.DrawDone, 90f);
             Game(m.Paint, "3 DETECTOR", "Make the 3s glow, keep the rest dark", RideLine.NeuronSolved, 120f);
-            Game(m.Blame, "HOT-WIRE HUNT", "Drag each hot wire to the 3 before it cools", RideLine.BackDone, 60f);
+            Game(m.Blame, "WIRE HUNT", "Drag each hot wire to the 3 before it cools", RideLine.BackDone, 60f);
             Game(m.Train, "TRAIN PIXEL", "Hold a step size to train", RideLine.TrainDone, 90f);
             Game(m.Stump, "STUMP PIXEL", "Draw the digit Pixel asks for", RideLine.StumpDone, 75f);
             // The plunge after the training game is a quick victory ride.
