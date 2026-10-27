@@ -203,12 +203,15 @@ namespace Convergence.EditorTools
             return line;
         }
 
-        /// <summary>A button on a board: its tile goes into the board's tile mesh; a trigger collider and a label sit on it.</summary>
-        private static Transform BoardButton(TileMesh tiles, Transform board, string name, Vector3 at, Vector2 size, string label, Color labelColor)
+        /// <summary>
+        /// A button on a board: its tile goes into the board's tile mesh; a trigger collider and a white label sit on it
+        /// (white stays readable on the dark, the pulsing and the lit button colours).
+        /// </summary>
+        private static Transform BoardButton(TileMesh tiles, Transform board, string name, Vector3 at, Vector2 size, string label, float labelSize = 0.026f)
         {
             tiles.Face(at, size.x, size.y, new Color(0.15f, 0.35f, 0.6f, 0.6f));
             var button = Make(name, board, at);
-            Text("Label", button.transform, new Vector3(0, 0, -0.004f), label, 0.02f, labelColor, size.x, bold: true).rectTransform.sizeDelta = new Vector2(size.x, size.y);
+            Text("Label", button.transform, new Vector3(0, 0, -0.004f), label, labelSize, Color.white, size.x, bold: true).rectTransform.sizeDelta = new Vector2(size.x, size.y);
             var c = button.AddComponent<BoxCollider>();
             c.size = new Vector3(size.x, size.y + 0.006f, 0.03f);
             c.isTrigger = true;
@@ -234,9 +237,13 @@ namespace Convergence.EditorTools
         /// </summary>
         private static readonly Vector3 BoardLift = new Vector3(0f, 0f, -0.008f);
 
-        /// <summary>The drawing canvas's side, metres, and its centre on the drawing board.</summary>
+        /// <summary>
+        /// The drawing canvas's side, metres, and its centre on the drawing board; the readout (what Pixel sees, the bonus
+        /// round's bars) is centred at ReadoutX, 15 mm clear of the canvas's glowing edge.
+        /// </summary>
         private const float CanvasSide = 0.27f;
-        private static readonly Vector3 CanvasCentre = new Vector3(-0.13f, 0f, -0.006f);
+        private static readonly Vector3 CanvasCentre = new Vector3(-0.142f, 0f, -0.006f);
+        private const float ReadoutX = 0.106f;
 
         /// <summary>
         /// The drawing board (v6), for "draw your 3" and the bonus round: the canvas (a dark square with a trigger collider
@@ -263,7 +270,7 @@ namespace Convergence.EditorTools
             var tiles = new TileMesh();
             // What Pixel sees: the 49 numbers as a 7×7 (the prompt text doubles as its label).
             const float pitch = 0.025f;
-            Vector3 middle = new Vector3(0.1f, 0.015f, -0.006f);
+            Vector3 middle = new Vector3(ReadoutX, 0.015f, -0.006f);
             for (int i = 0; i < 49; i++)
             {
                 Vector3 at = middle + new Vector3((i % 7 - 3f) * pitch, (3f - i / 7) * pitch, 0f);
@@ -274,12 +281,12 @@ namespace Convergence.EditorTools
             const float barPitch = 0.019f, barBottom = -0.06f, barHeight = 0.12f;
             for (int k = 0; k < 10; k++)
             {
-                float x = 0.1f + (k - 4.5f) * barPitch;
+                float x = ReadoutX + (k - 4.5f) * barPitch;
                 tiles.Face(new Vector3(x, barBottom + barHeight * 0.5f, -0.006f), barPitch * 0.7f, barHeight, new Color(0.3f, 0.6f, 0.95f, 0.85f));
             }
 
-            BoardButton(tiles, board, "Done", new Vector3(0.262f, 0.045f, -0.006f), new Vector2(0.085f, 0.07f), "DONE", Color.white);
-            BoardButton(tiles, board, "Clear", new Vector3(0.262f, -0.045f, -0.006f), new Vector2(0.085f, 0.07f), "CLEAR", _theme.orange);
+            BoardButton(tiles, board, "Done", new Vector3(0.262f, 0.045f, -0.006f), new Vector2(0.095f, 0.07f), "DONE", 0.025f);
+            BoardButton(tiles, board, "Clear", new Vector3(0.262f, -0.045f, -0.006f), new Vector2(0.095f, 0.07f), "CLEAR", 0.025f);
             // The canvas's glowing edge, so the rider sees where to draw (four bars; DrawBoardView leaves them lit).
             Color edge = new Color(_theme.cyan.r, _theme.cyan.g, _theme.cyan.b, 0.75f);
             float side = CanvasSide + 0.008f, bar = 0.004f;
@@ -288,14 +295,18 @@ namespace Convergence.EditorTools
             tiles.Face(c0 + new Vector3(0f, -side * 0.5f, 0f), side + bar, bar, edge);
             tiles.Face(c0 + new Vector3(-side * 0.5f, 0f, 0f), bar, side, edge);
             tiles.Face(c0 + new Vector3(side * 0.5f, 0f, 0f), bar, side, edge);
-            for (int k = 0; k < 10; k++) FaceGlyph(tiles, k, new Vector3(0.1f + (k - 4.5f) * barPitch, barBottom - 0.014f, -0.006f), 0.0036f, Color.white);
+            // The bars' digits, 15 × 25 mm (inside the bar pitch), big enough that 3, 5, 6, 8 and 9 stay apart.
+            for (int k = 0; k < 10; k++) FaceGlyph(tiles, k, new Vector3(ReadoutX + (k - 4.5f) * barPitch, barBottom - 0.016f, -0.006f), 0.005f, Color.white);
             TileObject("Tiles", board, tiles, "Laser");
 
-            Text("Count", board, middle + new Vector3(0, -0.115f, 0), "49 numbers, 0 to 1", 0.016f, Color.white, 0.2f);
-            TextMeshPro prompt = Text("Prompt", board, new Vector3(0.1f, 0.128f, -0.006f), "WHAT PIXEL SEES", 0.022f, _theme.gold, 0.22f, bold: true);
-            prompt.rectTransform.sizeDelta = new Vector2(0.22f, 0.03f);
-            TextMeshPro answer = Text("Answer", board, new Vector3(0.1f, -0.115f, -0.006f), "", 0.018f, Color.white, 0.22f, bold: true);
-            answer.rectTransform.sizeDelta = new Vector2(0.22f, 0.03f);
+            // "Count" is the hint in the empty canvas (DrawBoardView hides it once there is ink).
+            TextMeshPro hint = Text("Count", board, CanvasCentre + new Vector3(0f, 0f, -0.003f), "HOLD TRIGGER\nAND DRAW", 0.032f, new Color(0.55f, 0.95f, 1f, 0.8f), 0.26f, bold: true);
+            hint.rectTransform.sizeDelta = new Vector2(0.26f, 0.09f);
+            TextMeshPro prompt = Text("Prompt", board, new Vector3(ReadoutX, 0.128f, -0.006f), "PIXEL SEES", 0.026f, _theme.gold, 0.2f, bold: true);
+            prompt.rectTransform.sizeDelta = new Vector2(0.2f, 0.034f);
+            // The bonus round's verdict sits under the bar digits and right of the canvas (clear of its edge).
+            TextMeshPro answer = Text("Answer", board, new Vector3(0.16f, -0.115f, -0.006f), "", 0.028f, Color.white, 0.3f, bold: true);
+            answer.rectTransform.sizeDelta = new Vector2(0.3f, 0.036f);
             board.gameObject.SetActive(false);
         }
 
@@ -317,7 +328,7 @@ namespace Convergence.EditorTools
         }
 
         /// <summary>The step-size buttons' labels (the learning rates the bake checked: tiny, good, huge).</summary>
-        private static readonly string[] StepLabels = { "SMALL STEP\n0.15", "MEDIUM STEP\n4", "HUGE STEP\n40" };
+        private static readonly string[] StepLabels = { "SMALL\n0.15", "MEDIUM\n4", "HUGE\n40" };
         private static readonly Vector2 PlotSize = new Vector2(0.36f, 0.2f);
         private static readonly Vector2 PlotCentre = new Vector2(-0.1f, 0.0f);
 
@@ -337,7 +348,7 @@ namespace Convergence.EditorTools
             var tiles = new TileMesh();
             for (int b = 0; b < StepLabels.Length; b++)
             {
-                BoardButton(tiles, board, "StepButton" + b, new Vector3(0.225f, 0.075f - b * 0.075f, -0.006f), new Vector2(0.15f, 0.062f), StepLabels[b], b == 2 ? _theme.orange : Color.white);
+                BoardButton(tiles, board, "StepButton" + b, new Vector3(0.225f, 0.082f - b * 0.082f, -0.006f), new Vector2(0.15f, 0.07f), StepLabels[b]);
             }
 
             float target = (float)_data.File.live.targetAccuracy;
@@ -347,12 +358,15 @@ namespace Convergence.EditorTools
             tiles.Face(new Vector3(left, PlotCentre.y, -0.006f), 0.002f, PlotSize.y, new Color(1f, 1f, 1f, 0.5f));
             TileObject("Tiles", board, tiles, "Laser");
 
-            Text("LossLabel", board, new Vector3(left + 0.04f, bottom + PlotSize.y + 0.008f, -0.006f), "LOSS", 0.018f, _theme.orange, 0.1f, TextAlignmentOptions.Left, true);
-            Text("AccuracyLabel", board, new Vector3(left + 0.16f, bottom + PlotSize.y + 0.008f, -0.006f), "ACCURACY", 0.018f, _theme.cyan, 0.16f, TextAlignmentOptions.Left, true);
-            Text("TargetLabel", board, new Vector3(left + PlotSize.x - 0.03f, bottom + PlotSize.y * target + 0.01f, -0.006f), Mathf.RoundToInt(target * 100f) + "%", 0.016f, new Color(0.45f, 1f, 0.5f), 0.06f, bold: true);
-            Text("StepsLabel", board, new Vector3(PlotCentre.x, bottom - 0.015f, -0.006f), "training steps", 0.014f, Color.white, 0.2f);
-            Text("RateLabel", board, new Vector3(0.225f, 0.125f, -0.006f), "LEARNING RATE", 0.016f, Color.white, 0.18f, bold: true);
-            Text("Hold", board, new Vector3(0.225f, -0.125f, -0.006f), "hold one to train", 0.014f, new Color(1f, 1f, 1f, 0.6f), 0.18f);
+            // The labels sit above the plot's plate, so the loss spiking off the top never runs through them.
+            float labels = PlotCentre.y + PlotSize.y * 0.5f + 0.025f;
+            Text("LossLabel", board, new Vector3(left + 0.04f, labels, -0.006f), "LOSS", 0.024f, _theme.orange, 0.1f, TextAlignmentOptions.Left, true);
+            Text("AccuracyLabel", board, new Vector3(left + 0.17f, labels, -0.006f), "ACCURACY", 0.024f, _theme.cyan, 0.17f, TextAlignmentOptions.Left, true);
+            Text("TargetLabel", board, new Vector3(left + PlotSize.x - 0.03f, bottom + PlotSize.y * target + 0.012f, -0.006f), Mathf.RoundToInt(target * 100f) + "%", 0.022f, new Color(0.45f, 1f, 0.5f), 0.07f, bold: true);
+            Text("RateLabel", board, new Vector3(0.225f, 0.14f, -0.006f), "LEARNING RATE", 0.024f, Color.white, 0.26f, bold: true);
+            // The empty plot says what to do; TrainBoardView hides it at the first step.
+            TextMeshPro hint = Text("Hint", board, new Vector3(PlotCentre.x, PlotCentre.y, -0.008f), "HOLD A STEP SIZE\nTO START TRAINING", 0.03f, Color.white, PlotSize.x, bold: true);
+            hint.rectTransform.sizeDelta = new Vector2(PlotSize.x, 0.09f);
             board.gameObject.SetActive(false);
         }
 
@@ -527,6 +541,7 @@ namespace Convergence.EditorTools
             Ref(trainView, "accuracyCurve", train.Find("AccuracyCurve").GetComponent<LineRenderer>());
             Ref(trainView, "ball", train.Find("Ball"));
             Ref(trainView, "tiles", train.Find("Tiles").GetComponent<MeshFilter>());
+            Ref(trainView, "hint", train.Find("Hint").gameObject);
             Set(trainView, "plotSize", p => p.vector2Value = PlotSize);
             Set(trainView, "plotCentre", p => p.vector2Value = PlotCentre);
             for (int b = 0; b < TrainMoment.ButtonCount; b++)

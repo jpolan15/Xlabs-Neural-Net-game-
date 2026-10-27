@@ -125,7 +125,7 @@ namespace Convergence.EditorTools
                         {
                             Shoot(cam, rt, tex, podT, EyeHeights[e], Yaws[y]);
                             File.WriteAllBytes(Path.Combine(dir, "eye" + Mathf.RoundToInt(EyeHeights[e] * 100f) + "_yaw" + YawTag(Yaws[y]) + ".jpg"), tex.EncodeToJPG(88));
-                            Paste(tex, sheet, y, 2 - e);
+                            Paste(tex, sheet, y, e); // texture rows count up from the bottom: the tallest eye ends on top
                             shots++;
                         }
                     }

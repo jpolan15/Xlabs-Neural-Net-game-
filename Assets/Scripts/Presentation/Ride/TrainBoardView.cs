@@ -8,8 +8,9 @@ namespace Convergence.Presentation.Ride
     /// <summary>
     /// The training game's board on the table (v6): the loss curve as it is measured (red-orange, falling as the network
     /// learns, spiking off the top when a huge step blows it up), the test accuracy under it (cyan) with the target as a
-    /// green line, a ball riding the head of the loss curve, and the three step-size buttons (lit while held, dark red
-    /// for a moment after an undo). Display only: <see cref="TrainMoment"/> and Core decide.
+    /// green line, a ball riding the head of the loss curve, and the three step-size buttons (lit green while held, dark
+    /// red for a moment after an undo; their labels are white, so every colour here keeps them readable). Until the
+    /// first step the empty plot says what to do. Display only: <see cref="TrainMoment"/> and Core decide.
     /// </summary>
     public sealed class TrainBoardView : MonoBehaviour
     {
@@ -21,13 +22,16 @@ namespace Convergence.Presentation.Ride
         [SerializeField] private LineRenderer accuracyCurve;
         [SerializeField] private Transform ball;
         [SerializeField] private MeshFilter tiles;
+        [Tooltip("\"Hold a step size\", shown in the empty plot until the first training step.")]
+        [SerializeField] private GameObject hint;
         [Tooltip("The plot's size and centre, in the board's local metres.")]
         [SerializeField] private Vector2 plotSize = new Vector2(0.36f, 0.2f);
         [SerializeField] private Vector2 plotCentre = new Vector2(-0.1f, 0.0f);
         [Tooltip("The loss that reaches the top of the plot, as a multiple of the starting loss.")]
         [SerializeField] private float lossTop = 1.4f;
         [SerializeField] private Color buttonColor = new Color(0.15f, 0.35f, 0.6f, 0.55f);
-        [SerializeField] private Color heldColor = new Color(1f, 0.85f, 0.4f, 1f);
+        [SerializeField] private Color idlePulse = new Color(0.2f, 0.45f, 0.85f, 0.75f);
+        [SerializeField] private Color heldColor = new Color(0.08f, 0.5f, 0.28f, 1f);
         [SerializeField] private Color coolColor = new Color(0.7f, 0.12f, 0.1f, 0.8f);
         [SerializeField] private Color flashColor = new Color(1f, 0.25f, 0.15f, 0.9f);
 
@@ -97,6 +101,9 @@ namespace Convergence.Presentation.Ride
                 ball.localScale = Vector3.one * (0.022f * (game.Held >= 0 ? 1f + 0.15f * Mathf.Sin(Time.time * 18f) : 1f));
             }
 
+            bool showHint = game.IsLive && game.Steps == 0;
+            if (hint != null && hint.activeSelf != showHint) hint.SetActive(showHint);
+
             if (_colors == null) return;
             bool flashing = Time.time < _flashUntil;
             for (int b = 0; b < TrainMoment.ButtonCount; b++)
@@ -104,7 +111,7 @@ namespace Convergence.Presentation.Ride
                 Color c = buttonColor;
                 if (game.Cooling) c = coolColor;
                 else if (game.Held == b) c = heldColor;
-                else if (game.IsLive && game.Held < 0) c = Color.Lerp(buttonColor, new Color(0.3f, 0.6f, 0.95f, 0.75f), 0.5f + 0.5f * Mathf.Sin(Time.time * 3f + b));
+                else if (game.IsLive && game.Held < 0) c = Color.Lerp(buttonColor, idlePulse, 0.5f + 0.5f * Mathf.Sin(Time.time * 3f + b));
                 for (int i = b * 4; i < b * 4 + 4 && i < _colors.Length; i++) _colors[i] = c;
             }
 

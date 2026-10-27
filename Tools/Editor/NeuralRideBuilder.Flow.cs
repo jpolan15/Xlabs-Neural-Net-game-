@@ -49,7 +49,7 @@ namespace Convergence.EditorTools
                 new SegmentSpec { Name = "E2 neuron: explain", Region = 2, Leg = A, To = L.NeuronStop, Cruise = 3f, MinSeconds = 0f, Travel = -1, Arrival = 1, Mask = R(2) },
                 new SegmentSpec { Name = "E2 neuron: your turn", Region = 2, Leg = A, To = L.NeuronStop, Cruise = 3f, MinSeconds = 0f, Travel = -1, Arrival = 2, Moment = m.Paint, Mask = R(2) },
                 // E3: the network, then the rider sends their own 3 through it.
-                new SegmentSpec { Name = "E3 network: explain", Region = 3, Leg = A, To = L.NetViewStop, Cruise = 7f, MinSeconds = 7f, Travel = -1, Arrival = 3, Mask = R(2, 3) },
+                new SegmentSpec { Name = "E3 network: explain", Region = 3, Leg = A, To = L.NetViewStop, Cruise = 8f, MinSeconds = 7f, Travel = -1, Arrival = 3, Mask = R(2, 3) },
                 new SegmentSpec { Name = "E3 network: send your 3", Region = 3, Leg = A, To = L.NetViewStop, Cruise = 4f, MinSeconds = 0f, Travel = -1, Arrival = 4, Moment = m.Forward, Mask = R(3) },
                 // E4: the guess (random: nothing is trained yet) and the loss.
                 new SegmentSpec { Name = "E4 the guess and the loss", Region = 4, Leg = A, To = L.WrongStop, Cruise = 4f, MinSeconds = 0f, Travel = -1, Arrival = 5, Mask = R(3, 4) },
@@ -61,7 +61,8 @@ namespace Convergence.EditorTools
                 new SegmentSpec { Name = "E6 descent: explain, then train", Region = 6, Leg = C, To = L.Rim, Cruise = 6f, MinSeconds = 8f, Travel = -1, Arrival = 8, Moment = m.Train, Mask = R(3, 6) },
                 new SegmentSpec { Name = "E6 descent: the Valley", Region = 6, Leg = C, To = L.Rim, Cruise = 1f, MinSeconds = 0f, Travel = -1, Arrival = -1, Moment = m.Valley, Mask = R(6, 7) },
                 // E7: Pixel reads the rider's own 3 with the network they trained (its moment says the lines), then the bonus round.
-                new SegmentSpec { Name = "E7 right: Pixel reads your 3", Region = 7, Leg = C, To = L.RightView, Cruise = 5f, MinSeconds = 6f, Travel = -1, Arrival = -1, Moment = m.Right, Mask = R(6, 7) },
+                // The climb out of the Valley is long and straight, so it runs quicker (noise to zap on the way).
+                new SegmentSpec { Name = "E7 right: Pixel reads your 3", Region = 7, Leg = C, To = L.RightView, Cruise = 9f, MinSeconds = 6f, Travel = -1, Arrival = -1, Moment = m.Right, Mask = R(6, 7) },
                 new SegmentSpec { Name = "Bonus: stump Pixel", Region = 7, Leg = C, To = L.RightView, Cruise = 1f, MinSeconds = 0f, Travel = -1, Arrival = -1, Moment = m.Stump, Mask = R(7) },
                 // E8: tokens, then the end card.
                 new SegmentSpec { Name = "E8 tokens: explain", Region = 7, Leg = C, To = L.EndStop, Cruise = 4f, MinSeconds = 5f, Travel = -1, Arrival = 9, Mask = R(7) },

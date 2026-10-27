@@ -33,6 +33,7 @@ namespace Convergence.Presentation.Ride
         [SerializeField] private MeshFilter tiles;
         [SerializeField] private TextMeshPro prompt;
         [SerializeField] private TextMeshPro answer;
+        [Tooltip("The hint in the empty canvas (\"hold trigger and draw\"), shown while a game is live and the canvas has no ink.")]
         [SerializeField] private TextMeshPro count;
         [SerializeField] private float barHeight = 0.12f;
         [SerializeField] private Color inkColor = new Color(0.85f, 0.98f, 1f, 1f);
@@ -41,7 +42,7 @@ namespace Convergence.Presentation.Ride
         [SerializeField] private Color barColor = new Color(0.3f, 0.6f, 0.95f, 0.85f);
         [SerializeField] private Color barGuess = new Color(1f, 0.85f, 0.4f, 1f);
         [SerializeField] private Color buttonColor = new Color(0.15f, 0.35f, 0.6f, 0.6f);
-        [SerializeField] private Color buttonReady = new Color(0.3f, 0.85f, 0.45f, 0.9f);
+        [SerializeField] private Color buttonReady = new Color(0.05f, 0.5f, 0.25f, 0.95f);
 
         private Mesh _tiles;
         private Color[] _colors;
@@ -134,9 +135,8 @@ namespace Convergence.Presentation.Ride
             if (board == null || (index != drawSegment && index != stumpSegment)) return;
             board.SetActive(true);
             bool bonus = index == stumpSegment;
-            if (prompt != null) prompt.text = bonus ? "" : "WHAT PIXEL SEES";
+            if (prompt != null) prompt.text = bonus ? "" : "PIXEL SEES";
             if (answer != null) answer.text = "";
-            if (count != null) count.gameObject.SetActive(!bonus);
             System.Array.Clear(_pixels, 0, _pixels.Length);
             _dirtyInk = true;
         }
@@ -167,6 +167,9 @@ namespace Convergence.Presentation.Ride
             bool bonus = Stumping;
             DigitCanvas live = bonus ? (stump != null ? stump.Canvas : null) : (draw != null ? draw.Canvas : null);
             if (_dirtyInk && live != null) DrawInk(live);
+            bool playing = bonus ? stump != null && stump.IsLive : draw != null && draw.IsLive;
+            bool hint = playing && live != null && live.StrokeCount == 0;
+            if (count != null && count.gameObject.activeSelf != hint) count.gameObject.SetActive(hint);
             if (_tiles == null) return;
 
             for (int i = 0; i < CellFaces; i++) Face(i, bonus ? Color.clear : Color.Lerp(cellDark, cellInk, Mathf.Clamp01((float)_pixels[i])));
@@ -176,7 +179,7 @@ namespace Convergence.Presentation.Ride
 
             bool ready = live != null && live.HasEnoughInk;
             Face(FirstButton, ready ? Color.Lerp(buttonColor, buttonReady, 0.6f + 0.4f * Mathf.Sin(Time.time * 4f)) : buttonColor);
-            Face(FirstButton + 1, live != null && live.StrokeCount > 0 ? buttonColor * 1.4f : buttonColor * 0.6f);
+            Face(FirstButton + 1, live != null && live.StrokeCount > 0 ? buttonColor * 1.2f : buttonColor * 0.6f);
             _tiles.colors = _colors;
         }
 
@@ -198,7 +201,7 @@ namespace Convergence.Presentation.Ride
             if (answer == null) return;
             if (Time.time < _judgedUntil) answer.text = _judgedRight ? "PIXEL READ IT!" : "FOOLED PIXEL!";
             else if (guess < 0) answer.text = "";
-            else answer.SetText("PIXEL SAYS  {0:0}   {1:0}%", guess, (float)p[guess] * 100f);
+            else answer.SetText("PIXEL: {0:0}  {1:0}%", guess, (float)p[guess] * 100f);
         }
 
         /// <summary>Every stroke as a ribbon of quads (with a square at each point so the joints stay solid), in metres.</summary>

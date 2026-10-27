@@ -73,3 +73,23 @@ timings and captions work; swapping is re-render + install + rebuild.
   eye to each control. Live play-mode screenshots checked: draw board, training board (blow-up spike, curves), bonus round.
 - Training speed set to 25 steps/s (the good rate won in ~5 s at 40/s; now ~8 s).
 - Not done: headset ride; the real voice (owner choosing: record or ElevenLabs); vr-qa review of the new boards.
+
+### 2026-10-26 — pace (Claude)
+- Ride length estimate (builder travel + sequence lines): travel 101 s, lines 158 s, about 7.5 to 8 min with the games,
+  roughly 40 % hands-on. Longest dead stretch: the straight climb out of the Valley to E7 (38 s at cruise 5). Cruise
+  raised there (5 → 9) and on the E3 approach (7 → 8); noise specks (zap) still run on every travel leg.
+
+### 2026-10-26 — vr-qa review of the v6 boards, fixes (Claude)
+- Text was 0.8-1.3 degrees (too small): board text now 0.024-0.032 m em (button labels 0.025-0.026, verdict 0.028,
+  LOSS/ACCURACY/LEARNING RATE 0.024). "training steps" and "hold one to train" removed; the empty plot says "HOLD A STEP
+  SIZE TO START TRAINING" and the empty canvas "HOLD TRIGGER AND DRAW" (both hide at the first step / stroke; same TMP
+  count). Step labels "SMALL / MEDIUM / HUGE" + rate; step buttons 0.15 × 0.07 at 0.082 pitch.
+- Contrast: every button label white; held step green (0.08, 0.5, 0.28), DONE-ready green (0.05, 0.5, 0.25), idle pulse
+  darker, lit CLEAR ×1.2.
+- Layout: canvas left 12 mm and readout right 6 mm (15 mm clear of the canvas edge); bar digits 15 × 25 mm; LOSS and
+  ACCURACY above the plot plate (the spike no longer runs through them).
+- `GameTableView` lifts or lowers the table by the rider's eye offset from 1.30 m (clamped 1.10-1.50) each time it rises,
+  so the boards sit 34 degrees down for every rider.
+- Bonus round: digit walls out to ±10.5 m, 8 columns (end 13 m ahead), gold dimmed, so they no longer cover the network's
+  pixels and answer labels; "10 ANSWERS" moved 1.8 m left, clear of Pixel's antennae.
+- Not judged by the review: headset sharpness, laser hit reliability on a real controller, the lit send card.

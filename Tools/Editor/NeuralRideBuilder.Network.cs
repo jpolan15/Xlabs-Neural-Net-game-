@@ -291,7 +291,7 @@ namespace Convergence.EditorTools
             {
                 ("49 PIXELS", new Vector3(InputX, -0.6f, -0.3f)),
                 ("16 HIDDEN", new Vector3(0f, 1.9f, -0.3f)),
-                ("10 ANSWERS", new Vector3(OutputX + 0.6f, -1.1f, -0.3f)),
+                ("10 ANSWERS", new Vector3(OutputX - 1.2f, -1.1f, -0.3f)),
             })
             {
                 TextMeshPro sign = Text(text.Replace(" ", ""), signs, at, text, 1.35f, trained ? _theme.gold : _theme.networkBlue, 11f, bold: true);
@@ -508,13 +508,15 @@ namespace Convergence.EditorTools
 
         /// <summary>
         /// 60 real test digits, digits the network never trained on, on two walls (v6: without the bake's answers under
-        /// them, since the network here is the one the rider trained).
+        /// them, since the network here is the one the rider trained). The walls stand 10.5 m out and end 13 m ahead, so
+        /// from the stop they never cover the network's pixels or its answer labels, and their gold is dimmed so the
+        /// network stays the brightest thing in view.
         /// </summary>
         private static void BuildDigitWalls(Transform root)
         {
             Level1Digit[] digits = _data.File.finale.digits;
             Transform walls = Make("DigitWall", root, Vector3.zero).transform;
-            const int perWall = 30, columns = 10;
+            const int perWall = 30, columns = 8;
             const float cell = 0.17f, pitch = 1.65f;
             for (int side = 0; side < 2; side++)
             {
@@ -526,13 +528,13 @@ namespace Convergence.EditorTools
                     int row = n / columns, col = n % columns;
                     // Local to the wall: x along the track (toward +z), y up. The wall faces the track.
                     float along = -Layout.ViewDistance + 1.5f + col * pitch;
-                    float up = 3.9f - row * 1.45f;
+                    float up = 5.35f - row * 1.45f;
                     for (int r = 0; r < 7; r++)
                     {
                         for (int c = 0; c < 7; c++)
                         {
                             Color ink = Ink(d.pixels7[r * 7 + c]);
-                            ink = Color.Lerp(new Color(0.12f, 0.1f, 0.05f, 0f), _theme.gold, ink.r);
+                            ink = Color.Lerp(new Color(0.12f, 0.1f, 0.05f, 0f), _theme.gold * 0.65f, ink.r);
                             ink.a = (float)d.pixels7[r * 7 + c];
                             float z = along + (c - 3) * cell * sign * -1f;
                             tiles.Quad(
@@ -546,7 +548,7 @@ namespace Convergence.EditorTools
 
                 }
 
-                var wall = Make(side == 0 ? "Left" : "Right", walls, new Vector3(sign * 6.5f, 0f, 0f));
+                var wall = Make(side == 0 ? "Left" : "Right", walls, new Vector3(sign * 10.5f, 0f, 0f));
                 TileObject("Tiles", wall.transform, tiles, "TilesBright");
             }
         }
