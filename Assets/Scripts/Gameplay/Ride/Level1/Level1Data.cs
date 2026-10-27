@@ -118,6 +118,15 @@ namespace Convergence.Gameplay.Ride.Level1
             Require(f.finale != null && f.finale.digits != null && f.finale.digits.Length > 0, "finale.digits");
             Require(f.threes != null && f.threes.Length >= 12, "threes (the dock's gallery)");
             foreach (var t in f.threes) Require(t != null && t.label == HeroDigit && t.pixels28 != null && t.pixels28.Length == 784, "a gallery three's pixels28");
+            Require(f.targets != null && f.targets.Length >= 8, "targets (blast the 3s)");
+            int targetThrees = 0;
+            foreach (var t in f.targets)
+            {
+                Require(t != null && t.label >= 0 && t.label <= 9 && t.pixels28 != null && t.pixels28.Length == 784, "a target's pixels28");
+                if (t.label == HeroDigit) targetThrees++;
+            }
+
+            Require(targetThrees > 0 && targetThrees < f.targets.Length, "targets need threes and other digits");
             Level1Live live = f.live;
             Require(live != null && live.rates != null && live.rates.Length == 3 && live.batch > 0 && live.samplerSeed != 0, "live (the training game)");
             Require(live.trainLabels != null && live.trainLabels.Length > 0 && !string.IsNullOrEmpty(live.trainPixels), "live.train");
@@ -154,6 +163,9 @@ namespace Convergence.Gameplay.Ride.Level1
 
         /// <summary>The dock's gallery (E0): real test threes, all different, never the hero.</summary>
         public Level1Picture[] threes;
+
+        /// <summary>The travel game (v7, blast the 3s): clear real test digits, threes and look-alikes, 28x28.</summary>
+        public Level1Picture[] targets;
         /// <summary>The training game (v6): the digits the rider trains on and is tested on.</summary>
         public Level1Live live;
     }

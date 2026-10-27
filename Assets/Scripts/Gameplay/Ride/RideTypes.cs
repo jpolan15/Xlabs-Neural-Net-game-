@@ -237,7 +237,13 @@ namespace Convergence.Gameplay.Ride
         TokensWords = 170,
         TokensNumbers = 171,
         TokensPredict = 172,
-        TokensNext = 173
+        TokensNext = 173,
+
+        // Level 1 v7 (TASK_LEVEL1_V7_DEMO): the intro's roadmap, blast the 3s, what the hidden neurons learned.
+        IntroStops = 174,
+        ZapWrong = 175,
+        LearnedPainted = 176,
+        LearnedHonest = 177
     }
 
     /// <summary>Stable ids for the pod's control channels. Level 1 has one: GO.</summary>

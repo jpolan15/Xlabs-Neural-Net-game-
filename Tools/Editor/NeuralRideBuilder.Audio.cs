@@ -53,6 +53,12 @@ namespace Convergence.EditorTools
             new CueSpec("solved", KenneyDir + "confirmation_001.wav", -11.6f, -22f),
             new CueSpec("solvedShimmer", SciFiDir + "forceField_002.ogg", -11.3f, -27f),
             new CueSpec("wrong", SfxDir + "ride_wrong.wav", -7.3f, -24f),
+            // The v5 game cues had no clips until v7 (laser shots, blasts, the send card and the win were silent).
+            new CueSpec("fire", SciFiDir + "laserSmall_001.ogg", -18.7f, -25f, 0.06f),
+            new CueSpec("pop", SciFiDir + "explosionCrunch_000.ogg", -17.7f, -23f, 0.05f),
+            new CueSpec("plugIn", SciFiDir + "impactMetal_001.ogg", -27.2f, -28f),
+            new CueSpec("win", KenneyDir + "confirmation_001.wav", -11.6f, -21f),
+            new CueSpec("winShimmer", SciFiDir + "forceField_001.ogg", -11.7f, -26f),
             new CueSpec("nudge", SciFiDir + "laserLarge_000.ogg", -19.6f, -25f, 0.05f),
             new CueSpec("hop", KenneyDir + "click_001.wav", -26.1f, -30f),
             new CueSpec("finale", SciFiDir + "lowFrequency_explosion_001.ogg", -15.9f, -21f),

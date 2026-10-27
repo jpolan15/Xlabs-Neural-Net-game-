@@ -92,6 +92,9 @@ namespace Convergence.Gameplay.Ride.Level1
 
             if (trained)
             {
+                // First, what training learned (v7): the hidden neurons' real weights beside the one the rider painted.
+                yield return Say(RideLine.LearnedPainted);
+                yield return Say(RideLine.LearnedHonest);
                 yield return Say(RideLine.RightYours);
                 yield return Race();
                 yield return Hold(holdAfter);

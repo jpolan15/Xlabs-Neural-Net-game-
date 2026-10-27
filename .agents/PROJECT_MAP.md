@@ -2,7 +2,7 @@
 
 Read this before scanning the repository. Each entry is a one-line description of the directory's purpose.
 
-Last updated: 2026-10-26 (Level 1 v6: the rider's own 3, trained live, ADR-020)
+Last updated: 2026-10-27 (Level 1 v7: blast the 3s, intro roadmap, what training learned, ADR-021)
 
 ---
 
@@ -43,7 +43,7 @@ Last updated: 2026-10-26 (Level 1 v6: the rider's own 3, trained live, ADR-020)
 | Path | Purpose |
 |---|---|
 | `Assets/_Project/` | First-party assets: Audio, Materials, Prefabs, Scenes, ScriptableObjects |
-| `Assets/_Project/Data/Level1/` | `level1_digits.json`: the baked Level 1 network (both weight sets), hero digit, puzzle, Valley ribbon, finale digits and the training game's digits (`live`), written by `ArtSource/training/bake_level1.py` |
+| `Assets/_Project/Data/Level1/` | `level1_digits.json`: the baked Level 1 network (both weight sets), hero digit, puzzle, Valley ribbon, finale digits, the training game's digits (`live`) and the travel game's targets (`targets`), written by `ArtSource/training/bake_level1.py` |
 | `Assets/_Project/Audio/` | **Canonical** audio assets location — see `Assets/_Project/Audio/AGENTS.md`. Ride: `Voice/vo_ride_NN.wav` (+ `.txt` sidecars), `Sfx/` (derived loops and buzzer), `Kenney/` (CC0 effects), `Music/` |
 | `Assets/AudioAssets/` | **Deprecated** — redirect to `Assets/_Project/Audio/` (no files; only AGENTS.md) |
 | `Assets/Materials/` | Shared materials. `NeuralRide/` holds the ride's materials (HoloLit solids, unlit icons and lines, additive glows, the two network materials) |
@@ -60,11 +60,11 @@ Last updated: 2026-10-26 (Level 1 v6: the rider's own 3, trained live, ADR-020)
 | Path | Purpose |
 |---|---|
 | `Assets/Scripts/Core/` | Engine-independent C# — Math, Neural, Training, Puzzles |
-| `Assets/Scripts/Gameplay/` | MonoBehaviour orchestration — chamber state, blast doors, facility. `Ride/` is the Neural Ride segment director, `RideScript` and moments; `RideGame` is the mini-game base (score, stars, win, pull GO), `ZapGame` the noise specks; `Ride/Level1/` loads the bake (`Level1Data`), holds the rider's run (`Level1Session`: their digit and network) and Level 1's moments (draw, weight paint, forward pass and reading, blame hunt, training game, valley run, stump Pixel), the canvas and button inputs |
+| `Assets/Scripts/Gameplay/` | MonoBehaviour orchestration — chamber state, blast doors, facility. `Ride/` is the Neural Ride segment director, `RideScript` and moments; `RideGame` is the mini-game base (score, stars, win, pull GO), `ZapGame` the travel game (blast the 3s: real digits fly at the pod); `Ride/Level1/` loads the bake (`Level1Data`), holds the rider's run (`Level1Session`: their digit and network) and Level 1's moments (draw, weight paint, forward pass and reading, blame hunt, training game, valley run, stump Pixel), the canvas and button inputs |
 | `Assets/Scripts/XR/` | XR input translation — converts interaction to gameplay commands |
 | `Assets/Scripts/XR/Ride/` | Hand lasers (`RideHandLasers`: trigger/A fires, right green / left red), `HandPolarityController` (hand colour, fingertip orb and touch trigger), pod lever, pod seat (eye-height normalisation), and desktop fallback with operator keys: Space skips narration, R restarts (ADR-011) |
 | `Assets/Scripts/XR/Meta/` | Meta-specific adapters only (isolated from Core and Gameplay) |
-| `Assets/Scripts/Presentation/` | Visualization, audio, haptics — observes state, never decides it. `Ride/` holds the ride views, `NarrationLibrary`, `PixelBuddyView` (the buddy, pettable), `BlameView` (the wires you drag to the 3, re-aimed at the rider's digit), `DrawBoardView`/`TrainBoardView`/`SendCardView` (the v6 boards), `NetworkLiveView` (the diagrams follow the rider's digit and weights), `RideBoot` (black fade + warm-up before the ride starts); `Ride/Explainers/` the explainer kit (Rate, Tween, Anim, ShapeBatch) and E0–E8 (ADR-017) |
+| `Assets/Scripts/Presentation/` | Visualization, audio, haptics — observes state, never decides it. `Ride/` holds the ride views, `NarrationLibrary`, `PixelBuddyView` (the buddy, pettable), `BlameView` (the wires you drag to the 3, re-aimed at the rider's digit), `DrawBoardView`/`TrainBoardView`/`SendCardView` (the v6 boards), `NetworkLiveView` (the diagrams follow the rider's digit and weights), `RideBoot` (black fade + warm-up before the ride starts), `BlasterView` (the flying digits in one batch, the bolt, the pixel burst); `Ride/Explainers/` the explainer kit (Rate, Tween, Anim, ShapeBatch) and E0–E8 (ADR-017) |
 | `Assets/Scripts/Infrastructure/` | Cross-cutting utilities: logging, events, telemetry contracts |
 
 > Note: `Assets/Scripts/Visualization/` and `Assets/Scripts/Audio/` are being consolidated into `Assets/Scripts/Presentation/` in a future migration task. Do not move files yet.

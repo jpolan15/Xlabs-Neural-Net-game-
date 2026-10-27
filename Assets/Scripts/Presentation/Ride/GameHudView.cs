@@ -38,27 +38,44 @@ namespace Convergence.Presentation.Ride
         private float _popupAt = -100f;
         private Vector3 _popupFrom;
         private int _shownScore = -1;
+        private Color _popupColor = Color.white;
+        private static readonly Color WrongColor = new Color(1f, 0.38f, 0.33f);
 
         private void Start()
         {
             if (panel != null) panel.SetActive(false);
             if (stamp != null) stamp.SetActive(false);
-            if (popup != null) popup.gameObject.SetActive(false);
+            if (popup != null)
+            {
+                _popupColor = popup.color;
+                popup.gameObject.SetActive(false);
+            }
+
             if (score != null) score.text = "";
         }
 
         private void OnEnable()
         {
-            if (zap != null) zap.SpeckZapped += OnZapped;
+            if (zap != null) zap.Shot += OnShot;
         }
 
         private void OnDisable()
         {
             Watch(null);
-            if (zap != null) zap.SpeckZapped -= OnZapped;
+            if (zap != null) zap.Shot -= OnShot;
         }
 
-        private void OnZapped(Vector3 where) => OnScored(10, where);
+        // Blast the 3s: "+10", "+20 x2" on a streak, "NOT A 3  -10" in red for a mistake.
+        private void OnShot(Vector3 where, bool right, int points)
+        {
+            if (popup == null) return;
+            int multiplier = zap.LastMultiplier;
+            popup.text = right ? (multiplier > 1 ? "+" + points + "  x" + multiplier : "+" + points) : "NOT A " + zap.TargetLabel + (points < 0 ? "  " + points : "");
+            popup.color = right ? _popupColor : WrongColor;
+            _popupAt = Time.time;
+            _popupFrom = where;
+            popup.gameObject.SetActive(true);
+        }
 
         private void Update()
         {
@@ -134,6 +151,7 @@ namespace Convergence.Presentation.Ride
         {
             if (popup == null || points <= 0) return;
             popup.text = "+" + points;
+            popup.color = _popupColor;
             _popupAt = Time.time;
             _popupFrom = where == Vector3.zero && popupAnchor != null ? popupAnchor.position : where;
             popup.gameObject.SetActive(true);
@@ -172,6 +190,11 @@ namespace Convergence.Presentation.Ride
             }
 
             popup.transform.position = _popupFrom + Vector3.up * (0.05f + t * 0.25f);
+
+            // Same angular size wherever it pops: a blasted digit 6 m out gets text as readable as one on the table.
+            Camera eye = Camera.main;
+            float distance = eye != null ? Vector3.Distance(eye.transform.position, popup.transform.position) : 0.7f;
+            popup.transform.localScale = Vector3.one * Mathf.Max(1f, distance / 0.7f);
             Color c = popup.color;
             c.a = 1f - t / 0.9f;
             popup.color = c;

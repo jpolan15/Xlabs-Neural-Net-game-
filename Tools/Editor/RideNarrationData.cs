@@ -45,9 +45,10 @@ namespace Convergence.EditorTools
         public static readonly Line[] Lines =
         {
             // E0, the dock: every one of these is a three, and Pixel can't read any of them (intro and dock line).
-            new Line(RideLine.Threes, "{threes}Every one of these is a three. [p0.15] Different shapes, [p0.1] different slants, [p0.1] and you read them all without thinking.", 0.3f),
+            new Line(RideLine.Threes, "{threes}Every one of these is a three. [p0.15] You read them all, [p0.1] without thinking.", 0.2f),
             new Line(RideLine.MeetPixel, "{pixel}This is Pixel. [p0.15] Pixel can't read a single one.", 0.2f),
-            new Line(RideLine.PixelBrain, "{brain}So let's build a brain for Pixel, [p0.1] and teach it, [p0.1] right here.", 0.2f),
+            new Line(RideLine.PixelBrain, "{brain}In the next few minutes, [p0.1] you'll build Pixel a real neural network, [p0.1] the kind behind face unlock and chatbots, [p0.15] and train it to read your handwriting.", 0.2f),
+            new Line(RideLine.IntroStops, "{stops}Five stops: [p0.15] pixels, [p0.15] neurons, [p0.15] the network, [p0.15] backpropagation, [p0.15] and training. [p0.15] {blast}In between, [p0.1] blast every three you see.", 0.2f),
             new Line(RideLine.PullGo, "{go}Pull the orange lever, [p0.1] or press A.", 0.2f),
 
             // E1, pixels, then draw your 3 (the drawing is the input for the rest of the ride).
@@ -58,7 +59,8 @@ namespace Convergence.EditorTools
             new Line(RideLine.DrawBigger, "Bigger! [p0.1] Fill the board.", 0.1f),
             new Line(RideLine.DrawDoneNudge, "Looks like a three to me. [p0.1] Shoot DONE.", 0.1f),
             new Line(RideLine.DrawDone, "That's your three, [p0.1] as forty-nine numbers. [p0.15] Hang on to it.", 0.1f),
-            new Line(RideLine.ZapIntro, "Noise incoming. [p0.1] Zap it!", 0.1f),
+            new Line(RideLine.ZapIntro, "Digits incoming! [p0.1] Blast every three, [p0.1] and spare the rest. [p0.15] For now, [p0.1] you're the classifier.", 0.1f),
+            new Line(RideLine.ZapWrong, "Careful! [p0.1] That one wasn't a three.", 0.1f),
 
             // E2, one neuron, then spray its weights.
             new Line(RideLine.NeuronHolds, "{neuron}This is a neuron. [p0.1] It holds one number, [p0.1] its activation. [p0.15] {glow}The bigger the number, [p0.1] the brighter it glows.", 0.2f),
@@ -71,7 +73,7 @@ namespace Convergence.EditorTools
             new Line(RideLine.NeuronSolved, "You just built a three detector, [p0.1] by hand.", 0.1f),
 
             // E3, the network: send your 3 through it.
-            new Line(RideLine.NetworkTeam, "{copy}One neuron spots one pattern. [p0.15] {layer}Put sixteen side by side, [p0.1] and you have a layer. [p0.1] Each one can learn a different stroke.", 0.2f),
+            new Line(RideLine.NetworkTeam, "{copy}One neuron spots one pattern. [p0.15] {layer}Put sixteen side by side, [p0.1] and you have a layer. [p0.1] Each one will learn to look for something different.", 0.2f),
             new Line(RideLine.NetworkAnswers, "{answers}Then ten output neurons, [p0.1] one for each digit.", 0.2f),
             new Line(RideLine.NetworkWire, "{connect}Connect every neuron to the next layer, [p0.1] and that's a neural network. [p0.15] Nine hundred and forty-four weights.", 0.2f),
             new Line(RideLine.NetworkSend, "{race}Shoot your three, [p0.1] and send it in.", 0.1f),
@@ -79,7 +81,7 @@ namespace Convergence.EditorTools
             // E4, the guess and the loss (the guess itself is on the network: it depends on the rider's drawing).
             new Line(RideLine.WrongSays, "{guess}Pixel's guess is in. [p0.15] {wrong}But look how unsure it is. [p0.1] Every weight is still random, [p0.1] so it's only guessing.", 0.2f),
             new Line(RideLine.WrongWanted, "{want}What we want is the three's neuron at one, [p0.1] and every other at zero.", 0.2f),
-            new Line(RideLine.WrongLoss, "{oops}Add up how far off it is, [p0.1] and you get one number: [p0.1] the loss. [p0.15] Training means just one thing. [p0.1] Make the loss small.", 0.3f),
+            new Line(RideLine.WrongLoss, "{oops}Measure how far off it is, [p0.1] and you get one number: [p0.1] the loss. [p0.15] Training means just one thing. [p0.1] Make the loss small.", 0.3f),
 
             // E5, backpropagation, then the hot-wire hunt on the rider's own 3.
             new Line(RideLine.BackWish, "{nudges}So which weights should change, [p0.1] and which way? [p0.15] {wish}The three's output wants to go up. [p0.1] {dim}Every other output wants to go down.", 0.2f),
@@ -99,7 +101,9 @@ namespace Convergence.EditorTools
             new Line(RideLine.TrainGood, "That's the one. [p0.1] Watch the loss go down.", 0.1f),
             new Line(RideLine.TrainDone, "Pixel is trained. [p0.15] You just ran gradient descent on a real neural network.", 0.1f),
 
-            // E7, Pixel reads the rider's own 3 with the weights the rider trained.
+            // E7, what training learned (v7), then Pixel reads the rider's own 3 with the weights the rider trained.
+            new Line(RideLine.LearnedPainted, "{learned}Remember the neuron you painted by hand? [p0.25] {sixteen}Training just painted all sixteen hidden neurons, [p0.1] from real digits.", 0.2f),
+            new Line(RideLine.LearnedHonest, "{blobs}Nobody told them what to look for. [p0.15] They're not neat strokes, [p0.1] but together, [p0.1] they read handwriting.", 0.2f),
             new Line(RideLine.RightYours, "{right}Now, [p0.1] the real test: [p0.15] the three you drew. [p0.2] Pixel says...", 0.2f),
             new Line(RideLine.RightYes, "Three! [p0.15] It can read your handwriting.", 0.3f),
             new Line(RideLine.RightStudy, "Not quite. [p0.1] Your three is unusual. [p0.15] So Pixel studies it, [p0.1] a few more steps...", 0.1f),
@@ -121,7 +125,7 @@ namespace Convergence.EditorTools
         };
 
         /// <summary>The intro at the dock (E0's explainer plays with it): GO holds (two seconds of holding skips it). Then the dock says DockLine and GO goes live.</summary>
-        public static readonly RideLine[] IntroLines = { RideLine.Threes, RideLine.MeetPixel, RideLine.PixelBrain };
+        public static readonly RideLine[] IntroLines = { RideLine.Threes, RideLine.MeetPixel, RideLine.PixelBrain, RideLine.IntroStops };
 
         public const RideLine DockLine = RideLine.PullGo;
 
@@ -146,11 +150,11 @@ namespace Convergence.EditorTools
         /// <summary>Lines the moments say (not in a sequence): reactions, win lines, the training game's calls, the reading of the rider's 3.</summary>
         public static readonly RideLine[] MomentLines =
         {
-            RideLine.DrawBigger, RideLine.DrawDoneNudge, RideLine.DrawDone, RideLine.ZapIntro,
+            RideLine.DrawBigger, RideLine.DrawDoneNudge, RideLine.DrawDone, RideLine.ZapIntro, RideLine.ZapWrong,
             RideLine.NeuronLitForOther, RideLine.NeuronMissedThree, RideLine.NeuronSolved,
             RideLine.BackHurry, RideLine.BackDone, RideLine.StopClear,
             RideLine.TrainTooBig, RideLine.TrainTooSmall, RideLine.TrainGood, RideLine.TrainDone,
-            RideLine.RightYours, RideLine.RightYes, RideLine.RightStudy, RideLine.RightNowYes, RideLine.RightAccuracy, RideLine.RightLoop,
+            RideLine.LearnedPainted, RideLine.LearnedHonest, RideLine.RightYours, RideLine.RightYes, RideLine.RightStudy, RideLine.RightNowYes, RideLine.RightAccuracy, RideLine.RightLoop,
             RideLine.StumpYourTurn, RideLine.StumpRight, RideLine.StumpWrong, RideLine.StumpDone
         };
 

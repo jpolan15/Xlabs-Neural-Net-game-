@@ -2,11 +2,17 @@ using System.Collections.Generic;
 using System.Globalization;
 using TMPro;
 using UnityEngine;
+using Convergence.Core.Training;
+using Convergence.Gameplay.Ride.Level1;
 
 namespace Convergence.Presentation.Ride.Explainers
 {
     /// <summary>
-    /// E7, right, and training (the classic: train on MNIST's 60,000; test on digits it has never seen). Beside the
+    /// E7, right, and training (the classic: train on MNIST's 60,000; test on digits it has never seen). First (v7), what
+    /// training learned: on {learned} the neuron the rider painted by hand appears as a 7×7 of GREEN (+) and RED (−); on
+    /// {sixteen} the sixteen hidden neurons of the rider's own trained network appear beside it, each one's 49 real weights
+    /// as a 7×7 (colour by sign, brightness by size against that neuron's biggest); on {right} they clear for the reading.
+    /// Then, beside the
     /// gold network, on {practice}, real test digits stream into it while a counter climbs to the real training count
     /// and the RED loss bar shrinks from the bake's first loss to its last; on {accuracy} a 10×10 grid of a hundred
     /// digits fills, as many GREEN as the real test accuracy, the rest RED.
@@ -25,8 +31,24 @@ namespace Convergence.Presentation.Ride.Explainers
         [SerializeField] private int perDigit = 49;
         [SerializeField] private Vector3 into;
 
+        [Header("What it learned (v7)")]
+        [SerializeField] private Level1Session session;
+        [SerializeField] private WeightPaintMoment paint;
+        [Tooltip("A backing (shape 0), 16 × 49 squares (hidden neuron j's weight on pixel i is square 1 + j*49 + i), then the rider's painted 49.")]
+        [SerializeField] private ShapeBatch learned;
+        [SerializeField] private TMP_Text yoursTitle;
+        [SerializeField] private TMP_Text learnedTitle;
+
         protected override void ResetPieces()
         {
+            if (learned != null) Hide(learned);
+            foreach (TMP_Text t in new[] { yoursTitle, learnedTitle })
+            {
+                if (t == null) continue;
+                t.gameObject.SetActive(false);
+                t.alpha = 1f;
+            }
+
             Hide(stream);
             Hide(lossBar);
             Hide(dots);
@@ -60,9 +82,72 @@ namespace Convergence.Presentation.Ride.Explainers
             lossBar.MarkDirty();
         }
 
+        private const int Pixels = DigitNetwork.Inputs, HiddenCount = DigitNetwork.Hidden, First = 1, Painted = First + HiddenCount * Pixels;
+
+        /// <summary>Colours the squares from the weights as they are now: the rider's painted cells, and the trained W1.</summary>
+        private void PaintLearned()
+        {
+            Color green = theme.explainGreen, red = theme.explainRed, off = new Color(0.25f, 0.27f, 0.32f);
+            var painted = paint != null ? paint.Weights : null;
+            for (int i = 0; i < Pixels; i++)
+            {
+                int w = painted != null && i < painted.Count ? painted[i] : 0;
+                learned[Painted + i].color = w > 0 ? green : w < 0 ? red : off;
+            }
+
+            double[] w1 = session != null && session.Network != null ? session.Network.W1 : null;
+            for (int j = 0; j < HiddenCount; j++)
+            {
+                double biggest = 1e-9;
+                for (int i = 0; i < Pixels; i++) biggest = System.Math.Max(biggest, w1 == null ? 0.0 : System.Math.Abs(w1[j * Pixels + i]));
+                for (int i = 0; i < Pixels; i++)
+                {
+                    double w = w1 == null ? 0.0 : w1[j * Pixels + i];
+                    float size = Mathf.Pow((float)(System.Math.Abs(w) / biggest), 0.8f);
+                    Color c = w >= 0 ? green : red;
+                    learned[First + j * Pixels + i].color = Color.Lerp(new Color(0.06f, 0.07f, 0.1f, 1f), c, size);
+                }
+            }
+
+            learned.MarkDirty();
+        }
+
         protected override void Declare(Steps s)
         {
             Color yellow = theme.explainYellow;
+
+            // "Remember the neuron you painted by hand?" It appears, square by square.
+            s.At("learned", () =>
+            {
+                PaintLearned();
+                var list = Anim.Each(Anim.Range(Painted, Pixels), 0.012f, i => Anim.FadeIn(learned, i, Vector3.zero, 0.35f));
+                list.Insert(0, Anim.FadeIn(learned, 0, Vector3.zero, 0.5f));
+                list.Add(Anim.Write(yoursTitle, 0.6f));
+                return list;
+            });
+
+            // "Training just painted all sixteen hidden neurons." One after another, each a 7×7 of its real weights.
+            s.At("sixteen", () =>
+            {
+                PaintLearned();
+                var list = new List<Tween> { Anim.Write(learnedTitle, 0.7f) };
+                for (int j = 0; j < HiddenCount; j++)
+                {
+                    for (int i = 0; i < Pixels; i++) list.Add(Anim.FadeIn(learned, First + j * Pixels + i, Vector3.zero, 0.4f).After(0.2f + j * 0.12f + (i / 7) * 0.02f));
+                }
+
+                return list;
+            });
+
+            // "Now, the real test." The weights clear so the network is in full view.
+            s.At("right", () =>
+            {
+                var list = new List<Tween>();
+                for (int i = 0; i < learned.Count; i++) list.Add(Anim.FadeOut(learned, i, Vector3.zero, 0.5f));
+                list.Add(Anim.FadeText(yoursTitle, 0f, 0.5f));
+                list.Add(Anim.FadeText(learnedTitle, 0f, 0.5f));
+                return list;
+            });
 
             // "Pixel practised on sixty thousand digits." Digits stream in; the count climbs; the loss shrinks.
             s.At("practice", () =>

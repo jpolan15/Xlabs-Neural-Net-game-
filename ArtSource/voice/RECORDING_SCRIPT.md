@@ -7,9 +7,10 @@ Name each file after its number (for example `vo_ride_119.wav`, or .m4a from a p
 | File | Line |
 |---|---|
 | | **E0, the dock: every one of these is a three, and Pixel can't read any of them (intro and dock line).** |
-| `vo_ride_119` | Every one of these is a three. / Different shapes, / different slants, / and you read them all without thinking. |
+| `vo_ride_119` | Every one of these is a three. / You read them all, / without thinking. |
 | `vo_ride_120` | This is Pixel. / Pixel can't read a single one. |
-| `vo_ride_121` | So let's build a brain for Pixel, / and teach it, / right here. |
+| `vo_ride_121` | In the next few minutes, / you'll build Pixel a real neural network, / the kind behind face unlock and chatbots, / and train it to read your handwriting. |
+| `vo_ride_174` | Five stops: / pixels, / neurons, / the network, / backpropagation, / and training. / In between, / blast every three you see. |
 | `vo_ride_122` | Pull the orange lever, / or press A. |
 | | **E1, pixels, then draw your 3 (the drawing is the input for the rest of the ride).** |
 | `vo_ride_123` | To a computer, / a picture is a grid of tiny squares, / called pixels. |
@@ -19,7 +20,8 @@ Name each file after its number (for example `vo_ride_119.wav`, or .m4a from a p
 | `vo_ride_127` | Bigger! / Fill the board. |
 | `vo_ride_128` | Looks like a three to me. / Shoot DONE. |
 | `vo_ride_129` | That's your three, / as forty-nine numbers. / Hang on to it. |
-| `vo_ride_130` | Noise incoming. / Zap it! |
+| `vo_ride_130` | Digits incoming! / Blast every three, / and spare the rest. / For now, / you're the classifier. |
+| `vo_ride_175` | Careful! / That one wasn't a three. |
 | | **E2, one neuron, then spray its weights.** |
 | `vo_ride_131` | This is a neuron. / It holds one number, / its activation. / The bigger the number, / the brighter it glows. |
 | `vo_ride_132` | It's connected to all forty-nine pixels, / and every connection has a weight. |
@@ -30,14 +32,14 @@ Name each file after its number (for example `vo_ride_119.wav`, or .m4a from a p
 | `vo_ride_137` | A three slipped past. / Paint positive where the threes have ink. |
 | `vo_ride_138` | You just built a three detector, / by hand. |
 | | **E3, the network: send your 3 through it.** |
-| `vo_ride_139` | One neuron spots one pattern. / Put sixteen side by side, / and you have a layer. / Each one can learn a different stroke. |
+| `vo_ride_139` | One neuron spots one pattern. / Put sixteen side by side, / and you have a layer. / Each one will learn to look for something different. |
 | `vo_ride_140` | Then ten output neurons, / one for each digit. |
 | `vo_ride_141` | Connect every neuron to the next layer, / and that's a neural network. / Nine hundred and forty-four weights. |
 | `vo_ride_142` | Shoot your three, / and send it in. |
 | | **E4, the guess and the loss (the guess itself is on the network: it depends on the rider's drawing).** |
 | `vo_ride_143` | Pixel's guess is in. / But look how unsure it is. / Every weight is still random, / so it's only guessing. |
 | `vo_ride_144` | What we want is the three's neuron at one, / and every other at zero. |
-| `vo_ride_145` | Add up how far off it is, / and you get one number: / the loss. / Training means just one thing. / Make the loss small. |
+| `vo_ride_145` | Measure how far off it is, / and you get one number: / the loss. / Training means just one thing. / Make the loss small. |
 | | **E5, backpropagation, then the hot-wire hunt on the rider's own 3.** |
 | `vo_ride_146` | So which weights should change, / and which way? / The three's output wants to go up. / Every other output wants to go down. |
 | `vo_ride_147` | Those wishes flow backwards, / layer by layer, / with the chain rule. / That's backpropagation. / It gives every weight a gradient: / which way to move, / and how much. |
@@ -54,7 +56,9 @@ Name each file after its number (for example `vo_ride_119.wav`, or .m4a from a p
 | `vo_ride_157` | It's learning, / but painfully slowly. / Try a bigger step. |
 | `vo_ride_158` | That's the one. / Watch the loss go down. |
 | `vo_ride_159` | Pixel is trained. / You just ran gradient descent on a real neural network. |
-| | **E7, Pixel reads the rider's own 3 with the weights the rider trained.** |
+| | **E7, what training learned (the 16 hidden neurons beside the one you painted), then Pixel reads the rider's own 3.** |
+| `vo_ride_176` | Remember the neuron you painted by hand? / Training just painted all sixteen hidden neurons, / from real digits. |
+| `vo_ride_177` | Nobody told them what to look for. / They're not neat strokes, / but together, / they read handwriting. |
 | `vo_ride_160` | Now, / the real test: / the three you drew. / Pixel says... |
 | `vo_ride_161` | Three! / It can read your handwriting. |
 | `vo_ride_162` | Not quite. / Your three is unusual. / So Pixel studies it, / a few more steps... |

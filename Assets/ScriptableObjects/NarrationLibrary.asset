@@ -17,21 +17,18 @@ MonoBehaviour:
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 7e78c7b7e7e3de045816657db83ecdac, type: 3}
-    pauseAfter: 0.3
-    readSeconds: 7.0166664
+    pauseAfter: 0.2
+    readSeconds: 5.0648146
     segments:
     - text: Every one of these is a three.
       weight: 1.55
       cues:
       - threes
-    - text: Different shapes,
-      weight: 0.94
+    - text: You read them all,
+      weight: 0.96
       cues: []
-    - text: different slants,
-      weight: 0.95
-      cues: []
-    - text: and you read them all without thinking.
-      weight: 1.5
+    - text: without thinking.
+      weight: 0.89
       cues: []
   - line: 120
     speaker: 0
@@ -52,17 +49,53 @@ MonoBehaviour:
     tag: GUIDE
     clip: {fileID: 8300000, guid: 44ea593b0279a7143a76dc747f63650a, type: 3}
     pauseAfter: 0.2
-    readSeconds: 4.6444445
+    readSeconds: 9.9796295
     segments:
-    - text: So let's build a brain for Pixel,
-      weight: 1.85
+    - text: In the next few minutes,
+      weight: 1.23
       cues:
       - brain
-    - text: and teach it,
+    - text: you'll build Pixel a real neural network,
+      weight: 2.331
+      cues: []
+    - text: the kind behind face unlock and chatbots,
+      weight: 2.434
+      cues: []
+    - text: and train it to read your handwriting.
+      weight: 1.83
+      cues: []
+  - line: 174
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: 4c5ad4ffba1e0cd41a4b5b786d5b97c5, type: 3}
+    pauseAfter: 0.2
+    readSeconds: 6.9259257
+    segments:
+    - text: 'Five stops:'
+      weight: 1.03
+      cues:
+      - stops
+    - text: pixels,
+      weight: 0.86
+      cues: []
+    - text: neurons,
+      weight: 0.82
+      cues: []
+    - text: the network,
       weight: 0.88
       cues: []
-    - text: right here.
-      weight: 0.61
+    - text: backpropagation,
+      weight: 1.11
+      cues: []
+    - text: and training.
+      weight: 0.9
+      cues: []
+    - text: In between,
+      weight: 0.87
+      cues:
+      - blast
+    - text: blast every three you see.
+      weight: 1.33
       cues: []
   - line: 122
     speaker: 0
@@ -199,13 +232,35 @@ MonoBehaviour:
     tag: GUIDE
     clip: {fileID: 8300000, guid: d2b0af61b2811184fa94319b8f03a9d7, type: 3}
     pauseAfter: 0.1
-    readSeconds: 1.5814815
+    readSeconds: 5.6351852
     segments:
-    - text: Noise incoming.
-      weight: 1.03
+    - text: Digits incoming!
+      weight: 1.1
       cues: []
-    - text: Zap it!
-      weight: 0.64
+    - text: Blast every three,
+      weight: 1.24
+      cues: []
+    - text: and spare the rest.
+      weight: 1.12
+      cues: []
+    - text: For now,
+      weight: 0.69
+      cues: []
+    - text: you're the classifier.
+      weight: 1.06
+      cues: []
+  - line: 175
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: 89d21469310ee5a479dc225e9c1f6703, type: 3}
+    pauseAfter: 0.1
+    readSeconds: 2.3222222
+    segments:
+    - text: Careful!
+      weight: 0.68
+      cues: []
+    - text: That one wasn't a three.
+      weight: 1.2
       cues: []
   - line: 131
     speaker: 0
@@ -360,7 +415,7 @@ MonoBehaviour:
     tag: GUIDE
     clip: {fileID: 8300000, guid: 23ef8449969935047bf37c601c8d0241, type: 3}
     pauseAfter: 0.2
-    readSeconds: 8.498148
+    readSeconds: 9.238889
     segments:
     - text: One neuron spots one pattern.
       weight: 1.89
@@ -373,8 +428,8 @@ MonoBehaviour:
     - text: and you have a layer.
       weight: 1.05
       cues: []
-    - text: Each one can learn a different stroke.
-      weight: 1.71
+    - text: Each one will learn to look for something different.
+      weight: 2.23
       cues: []
   - line: 140
     speaker: 0
@@ -461,10 +516,10 @@ MonoBehaviour:
     tag: GUIDE
     clip: {fileID: 8300000, guid: e6017452d7209ac45a9ec20d3fc4da13, type: 3}
     pauseAfter: 0.3
-    readSeconds: 8.968518
+    readSeconds: 8.598148
     segments:
-    - text: Add up how far off it is,
-      weight: 1.46
+    - text: Measure how far off it is,
+      weight: 1.52
       cues:
       - oops
     - text: 'and you get one number:'
@@ -731,6 +786,44 @@ MonoBehaviour:
       cues: []
     - text: You just ran gradient descent on a real neural network.
       weight: 3.053
+      cues: []
+  - line: 176
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: 9856cc5e6149e4a469b498427bdf4465, type: 3}
+    pauseAfter: 0.2
+    readSeconds: 6.646296
+    segments:
+    - text: Remember the neuron you painted by hand?
+      weight: 2.225
+      cues:
+      - learned
+    - text: Training just painted all sixteen hidden neurons,
+      weight: 2.639
+      cues:
+      - sixteen
+    - text: from real digits.
+      weight: 1.09
+      cues: []
+  - line: 177
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: 69919e1c6a09c4d46aa8e26d5cba2511, type: 3}
+    pauseAfter: 0.2
+    readSeconds: 6.2759256
+    segments:
+    - text: Nobody told them what to look for.
+      weight: 1.85
+      cues:
+      - blobs
+    - text: They're not neat strokes,
+      weight: 1.3
+      cues: []
+    - text: but together,
+      weight: 0.81
+      cues: []
+    - text: they read handwriting.
+      weight: 1.24
       cues: []
   - line: 160
     speaker: 0

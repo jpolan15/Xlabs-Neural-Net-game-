@@ -76,6 +76,7 @@ namespace Convergence.EditorTools
             Flat("ExplainerFlat", null);
             Flat("ExplainerHero", heroInk);
             Flat("ExplainerThrees", ThreesAtlas());
+            Flat("ExplainerTargets", TargetsAtlas());
 
             // The blackboard's faint distant grid: additive-looking thin lines, alpha driven by RegionAtmosphere.
             Material grid = Flat("BlackboardGrid", null);
@@ -123,6 +124,94 @@ namespace Convergence.EditorTools
             imp.textureCompression = TextureImporterCompression.Uncompressed;
             imp.SaveAndReimport();
             return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+        }
+
+        private const int TargetColumns = 6, TargetRows = 4;
+
+        /// <summary>
+        /// Blast the 3s (v7): the bake's target digits in one texture, white ink with a soft cyan halo so they read against
+        /// the dark from metres away. The colour never tells a 3 from another digit.
+        /// </summary>
+        private static Texture2D TargetsAtlas()
+        {
+            string path = TexDir + "/TargetsAtlas.png";
+            Level1Picture[] targets = _data.File.targets;
+            int w = TargetColumns * AtlasCell, h = TargetRows * AtlasCell;
+            var tex = new Texture2D(w, h, TextureFormat.RGBA32, false);
+            var clear = new Color(0.35f, 0.85f, 1f, 0f);
+            for (int y = 0; y < h; y++)
+            {
+                for (int x = 0; x < w; x++) tex.SetPixel(x, y, clear);
+            }
+
+            const int inner = 112, pad = (AtlasCell - inner) / 2;
+            for (int k = 0; k < targets.Length && k < TargetColumns * TargetRows; k++)
+            {
+                double[] ink = targets[k].pixels28;
+                double[] halo = Blur28(Blur28(Blur28(ink)));
+                int cx = k % TargetColumns, cy = TargetRows - 1 - k / TargetColumns;
+                for (int y = 0; y < inner; y++)
+                {
+                    for (int x = 0; x < inner; x++)
+                    {
+                        float u = (x + 0.5f) / inner, v = (y + 0.5f) / inner;
+                        float core = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(SampleBilinear(ink, 28, u, v) * 1.3f));
+                        float glow = Mathf.Clamp01(SampleBilinear(halo, 28, u, v) * 1.6f) * 0.55f;
+                        var c = Color.Lerp(new Color(0.35f, 0.85f, 1f), Color.white, core);
+                        c.a = Mathf.Max(core, glow);
+                        tex.SetPixel(cx * AtlasCell + pad + x, cy * AtlasCell + pad + y, c);
+                    }
+                }
+            }
+
+            File.WriteAllBytes(path, tex.EncodeToPNG());
+            Object.DestroyImmediate(tex);
+            AssetDatabase.ImportAsset(path);
+            var imp = (TextureImporter)AssetImporter.GetAtPath(path);
+            imp.alphaIsTransparency = true;
+            imp.wrapMode = TextureWrapMode.Clamp;
+            imp.filterMode = FilterMode.Trilinear;
+            imp.mipmapEnabled = true;
+            imp.npotScale = TextureImporterNPOTScale.None;
+            imp.textureCompression = TextureImporterCompression.Uncompressed;
+            imp.SaveAndReimport();
+            return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+        }
+
+        /// <summary>A 3×3 blur of a 28×28 picture (edges clamped).</summary>
+        private static double[] Blur28(double[] img)
+        {
+            var o = new double[784];
+            for (int y = 0; y < 28; y++)
+            {
+                for (int x = 0; x < 28; x++)
+                {
+                    double sum = 0, weight = 0;
+                    for (int dy = -1; dy <= 1; dy++)
+                    {
+                        for (int dx = -1; dx <= 1; dx++)
+                        {
+                            int xx = Mathf.Clamp(x + dx, 0, 27), yy = Mathf.Clamp(y + dy, 0, 27);
+                            double k = (dx == 0 ? 2 : 1) * (dy == 0 ? 2 : 1);
+                            sum += img[yy * 28 + xx] * k;
+                            weight += k;
+                        }
+                    }
+
+                    o[y * 28 + x] = sum / weight;
+                }
+            }
+
+            return o;
+        }
+
+        /// <summary>Target k's uv rect in the targets atlas.</summary>
+        private static Rect TargetRect(int k)
+        {
+            int cx = k % TargetColumns, cy = TargetRows - 1 - k / TargetColumns;
+            float pad = (AtlasCell - 112) / 2f;
+            return new Rect((cx * AtlasCell + pad) / (TargetColumns * AtlasCell), (cy * AtlasCell + pad) / (TargetRows * AtlasCell),
+                112f / (TargetColumns * AtlasCell), 112f / (TargetRows * AtlasCell));
         }
 
         private static void Level1PictureSet(out double[][] threes)
@@ -226,7 +315,7 @@ namespace Convergence.EditorTools
             var grow = Explainer.UnfoldStyle.Grow;
 
             // E0, E1: the quality reference.
-            BuildDock(Add<DockExplainer>(new[] { RideLine.Threes, RideLine.MeetPixel, RideLine.PixelBrain, RideLine.PullGo }, -1, SegPixels, true,
+            BuildDock(Add<DockExplainer>(new[] { RideLine.Threes, RideLine.MeetPixel, RideLine.PixelBrain, RideLine.IntroStops, RideLine.PullGo }, -1, SegPixels, true,
                 null, new[] { Child(0, "Page"), Child(0, "Desk") }, null), regions[0]);
             BuildPixels(Add<PixelsExplainer>(new[] { RideLine.PixelsSquares, RideLine.PixelsNumbers, RideLine.PixelsFortyNine, RideLine.DrawYourTurn }, SegPixels, SegPixels, true,
                 null, new[] { Child(1, "PixelField") }, null), regions[1]);
@@ -249,7 +338,7 @@ namespace Convergence.EditorTools
                     new UnfoldSpec(null, T(6, "Sign"), grow, 1.4f, 1f),
                     new UnfoldSpec(null, T(6, "Sun"), grow, 1.7f, 1.5f),
                 }), regions[6]);
-            BuildTraining(Add<TrainingExplainer>(new[] { RideLine.RightYours, RideLine.RightAccuracy, RideLine.RightLoop }, SegRight, SegRight, false, null, null, null), regions[7]);
+            BuildTraining(Add<TrainingExplainer>(new[] { RideLine.LearnedPainted, RideLine.LearnedHonest, RideLine.RightYours, RideLine.RightAccuracy, RideLine.RightLoop }, SegRight, SegRight, false, null, null, null), regions[7]);
             BuildTokens(Add<TokensExplainer>(new[] { RideLine.TokensWords, RideLine.TokensNumbers, RideLine.TokensPredict, RideLine.TokensNext }, SegTokens, SegTokens, false, null, null, null), regions[7]);
         }
 
@@ -315,6 +404,30 @@ namespace Convergence.EditorTools
             Transform centre = Make("HeroCentre", content, eye + Quaternion.Euler(-6f, 0f, 0f) * Vector3.forward * 4.6f).transform;
             centre.localScale = Vector3.one * 1.9f;
             Make("PixelAnchor", content, new Vector3(1.15f, 1.45f, 1.9f));
+
+            // The roadmap (v7): the five stops on a track above the hero 3, lit one by one as the intro names them.
+            Transform road = Make("Roadmap", content, eye + Quaternion.Euler(-18.5f, 0f, 0f) * Vector3.forward * 4.2f).transform;
+            road.rotation = Quaternion.LookRotation(road.position - eye, Vector3.up);
+            string[] stopNames = { "PIXELS", "NEURON", "NETWORK", "BACKPROP", "TRAINING" };
+            const float chipW = 0.86f, chipH = 0.27f, chipPitch = 0.95f;
+            var roadShapes = new List<Shape> { Segment(new Vector3(-chipPitch * 2.45f, 0f, 0.01f), new Vector3(chipPitch * 2.45f, 0f, 0.01f), 0.02f, new Color(blue.r, blue.g, blue.b, 0.7f)) };
+            var stopLabels = new List<Object>();
+            for (int k = 0; k < stopNames.Length; k++)
+            {
+                float x = (k - 2) * chipPitch;
+                roadShapes.Add(new Shape
+                {
+                    kind = Shape.Kind.Quad, position = new Vector3(x, 0f, 0f), size = new Vector2(chipW, chipH), round = 0.5f,
+                    color = new Color(0.05f, 0.07f, 0.11f, 0.95f), stroke = blue, strokeWidth = 0.014f
+                });
+                stopLabels.Add(Serif("Stop" + k, road, new Vector3(x, 0f, -0.01f), stopNames[k], 0.12f, white, chipW, TextAlignmentOptions.Center, 6));
+            }
+
+            ShapeBatch roadBatch = Batch("Track", road, roadShapes, "ExplainerFlat", 5);
+            TextMeshPro blast = Serif("Blast", road, new Vector3(0f, -0.33f, -0.01f), "BLAST THE 3s ON THE WAY", 0.12f, _theme.explainYellow, 3f, TextAlignmentOptions.Center, 6);
+            Ref(e, "roadmap", roadBatch);
+            Refs(e, "stopLabels", stopLabels);
+            Ref(e, "blast", blast);
 
             Transform ink = region.transform.Find("Page/Ink");
             Transform paper = region.transform.Find("Page/Paper");
@@ -994,10 +1107,31 @@ namespace Convergence.EditorTools
 
             // A dark card under the numbers, so the digit walls on both sides never compete with them.
             var card = new List<Shape> { new Shape { kind = Shape.Kind.Quad, position = new Vector3(-0.05f, -0.17f, 0.05f), size = new Vector2(4.4f, 1.75f), round = 0.08f, color = new Color(0.04f, 0.05f, 0.08f, 0.94f) } };
+
+            // What it learned (v7), on its own dark backing in front of the card: the sixteen trained hidden neurons as 7x7
+            // weights in a 4x4 (right), the neuron the rider painted (left). Shape 0 is the backing (drawn first), then
+            // hidden neuron j's weight on pixel i at 1 + j*49 + i, then the painted 49. TrainingExplainer colours them.
+            Vector3 front = new Vector3(0f, -0.12f, -0.6f);
+            var learned = new List<Shape>
+            {
+                new Shape { kind = Shape.Kind.Quad, position = front + new Vector3(-0.15f, 0.13f, 0.01f), size = new Vector2(4.4f, 2.4f), round = 0.06f, color = new Color(0.03f, 0.04f, 0.07f, 0.96f) }
+            };
+            const float cell = 0.06f, tile = cell * 7f, tileGap = 0.07f, bigCell = 0.12f;
+            for (int j = 0; j < 16; j++)
+            {
+                Vector3 c = front + new Vector3(0.75f + (j % 4 - 1.5f) * (tile + tileGap), -(j / 4 - 1.5f) * (tile + tileGap), 0f);
+                for (int i = 0; i < 49; i++) learned.Add(Square(c + new Vector3((i % 7 - 3) * cell, (3 - i / 7) * cell, 0f), cell * 0.9f, white, 0.15f));
+            }
+
+            Vector3 mine = front + new Vector3(-1.45f, 0f, 0f);
+            for (int i = 0; i < 49; i++) learned.Add(Square(mine + new Vector3((i % 7 - 3) * bigCell, (3 - i / 7) * bigCell, 0f), bigCell * 0.9f, white, 0.15f));
             Batch("Card", stage, card, "ExplainerFlat", 20);
             ShapeBatch bStream = Batch("Stream", stage, stream, "ExplainerFlat", 22);
             ShapeBatch bBar = Batch("LossBar", stage, bar, "ExplainerFlat", 21);
             ShapeBatch bDots = Batch("Dots", stage, dots, "ExplainerFlat", 21);
+            ShapeBatch bLearned = Batch("Learned", stage, learned, "ExplainerFlat", 22);
+            TextMeshPro yoursTitle = Serif("YoursTitle", stage, front + new Vector3(-1.45f, 1.1f, -0.01f), "YOU PAINTED ONE", 0.14f, white, 1.6f, TextAlignmentOptions.Center, 24);
+            TextMeshPro learnedTitle = Serif("LearnedTitle", stage, front + new Vector3(0.75f, 1.1f, -0.01f), "TRAINING PAINTED SIXTEEN", 0.14f, white, 2.4f, TextAlignmentOptions.Center, 24);
             TextMeshPro counter = Serif("Counter", stage, new Vector3(-0.85f, 0.1f, -0.02f), "0 digits", 0.32f, white, 3.2f, TextAlignmentOptions.Center, 24);
             TextMeshPro lossLabel = Serif("LossLabel", stage, new Vector3(-1.98f, -0.3f, -0.02f), "LOSS", 0.2f, red, 1f, TextAlignmentOptions.Center, 24);
             lossLabel.characterSpacing = 10f;
@@ -1010,6 +1144,11 @@ namespace Convergence.EditorTools
             Ref(e, "counter", counter);
             Ref(e, "lossLabel", lossLabel);
             Ref(e, "score", score);
+            Ref(e, "session", _session);
+            Ref(e, "paint", Object.FindAnyObjectByType<WeightPaintMoment>());
+            Ref(e, "learned", bLearned);
+            Ref(e, "yoursTitle", yoursTitle);
+            Ref(e, "learnedTitle", learnedTitle);
             Int(e, "trainCount", _data.File.trainCount);
             Float(e, "lossEnd", lossEnd);
             Int(e, "perDigit", 49);

@@ -16,11 +16,13 @@ MonoBehaviour:
     name: Intro
     beats:
     - line: 119
-      seconds: 5.23
+      seconds: 3.5900002
     - line: 120
       seconds: 2.79
     - line: 121
-      seconds: 3.52
+      seconds: 8.015333
+    - line: 174
+      seconds: 7.99
   dockLine: 122
   sequences:
   - name: 'E1 pixels: explain, then draw your 3'
@@ -50,7 +52,7 @@ MonoBehaviour:
   - name: 'E3 network: explain'
     beats:
     - line: 139
-      seconds: 6.4199996
+      seconds: 6.9399996
     - line: 140
       seconds: 2.9320002
     - line: 141
@@ -66,7 +68,7 @@ MonoBehaviour:
     - line: 144
       seconds: 3.69
     - line: 145
-      seconds: 6.4300003
+      seconds: 6.4900002
   - name: 'E5 backprop: explain'
     beats:
     - line: 146
@@ -99,11 +101,13 @@ MonoBehaviour:
       seconds: 2.85
   lines:
   - line: 119
-    seconds: 5.23
+    seconds: 3.5900002
   - line: 120
     seconds: 2.79
   - line: 121
-    seconds: 3.52
+    seconds: 8.015333
+  - line: 174
+    seconds: 7.99
   - line: 122
     seconds: 2.3400002
   - line: 123
@@ -121,7 +125,9 @@ MonoBehaviour:
   - line: 129
     seconds: 3.3899999
   - line: 130
-    seconds: 1.76
+    seconds: 5.2999997
+  - line: 175
+    seconds: 1.97
   - line: 131
     seconds: 5.93
   - line: 132
@@ -139,7 +145,7 @@ MonoBehaviour:
   - line: 138
     seconds: 2.36
   - line: 139
-    seconds: 6.4199996
+    seconds: 6.9399996
   - line: 140
     seconds: 2.9320002
   - line: 141
@@ -151,7 +157,7 @@ MonoBehaviour:
   - line: 144
     seconds: 3.69
   - line: 145
-    seconds: 6.4300003
+    seconds: 6.4900002
   - line: 146
     seconds: 6.18
   - line: 147
@@ -180,6 +186,10 @@ MonoBehaviour:
     seconds: 2.27
   - line: 159
     seconds: 4.3433332
+  - line: 176
+    seconds: 6.1439996
+  - line: 177
+    seconds: 5.39
   - line: 160
     seconds: 3.78
   - line: 161

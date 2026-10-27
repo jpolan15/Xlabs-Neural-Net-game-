@@ -226,17 +226,27 @@ namespace Convergence.Tests.PlayMode.Gameplay
             Assert.IsTrue(session.DigitIsRiders, "the rider's drawing is the digit the rest of the ride follows");
             CollectionAssert.AreEqual(draw.Canvas.ToPixels7(), session.Digit);
 
-            // On the way to the neuron, noise drifts past: a hit pops it and scores.
-            ZapSpeck speck = null;
+            // On the way to the neuron, real handwritten digits fly at the pod (v7, blast the 3s): a 3 scores, any other
+            // digit costs points. Every target shows a real picture.
+            ZapSpeck three = null, other = null;
             yield return WaitFor(() =>
             {
-                foreach (ZapSpeck s in UnityEngine.Object.FindObjectsByType<ZapSpeck>(FindObjectsSortMode.None)) if (s.gameObject.activeInHierarchy) speck = s;
-                return speck != null;
-            }, "a noise speck while travelling", 30f);
+                foreach (ZapSpeck s in UnityEngine.Object.FindObjectsByType<ZapSpeck>(FindObjectsSortMode.None))
+                {
+                    if (!s.gameObject.activeInHierarchy) continue;
+                    Assert.GreaterOrEqual(s.Picture, 0, "a target shows a real digit");
+                    if (s.Label == 3 && three == null) three = s;
+                    if (s.Label != 3 && other == null) other = s;
+                }
+
+                return three != null && other != null;
+            }, "a 3 and another digit while travelling", 40f);
             int score = _director.Score;
-            Assert.IsTrue(speck.Hit(RideHand.Right));
-            Assert.IsFalse(speck.gameObject.activeSelf, "a zapped speck pops");
-            Assert.AreEqual(score + 10, _director.Score);
+            Assert.IsTrue(three.Hit(RideHand.Right));
+            Assert.IsFalse(three.gameObject.activeSelf, "a blasted 3 bursts");
+            Assert.AreEqual(score + 10, _director.Score, "a 3 scores");
+            Assert.IsTrue(other.Hit(RideHand.Left));
+            Assert.AreEqual(score, _director.Score, "another digit costs what a 3 gave");
 
             // Teach one neuron: fingertips press a cell with their own hand; a held laser sweeps (sprays) without toggling.
             yield return WaitFor(() => paint.IsLive, "the paint game to open");

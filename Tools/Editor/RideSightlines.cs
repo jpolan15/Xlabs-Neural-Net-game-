@@ -608,6 +608,8 @@ namespace Convergence.EditorTools
                 {
                     bool on = e.Content != null && vp.segment >= e.ExplainSegment && vp.segment <= e.LastSegment;
                     if (e.Content != null && !on) off.Add(e.Content.transform);
+                    Transform roadmap = e.Content != null && vp.segment >= 0 ? e.Content.transform.Find("Roadmap") : null;
+                    if (roadmap != null) off.Add(roadmap);
                 }
 
                 foreach (GameObject region in RideSightlines.VisibleRegions(vp, streamer, regions)) Count(region, ref draws, ref triangles, null, off);

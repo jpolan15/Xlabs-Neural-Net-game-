@@ -95,7 +95,7 @@ namespace Convergence.Presentation.Ride
 
             if (blame != null) blame.Connected += OnConnected;
             if (valley != null) valley.HopReached += OnHop;
-            if (zap != null) zap.SpeckZapped += OnZapped;
+            if (zap != null) zap.Shot += OnShot;
             if (train != null)
             {
                 train.Checked += OnChecked;
@@ -126,7 +126,7 @@ namespace Convergence.Presentation.Ride
 
             if (blame != null) blame.Connected -= OnConnected;
             if (valley != null) valley.HopReached -= OnHop;
-            if (zap != null) zap.SpeckZapped -= OnZapped;
+            if (zap != null) zap.Shot -= OnShot;
             if (train != null)
             {
                 train.Checked -= OnChecked;
@@ -155,9 +155,19 @@ namespace Convergence.Presentation.Ride
             Play(winShimmer, 1f);
         }
 
-        private void OnFired(int hand, bool hit) => Play(fire, hit ? 1.15f : 0.9f);
+        // A blaster shot while the digits fly; elsewhere (drawing, buttons) a soft click.
+        private void OnFired(int hand, bool hit)
+        {
+            if (zap != null && zap.IsRunning) Play(fire, hit ? 1.1f : 0.95f);
+            else Play(tick, hit ? 1.2f : 1f);
+        }
 
-        private void OnZapped(Vector3 where) => Play(pop, 1.3f);
+        // A 3 bursts (higher with the streak); any other digit buzzes wrong.
+        private void OnShot(Vector3 where, bool right, int points)
+        {
+            if (right) Play(pop, 1f + 0.08f * (zap.LastMultiplier - 1));
+            else Play(wrong, 1f);
+        }
 
         // The training game ticks higher as the accuracy climbs, and a blow-up sounds wrong.
         private void OnChecked(double accuracy) => Play(tick, 0.7f + (float)accuracy * 0.8f);

@@ -29,11 +29,11 @@ namespace Convergence.Tests.EditMode.Ride
         // Lines said by moments, not by a sequence (RideNarrationData.MomentLines).
         private static readonly RideLine[] MomentLines =
         {
-            RideLine.DrawBigger, RideLine.DrawDoneNudge, RideLine.DrawDone, RideLine.ZapIntro,
+            RideLine.DrawBigger, RideLine.DrawDoneNudge, RideLine.DrawDone, RideLine.ZapIntro, RideLine.ZapWrong,
             RideLine.NeuronLitForOther, RideLine.NeuronMissedThree, RideLine.NeuronSolved,
             RideLine.BackHurry, RideLine.BackDone, RideLine.StopClear,
             RideLine.TrainTooBig, RideLine.TrainTooSmall, RideLine.TrainGood, RideLine.TrainDone,
-            RideLine.RightYours, RideLine.RightYes, RideLine.RightStudy, RideLine.RightNowYes, RideLine.RightAccuracy, RideLine.RightLoop,
+            RideLine.LearnedPainted, RideLine.LearnedHonest, RideLine.RightYours, RideLine.RightYes, RideLine.RightStudy, RideLine.RightNowYes, RideLine.RightAccuracy, RideLine.RightLoop,
             RideLine.StumpYourTurn, RideLine.StumpRight, RideLine.StumpWrong, RideLine.StumpDone
         };
 
@@ -159,6 +159,10 @@ namespace Convergence.Tests.EditMode.Ride
             Assert.AreEqual(152, (int)RideLine.DescentHill);
             Assert.AreEqual(164, (int)RideLine.RightAccuracy);
             Assert.AreEqual(173, (int)RideLine.TokensNext);
+
+            // v7, appended from 174.
+            Assert.AreEqual(174, (int)RideLine.IntroStops);
+            Assert.AreEqual(177, (int)RideLine.LearnedHonest);
         }
 
         [Test]

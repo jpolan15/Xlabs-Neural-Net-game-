@@ -7,6 +7,7 @@ using UnityEngine.Rendering;
 using Convergence.Gameplay.Ride;
 using Convergence.Gameplay.Ride.Level1;
 using Convergence.Presentation.Ride;
+using Convergence.Presentation.Ride.Explainers;
 using Convergence.XR.Ride;
 
 namespace Convergence.EditorTools
@@ -448,20 +449,92 @@ namespace Convergence.EditorTools
             return mesh;
         }
 
-        /// <summary>The template noise speck (hidden; ZapGame copies it): a spinning magenta cube in a pink glow, a generous trigger to hit.</summary>
+        /// <summary>
+        /// The template target (hidden; ZapGame copies it): only a generous trigger to hit. BlasterView draws every target's
+        /// handwritten digit in one batch (v7, blast the 3s).
+        /// </summary>
         private static ZapSpeck BuildSpeckTemplate(Transform parent)
         {
-            var speck = Make("NoiseSpeck", parent, Vector3.zero);
-            var body = Prim(PrimitiveType.Cube, "Body", speck.transform, Vector3.zero, Vector3.one * 0.13f, "Noise");
-            body.transform.localRotation = Quaternion.Euler(30f, 45f, 20f);
-            var glow = Quad("Glow", speck.transform, Vector3.zero, new Vector2(0.5f, 0.5f), "GlowPink");
-            glow.AddComponent<FaceCamera>();
+            var speck = Make("Target", parent, Vector3.zero);
             var c = speck.AddComponent<SphereCollider>();
-            c.radius = 0.3f;
+            c.radius = 0.34f;
             c.isTrigger = true;
             var s = speck.AddComponent<ZapSpeck>();
             speck.SetActive(false);
             return s;
+        }
+
+        /// <summary>Blast the 3s, seen (v7): one batch of digit pictures for the whole target pool, a bolt per hand, a pixel burst.</summary>
+        private static void BuildBlaster(GameObject pod, ZapGame zap, int pictureCount)
+        {
+            int pool = new SerializedObject(zap).FindProperty("poolSize").intValue;
+            Transform root = Make("Blaster", pod.transform, Vector3.zero).transform;
+            var shapes = new List<Shape>();
+            for (int i = 0; i < pool; i++) shapes.Add(new Shape { kind = Shape.Kind.Quad, size = Vector2.one * 0.6f, color = Color.white, alpha = 0f });
+            ShapeBatch pictures = Batch("Targets", root, shapes, "ExplainerTargets", 8);
+            pictures.GetComponent<Renderer>().enabled = false; // BlasterView turns it on while digits fly
+
+            var bolts = new List<Object>();
+            foreach (string hand in new[] { "Left", "Right" })
+            {
+                var line = Make("Bolt" + hand, root, Vector3.zero).AddComponent<LineRenderer>();
+                line.useWorldSpace = true;
+                line.positionCount = 2;
+                line.sharedMaterial = Mat("Laser");
+                line.startWidth = 0.035f;
+                line.endWidth = 0.012f;
+                line.startColor = Color.white;
+                line.endColor = new Color(1f, 0.85f, 0.45f, 1f);
+                line.numCapVertices = 3;
+                line.shadowCastingMode = ShadowCastingMode.Off;
+                line.receiveShadows = false;
+                line.enabled = false;
+                bolts.Add(line);
+            }
+
+            var burst = Make("Burst", root, Vector3.zero).AddComponent<ParticleSystem>();
+            ParticleSystem.MainModule main = burst.main;
+            main.playOnAwake = false;
+            main.loop = false;
+            main.startLifetime = new ParticleSystem.MinMaxCurve(0.45f, 0.8f);
+            main.startSpeed = new ParticleSystem.MinMaxCurve(1.2f, 3.2f);
+            main.startSize = new ParticleSystem.MinMaxCurve(0.04f, 0.08f);
+            main.gravityModifier = 0.25f;
+            main.simulationSpace = ParticleSystemSimulationSpace.World;
+            main.maxParticles = 240;
+            ParticleSystem.EmissionModule emission = burst.emission;
+            emission.rateOverTime = 0f;
+            ParticleSystem.ShapeModule shape = burst.shape;
+            shape.shapeType = ParticleSystemShapeType.Sphere;
+            shape.radius = 0.22f;
+            ParticleSystem.RotationOverLifetimeModule spin = burst.rotationOverLifetime;
+            spin.enabled = true;
+            spin.z = new ParticleSystem.MinMaxCurve(-5f, 5f);
+            ParticleSystem.ColorOverLifetimeModule fade = burst.colorOverLifetime;
+            fade.enabled = true;
+            var ramp = new Gradient();
+            ramp.SetKeys(new[] { new GradientColorKey(Color.white, 0f), new GradientColorKey(Color.white, 1f) },
+                new[] { new GradientAlphaKey(1f, 0f), new GradientAlphaKey(1f, 0.6f), new GradientAlphaKey(0f, 1f) });
+            fade.color = ramp;
+            var pr = burst.GetComponent<ParticleSystemRenderer>();
+            pr.sharedMaterial = Mat("Confetti");
+            pr.shadowCastingMode = ShadowCastingMode.Off;
+            pr.receiveShadows = false;
+            pr.enabled = false; // on while a burst flies
+
+            var view = pod.AddComponent<BlasterView>();
+            Ref(view, "zap", zap);
+            Ref(view, "pictures", pictures);
+            Set(view, "cells", p =>
+            {
+                p.arraySize = pictureCount;
+                for (int i = 0; i < pictureCount; i++) p.GetArrayElementAtIndex(i).rectValue = TargetRect(i);
+            });
+            Refs(view, "bolts", bolts);
+            Ref(view, "burst", burst);
+            Color gold = _theme.gold, red = _theme.explainRed;
+            Set(view, "right", p => p.colorValue = gold);
+            Set(view, "wrong", p => p.colorValue = red);
         }
 
         // ---------- scene wiring (pod instance) ----------
@@ -562,6 +635,14 @@ namespace Convergence.EditorTools
             var zap = rd.gameObject.AddComponent<ZapGame>();
             Ref(zap, "director", rd);
             Ref(zap, "template", BuildSpeckTemplate(pod.transform));
+            Level1Picture[] targets = _data.File.targets;
+            Set(zap, "labels", p =>
+            {
+                p.arraySize = targets.Length;
+                for (int i = 0; i < targets.Length; i++) p.GetArrayElementAtIndex(i).intValue = targets[i].label;
+            });
+            Int(zap, "targetLabel", Level1Data.HeroDigit);
+            BuildBlaster(pod, zap, targets.Length);
 
             // HUD and stamp.
             var hud = pod.AddComponent<GameHudView>();

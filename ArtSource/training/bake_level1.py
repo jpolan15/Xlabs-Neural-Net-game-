@@ -58,6 +58,9 @@ FINALE_COUNT = 60
 GALLERY_COUNT = 20       # the dock's cloud of real threes (E0), 28x28 each
 GALLERY_DEC = 2          # decimals kept for gallery pixels (display only)
 SEED_FINALE = 2026
+TARGET_THREES = 12       # the travel game (blast the 3s): real threes...
+TARGET_OTHERS = [8, 5, 2, 9, 7, 0]   # ...and look-alikes to spare
+TARGET_PER_OTHER = 2
 
 W_DEC = 9                # decimals kept for weights
 PX_DEC = 4               # decimals kept for pixels
@@ -347,6 +350,21 @@ def main():
                 "pixels28": np.round(test_raw[i].astype(np.float64).ravel() / 255.0, GALLERY_DEC).tolist()}
                for i in gallery_idx]
 
+    # ---- the travel game's targets (blast the 3s, v7): clear real test digits, threes and look-alikes, 28x28.
+    # Clear = the trained network reads it with p > 0.9 (a stand-in for "a person reads it at a glance"); within each
+    # label, evenly spaced ink ranks, so thin and thick ones both fly. Never the hero or a gallery three.
+    used = set(gallery_idx) | {hero}
+    targets = []
+    for label, count in [(3, TARGET_THREES)] + [(d, TARGET_PER_OTHER) for d in TARGET_OTHERS]:
+        pool = [int(i) for i in np.nonzero(test_y == label)[0]
+                if int(i) not in used and p_test[i, label] > 0.9 and int(p_test[i].argmax()) == label]
+        pool.sort(key=lambda i: (float(test_raw[i].sum()), i))
+        picks = [pool[int(round(r))] for r in np.linspace(0.15, 0.85, count) * (len(pool) - 1)]
+        check(len(set(picks)) == count, f"target {label}s repeat")
+        targets += [{"testIndex": i, "label": label,
+                     "pixels28": np.round(test_raw[i].astype(np.float64).ravel() / 255.0, GALLERY_DEC).tolist()}
+                    for i in picks]
+
     # ---- neuron puzzle: 4 clear threes, one clear 0, 1, 7 and 4, a line the reference clears with margin
     ref = reference_solution(train_x, train_y)
     threes_all = np.nonzero(test_y == 3)[0]
@@ -508,6 +526,7 @@ def main():
         },
         "finale": {"digits": finale, "correct": finale_right},
         "threes": gallery,
+        "targets": targets,
         "live": {
             "batch": LIVE_BATCH, "rates": LIVE_RATES, "targetAccuracy": LIVE_TARGET,
             "samplerSeed": LIVE_SAMPLER_SEED, "dataSeed": LIVE_SEED,
