@@ -501,25 +501,22 @@ namespace Convergence.EditorTools
             var directorObject = new GameObject("RideDirector");
             var source = directorObject.AddComponent<Level1DataSource>();
             Ref(source, "data", dataAsset);
+            // The rider's run (v6, ADR-020): their digit and the network they teach, shared by every moment that needs it.
+            var session = directorObject.AddComponent<Level1Session>();
+            Ref(session, "source", source);
+            _session = session;
             var moments = new Moments
             {
                 Draw = MakeMoment<DrawMoment>(directorObject.transform, "Draw", source),
                 Paint = MakeMoment<WeightPaintMoment>(directorObject.transform, "WeightPaint", source),
-                Plug = MakeMoment<PlugMoment>(directorObject.transform, "Plug", source),
-                Descent = Make("Descent", directorObject.transform, Vector3.zero).AddComponent<DescentMoment>(),
                 Forward = MakeMoment<ForwardPassMoment>(directorObject.transform, "ForwardPassUntrained", source),
                 Blame = MakeMoment<BlameMoment>(directorObject.transform, "Blame", source),
+                Train = MakeMoment<TrainMoment>(directorObject.transform, "Train", source),
                 Valley = MakeMoment<ValleyRunMoment>(directorObject.transform, "ValleyRun", source),
                 Right = MakeMoment<ForwardPassMoment>(directorObject.transform, "ForwardPassTrained", source),
+                Stump = MakeMoment<StumpMoment>(directorObject.transform, "Stump", source),
             };
             Set(moments.Right, "trained", p => p.boolValue = true);
-            Set(moments.Right, "revealLines", p =>
-            {
-                p.arraySize = 3;
-                p.GetArrayElementAtIndex(0).intValue = (int)RideLine.RightSays;
-                p.GetArrayElementAtIndex(1).intValue = (int)RideLine.RightTraining;
-                p.GetArrayElementAtIndex(2).intValue = (int)RideLine.RightAccuracy;
-            });
             Set(moments.Valley, "hopDistances", p =>
             {
                 p.arraySize = layout.HopDistances.Length;
@@ -584,18 +581,24 @@ namespace Convergence.EditorTools
         {
             public DrawMoment Draw;
             public WeightPaintMoment Paint;
-            public PlugMoment Plug;
-            public DescentMoment Descent;
             public ForwardPassMoment Forward;
             public BlameMoment Blame;
+            public TrainMoment Train;
             public ValleyRunMoment Valley;
             public ForwardPassMoment Right;
+            public StumpMoment Stump;
         }
 
+        /// <summary>The rider's run, made by <see cref="BuildScene"/> for the region builders that wire views to it.</summary>
+        private static Level1Session _session;
+
+        /// <summary>A moment on its own object, given the data and the rider's run when it has fields for them.</summary>
         private static T MakeMoment<T>(Transform parent, string name, Level1DataSource source) where T : RideMoment
         {
             var moment = Make(name, parent, Vector3.zero).AddComponent<T>();
-            Ref(moment, "source", source);
+            var so = new SerializedObject(moment);
+            if (so.FindProperty("source") != null) Ref(moment, "source", source);
+            if (so.FindProperty("session") != null) Ref(moment, "session", _session);
             return moment;
         }
 

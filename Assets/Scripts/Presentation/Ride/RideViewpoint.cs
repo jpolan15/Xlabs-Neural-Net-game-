@@ -23,7 +23,7 @@ namespace Convergence.Presentation.Ride
         public string[] podPanels = new string[0];
 
         /// <summary>The game table's boards: only one shows at a time, the one its game uses.</summary>
-        public static readonly string[] GameBoards = { "WeightGrid", "PlugBoard", "DescentBoard", "HuntBoard" };
+        public static readonly string[] GameBoards = { "WeightGrid", "DrawBoard", "SendBoard", "HuntBoard", "TrainBoard" };
 
         /// <summary>
         /// True for a part of the game table that is not up at this viewpoint: the whole table unless "GameTable" is

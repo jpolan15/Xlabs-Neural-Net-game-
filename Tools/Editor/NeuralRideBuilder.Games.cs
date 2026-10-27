@@ -12,8 +12,9 @@ using Convergence.XR.Ride;
 namespace Convergence.EditorTools
 {
     /// <summary>
-    /// Level 1 v5's games (TASK_LEVEL1_V5_GAMEPLAY): the game table every mini-game is played on (it rises out of the
-    /// dash to tablet height), its boards (the 7×7 grid, the plug board, the descent hill), the HUD (title, goal,
+    /// Level 1's games (v5, TASK_LEVEL1_V5_GAMEPLAY; boards v6, TASK_LEVEL1_V6_TRAIN): the game table every mini-game is
+    /// played on (it rises out of the dash to tablet height), its boards (the drawing board, the 7×7 weight grid, the send
+    /// card, the hunt card, the training board), the HUD (title, goal,
     /// progress, countdown, score), the "STOP CLEAR!" stamp with stars and confetti, the noise specks the rider zaps
     /// between stops, and a laser on each hand. Geometry is built into the pod prefab; the scene wiring (moments,
     /// director) is added to the pod instance in <see cref="WireGames"/>.
@@ -31,7 +32,6 @@ namespace Convergence.EditorTools
         private const float TableScale = 0.85f;
         private static readonly Vector2 TableSize = new Vector2(0.68f, 0.54f);
         private static readonly Vector3 BoardCentre = new Vector3(0f, -0.075f, 0f);
-        private static readonly string[] StepLabels = { "TINY STEP", "MEDIUM STEP", "GIANT LEAP" };
 
         private static void MakeGameMaterials()
         {
@@ -158,7 +158,7 @@ namespace Convergence.EditorTools
             subtitle.fontSizeMin = 0.2f;
             subtitle.fontSizeMax = 0.26f;
             // The table sits farther away and smaller than it did (TableScale), so the title and score are bigger to stay readable.
-            TextMeshPro title = Text("Title", table, new Vector3(-0.09f, top - 0.088f, -0.006f), "DRAW THE 3", 0.039f, _theme.gold, 0.46f, TextAlignmentOptions.Left, true);
+            TextMeshPro title = Text("Title", table, new Vector3(-0.09f, top - 0.088f, -0.006f), "DRAW YOUR 3", 0.039f, _theme.gold, 0.46f, TextAlignmentOptions.Left, true);
             title.rectTransform.sizeDelta = new Vector2(0.46f, 0.045f);
             TextMeshPro score = Text("Score", table, new Vector3(0.175f, top - 0.088f, -0.006f), "SCORE 0", 0.042f, _theme.cyan, 0.3f, TextAlignmentOptions.Right, true);
             score.rectTransform.sizeDelta = new Vector2(0.3f, 0.048f);
@@ -176,8 +176,9 @@ namespace Convergence.EditorTools
 
             Transform grid = BuildWeightGrid(table);
             grid.localPosition = BoardCentre + new Vector3(0, 0, -0.006f);
-            BuildPlugBoard(table);
-            BuildDescentBoard(table);
+            BuildDrawBoard(table);
+            BuildSendBoard(table);
+            BuildTrainBoard(table);
 
             var shoot = Make("HuntBoard", table, BoardCentre).transform;
             Text("Shoot", shoot, new Vector3(0, 0.03f, -0.006f), "DRAG HOT WIRES\nTO THE 3!", 0.05f, _theme.rewindMagenta, 0.6f, bold: true).rectTransform.sizeDelta = new Vector2(0.6f, 0.16f);
@@ -186,109 +187,172 @@ namespace Convergence.EditorTools
             return table;
         }
 
-        /// <summary>Glow tiles of the plug board: six string heads, then ten sockets, then the gold goal ring (four bars).</summary>
-        public const int PlugHeadTiles = 6, PlugSocketTiles = 10;
-
-        /// <summary>
-        /// The plug board, cheap to draw: one mesh of glow tiles (string heads, sockets, the goal ring), the digits in two
-        /// text columns, and one line per string. Each socket's tile and collider sit on its digit, measured from the text.
-        /// </summary>
-        private static void BuildPlugBoard(Transform table)
+        /// <summary>A line renderer in a board's own frame (the boards move with the table).</summary>
+        private static LineRenderer BoardLine(string name, Transform parent, int points, float width, Color color)
         {
-            var board = Make("PlugBoard", table, BoardCentre).transform;
-            var tiles = new TileMesh();
-            for (int s = 0; s < PlugHeadTiles; s++)
-            {
-                Vector3 at = new Vector3(-0.24f, 0.11f - s * 0.046f, -0.008f);
-                tiles.Face(at, 0.034f, 0.034f, new Color(0.4f, 0.9f, 1f, 0.5f));
-                var head = Make("Head" + s, board, at);
-                var c = head.AddComponent<SphereCollider>();
-                c.radius = 0.026f;
-                c.isTrigger = true;
-                var line = Make("String", head.transform, Vector3.zero).AddComponent<LineRenderer>();
-                line.useWorldSpace = true;
-                line.positionCount = 12;
-                line.widthMultiplier = 0.005f;
-                line.numCapVertices = 2;
-                line.sharedMaterial = Mat("Laser");
-                line.shadowCastingMode = ShadowCastingMode.Off;
-                line.receiveShadows = false;
-            }
+            var line = Make(name, parent, Vector3.zero).AddComponent<LineRenderer>();
+            line.useWorldSpace = false;
+            line.positionCount = points;
+            line.widthMultiplier = width;
+            line.numCapVertices = 3;
+            line.numCornerVertices = 2;
+            line.sharedMaterial = Mat("Laser");
+            line.startColor = line.endColor = color;
+            line.shadowCastingMode = ShadowCastingMode.Off;
+            line.receiveShadows = false;
+            return line;
+        }
 
-            var socketAt = new Vector3[10];
-            for (int col = 0; col < 2; col++)
+        /// <summary>A button on a board: its tile goes into the board's tile mesh; a trigger collider and a label sit on it.</summary>
+        private static Transform BoardButton(TileMesh tiles, Transform board, string name, Vector3 at, Vector2 size, string label, Color labelColor)
+        {
+            tiles.Face(at, size.x, size.y, new Color(0.15f, 0.35f, 0.6f, 0.6f));
+            var button = Make(name, board, at);
+            Text("Label", button.transform, new Vector3(0, 0, -0.004f), label, 0.02f, labelColor, size.x, bold: true).rectTransform.sizeDelta = new Vector2(size.x, size.y);
+            var c = button.AddComponent<BoxCollider>();
+            c.size = new Vector3(size.x, size.y + 0.006f, 0.03f);
+            c.isTrigger = true;
+            return button.transform;
+        }
+
+        /// <summary>A digit as 3×5 tiles facing the rider (-z), centred at c.</summary>
+        private static void FaceGlyph(TileMesh tiles, int n, Vector3 c, float cell, Color color)
+        {
+            string[] rows = DigitGlyphs[n].Split('|');
+            for (int r = 0; r < 5; r++)
             {
-                var digits = Text("Digits" + col, board, new Vector3(0.13f + col * 0.13f, -0.005f, -0.01f), "", 0.03f, Color.white, 0.06f, bold: true);
-                digits.rectTransform.sizeDelta = new Vector2(0.06f, 0.3f);
-                digits.text = string.Join("\n", new[] { 0, 1, 2, 3, 4 }.Select(r => (col * 5 + r).ToString()));
-                digits.lineSpacing = 22f;
-                digits.ForceMeshUpdate();
-                for (int r = 0; r < 5; r++)
+                for (int col = 0; col < 3; col++)
                 {
-                    TMP_CharacterInfo ch = digits.textInfo.characterInfo[digits.textInfo.lineInfo[r].firstCharacterIndex];
-                    Vector3 local = (ch.bottomLeft + ch.topRight) * 0.5f;
-                    socketAt[col * 5 + r] = board.InverseTransformPoint(digits.transform.TransformPoint(local));
+                    if (rows[r][col] == '#') tiles.Face(c + new Vector3((col - 1) * cell, (2 - r) * cell, 0f), cell * 0.9f, cell * 0.9f, color);
                 }
             }
+        }
 
-            for (int k = 0; k < PlugSocketTiles; k++)
+        /// <summary>
+        /// The v6 boards stand this far in front of the table's back plate (its front face is at z = -0.006), so their plates,
+        /// lines and tiles are never coplanar with it (no z-fighting, and the sightline check sees them).
+        /// </summary>
+        private static readonly Vector3 BoardLift = new Vector3(0f, 0f, -0.008f);
+
+        /// <summary>The drawing canvas's side, metres, and its centre on the drawing board.</summary>
+        private const float CanvasSide = 0.27f;
+        private static readonly Vector3 CanvasCentre = new Vector3(-0.13f, 0f, -0.006f);
+
+        /// <summary>
+        /// The drawing board (v6), for "draw your 3" and the bonus round: the canvas (a dark square with a trigger collider
+        /// the held laser draws on, and the ink mesh DrawBoardView fills), and one tile mesh holding, in order, the 7×7 of
+        /// what Pixel sees, the ten probability bars of the bonus round, DONE, CLEAR, the canvas's four edges, and the bars'
+        /// digits. Two draw calls plus the labels.
+        /// </summary>
+        private static void BuildDrawBoard(Transform table)
+        {
+            var board = Make("DrawBoard", table, BoardCentre + BoardLift).transform;
+            Quad("CanvasPlate", board, CanvasCentre, new Vector2(CanvasSide, CanvasSide), "PlateSolid");
+            var canvas = Make("Canvas", board, CanvasCentre + new Vector3(0, 0, -0.002f));
+            canvas.transform.localScale = new Vector3(CanvasSide, CanvasSide, 1f);
+            var box = canvas.AddComponent<BoxCollider>();
+            box.size = new Vector3(1f, 1f, 0.06f);
+            box.isTrigger = true;
+            var ink = Make("Ink", board, CanvasCentre + new Vector3(0, 0, -0.004f));
+            ink.AddComponent<MeshFilter>();
+            var inkRenderer = ink.AddComponent<MeshRenderer>();
+            inkRenderer.sharedMaterial = Mat("Laser");
+            inkRenderer.shadowCastingMode = ShadowCastingMode.Off;
+            inkRenderer.receiveShadows = false;
+
+            var tiles = new TileMesh();
+            // What Pixel sees: the 49 numbers as a 7×7 (the prompt text doubles as its label).
+            const float pitch = 0.025f;
+            Vector3 middle = new Vector3(0.1f, 0.015f, -0.006f);
+            for (int i = 0; i < 49; i++)
             {
-                Vector3 at = new Vector3(socketAt[k].x, socketAt[k].y, -0.007f);
-                tiles.Face(at, 0.075f, 0.044f, new Color(0.4f, 0.85f, 1f, 0.2f));
-                var socket = Make("Socket" + k, board, at);
-                var c = socket.AddComponent<BoxCollider>();
-                c.size = new Vector3(0.11f, 0.05f, 0.03f);
-                c.isTrigger = true;
+                Vector3 at = middle + new Vector3((i % 7 - 3f) * pitch, (3f - i / 7) * pitch, 0f);
+                tiles.Face(at, pitch * 0.9f, pitch * 0.9f, new Color(0.04f, 0.06f, 0.12f, 0.9f));
             }
 
-            Vector3 g = new Vector3(socketAt[Level1Data.HeroDigit].x, socketAt[Level1Data.HeroDigit].y, -0.009f);
-            Color gold = new Color(_theme.gold.r, _theme.gold.g, _theme.gold.b, 0.9f);
-            tiles.Face(g + new Vector3(0, 0.026f, 0), 0.09f, 0.004f, gold);
-            tiles.Face(g + new Vector3(0, -0.026f, 0), 0.09f, 0.004f, gold);
-            tiles.Face(g + new Vector3(-0.045f, 0, 0), 0.004f, 0.052f, gold);
-            tiles.Face(g + new Vector3(0.045f, 0, 0), 0.004f, 0.052f, gold);
+            // The bonus round's ten bars, each over its digit (in the same place as the 7×7; the view shows one or the other).
+            const float barPitch = 0.019f, barBottom = -0.06f, barHeight = 0.12f;
+            for (int k = 0; k < 10; k++)
+            {
+                float x = 0.1f + (k - 4.5f) * barPitch;
+                tiles.Face(new Vector3(x, barBottom + barHeight * 0.5f, -0.006f), barPitch * 0.7f, barHeight, new Color(0.3f, 0.6f, 0.95f, 0.85f));
+            }
+
+            BoardButton(tiles, board, "Done", new Vector3(0.262f, 0.045f, -0.006f), new Vector2(0.085f, 0.07f), "DONE", Color.white);
+            BoardButton(tiles, board, "Clear", new Vector3(0.262f, -0.045f, -0.006f), new Vector2(0.085f, 0.07f), "CLEAR", _theme.orange);
+            // The canvas's glowing edge, so the rider sees where to draw (four bars; DrawBoardView leaves them lit).
+            Color edge = new Color(_theme.cyan.r, _theme.cyan.g, _theme.cyan.b, 0.75f);
+            float side = CanvasSide + 0.008f, bar = 0.004f;
+            Vector3 c0 = CanvasCentre + new Vector3(0f, 0f, -0.003f);
+            tiles.Face(c0 + new Vector3(0f, side * 0.5f, 0f), side + bar, bar, edge);
+            tiles.Face(c0 + new Vector3(0f, -side * 0.5f, 0f), side + bar, bar, edge);
+            tiles.Face(c0 + new Vector3(-side * 0.5f, 0f, 0f), bar, side, edge);
+            tiles.Face(c0 + new Vector3(side * 0.5f, 0f, 0f), bar, side, edge);
+            for (int k = 0; k < 10; k++) FaceGlyph(tiles, k, new Vector3(0.1f + (k - 4.5f) * barPitch, barBottom - 0.014f, -0.006f), 0.0036f, Color.white);
             TileObject("Tiles", board, tiles, "Laser");
-            Text("Goal3", board, g + new Vector3(-0.075f, 0, -0.002f), "GOAL", 0.016f, _theme.gold, 0.06f, bold: true);
+
+            Text("Count", board, middle + new Vector3(0, -0.115f, 0), "49 numbers, 0 to 1", 0.016f, Color.white, 0.2f);
+            TextMeshPro prompt = Text("Prompt", board, new Vector3(0.1f, 0.128f, -0.006f), "WHAT PIXEL SEES", 0.022f, _theme.gold, 0.22f, bold: true);
+            prompt.rectTransform.sizeDelta = new Vector2(0.22f, 0.03f);
+            TextMeshPro answer = Text("Answer", board, new Vector3(0.1f, -0.115f, -0.006f), "", 0.018f, Color.white, 0.22f, bold: true);
+            answer.rectTransform.sizeDelta = new Vector2(0.22f, 0.03f);
             board.gameObject.SetActive(false);
         }
 
-        /// <summary>Tiles of the descent board: the three step buttons, then the green bottom mark.</summary>
-        public const int DescentButtonTiles = 3;
-
-        /// <summary>The descent board, cheap to draw: the hill and the trail of steps as lines, the ball, and one mesh for the buttons and the bottom mark.</summary>
-        private static void BuildDescentBoard(Transform table)
+        /// <summary>The card with the rider's digit (v6), shot to send it into the network: a 7×7 of tiles on a frame.</summary>
+        private static void BuildSendBoard(Transform table)
         {
-            var board = Make("DescentBoard", table, BoardCentre).transform;
-            LineRenderer Line(string name, int points, float width, Color color)
-            {
-                var line = Make(name, board, Vector3.zero).AddComponent<LineRenderer>();
-                line.useWorldSpace = false;
-                line.positionCount = points;
-                line.widthMultiplier = width;
-                line.sharedMaterial = Mat("Laser");
-                line.startColor = line.endColor = color;
-                line.shadowCastingMode = ShadowCastingMode.Off;
-                line.receiveShadows = false;
-                return line;
-            }
-
-            Line("Hill", 48, 0.004f, new Color(_theme.valleyPink.r, _theme.valleyPink.g, _theme.valleyPink.b, 1f));
-            Line("Trail", 0, 0.0025f, new Color(1f, 0.85f, 0.4f, 0.8f));
-            Prim(PrimitiveType.Sphere, "Ball", board, new Vector3(0, 0, -0.01f), Vector3.one * 0.026f, "SumFires");
+            var board = Make("SendBoard", table, BoardCentre + BoardLift).transform;
+            var card = Make("Card", board, new Vector3(0f, 0.02f, -0.006f)).transform;
+            Quad("Frame", card, new Vector3(0, 0, 0.002f), new Vector2(0.26f, 0.26f), "TableFrame");
             var tiles = new TileMesh();
-            for (int b = 0; b < DescentButtonTiles; b++)
+            const float pitch = 0.034f;
+            for (int i = 0; i < 49; i++) tiles.Face(new Vector3((i % 7 - 3f) * pitch, (3f - i / 7) * pitch, -0.002f), pitch * 0.92f, pitch * 0.92f, new Color(0.04f, 0.06f, 0.12f, 0.9f));
+            TileObject("Tiles", card, tiles, "Laser");
+            var c = card.gameObject.AddComponent<BoxCollider>();
+            c.size = new Vector3(0.26f, 0.26f, 0.04f);
+            c.isTrigger = true;
+            Text("Shoot", board, new Vector3(0, -0.135f, -0.006f), "SHOOT YOUR 3 TO SEND IT IN", 0.022f, _theme.gold, 0.6f, bold: true).rectTransform.sizeDelta = new Vector2(0.6f, 0.03f);
+            board.gameObject.SetActive(false);
+        }
+
+        /// <summary>The step-size buttons' labels (the learning rates the bake checked: tiny, good, huge).</summary>
+        private static readonly string[] StepLabels = { "SMALL STEP\n0.15", "MEDIUM STEP\n4", "HUGE STEP\n40" };
+        private static readonly Vector2 PlotSize = new Vector2(0.36f, 0.2f);
+        private static readonly Vector2 PlotCentre = new Vector2(-0.1f, 0.0f);
+
+        /// <summary>
+        /// The training board (v6): a plot (the loss curve, the accuracy curve, the target line, a ball at the head of the
+        /// loss) and the three step sizes (the learning rate) as hold buttons. One tile mesh: the three buttons first, then
+        /// the target line and the plot's axes (TrainBoardView colours the buttons by index).
+        /// </summary>
+        private static void BuildTrainBoard(Transform table)
+        {
+            var board = Make("TrainBoard", table, BoardCentre + BoardLift).transform;
+            Quad("PlotPlate", board, new Vector3(PlotCentre.x, PlotCentre.y, -0.004f), PlotSize + new Vector2(0.03f, 0.03f), "PlateSolid");
+            BoardLine("LossCurve", board, 0, 0.005f, _theme.orange);
+            BoardLine("AccuracyCurve", board, 0, 0.0035f, _theme.cyan);
+            Prim(PrimitiveType.Sphere, "Ball", board, new Vector3(PlotCentre.x - PlotSize.x * 0.5f, 0, -0.012f), Vector3.one * 0.022f, "SumFires");
+
+            var tiles = new TileMesh();
+            for (int b = 0; b < StepLabels.Length; b++)
             {
-                Vector3 at = new Vector3(0.225f, 0.085f - b * 0.075f, -0.006f);
-                tiles.Face(at, 0.17f, 0.06f, new Color(0.15f, 0.35f, 0.6f, 0.55f));
-                var button = Make("StepButton" + b, board, at);
-                Text("Label", button.transform, new Vector3(0, 0, -0.004f), StepLabels[b], 0.022f, b == 2 ? _theme.orange : Color.white, 0.17f, bold: true);
-                var c = button.AddComponent<BoxCollider>();
-                c.size = new Vector3(0.17f, 0.065f, 0.03f);
-                c.isTrigger = true;
+                BoardButton(tiles, board, "StepButton" + b, new Vector3(0.225f, 0.075f - b * 0.075f, -0.006f), new Vector2(0.15f, 0.062f), StepLabels[b], b == 2 ? _theme.orange : Color.white);
             }
 
-            tiles.Face(new Vector3(0, -0.09f, -0.005f), 0.006f, 0.02f, new Color(0.45f, 1f, 0.5f, 0.9f));
+            float target = (float)_data.File.live.targetAccuracy;
+            float left = PlotCentre.x - PlotSize.x * 0.5f, bottom = PlotCentre.y - PlotSize.y * 0.5f;
+            tiles.Face(new Vector3(PlotCentre.x, bottom + PlotSize.y * target, -0.006f), PlotSize.x, 0.0025f, new Color(0.45f, 1f, 0.5f, 0.9f));
+            tiles.Face(new Vector3(PlotCentre.x, bottom, -0.006f), PlotSize.x, 0.002f, new Color(1f, 1f, 1f, 0.5f));
+            tiles.Face(new Vector3(left, PlotCentre.y, -0.006f), 0.002f, PlotSize.y, new Color(1f, 1f, 1f, 0.5f));
             TileObject("Tiles", board, tiles, "Laser");
+
+            Text("LossLabel", board, new Vector3(left + 0.04f, bottom + PlotSize.y + 0.008f, -0.006f), "LOSS", 0.018f, _theme.orange, 0.1f, TextAlignmentOptions.Left, true);
+            Text("AccuracyLabel", board, new Vector3(left + 0.16f, bottom + PlotSize.y + 0.008f, -0.006f), "ACCURACY", 0.018f, _theme.cyan, 0.16f, TextAlignmentOptions.Left, true);
+            Text("TargetLabel", board, new Vector3(left + PlotSize.x - 0.03f, bottom + PlotSize.y * target + 0.01f, -0.006f), Mathf.RoundToInt(target * 100f) + "%", 0.016f, new Color(0.45f, 1f, 0.5f), 0.06f, bold: true);
+            Text("StepsLabel", board, new Vector3(PlotCentre.x, bottom - 0.015f, -0.006f), "training steps", 0.014f, Color.white, 0.2f);
+            Text("RateLabel", board, new Vector3(0.225f, 0.125f, -0.006f), "LEARNING RATE", 0.016f, Color.white, 0.18f, bold: true);
+            Text("Hold", board, new Vector3(0.225f, -0.125f, -0.006f), "hold one to train", 0.014f, new Color(1f, 1f, 1f, 0.6f), 0.18f);
             board.gameObject.SetActive(false);
         }
 
@@ -403,57 +467,74 @@ namespace Convergence.EditorTools
             Ref(tableView, "frameLive", Mat("Orange"));
             Ref(tableView, "frameIdle", Mat("TableFrame"));
 
-            // The grid: both grid games through one router.
+            // The weight grid: the paint game through its router (sprayed cell by cell by a held laser, v6).
             var gridInput = m.Paint.gameObject.AddComponent<DashGridInput>();
-            Ref(gridInput, "draw", m.Draw);
             Ref(gridInput, "paint", m.Paint);
             // The cells are part of the Pod prefab, so the router goes in through the serialized field (which records the scene
             // override); assigning it in code on the instance would be lost when the scene is saved.
             foreach (WeightCellInteractable cell in table.GetComponentsInChildren<WeightCellInteractable>(true)) Ref(cell, "grid", gridInput);
 
-            // The plug board.
-            Transform plug = table.Find("PlugBoard");
-            var plugView = pod.AddComponent<PlugBoardView>();
-            Ref(plugView, "director", rd);
-            Ref(plugView, "game", m.Plug);
-            Ref(plugView, "board", plug.gameObject);
-            Int(plugView, "showSegment", SegWrong);
-            Ref(plugView, "tiles", plug.Find("Tiles").GetComponent<MeshFilter>());
-            Refs(plugView, "digitColumns", new List<Object> { plug.Find("Digits0").GetComponent<TextMeshPro>(), plug.Find("Digits1").GetComponent<TextMeshPro>() });
-            var heads = new List<Object>();
-            var strings = new List<Object>();
-            for (int s = 0; s < PlugHeadTiles; s++)
+            // The drawing board: draw your 3, and the bonus round. The canvas routes a held laser to whichever game is live.
+            Transform draw = table.Find("DrawBoard");
+            var canvasInput = draw.Find("Canvas").gameObject.AddComponent<CanvasInput>();
+            Refs(canvasInput, "games", new List<Object> { m.Draw, m.Stump });
+            foreach (var (name, index) in new[] { ("Done", DrawMoment.ButtonDone), ("Clear", DrawMoment.ButtonClear) })
             {
-                Transform head = plug.Find("Head" + s);
-                heads.Add(head);
-                strings.Add(head.Find("String").GetComponent<LineRenderer>());
-                head.gameObject.AddComponent<PlugTarget>().Set(m.Plug, false, s);
+                var button = draw.Find(name).gameObject.AddComponent<GameButton>();
+                Refs(button, "games", new List<Object> { m.Draw, m.Stump });
+                Int(button, "button", index);
             }
+            var drawView = pod.AddComponent<DrawBoardView>();
+            Ref(drawView, "director", rd);
+            Ref(drawView, "draw", m.Draw);
+            Ref(drawView, "stump", m.Stump);
+            Ref(drawView, "board", draw.gameObject);
+            Int(drawView, "drawSegment", SegPixels);
+            Int(drawView, "stumpSegment", SegStump);
+            Ref(drawView, "ink", draw.Find("Ink").GetComponent<MeshFilter>());
+            Float(drawView, "canvasSize", CanvasSide);
+            Ref(drawView, "tiles", draw.Find("Tiles").GetComponent<MeshFilter>());
+            Ref(drawView, "prompt", draw.Find("Prompt").GetComponent<TextMeshPro>());
+            Ref(drawView, "count", draw.Find("Count").GetComponent<TextMeshPro>());
+            Ref(drawView, "answer", draw.Find("Answer").GetComponent<TextMeshPro>());
 
-            var sockets = new List<Object>();
-            for (int k = 0; k < PlugSocketTiles; k++)
+            // The card the rider shoots to send their 3 into the network.
+            Transform send = table.Find("SendBoard");
+            var sendButton = send.Find("Card").gameObject.AddComponent<GameButton>();
+            Refs(sendButton, "games", new List<Object> { m.Forward });
+            var sendView = pod.AddComponent<SendCardView>();
+            Ref(sendView, "director", rd);
+            Ref(sendView, "session", _session);
+            Ref(sendView, "moment", m.Forward);
+            Ref(sendView, "board", send.gameObject);
+            Int(sendView, "showSegment", SegNetworkSend);
+            Ref(sendView, "card", send.Find("Card"));
+            Ref(sendView, "tiles", send.Find("Card/Tiles").GetComponent<MeshFilter>());
+            Set(tableView, "alsoUpAt", p =>
             {
-                Transform socket = plug.Find("Socket" + k);
-                sockets.Add(socket);
-                socket.gameObject.AddComponent<PlugTarget>().Set(m.Plug, true, k);
+                p.arraySize = 1;
+                p.GetArrayElementAtIndex(0).intValue = SegNetworkSend;
+            });
+
+            // The training board.
+            Transform train = table.Find("TrainBoard");
+            var trainView = pod.AddComponent<TrainBoardView>();
+            Ref(trainView, "director", rd);
+            Ref(trainView, "game", m.Train);
+            Ref(trainView, "board", train.gameObject);
+            Int(trainView, "showSegment", SegRim);
+            Ref(trainView, "lossCurve", train.Find("LossCurve").GetComponent<LineRenderer>());
+            Ref(trainView, "accuracyCurve", train.Find("AccuracyCurve").GetComponent<LineRenderer>());
+            Ref(trainView, "ball", train.Find("Ball"));
+            Ref(trainView, "tiles", train.Find("Tiles").GetComponent<MeshFilter>());
+            Set(trainView, "plotSize", p => p.vector2Value = PlotSize);
+            Set(trainView, "plotCentre", p => p.vector2Value = PlotCentre);
+            for (int b = 0; b < TrainMoment.ButtonCount; b++)
+            {
+                var step = train.Find("StepButton" + b).gameObject.AddComponent<GameButton>();
+                Refs(step, "games", new List<Object> { m.Train });
+                Int(step, "button", b);
             }
-
-            Refs(plugView, "heads", heads);
-            Refs(plugView, "strings", strings);
-            Refs(plugView, "sockets", sockets);
-
-            // The descent board.
-            Transform descent = table.Find("DescentBoard");
-            var descentView = pod.AddComponent<DescentBoardView>();
-            Ref(descentView, "director", rd);
-            Ref(descentView, "game", m.Descent);
-            Ref(descentView, "board", descent.gameObject);
-            Int(descentView, "showSegment", SegRim);
-            Ref(descentView, "curve", descent.Find("Hill").GetComponent<LineRenderer>());
-            Ref(descentView, "trail", descent.Find("Trail").GetComponent<LineRenderer>());
-            Ref(descentView, "ball", descent.Find("Ball"));
-            Ref(descentView, "tiles", descent.Find("Tiles").GetComponent<MeshFilter>());
-            for (int b = 0; b < DescentButtonTiles; b++) descent.Find("StepButton" + b).gameObject.AddComponent<DescentTarget>().Set(m.Descent, b);
 
             // The hunt's card on the table while the wires are live.
             var hunt = table.Find("HuntBoard").gameObject;
@@ -490,8 +571,9 @@ namespace Convergence.EditorTools
 
             var sfx = pod.GetComponent<RideSfxView>();
             Ref(sfx, "zap", zap);
-            Ref(sfx, "plug", m.Plug);
-            Ref(sfx, "descent", m.Descent);
+            Ref(sfx, "train", m.Train);
+            Ref(sfx, "stump", m.Stump);
+            Ref(sfx, "send", m.Forward);
 
             // A laser on each hand. The rig's own near-far ray visuals are turned off so there is one beam per hand.
             Transform offset = rig.transform.Find("Camera Offset");
@@ -530,13 +612,14 @@ namespace Convergence.EditorTools
                 Set(g, "giveUpAfter", p => p.floatValue = giveUp);
             }
 
-            Game(m.Draw, "DRAW THE 3", "Right hand draws, left hand rubs out", RideLine.DrawDone, 90f);
-            Game(m.Paint, "TEACH ONE NEURON", "Light up for 3s only. Right = green, left = red", RideLine.NeuronSolved, 120f);
-            Game(m.Plug, "PLUG THE STRINGS", "Make the 3 the brightest answer", RideLine.PlugDone, 90f);
+            Game(m.Draw, "DRAW YOUR 3", "Hold the trigger and draw a 3", RideLine.DrawDone, 90f);
+            Game(m.Paint, "TEACH ONE NEURON", "Fire for 3s only. Right hand +, left hand -", RideLine.NeuronSolved, 120f);
             Game(m.Blame, "HOT-WIRE HUNT", "Drag each hot wire to the 3 before it cools", RideLine.BackDone, 60f);
-            Game(m.Descent, "ROLL IT DOWN", "Get the ball to the bottom in few steps", RideLine.DescentRealHill, 75f);
-            Set(m.Valley, "hopSeconds", p => p.floatValue = 1.3f);
-            Set(m.Valley, "pauseSeconds", p => p.floatValue = 0.25f);
+            Game(m.Train, "TRAIN PIXEL", "Hold a step size to train", RideLine.TrainDone, 90f);
+            Game(m.Stump, "STUMP PIXEL", "Draw the digit Pixel asks for", RideLine.StumpDone, 75f);
+            // The plunge after the training game is a quick victory ride.
+            Set(m.Valley, "hopSeconds", p => p.floatValue = 0.75f);
+            Set(m.Valley, "pauseSeconds", p => p.floatValue = 0.1f);
         }
     }
 }

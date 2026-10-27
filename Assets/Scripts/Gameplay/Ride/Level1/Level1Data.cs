@@ -1,6 +1,7 @@
 using System;
 using Convergence.Core.Neural;
 using Convergence.Core.Puzzles;
+using Convergence.Core.Training;
 using UnityEngine;
 
 namespace Convergence.Gameplay.Ride.Level1
@@ -40,6 +41,32 @@ namespace Convergence.Gameplay.Ride.Level1
 
         /// <summary>A fresh network with the trained weights.</summary>
         public NetworkModel CreateTrained() => Create(File.trained);
+
+        /// <summary>The untrained (initial) or offline-trained weights as a flat <see cref="DigitNetwork"/>.</summary>
+        public DigitNetwork CreateDigitNetwork(bool trained)
+        {
+            Level1Weights w = trained ? File.trained : File.initial;
+            return new DigitNetwork(w.w1, w.b1, w.w2, w.b2);
+        }
+
+        /// <summary>
+        /// A live trainer (v6, the training game) for <paramref name="network">a network</paramref>, on the bake's
+        /// balanced subsets of real training and test digits, with the bake's batch size and sampler seed.
+        /// </summary>
+        public LiveTrainer CreateLiveTrainer(DigitNetwork network)
+        {
+            Level1Live live = File.live;
+            if (_trainPixels == null)
+            {
+                _trainPixels = Convert.FromBase64String(live.trainPixels);
+                _testPixels = Convert.FromBase64String(live.testPixels);
+            }
+
+            return new LiveTrainer(network, _trainPixels, live.trainLabels, _testPixels, live.testLabels, live.batch, live.samplerSeed);
+        }
+
+        private byte[] _trainPixels;
+        private byte[] _testPixels;
 
         /// <summary>The neuron puzzle of region 2.</summary>
         public WeightPaintPuzzle CreatePuzzle()
@@ -91,6 +118,10 @@ namespace Convergence.Gameplay.Ride.Level1
             Require(f.finale != null && f.finale.digits != null && f.finale.digits.Length > 0, "finale.digits");
             Require(f.threes != null && f.threes.Length >= 12, "threes (the dock's gallery)");
             foreach (var t in f.threes) Require(t != null && t.label == HeroDigit && t.pixels28 != null && t.pixels28.Length == 784, "a gallery three's pixels28");
+            Level1Live live = f.live;
+            Require(live != null && live.rates != null && live.rates.Length == 3 && live.batch > 0 && live.samplerSeed != 0, "live (the training game)");
+            Require(live.trainLabels != null && live.trainLabels.Length > 0 && !string.IsNullOrEmpty(live.trainPixels), "live.train");
+            Require(live.testLabels != null && live.testLabels.Length > 0 && !string.IsNullOrEmpty(live.testPixels), "live.test");
         }
 
         private static void CheckWeights(Level1Weights w, Level1DataFile f, string name)
@@ -123,6 +154,8 @@ namespace Convergence.Gameplay.Ride.Level1
 
         /// <summary>The dock's gallery (E0): real test threes, all different, never the hero.</summary>
         public Level1Picture[] threes;
+        /// <summary>The training game (v6): the digits the rider trains on and is tested on.</summary>
+        public Level1Live live;
     }
 
     /// <summary>Where the data came from.</summary>
@@ -200,6 +233,20 @@ namespace Convergence.Gameplay.Ride.Level1
     {
         public Level1Digit[] digits;
         public int correct;
+    }
+    /// <summary>
+    /// The training game's data (v6, ADR-020): balanced subsets of real MNIST, 49 bytes per digit (base64, 255 = ink),
+    /// the three step sizes (tiny, good, huge), and what the bake's replay of each measured.
+    /// </summary>
+    [Serializable]
+    public sealed class Level1Live
+    {
+        public int batch, dataSeed, stepsToTarget;
+        public uint samplerSeed;
+        public double targetAccuracy, startLoss, goodAccuracyAt300, tinyAccuracyAt300, hugePeakLoss;
+        public double[] rates;
+        public string trainPixels, testPixels;
+        public int[] trainLabels, testLabels;
     }
 #pragma warning restore CS0649
 }

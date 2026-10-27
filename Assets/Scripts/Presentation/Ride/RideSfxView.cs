@@ -33,8 +33,9 @@ namespace Convergence.Presentation.Ride
         [SerializeField] private BlameMoment blame;
         [SerializeField] private ValleyRunMoment valley;
         [SerializeField] private ZapGame zap;
-        [SerializeField] private PlugMoment plug;
-        [SerializeField] private DescentMoment descent;
+        [SerializeField] private TrainMoment train;
+        [SerializeField] private StumpMoment stump;
+        [SerializeField] private ForwardPassMoment send;
 
         [Header("Sources")]
         [SerializeField] private AudioSource hum;
@@ -95,8 +96,14 @@ namespace Convergence.Presentation.Ride
             if (blame != null) blame.Connected += OnConnected;
             if (valley != null) valley.HopReached += OnHop;
             if (zap != null) zap.SpeckZapped += OnZapped;
-            if (plug != null) plug.Plugged += OnPlugged;
-            if (descent != null) descent.Stepped += OnStepped;
+            if (train != null)
+            {
+                train.Checked += OnChecked;
+                train.BlewUp += OnBlewUp;
+            }
+
+            if (stump != null) stump.Judged += OnJudged;
+            if (send != null) send.Thrown += OnThrown;
             RideAim.Fired += OnFired;
         }
 
@@ -120,8 +127,14 @@ namespace Convergence.Presentation.Ride
             if (blame != null) blame.Connected -= OnConnected;
             if (valley != null) valley.HopReached -= OnHop;
             if (zap != null) zap.SpeckZapped -= OnZapped;
-            if (plug != null) plug.Plugged -= OnPlugged;
-            if (descent != null) descent.Stepped -= OnStepped;
+            if (train != null)
+            {
+                train.Checked -= OnChecked;
+                train.BlewUp -= OnBlewUp;
+            }
+
+            if (stump != null) stump.Judged -= OnJudged;
+            if (send != null) send.Thrown -= OnThrown;
             RideAim.Fired -= OnFired;
             WatchGame(null);
         }
@@ -146,9 +159,14 @@ namespace Convergence.Presentation.Ride
 
         private void OnZapped(Vector3 where) => Play(pop, 1.3f);
 
-        private void OnPlugged(int s, int k) => Play(plugIn, k == 3 ? 1.2f : 0.85f);
+        // The training game ticks higher as the accuracy climbs, and a blow-up sounds wrong.
+        private void OnChecked(double accuracy) => Play(tick, 0.7f + (float)accuracy * 0.8f);
 
-        private void OnStepped(double from, double to, int button) => Play(hop, button == 0 ? 1.4f : button == 1 ? 1.1f : 0.8f);
+        private void OnBlewUp() => Play(wrong, 0.8f);
+
+        private void OnJudged(int prompt, int guess, bool right) => Play(right ? solved : wrong, right ? 1.1f : 1f);
+
+        private void OnThrown(bool byRider) => Play(plugIn, 1.1f);
 
         /// <summary>Adds every clip this view can play to a list (the boot loads them before the ride starts).</summary>
         public void CollectClips(System.Collections.Generic.List<AudioClip> into)

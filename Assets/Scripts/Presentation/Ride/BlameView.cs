@@ -46,6 +46,14 @@ namespace Convergence.Presentation.Ride
         [SerializeField] private float snapBuzz = 0.75f;
         [SerializeField] private float snapBuzzSeconds = 0.12f;
 
+        [Header("Re-aiming at the rider's digit (v6)")]
+        [Tooltip("Where the 49 pixels, 16 hidden neurons and 10 answers sit, in the blame meshes' frame.")]
+        [SerializeField] private Vector3[] inputPositions = new Vector3[0];
+        [SerializeField] private Vector3[] hiddenPositions = new Vector3[0];
+        [SerializeField] private Vector3[] outputPositions = new Vector3[0];
+        [Tooltip("Each top wire's laser target (its capsule along the wire, and its grip at the loose end).")]
+        [SerializeField] private Transform[] targets = new Transform[0];
+
         private static readonly int LitUpTo = Shader.PropertyToID("_LitUpTo");
         private readonly Vector3[] _points = new Vector3[CablePoints];
         private MaterialPropertyBlock _block;
@@ -62,6 +70,9 @@ namespace Convergence.Presentation.Ride
         private Color[] _glowColors;
         private int _glowCount;
 
+        private Mesh _all;
+        private Color[] _allColors;
+
         private void Awake()
         {
             _block = new MaterialPropertyBlock();
@@ -69,6 +80,13 @@ namespace Convergence.Presentation.Ride
             topWires.sharedMesh = _mesh;
             _colors = _mesh.colors;
             _heat = (Color[])_colors.Clone();
+            if (blameLinks != null && blameLinks.TryGetComponent(out MeshFilter all))
+            {
+                _all = Instantiate(all.sharedMesh);
+                all.sharedMesh = _all;
+                _allColors = _all.colors;
+            }
+
             SetLit(-0.1f);
             BuildGlowMesh();
         }
@@ -112,6 +130,7 @@ namespace Convergence.Presentation.Ride
         {
             if (dash != null) dash.SegmentShown += OnCue;
             if (moment == null) return;
+            moment.BlameChanged += Reaim;
             moment.Nudged += OnNudged;
             moment.Grabbed += OnGrabbed;
             moment.Dropped += OnDropped;
@@ -122,6 +141,7 @@ namespace Convergence.Presentation.Ride
         {
             if (dash != null) dash.SegmentShown -= OnCue;
             if (moment == null) return;
+            moment.BlameChanged -= Reaim;
             moment.Nudged -= OnNudged;
             moment.Grabbed -= OnGrabbed;
             moment.Dropped -= OnDropped;
@@ -132,6 +152,77 @@ namespace Convergence.Presentation.Ride
         {
             foreach (LineRenderer cable in cables) if (cable != null) cable.enabled = false;
             if (glows != null) glows.gameObject.SetActive(false);
+            Reaim();
+        }
+
+        /// <summary>
+        /// The blame is the rider's own digit's (v6): every wire burns by its new |∂loss/∂w|, and the hunt's top wires,
+        /// their handles, cables and laser targets move onto the new hottest wires. The builder lays the full blame mesh in
+        /// the network's own order (hidden neuron j's 49 wires, then answer k's 16), 16 vertices per wire.
+        /// </summary>
+        private void Reaim()
+        {
+            if (moment == null || moment.Wires == null || moment.Wires.Count == 0 || inputPositions.Length < 49) return;
+            var wires = moment.Wires;
+            double biggest = System.Math.Max(1e-12, System.Math.Abs(wires[0].Gradient));
+            if (_allColors != null)
+            {
+                foreach (BlameMoment.Wire w in wires)
+                {
+                    int index = w.Layer == 0 ? w.Neuron * 49 + w.Input : 16 * 49 + w.Neuron * 16 + w.Input;
+                    float size = Mathf.Sqrt((float)(System.Math.Abs(w.Gradient) / biggest));
+                    for (int v = index * vertsPerWire; v < (index + 1) * vertsPerWire && v < _allColors.Length; v++) _allColors[v].r = size;
+                }
+
+                _all.colors = _allColors;
+            }
+
+            int top = Mathf.Min(moment.TopCount, Mathf.Min(origins.Length, ends.Length));
+            Vector3[] vertices = _mesh.vertices;
+            Vector3[] normals = _mesh.normals;
+            var uv = new System.Collections.Generic.List<Vector2>();
+            _mesh.GetUVs(0, uv);
+            for (int k = 0; k < top && k < wires.Count; k++)
+            {
+                BlameMoment.Wire w = wires[k];
+                Vector3 a = w.Layer == 0 ? inputPositions[w.Input] : hiddenPositions[w.Input];
+                Vector3 b = w.Layer == 0 ? hiddenPositions[w.Neuron] : outputPositions[w.Neuron];
+                Vector3 tangent = (b - a).normalized;
+                int points = vertsPerWire / 2;
+                for (int i = 0; i < points; i++)
+                {
+                    float t = i / (float)(points - 1);
+                    Vector3 p = Vector3.Lerp(a, b, t);
+                    float run = Vector3.Distance(a, b) * t;
+                    for (int side = 0; side < 2; side++)
+                    {
+                        int v = k * vertsPerWire + i * 2 + side;
+                        if (v >= vertices.Length) continue;
+                        vertices[v] = p;
+                        normals[v] = tangent;
+                        if (v < uv.Count) uv[v] = new Vector2(run, side == 0 ? -1f : 1f);
+                    }
+                }
+
+                origins[k].localPosition = a;
+                ends[k].localPosition = b;
+                if (k < targets.Length && targets[k] != null)
+                {
+                    Transform target = targets[k];
+                    target.localPosition = (a + b) * 0.5f;
+                    target.localRotation = Quaternion.LookRotation(tangent, Vector3.up);
+                    if (target.TryGetComponent(out CapsuleCollider capsule)) capsule.height = Vector3.Distance(a, b);
+                    if (target.childCount > 0) target.GetChild(0).position = target.parent.TransformPoint(b);
+                }
+            }
+
+            _mesh.vertices = vertices;
+            _mesh.normals = normals;
+            _mesh.SetUVs(0, uv);
+            _mesh.RecalculateBounds();
+            Bounds bounds = _mesh.bounds;
+            bounds.Expand(4f);
+            _mesh.bounds = bounds;
         }
 
         private void OnCue(RideLine line, int index, NarrationLibrary.Segment segment)
@@ -297,7 +388,7 @@ namespace Convergence.Presentation.Ride
             if (dash != null)
             {
                 dash.ShowReadout("WIRE NUDGED  " + before.ToString("0.00") + " > " + after.ToString("0.00")
-                    + "   LOSS FOR THIS 3: " + moment.StartLoss.ToString("0.00") + " > " + moment.HeroLoss.ToString("0.00"));
+                    + "   LOSS FOR YOUR 3: " + moment.StartLoss.ToString("0.00") + " > " + moment.HeroLoss.ToString("0.00"));
             }
         }
     }

@@ -13,9 +13,10 @@ using Convergence.XR.Ride;
 namespace Convergence.Tests.PlayMode.Gameplay
 {
     /// <summary>
-    /// Level 1 v5 (TASK_LEVEL1_V5_GAMEPLAY): every stop is a mini-game the rider wins, then GO moves on. These play the
-    /// NeuralRide scene the way a rider does, through each game's own inputs (a hand's press on a cell, a grab and a
-    /// plug, a shot wire, a step button) and GO's channel, and never set a game to won. A game must end with a win the
+    /// Level 1 v6 (TASK_LEVEL1_V6_TRAIN): every stop is a mini-game the rider wins, then GO moves on, and one thread runs
+    /// through them (the rider's own 3 and the network they train). These play the NeuralRide scene the way a rider does,
+    /// through each game's own inputs (strokes on the canvas, presses and sweeps on cells, buttons, a dragged wire) and
+    /// GO's channel, check that a laser from the eye reaches each control first, and never set a game to won. A game must end with a win the
     /// rider earned, and the ride must wait for GO after it.
     /// </summary>
     [TestFixture]
@@ -115,29 +116,115 @@ namespace Convergence.Tests.PlayMode.Gameplay
             yield return WaitFor(() => _director.SegmentIndex > segment, "the ride to move on after GO", 30f);
         }
 
+        /// <summary>A ray from the eye to a control must reach that control first: nothing on the table may block the laser.</summary>
+        private static void AssertLaserReaches(Component control, string what)
+        {
+            Vector3 eye = Camera.main.transform.position;
+            Vector3 at = control.GetComponent<Collider>().bounds.center;
+            Assert.IsTrue(Physics.Raycast(eye, (at - eye).normalized, out RaycastHit hit, 10f, ~0, QueryTriggerInteraction.Collide),
+                "a laser from the eye reaches nothing toward " + what);
+            Assert.IsTrue(hit.collider.transform.IsChildOf(control.transform) || hit.collider.transform == control.transform,
+                "a laser aimed at " + what + " hits " + hit.collider.name + " first");
+        }
+
+        private static T Find<T>(string name) where T : Component
+        {
+            foreach (T c in UnityEngine.Object.FindObjectsByType<T>(FindObjectsInactive.Include))
+            {
+                if (c.name == name) return c;
+            }
+
+            Assert.Fail(name + " (" + typeof(T).Name + ") missing");
+            return null;
+        }
+
+        /// <summary>Draws strokes (canvas units) on the canvas the way a held laser does: begin, move point by point, end.</summary>
+        private static void Draw(CanvasInput canvas, int hand, params Vector2[][] strokes)
+        {
+            foreach (Vector2[] s in strokes)
+            {
+                Assert.IsTrue(canvas.StrokeBegin(hand, canvas.ToWorld(s[0]), true), "the canvas takes a stroke");
+                for (int i = 1; i < s.Length; i++)
+                {
+                    int n = Mathf.Max(1, Mathf.CeilToInt(Vector2.Distance(s[i - 1], s[i]) / 0.02f));
+                    for (int k = 1; k <= n; k++) canvas.StrokeMove(hand, canvas.ToWorld(Vector2.Lerp(s[i - 1], s[i], k / (float)n)));
+                }
+
+                canvas.StrokeEnd(hand);
+            }
+        }
+
+        private static Vector2[] Arc(float cx, float cy, float rx, float ry, float from, float to, int n)
+        {
+            var points = new Vector2[n];
+            for (int i = 0; i < n; i++)
+            {
+                float a = Mathf.Deg2Rad * Mathf.Lerp(from, to, i / (float)(n - 1));
+                points[i] = new Vector2(cx + rx * Mathf.Cos(a), cy + ry * Mathf.Sin(a));
+            }
+
+            return points;
+        }
+
+        private static Vector2[] Join(params Vector2[][] parts)
+        {
+            var all = new List<Vector2>();
+            foreach (Vector2[] p in parts) all.AddRange(p);
+            return all.ToArray();
+        }
+
+        private static Vector2 V(float x, float y) => new Vector2(x, y);
+
+        // Digits as a rider might draw them (canvas units, y down).
+        private static readonly Dictionary<int, Vector2[][]> Digits = new Dictionary<int, Vector2[][]>
+        {
+            { 0, new[] { Arc(0.5f, 0.5f, 0.22f, 0.32f, 0f, 360f, 24) } },
+            { 1, new[] { new[] { V(0.48f, 0.18f), V(0.52f, 0.82f) } } },
+            { 2, new[] { Join(Arc(0.5f, 0.35f, 0.2f, 0.16f, 200f, 380f, 10), new[] { V(0.66f, 0.42f), V(0.3f, 0.82f), V(0.72f, 0.82f) }) } },
+            { 3, new[] { Join(Arc(0.5f, 0.33f, 0.19f, 0.15f, 200f, 450f, 12), Arc(0.5f, 0.65f, 0.21f, 0.17f, 270f, 520f, 12)) } },
+            { 4, new[] { new[] { V(0.6f, 0.82f), V(0.6f, 0.18f), V(0.28f, 0.6f), V(0.75f, 0.6f) } } },
+            { 5, new[] { Join(new[] { V(0.7f, 0.18f), V(0.36f, 0.18f), V(0.33f, 0.47f) }, Arc(0.5f, 0.63f, 0.2f, 0.18f, 230f, 500f, 12)) } },
+            { 6, new[] { Join(new[] { V(0.62f, 0.16f), V(0.42f, 0.4f) }, Arc(0.5f, 0.65f, 0.18f, 0.18f, 200f, 560f, 16)) } },
+            { 7, new[] { new[] { V(0.28f, 0.2f), V(0.72f, 0.2f), V(0.45f, 0.84f) } } },
+            { 8, new[] { Arc(0.5f, 0.32f, 0.16f, 0.14f, 90f, 450f, 14), Arc(0.5f, 0.66f, 0.2f, 0.18f, -90f, 270f, 16) } },
+            { 9, new[] { Arc(0.5f, 0.35f, 0.18f, 0.16f, 0f, 360f, 16), new[] { V(0.68f, 0.35f), V(0.62f, 0.85f) } } },
+        };
+
         [UnityTest]
         public IEnumerator EveryGame_IsWonByTheRider_ThroughItsOwnInputs_AndGoMovesOn()
         {
             yield return Launch(4f);
             var draw = Game<DrawMoment>("Draw");
             var paint = Game<WeightPaintMoment>("WeightPaint");
-            var plug = Game<PlugMoment>("Plug");
             var blame = Game<BlameMoment>("Blame");
-            var descent = Game<DescentMoment>("Descent");
+            var train = Game<TrainMoment>("Train");
+            var stump = Game<StumpMoment>("Stump");
+            ForwardPassMoment send = Find<ForwardPassMoment>("ForwardPassUntrained");
+            ForwardPassMoment read = Find<ForwardPassMoment>("ForwardPassTrained");
+            var session = UnityEngine.Object.FindAnyObjectByType<Level1Session>();
+            Assert.IsNotNull(session, "The rider's run (Level1Session) is missing");
             var grid = UnityEngine.Object.FindAnyObjectByType<DashGridInput>();
-            Assert.IsNotNull(grid, "The dash grid's router is missing");
+            Assert.IsNotNull(grid, "The weight grid's router is missing");
+            var canvas = UnityEngine.Object.FindAnyObjectByType<CanvasInput>(FindObjectsInactive.Include);
+            Assert.IsNotNull(canvas, "The drawing canvas is missing");
+            GameButton done = Find<GameButton>("Done"), clear = Find<GameButton>("Clear");
 
-            // Draw the 3: the right hand inks, the left rubs out; a scribble does not pass.
+            // Draw your 3: a held laser draws on the canvas; CLEAR wipes it; DONE keeps it as the rider's digit.
             yield return WaitFor(() => draw.IsLive, "the draw game to open");
-            int stray = -1;
-            for (int c = 0; c < 49 && stray < 0; c++) if (!draw.Puzzle.IsTarget(c)) stray = c;
-            Assert.IsTrue(grid.Press(stray, RideHand.Right));
-            Assert.IsTrue(draw.Puzzle.IsInked(stray));
-            Assert.IsTrue(grid.Press(stray, RideHand.Left), "the left hand rubs out");
-            Assert.IsFalse(draw.Puzzle.IsInked(stray));
-            for (int c = 0; c < 49; c++) if (draw.Puzzle.IsTarget(c)) grid.Press(c, RideHand.Right);
-            Assert.IsTrue(draw.Puzzle.Passed);
+            yield return new WaitForSecondsRealtime(1.2f); // the table finishes rising
+            AssertLaserReaches(canvas, "the canvas");
+            AssertLaserReaches(done, "DONE");
+            Assert.IsFalse(done.Hit(RideHand.Right), "DONE does nothing on an empty canvas");
+            Draw(canvas, RideHand.Left, new[] { V(0.2f, 0.2f), V(0.8f, 0.8f) });
+            Assert.AreEqual(1, draw.Canvas.StrokeCount, "either hand draws");
+            Assert.IsTrue(clear.Hit(RideHand.Right));
+            Assert.AreEqual(0, draw.Canvas.StrokeCount, "CLEAR wipes the canvas");
+            Draw(canvas, RideHand.Right, Digits[3]);
+            Assert.IsTrue(draw.Canvas.HasEnoughInk);
+            Assert.IsTrue(done.Hit(RideHand.Right), "DONE keeps the drawing");
             yield return WonThenPullGo(draw);
+            Assert.IsTrue(session.DigitIsRiders, "the rider's drawing is the digit the rest of the ride follows");
+            CollectionAssert.AreEqual(draw.Canvas.ToPixels7(), session.Digit);
 
             // On the way to the neuron, noise drifts past: a hit pops it and scores.
             ZapSpeck speck = null;
@@ -151,125 +238,122 @@ namespace Convergence.Tests.PlayMode.Gameplay
             Assert.IsFalse(speck.gameObject.activeSelf, "a zapped speck pops");
             Assert.AreEqual(score + 10, _director.Score);
 
-            // Teach one neuron: the baked reference, right hand green, left hand red.
+            // Teach one neuron: fingertips press a cell with their own hand; a held laser sweeps (sprays) without toggling.
             yield return WaitFor(() => paint.IsLive, "the paint game to open");
             int[] reference = _director.GetComponent<Level1DataSource>().Data.File.puzzle.referenceSolution;
-
-            // A real fingertip reaching a cell presses it with its own hand: the right hand paints green (+), the left red (-).
-            yield return new WaitForSecondsRealtime(1.2f); // the table finishes rising
+            yield return new WaitForSecondsRealtime(1.2f);
             var tips = new Dictionary<int, HandPolarityController>();
-            foreach (HandPolarityController tip in UnityEngine.Object.FindObjectsByType<HandPolarityController>(FindObjectsInactive.Include))
-            {
-                tips[tip.Hand] = tip;
-            }
-
+            foreach (HandPolarityController tip in UnityEngine.Object.FindObjectsByType<HandPolarityController>(FindObjectsInactive.Include)) tips[tip.Hand] = tip;
             Assert.AreEqual(2, tips.Count, "Each controller wears a HandPolarityController (left and right)");
-            // With no headset the rig leaves its controller objects switched off; a headset turns them on. Do what it does.
             foreach (HandPolarityController tip in tips.Values) tip.gameObject.SetActive(true);
             yield return null;
+            var cells = new Dictionary<int, WeightCellInteractable>();
+            foreach (WeightCellInteractable c in UnityEngine.Object.FindObjectsByType<WeightCellInteractable>(FindObjectsInactive.Include)) cells[c.Cell] = c;
+            AssertLaserReaches(cells[24], "the middle weight cell");
             int plus = Array.IndexOf(reference, 1), minus = Array.IndexOf(reference, -1);
             foreach ((int hand, int cell, int expected) in new[] { (RideHand.Right, plus, 1), (RideHand.Left, minus, -1) })
             {
-                WeightCellInteractable target = null;
-                foreach (WeightCellInteractable c in UnityEngine.Object.FindObjectsByType<WeightCellInteractable>(FindObjectsInactive.Include))
-                {
-                    if (c.Cell == cell) target = c;
-                }
-
-                Assert.IsNotNull(target, "cell " + cell + " has a collider");
                 Transform controller = tips[hand].transform;
-                Vector3 delta = target.GetComponent<Collider>().bounds.center - tips[hand].Position;
+                Vector3 delta = cells[cell].GetComponent<Collider>().bounds.center - tips[hand].Position;
                 controller.position += delta;
                 yield return new WaitForFixedUpdate();
                 yield return new WaitForFixedUpdate();
                 yield return null;
-                Assert.AreEqual(expected, paint.Weights[cell], (hand == RideHand.Right ? "right" : "left") + " fingertip touching cell " + cell + " paints it " + (expected > 0 ? "green (+)" : "red (-)"));
-                int painted = 0;
-                for (int c = 0; c < 49; c++) if (paint.Weights[c] != 0) painted++;
-                Assert.AreEqual(hand == RideHand.Right ? 1 : 2, painted, "a fingertip presses only the cell under it");
-                controller.position -= delta; // back where it was
+                Assert.AreEqual(expected, paint.Weights[cell], (hand == RideHand.Right ? "right" : "left") + " fingertip touching cell " + cell + " paints it " + (expected > 0 ? "+" : "-"));
+                controller.position -= delta;
             }
 
-            // Then the rest of the reference, by the cells' own presses: the colour that paints a weight (or rubs it out).
+            // A sweep onto a cell already that colour keeps it (a press would clear it).
+            Assert.IsFalse(((IRideStrokeTarget)cells[plus]).StrokeBegin(RideHand.Right, Vector3.zero, false));
+            Assert.AreEqual(1, paint.Weights[plus], "sweeping over a painted cell keeps its colour");
             for (int c = 0; c < 49; c++)
             {
-                int have = paint.Weights[c], want = reference[c];
-                if (have == want) continue;
-                grid.Press(c, (want != 0 ? want : have) > 0 ? RideHand.Right : RideHand.Left);
+                int want = reference[c];
+                if (paint.Weights[c] == want) continue;
+                if (want != 0) ((IRideStrokeTarget)cells[c]).StrokeBegin(want > 0 ? RideHand.Right : RideHand.Left, Vector3.zero, false);
+                else grid.Press(c, paint.Weights[c] > 0 ? RideHand.Right : RideHand.Left);
             }
 
-            Assert.IsTrue(paint.Result.Passed, "the reference weights, painted with two hands, solve it");
+            Assert.IsTrue(paint.Result.Passed, "the reference weights, sprayed with two hands, solve it");
             yield return WonThenPullGo(paint);
 
-            // Plug the strings: a wrong socket makes things worse; strings into the 3 make Pixel say 3.
-            yield return WaitFor(() => plug.IsLive, "the plug game to open", 150f);
-            Assert.AreNotEqual(Level1Data.HeroDigit, plug.Puzzle.Guess, "the untrained network starts wrong");
-            double gap = plug.Puzzle.Gap;
-            Assert.IsTrue(plug.GrabString(0, RideHand.Right));
-            Assert.IsTrue(plug.HitSocket(plug.Puzzle.Guess, RideHand.Right, Vector3.zero));
-            Assert.Greater(plug.Puzzle.Gap, gap, "plugging into the wrong answer makes it stronger");
-            int moves = 0;
-            while (!plug.Puzzle.Passed)
-            {
-                int s = plug.Puzzle.Hint();
-                Assert.IsTrue(plug.GrabString(s, RideHand.Left));
-                Assert.IsTrue(plug.HitSocket(Level1Data.HeroDigit, RideHand.Left, Vector3.zero));
-                Assert.LessOrEqual(++moves, plug.Puzzle.StringCount);
-            }
+            // Send your 3: shoot the card; the light races through the untrained network with the rider's own digit.
+            yield return WaitFor(() => send.IsLive, "the send card", 150f);
+            yield return new WaitForSecondsRealtime(1.2f);
+            GameButton card = Find<GameButton>("Card");
+            AssertLaserReaches(card, "the card with the rider's 3");
+            bool thrown = false;
+            send.Thrown += byRider => thrown = byRider;
+            Assert.IsTrue(card.Hit(RideHand.Right));
+            yield return WaitFor(() => thrown && send.Guess >= 0 && send.Progress >= 1f, "the race through the network", 60f);
+            Assert.AreEqual(session.Read(out _, out _), send.Guess, "the guess is Core's, on the rider's digit");
 
-            yield return WonThenPullGo(plug);
-
-            // The hot-wire hunt: grab a hot wire with a laser, drag its loose end to the 3, and it snaps on. (The desk seat and
-            // the hand lasers are switched off here so they do not overwrite the aim this test sets.)
+            // The hot-wire hunt on the rider's digit: each wire dragged to the 3 is a real step on the rider's network.
             yield return WaitFor(() => blame.IsLive, "the hunt to open", 150f);
             UnityEngine.Object.FindAnyObjectByType<DesktopSeat>().enabled = false;
             UnityEngine.Object.FindAnyObjectByType<RideHandLasers>().enabled = false;
             double before = blame.HeroLoss;
             Vector3 eye = Camera.main.transform.position;
-            var connected = new List<(int wire, int hand, int order)>();
-            blame.Connected += (wire, hand, order) => connected.Add((wire, hand, order));
-
-            Assert.IsFalse(blame.Grab(blame.TopCount + 3, RideHand.Right), "there is no such wire");
-            Assert.IsTrue(blame.Grab(0, RideHand.Right));
-            Assert.AreEqual(0, blame.Carrying(RideHand.Right));
-            RideAim.Set(RideHand.Right, eye, blame.Socket.position + Vector3.up * 25f, true); // pointing well away from the 3
-            yield return null;
-            Assert.IsFalse(blame.IsNudged(0), "a wire far from the 3 does not snap");
-            Assert.AreEqual(0, blame.Carrying(RideHand.Right), "and the hand still carries it");
-            Assert.IsTrue(blame.TryGetCursor(RideHand.Right, out Vector3 cursor));
-            Assert.Greater(Vector3.Distance(cursor, blame.Socket.position), blame.SnapRadiusFrom(eye), "the wire's end follows the laser");
-            RideAim.RaiseReleased(RideHand.Right); // let go over nothing
-            Assert.AreEqual(-1, blame.Carrying(RideHand.Right), "letting go drops the wire back");
-            Assert.IsFalse(blame.IsNudged(0));
-
+            BlameMoment.Wire top = blame.Wires[0];
+            double weightBefore = top.Layer == 0 ? session.Network.W1[top.Neuron * 49 + top.Input] : session.Network.W2[top.Neuron * 16 + top.Input];
             Assert.IsTrue(blame.Grab(0, RideHand.Left));
-            RideAim.Set(RideHand.Left, eye, blame.Socket.position, true); // pointing straight at the 3
+            RideAim.Set(RideHand.Left, eye, blame.Socket.position, true);
             yield return null;
             Assert.IsTrue(blame.IsNudged(0), "a wire dragged to the 3 snaps on, as one real gradient step");
-            Assert.AreEqual(-1, blame.Carrying(RideHand.Left), "a snapped wire is let go");
-            CollectionAssert.AreEqual(new[] { (0, RideHand.Left, 0) }, connected);
-            Assert.AreEqual(1, blame.ConnectedCount);
-            Assert.IsFalse(blame.Grab(0, RideHand.Right), "a wire that is on the 3 cannot be grabbed again");
-
+            double weightAfter = top.Layer == 0 ? session.Network.W1[top.Neuron * 49 + top.Input] : session.Network.W2[top.Neuron * 16 + top.Input];
+            Assert.AreEqual(weightBefore - blame.LearningRate * top.Gradient, weightAfter, 1e-9, "the step is kept in the rider's network");
             RideAim.Set(RideHand.Left, Vector3.zero, Vector3.zero, false);
-            RideAim.Set(RideHand.Right, Vector3.zero, Vector3.zero, false);
             for (int k = 0; k < blame.TopCount; k++) blame.Nudge(k);
-            Assert.Less(blame.HeroLoss, before, "the real gradient steps lower the loss");
+            Assert.Less(blame.HeroLoss, before, "the real gradient steps lower the loss of the rider's 3");
             yield return WonThenPullGo(blame);
+            UnityEngine.Object.FindAnyObjectByType<DesktopSeat>().enabled = true;
+            UnityEngine.Object.FindAnyObjectByType<RideHandLasers>().enabled = true;
 
-            // Roll it down: a giant leap flies past the bottom, medium steps settle.
-            yield return WaitFor(() => descent.IsLive, "the descent game to open", 150f);
-            double start = descent.Game.X;
-            Assert.IsTrue(descent.Press(2, Vector3.zero));
-            Assert.Greater(descent.Game.X, descent.Game.Bottom, "the giant leap overshoots");
-            Assert.Less(start, descent.Game.Bottom);
-            while (!descent.Game.Passed)
+            // Train: the huge step blows the loss up (and is undone); holding the medium step trains it to the target.
+            yield return WaitFor(() => train.IsLive, "the training game to open", 150f);
+            yield return new WaitForSecondsRealtime(1.2f);
+            GameButton small = Find<GameButton>("StepButton0"), medium = Find<GameButton>("StepButton1"), huge = Find<GameButton>("StepButton2");
+            AssertLaserReaches(medium, "the medium step button");
+            double startAccuracy = train.Accuracy;
+            Assert.Less(startAccuracy, 0.3, "untrained, it guesses");
+            bool blewUp = false;
+            train.BlewUp += () => blewUp = true;
+            Assert.IsTrue(huge.Hit(RideHand.Right));
+            yield return WaitFor(() => blewUp, "the huge step to blow the loss up", 30f);
+            Assert.AreEqual(-1, train.Held, "the undo lets go of the button");
+            Assert.IsTrue(session.Network.IsFinite);
+            yield return WaitFor(() => !train.Cooling, "the buttons to come back", 10f);
+            Assert.IsTrue(small.Hit(RideHand.Left));
+            yield return new WaitForSeconds(1f);
+            RideAim.RaiseReleased(RideHand.Left);
+            Assert.AreEqual(-1, train.Held, "letting go stops training");
+            int steps = train.Steps;
+            yield return new WaitForSeconds(0.5f);
+            Assert.AreEqual(steps, train.Steps, "nothing trains while no button is held");
+            Assert.IsTrue(medium.Hit(RideHand.Right));
+            yield return WaitFor(() => !train.IsLive, "training to reach the target", 90f);
+            RideAim.RaiseReleased(RideHand.Right);
+            Assert.GreaterOrEqual(train.Accuracy, train.TargetAccuracy, "won on the accuracy Core measured on unseen digits");
+            Assert.IsTrue(session.IsTrained);
+            yield return WonThenPullGo(train);
+
+            // Pixel reads the rider's 3 with the network the rider trained (studying it first if it has to).
+            yield return WaitFor(() => read.HasFinished, "Pixel to read the rider's 3", 150f);
+            Assert.AreEqual(3, session.Read(out _, out _), "the rider's network reads the rider's 3");
+
+            // Stump Pixel: draw what it asks for and shoot DONE; it reads each one with the rider's network.
+            yield return WaitFor(() => stump.IsLive, "the bonus round", 150f);
+            int judged = 0;
+            stump.Judged += (asked, guess, right) => judged++;
+            for (int p = 0; p < stump.PromptCount; p++)
             {
-                yield return WaitFor(() => descent.Press(1, Vector3.zero), "the ball to stop rolling", 10f);
-                Assert.Less(descent.Game.Steps, 20);
+                yield return WaitFor(() => stump.IsLive && stump.PromptIndex == p, "prompt " + p, 30f);
+                Draw(canvas, RideHand.Right, Digits[stump.Prompt]);
+                Assert.IsTrue(done.Hit(RideHand.Right), "DONE serves the bonus round too");
+                yield return WaitFor(() => judged == p + 1, "Pixel's answer to prompt " + p, 20f);
             }
 
-            yield return WonThenPullGo(descent);
+            yield return WonThenPullGo(stump);
             Assert.Greater(_director.Score, 0, "the ride keeps score");
             yield return WaitFor(() => _director.State == RideState.Complete, "the end of the ride", 240f);
         }

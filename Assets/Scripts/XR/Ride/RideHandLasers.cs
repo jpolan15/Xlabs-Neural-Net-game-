@@ -9,8 +9,8 @@ namespace Convergence.XR.Ride
     /// A laser on each hand, always on: the right one green, the left one red, the colours of <see cref="HandPolarityController"/>.
     /// The trigger, or A / X (or B / Y), fires the hand's laser at whatever it points at: a noise speck, a grid cell, a
     /// string or socket, a step button, a hot wire, the GO lever, Pixel. With nothing in its sights, a press pulls GO
-    /// whenever GO is live, so pressing A to go just works. Letting go of the trigger over a socket plugs in a string
-    /// being dragged. It turns input into commands and decides nothing (ADR-007); grip and finger pokes still work
+    /// whenever GO is live, so pressing A to go just works. Held on a stroke surface (v6) it draws on the canvas or
+    /// sprays the weight grid cell by cell as it sweeps. Letting go of the trigger drops a carried wire. It turns input into commands and decides nothing (ADR-007); grip and finger pokes still work
     /// through XRI as before.
     /// </summary>
     public sealed class RideHandLasers : MonoBehaviour
@@ -25,6 +25,7 @@ namespace Convergence.XR.Ride
         [SerializeField] private float width = 0.006f;
         [SerializeField] private float fireHaptic = 0.45f;
         [SerializeField] private float missHaptic = 0.1f;
+        [SerializeField] private float strokeHaptic = 0.08f;
 
         private sealed class Hand
         {
@@ -38,6 +39,8 @@ namespace Convergence.XR.Ride
             public Collider Aimed;
             public Vector3 AimPoint;
             public Color Color;
+            public IRideStrokeTarget Stroking;
+            public float NextTick;
         }
 
         private Hand[] _hands;
@@ -112,6 +115,7 @@ namespace Convergence.XR.Ride
                 h.Trigger.Disable();
                 h.Fire.Disable();
                 RideAim.Set(h.Index, Vector3.zero, Vector3.zero, false);
+                EndStroke(h);
                 RideAim.RaiseReleased(h.Index);
             }
         }
@@ -162,20 +166,59 @@ namespace Convergence.XR.Ride
             }
 
             bool pressed = h.Trigger.WasPressedThisFrame() || h.Fire.WasPressedThisFrame();
+            bool held = h.Trigger.IsPressed() || h.Fire.IsPressed();
+            IRideStrokeTarget under = h.Aimed != null ? h.Aimed.GetComponentInParent<IRideStrokeTarget>() : null;
             if (pressed)
             {
                 h.FlashUntil = Time.unscaledTime + 0.09f;
-                bool did = h.Aimed != null && RideTargeting.Fire(h.Aimed, h.Index);
-                if (!did) did = PullGoIfLive();
+                bool did = false;
+                if (under != null && under.StrokeBegin(h.Index, h.AimPoint, true))
+                {
+                    h.Stroking = under;
+                    did = true;
+                }
+                else
+                {
+                    did = h.Aimed != null && RideTargeting.Fire(h.Aimed, h.Index);
+                    if (!did) did = PullGoIfLive();
+                }
+
                 RideAim.RaiseFired(h.Index, did);
                 Haptic(h.Index, did ? fireHaptic : missHaptic, did ? 0.06f : 0.02f);
+            }
+            else if (held)
+            {
+                // A held laser draws on the canvas and sprays the grid cell by cell as it sweeps.
+                if (h.Stroking != null && under == h.Stroking)
+                {
+                    h.Stroking.StrokeMove(h.Index, h.AimPoint);
+                }
+                else
+                {
+                    EndStroke(h);
+                    if (under != null && under.StrokeBegin(h.Index, h.AimPoint, false)) h.Stroking = under;
+                }
+
+                if (h.Stroking != null && Time.unscaledTime >= h.NextTick)
+                {
+                    h.NextTick = Time.unscaledTime + 0.06f;
+                    Haptic(h.Index, strokeHaptic, 0.02f);
+                }
             }
 
             if (h.Trigger.WasReleasedThisFrame() || h.Fire.WasReleasedThisFrame())
             {
+                EndStroke(h);
                 if (h.Aimed != null && RideTargeting.Release(h.Aimed, h.Index)) Haptic(h.Index, fireHaptic, 0.06f);
                 RideAim.RaiseReleased(h.Index);
             }
+        }
+
+        private static void EndStroke(Hand h)
+        {
+            if (h.Stroking == null) return;
+            h.Stroking.StrokeEnd(h.Index);
+            h.Stroking = null;
         }
 
         private bool PullGoIfLive()

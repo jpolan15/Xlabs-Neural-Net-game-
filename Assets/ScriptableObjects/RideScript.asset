@@ -15,202 +15,196 @@ MonoBehaviour:
   intro:
     name: Intro
     beats:
-    - line: 64
-      seconds: 4.34
-    - line: 65
-      seconds: 4.3793335
-    - line: 66
-      seconds: 3.55
-  dockLine: 67
+    - line: 119
+      seconds: 5.23
+    - line: 120
+      seconds: 2.79
+    - line: 121
+      seconds: 3.52
+  dockLine: 122
   sequences:
-  - name: 'E1 pixels: explain, then draw'
+  - name: 'E1 pixels: explain, then draw your 3'
     beats:
-    - line: 68
-      seconds: 4.22
-    - line: 69
-      seconds: 4.23
-    - line: 70
-      seconds: 5.01
-    - line: 107
-      seconds: 5.27
+    - line: 123
+      seconds: 4.19
+    - line: 124
+      seconds: 4.37
+    - line: 125
+      seconds: 4.6299996
+    - line: 126
+      seconds: 4.83
   - name: 'E2 neuron: explain'
     beats:
-    - line: 72
-      seconds: 5.3900003
-    - line: 73
-      seconds: 3.27
-    - line: 74
-      seconds: 4.5
-    - line: 75
-      seconds: 4.28
+    - line: 131
+      seconds: 5.93
+    - line: 132
+      seconds: 4.0933332
+    - line: 133
+      seconds: 6.47
+    - line: 134
+      seconds: 8.58
   - name: 'E2 neuron: your turn'
     beats:
-    - line: 76
-      seconds: 6.73
+    - line: 135
+      seconds: 9.018667
   - name: 'E3 network: explain'
     beats:
-    - line: 80
-      seconds: 4.4700003
-    - line: 81
-      seconds: 3.296
-    - line: 82
-      seconds: 4.4900002
-  - name: 'E3 network: send it through'
+    - line: 139
+      seconds: 6.4199996
+    - line: 140
+      seconds: 2.9320002
+    - line: 141
+      seconds: 5.674
+  - name: 'E3 network: send your 3'
     beats:
-    - line: 83
-      seconds: 2.56
-  - name: 'E4 wrong: explain, then plug'
+    - line: 142
+      seconds: 1.9
+  - name: E4 the guess and the loss
     beats:
-    - line: 84
-      seconds: 1.8100001
-    - line: 85
-      seconds: 3.5500002
-    - line: 86
-      seconds: 2.85
-    - line: 87
-      seconds: 5.19
-    - line: 111
-      seconds: 4.13
+    - line: 143
+      seconds: 5.56
+    - line: 144
+      seconds: 3.69
+    - line: 145
+      seconds: 6.4300003
   - name: 'E5 backprop: explain'
     beats:
-    - line: 114
-      seconds: 4.38
-    - line: 88
-      seconds: 3.1
-    - line: 89
-      seconds: 4.3
-    - line: 90
-      seconds: 2.06
+    - line: 146
+      seconds: 6.18
+    - line: 147
+      seconds: 8.96
   - name: 'E5 backprop: grab'
     beats:
-    - line: 91
-      seconds: 3.66
-  - name: 'E6 descent: explain, then roll'
+    - line: 148
+      seconds: 4.96
+  - name: 'E6 descent: explain, then train'
     beats:
-    - line: 93
-      seconds: 5.17
-    - line: 94
-      seconds: 4.02
-    - line: 95
-      seconds: 4.48
-    - line: 116
-      seconds: 4.8199997
+    - line: 152
+      seconds: 5.356
+    - line: 153
+      seconds: 4.43
+    - line: 154
+      seconds: 6.62
+    - line: 155
+      seconds: 7.2186666
   - name: 'E8 tokens: explain'
     beats:
-    - line: 102
-      seconds: 4.2333336
-    - line: 103
-      seconds: 3.45
-    - line: 104
-      seconds: 4.05
-    - line: 105
-      seconds: 3.54
+    - line: 170
+      seconds: 4.159333
+    - line: 171
+      seconds: 3.49
+    - line: 172
+      seconds: 5.5793333
+    - line: 173
+      seconds: 2.85
   lines:
-  - line: 64
-    seconds: 4.34
-  - line: 65
-    seconds: 4.3793335
-  - line: 66
+  - line: 119
+    seconds: 5.23
+  - line: 120
+    seconds: 2.79
+  - line: 121
+    seconds: 3.52
+  - line: 122
+    seconds: 2.3400002
+  - line: 123
+    seconds: 4.19
+  - line: 124
+    seconds: 4.37
+  - line: 125
+    seconds: 4.6299996
+  - line: 126
+    seconds: 4.83
+  - line: 127
+    seconds: 1.5600001
+  - line: 128
+    seconds: 2.04
+  - line: 129
+    seconds: 3.3899999
+  - line: 130
+    seconds: 1.76
+  - line: 131
+    seconds: 5.93
+  - line: 132
+    seconds: 4.0933332
+  - line: 133
+    seconds: 6.47
+  - line: 134
+    seconds: 8.58
+  - line: 135
+    seconds: 9.018667
+  - line: 136
+    seconds: 3.76
+  - line: 137
     seconds: 3.55
-  - line: 67
-    seconds: 3.18
-  - line: 68
-    seconds: 4.22
-  - line: 69
-    seconds: 4.23
-  - line: 70
-    seconds: 5.01
-  - line: 107
-    seconds: 5.27
-  - line: 108
-    seconds: 2.84
-  - line: 109
-    seconds: 2.74
-  - line: 110
-    seconds: 2.7
-  - line: 72
-    seconds: 5.3900003
-  - line: 73
-    seconds: 3.27
-  - line: 74
-    seconds: 4.5
-  - line: 75
-    seconds: 4.28
-  - line: 76
-    seconds: 6.73
-  - line: 77
-    seconds: 3.85
-  - line: 78
-    seconds: 3.31
-  - line: 79
-    seconds: 3.1200001
-  - line: 80
-    seconds: 4.4700003
-  - line: 81
-    seconds: 3.296
-  - line: 82
-    seconds: 4.4900002
-  - line: 83
-    seconds: 2.56
-  - line: 84
-    seconds: 1.8100001
-  - line: 85
-    seconds: 3.5500002
-  - line: 86
-    seconds: 2.85
-  - line: 87
-    seconds: 5.19
-  - line: 111
-    seconds: 4.13
-  - line: 112
-    seconds: 3.71
-  - line: 113
-    seconds: 3.21
-  - line: 114
-    seconds: 4.38
-  - line: 88
-    seconds: 3.1
-  - line: 89
-    seconds: 4.3
-  - line: 90
-    seconds: 2.06
-  - line: 91
-    seconds: 3.66
-  - line: 115
-    seconds: 1.9000001
-  - line: 106
-    seconds: 1.74
-  - line: 92
-    seconds: 4.1986666
-  - line: 93
-    seconds: 5.17
-  - line: 94
-    seconds: 4.02
-  - line: 95
+  - line: 138
+    seconds: 2.36
+  - line: 139
+    seconds: 6.4199996
+  - line: 140
+    seconds: 2.9320002
+  - line: 141
+    seconds: 5.674
+  - line: 142
+    seconds: 1.9
+  - line: 143
+    seconds: 5.56
+  - line: 144
+    seconds: 3.69
+  - line: 145
+    seconds: 6.4300003
+  - line: 146
+    seconds: 6.18
+  - line: 147
+    seconds: 8.96
+  - line: 148
+    seconds: 4.96
+  - line: 149
+    seconds: 1.48
+  - line: 150
+    seconds: 6.0299997
+  - line: 151
+    seconds: 1.72
+  - line: 152
+    seconds: 5.356
+  - line: 153
+    seconds: 4.43
+  - line: 154
+    seconds: 6.62
+  - line: 155
+    seconds: 7.2186666
+  - line: 156
     seconds: 4.48
-  - line: 116
-    seconds: 4.8199997
-  - line: 117
-    seconds: 2.53
-  - line: 118
-    seconds: 2.62
-  - line: 96
-    seconds: 4.8199997
-  - line: 97
-    seconds: 1.59
-  - line: 98
-    seconds: 3.89
-  - line: 99
-    seconds: 4.71
-  - line: 100
-    seconds: 3.9993334
-  - line: 101
+  - line: 157
+    seconds: 3.27
+  - line: 158
+    seconds: 2.27
+  - line: 159
+    seconds: 4.3433332
+  - line: 160
+    seconds: 3.78
+  - line: 161
+    seconds: 2.36
+  - line: 162
+    seconds: 4.8399997
+  - line: 163
+    seconds: 1.3800001
+  - line: 164
+    seconds: 4.7400002
+  - line: 165
+    seconds: 6.3853335
+  - line: 166
     seconds: 4.49
-  - line: 102
-    seconds: 4.2333336
-  - line: 103
-    seconds: 3.45
-  - line: 104
-    seconds: 4.05
-  - line: 105
-    seconds: 3.54
+  - line: 167
+    seconds: 0.68
+  - line: 168
+    seconds: 2.7513332
+  - line: 169
+    seconds: 2.6999998
+  - line: 170
+    seconds: 4.159333
+  - line: 171
+    seconds: 3.49
+  - line: 172
+    seconds: 5.5793333
+  - line: 173
+    seconds: 2.85

@@ -9,12 +9,12 @@ using Convergence.Gameplay.Ride.Level1;
 namespace Convergence.XR.Ride
 {
     /// <summary>
-    /// One cell of the rider's 7×7 grid: a collider, no renderer (the grid is one mesh). A laser shot, a poke with a
-    /// fingertip, a grip select, or a mouse click presses it with a hand; the cell passes the press to the dash grid
-    /// (<see cref="DashGridInput"/>), which gives it to the live game (draw the 3, or paint the weights), and that game
+    /// One cell of the rider's 7×7 weight grid: a collider, no renderer (the grid is one mesh). A laser shot, a poke with
+    /// a fingertip, a grip select, or a mouse click presses it with a hand, and a held laser sweeping over it sprays it
+    /// (v6); the cell passes it to the grid (<see cref="DashGridInput"/>), which gives it to the paint game, and that game
     /// decides what it does. A poke or grip counts as the right hand unless it came from the left controller.
     /// </summary>
-    public sealed class WeightCellInteractable : XRSimpleInteractable
+    public sealed class WeightCellInteractable : XRSimpleInteractable, IRideStrokeTarget
     {
         [SerializeField] private int cell;
         [SerializeField] private float tapHaptic = 0.35f;
@@ -47,6 +47,22 @@ namespace Convergence.XR.Ride
             _lastTap = Time.unscaledTime;
             tapped.Invoke(cell);
             return grid != null && grid.Press(cell, hand);
+        }
+
+        /// <summary>A held laser landed on this cell (pressed here, or swept onto it): spray it with that hand's brush.</summary>
+        public bool StrokeBegin(int hand, Vector3 point, bool pressed)
+        {
+            if (pressed) return Press(hand);
+            tapped.Invoke(cell);
+            return grid != null && grid.Spray(cell, hand, false);
+        }
+
+        public void StrokeMove(int hand, Vector3 point)
+        {
+        }
+
+        public void StrokeEnd(int hand)
+        {
         }
 
         protected override void OnHoverEntered(HoverEnterEventArgs args)

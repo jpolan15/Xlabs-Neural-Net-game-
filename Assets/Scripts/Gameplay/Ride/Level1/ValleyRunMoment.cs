@@ -5,10 +5,10 @@ using UnityEngine;
 namespace Convergence.Gameplay.Ride.Level1
 {
     /// <summary>
-    /// Region 6: gradient descent as a coaster the game drives. The track through the Valley is the real training
-    /// path and its height is the real loss (the builder lays it from the bake). Each hop moves the pod to the weights
-    /// after the next group of real steps: hop 1 is the single too-big step that overshoots up the far slope, then
-    /// the steps settle into the valley. The pod pauses at every hop, like a step.
+    /// Region 6: the plunge after the training game (v6: a quick ride, no lines). The track through the Valley is the
+    /// bake's real training path and its height is the real loss (the builder lays it from the bake). Each hop moves the
+    /// pod to the weights after the next group of real steps: hop 1 is the single too-big step that overshoots up the
+    /// far slope, then the steps settle into the valley, with a short pause at every hop, like a step.
     /// </summary>
     public sealed class ValleyRunMoment : RideMoment
     {
@@ -51,16 +51,6 @@ namespace Convergence.Gameplay.Ride.Level1
                 yield return Director.TravelTo(hopDistances[k], seconds);
                 CurrentHop = k;
                 HopReached?.Invoke(k);
-                if (k == 1)
-                {
-                    Director.Narrate(RideLine.DescentOvershoot);
-                    if (!_hurry) yield return Director.WaitForSpeech();
-                }
-                else if (k == 2)
-                {
-                    Director.Narrate(RideLine.DescentSettle);
-                }
-
                 float held = 0f;
                 while (held < pauseSeconds && !_hurry)
                 {

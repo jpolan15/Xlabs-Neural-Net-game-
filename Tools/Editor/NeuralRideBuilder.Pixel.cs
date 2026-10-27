@@ -142,45 +142,51 @@ namespace Convergence.EditorTools
         private static readonly PixelBuddyView.LineMood[] PixelMoods =
         {
             PM(RideLine.MeetPixel, 0, Mood.Happy, true),
-            PM(RideLine.MeetPixel, 2, Mood.Sad, true),          // "and Pixel can't read yet."
+            PM(RideLine.MeetPixel, 1, Mood.Sad, true),          // "Pixel can't read a single one."
             PM(RideLine.PixelBrain, 0, Mood.Curious, true),
-            PM(RideLine.PixelBrain, 1, Mood.Celebrate, true),   // "and teach it to read threes."
+            PM(RideLine.PixelBrain, 2, Mood.Celebrate, true),   // "right here."
             PM(RideLine.PullGo, 0, Mood.Happy),
             PM(RideLine.PixelsSquares, 0, Mood.Curious),
-            PM(RideLine.PixelsFortyNine, 2, Mood.Thinking, true), // "It's all Pixel ever sees."
+            PM(RideLine.PixelsFortyNine, 2, Mood.Thinking, true), // "That's all the network ever sees."
             PM(RideLine.DrawYourTurn, 0, Mood.Happy, true),
+            PM(RideLine.DrawBigger, 0, Mood.Confused, true),
+            PM(RideLine.DrawDoneNudge, 0, Mood.Happy),
             PM(RideLine.DrawDone, 0, Mood.Celebrate, true),
             PM(RideLine.ZapIntro, 0, Mood.Happy, true),
             PM(RideLine.NeuronHolds, 0, Mood.Curious),
-            PM(RideLine.NeuronAdds, 1, Mood.Happy),
+            PM(RideLine.NeuronAdds, 4, Mood.Happy),             // "High means the neuron fires."
             PM(RideLine.NeuronYourTurn, 0, Mood.Happy, true),
             PM(RideLine.NeuronLitForOther, 0, Mood.Confused, true),
             PM(RideLine.NeuronMissedThree, 0, Mood.Confused, true),
             PM(RideLine.NeuronSolved, 0, Mood.Celebrate, true),
             PM(RideLine.NetworkTeam, 0, Mood.Curious),
-            PM(RideLine.NetworkWire, 2, Mood.Happy, true),       // "This is Pixel's brain!"
+            PM(RideLine.NetworkWire, 1, Mood.Happy, true),       // "and that's a neural network."
             PM(RideLine.NetworkSend, 0, Mood.Happy),
             PM(RideLine.WrongSays, 0, Mood.Thinking),
-            PM(RideLine.WrongRandom, 0, Mood.Sad, true),
-            PM(RideLine.WrongLoss, 0, Mood.Confused),
-            PM(RideLine.PlugYourTurn, 0, Mood.Happy, true),
-            PM(RideLine.PlugWrong, 0, Mood.Confused, true),
-            PM(RideLine.PlugDone, 0, Mood.Celebrate, true),
-            PM(RideLine.PlugTooMany, 0, Mood.Thinking),
+            PM(RideLine.WrongSays, 1, Mood.Confused, true),      // "But look how unsure it is."
+            PM(RideLine.WrongSays, 2, Mood.Sad, true),           // "Every weight is still random,"
+            PM(RideLine.WrongLoss, 0, Mood.Thinking),
             PM(RideLine.BackWish, 0, Mood.Thinking),
             PM(RideLine.BackGrab, 0, Mood.Happy, true),
+            PM(RideLine.BackHurry, 0, Mood.Confused),
             PM(RideLine.BackDone, 0, Mood.Celebrate, true),
-            PM(RideLine.DescentHill, 0, Mood.Curious),
-            PM(RideLine.DescentYourTurn, 0, Mood.Happy, true),
-            PM(RideLine.DescentGameOvershoot, 0, Mood.Confused, true),
-            PM(RideLine.DescentRealHill, 0, Mood.Celebrate, true),
             PM(RideLine.StopClear, 0, Mood.Celebrate, true),
-            PM(RideLine.DescentOvershoot, 0, Mood.Confused),
-            PM(RideLine.DescentSettle, 0, Mood.Happy),
-            PM(RideLine.RightSays, 0, Mood.Thinking),
-            PM(RideLine.RightSays, 3, Mood.Celebrate, true),     // "three!"
-            PM(RideLine.RightTraining, 0, Mood.Happy, true),
-            PM(RideLine.RightAccuracy, 0, Mood.Celebrate, true),
+            PM(RideLine.DescentHill, 0, Mood.Curious),
+            PM(RideLine.TrainYourTurn, 0, Mood.Happy, true),
+            PM(RideLine.TrainTooBig, 0, Mood.Confused, true),
+            PM(RideLine.TrainTooSmall, 0, Mood.Sad),
+            PM(RideLine.TrainGood, 0, Mood.Happy, true),
+            PM(RideLine.TrainDone, 0, Mood.Celebrate, true),
+            PM(RideLine.RightYours, 0, Mood.Thinking),
+            PM(RideLine.RightYes, 0, Mood.Celebrate, true),
+            PM(RideLine.RightStudy, 0, Mood.Thinking, true),
+            PM(RideLine.RightNowYes, 0, Mood.Celebrate, true),
+            PM(RideLine.RightAccuracy, 0, Mood.Happy, true),
+            PM(RideLine.RightLoop, 0, Mood.Happy),
+            PM(RideLine.StumpYourTurn, 0, Mood.Happy, true),
+            PM(RideLine.StumpRight, 0, Mood.Celebrate, true),
+            PM(RideLine.StumpWrong, 0, Mood.Confused, true),
+            PM(RideLine.StumpDone, 0, Mood.Celebrate, true),
             PM(RideLine.TokensWords, 0, Mood.Curious),
             PM(RideLine.TokensNext, 0, Mood.Celebrate, true),
         };

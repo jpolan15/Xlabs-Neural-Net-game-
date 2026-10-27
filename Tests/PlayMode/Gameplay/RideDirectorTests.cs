@@ -393,10 +393,11 @@ namespace Convergence.Tests.PlayMode.Gameplay
             var heights = new float[hops.Length];
             float rimY = float.NaN;
             valley.HopReached += k => heights[k] = _director.Pod.position.y;
-            yield return WaitFor(() => _director.SegmentIndex == ValleySegment, "the Valley", 220f);
-            rimY = _director.Pod.position.y;
+            // Gentle mode is set at the rim, before the drop starts; the rim's height is where the drop's hop 0 is.
+            yield return WaitFor(() => _director.SegmentIndex >= ValleySegment - 1, "the rim", 220f);
             _director.GentleMode = true;
             yield return WaitFor(() => valley.HasFinished, "the drop", 120f);
+            rimY = heights[0];
 
             const float metersPerLoss = 5f;
             for (int k = 0; k < hops.Length; k++)
@@ -417,9 +418,9 @@ namespace Convergence.Tests.PlayMode.Gameplay
             Level1Hop[] hops = Data().File.valley.hops;
             float last = float.NaN;
             float rimY = float.NaN;
-            yield return WaitFor(() => _director.SegmentIndex == ValleySegment, "the Valley", 220f);
-            rimY = _director.Pod.position.y;
-            yield return WaitFor(() => valley.HasFinished, "the drop", 120f);
+            // The rim's height is taken when the drop starts (hop 0), not a frame later: at 25x the pod is already moving.
+            valley.HopReached += k => { if (k == 0) rimY = _director.Pod.position.y; };
+            yield return WaitFor(() => valley.HasFinished, "the drop", 340f);
             last = _director.Pod.position.y;
             Assert.AreEqual((float)(hops[hops.Length - 1].loss - hops[0].loss) * 5f, last - rimY, 0.05f);
         }

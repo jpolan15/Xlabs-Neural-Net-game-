@@ -36,6 +36,8 @@ namespace Convergence.XR.Ride
         private float _pitch;
         private float _allowedAfter;
         private RideDirector _director;
+        private IRideStrokeTarget _stroking;
+        private int _strokeHand;
 
         private void Start()
         {
@@ -113,6 +115,7 @@ namespace Convergence.XR.Ride
             _driving = false;
             if (_dragged != null) _dragged.EndGrab();
             _dragged = null;
+            EndStroke();
             if (_poseDriver != null) _poseDriver.enabled = true;
         }
 
@@ -153,12 +156,37 @@ namespace Convergence.XR.Ride
                 }
                 else
                 {
-                    RideTargeting.Fire(hit.collider, hand);
+                    IRideStrokeTarget surface = hit.collider.GetComponentInParent<IRideStrokeTarget>();
+                    if (surface != null && surface.StrokeBegin(hand, hit.point, true))
+                    {
+                        _stroking = surface;
+                        _strokeHand = hand;
+                    }
+                    else
+                    {
+                        RideTargeting.Fire(hit.collider, hand);
+                    }
+                }
+            }
+            else if (mouse.leftButton.isPressed && _dragged == null)
+            {
+                // A held click draws on the canvas and sprays the weight grid as the mouse sweeps, like a held trigger.
+                IRideStrokeTarget surface = aimed ? hit.collider.GetComponentInParent<IRideStrokeTarget>() : null;
+                if (_stroking != null && surface == _stroking) _stroking.StrokeMove(_strokeHand, hit.point);
+                else
+                {
+                    EndStroke();
+                    if (surface != null && surface.StrokeBegin(hand, hit.point, false))
+                    {
+                        _stroking = surface;
+                        _strokeHand = hand;
+                    }
                 }
             }
 
             if (mouse.leftButton.wasReleasedThisFrame && _dragged == null)
             {
+                EndStroke();
                 if (aimed) RideTargeting.Release(hit.collider, hand);
                 // A wire carried with the mouse is dropped, whichever hand's colour picked it up.
                 RideAim.RaiseReleased(RideHand.Left);
@@ -174,6 +202,13 @@ namespace Convergence.XR.Ride
                     _dragged = null;
                 }
             }
+        }
+
+        private void EndStroke()
+        {
+            if (_stroking == null) return;
+            _stroking.StrokeEnd(_strokeHand);
+            _stroking = null;
         }
 
         private bool HeadsetIsActive()

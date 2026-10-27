@@ -380,6 +380,8 @@ def words(text: str) -> list[str]:
     text = re.sub(r"\b(?:a |one )?100\b", "a hundred", text)  # "a hundred" and "one hundred" are both written "100"
     text = re.sub(r"\b(\d{1,2}),000\b", lambda m: m.group(1) + " thousand", text)
     text = re.sub(r"\b(1[0-9])(\d\d)\b", lambda m: two_digits(int(m.group(1))) + " " + two_digits(int(m.group(2))), text)
+    text = re.sub(r"\b([1-9])(\d\d)\b", lambda m: ONES[int(m.group(1))] + " hundred"
+                  + ("" if m.group(2) == "00" else " and " + two_digits(int(m.group(2)))), text)  # "944", "500"
     text = re.sub(r"\b(\d{1,2})\b", lambda m: two_digits(int(m.group(1))), text)
     text = re.sub(r"\ba\.i\.?", "ai", text)
     text = re.sub(r"[^a-z0-9' ]", " ", text)

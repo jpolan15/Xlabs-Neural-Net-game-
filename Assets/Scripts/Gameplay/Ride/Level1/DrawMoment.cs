@@ -6,139 +6,186 @@ using UnityEngine;
 namespace Convergence.Gameplay.Ride.Level1
 {
     /// <summary>
-    /// Region 1, a mini-game: "draw the 3". The rider inks the dash's 7×7 grid over a faint outline of the hero 3 (the
-    /// real handwritten digit, shrunk to 7×7): the right hand inks, the left rubs out. Core's <see cref="DrawPuzzle"/>
-    /// decides when it looks enough like the 3. Each outline cell inked scores; Core's hint lights a cell after the
-    /// rider goes quiet, and after <see cref="RideGame.giveUpAfter"/> (or an operator hurry) the game inks the rest
-    /// itself, one cell at a time.
+    /// Region 1, a mini-game (v6, ADR-020): "draw your 3". The rider holds the trigger and draws on the canvas with
+    /// either hand; Core's <see cref="DigitCanvas"/> turns the strokes into the 49 numbers the network reads, live, the
+    /// way MNIST was made. CLEAR wipes it; DONE keeps it. The drawing is never judged: it becomes the rider's digit in
+    /// <see cref="Level1Session"/>, and every later stop uses it. If the rider never draws enough ink (an operator
+    /// hurry, or <see cref="RideGame.giveUpAfter"/>), the ride keeps the bake's real hero 3 instead.
     /// </summary>
-    public sealed class DrawMoment : RideGame
+    public sealed class DrawMoment : RideGame, ICanvasGame, IButtonGame
     {
-        [SerializeField] private Level1DataSource source;
-        [SerializeField] private float hintAfterIdle = 7f;
-        [SerializeField] private float autoStepSeconds = 0.5f;
+        public const int ButtonDone = 0;
+        public const int ButtonClear = 1;
 
-        private DrawPuzzle _puzzle;
+        [SerializeField] private Level1Session session;
+        [Tooltip("Seconds without a stroke, once there is enough ink, before Pixel suggests DONE.")]
+        [SerializeField] private float nudgeAfterIdle = 5f;
+        [Tooltip("Seconds without a stroke, once there is enough ink, before the drawing is kept as it is.")]
+        [SerializeField] private float keepAfterIdle = 14f;
+        [SerializeField] private float pixelsEvery = 0.08f;
+
+        private DigitCanvas _canvas;
         private bool _live;
         private bool _hurry;
-        private bool _auto;
-        private bool _byRider = true;
-        private bool _saidHint;
-        private int _strokes;
-        private float _lastTouch;
-        private int _hintCell = -1;
+        private bool _done;
+        private bool _saidNudge;
+        private bool _saidBigger;
+        private int _strokingHand = -1;
+        private float _lastInk;
+        private float _nextPixels;
+        private bool _pixelsDirty;
+        private double[] _pixels = new double[DigitCanvas.PixelCount];
 
-        public DrawPuzzle Puzzle => _puzzle;
+        public DigitCanvas Canvas => _canvas ?? (_canvas = new DigitCanvas());
+
         public bool IsLive => _live;
-        public int HintCell => _hintCell;
 
-        /// <summary>A cell changed (or everything, with -1).</summary>
-        public event Action<int> CellChanged;
+        /// <summary>The 49 numbers of the drawing as it is now.</summary>
+        public double[] Pixels => _pixels;
 
-        public event Action<int> HintChanged;
+        /// <summary>True when the rider kept their own drawing (false: the ride used the hero 3).</summary>
+        public bool KeptRidersDrawing { get; private set; }
+
+        /// <summary>The strokes changed (a new point, a new stroke, a clear).</summary>
+        public event Action InkChanged;
+
+        /// <summary>The 49 numbers changed.</summary>
+        public event Action<double[]> PixelsChanged;
+
         public event Action<bool> LiveChanged;
 
-        public void Prepare()
-        {
-            if (_puzzle != null || source == null) return;
-            _puzzle = new DrawPuzzle(source.Data.File.hero.pixels7);
-        }
-
-        private void Start() => Prepare();
+        /// <summary>The drawing was kept (true: the rider's; false: the hero 3 stands in).</summary>
+        public event Action<bool> Kept;
 
         public override void Hurry() => _hurry = true;
 
-        /// <summary>A press on a cell: the right hand inks, the left rubs out. Returns true when it changed the drawing.</summary>
-        public bool Press(int cell, int hand)
+        public bool StrokeBegin(int hand, Vector2 point, bool pressed)
         {
-            if (!_live || _auto || _puzzle == null) return false;
-            _lastTouch = Time.time;
-            bool ink = hand != RideHand.Left;
-            if (!_puzzle.Set(cell, ink)) return false;
-            _strokes++;
-            if (ink && _puzzle.IsTarget(cell)) AddScore(10, Vector3.zero);
-            SetHint(-1);
-            Changed(cell);
+            if (!_live || _done) return false;
+            Canvas.BeginStroke(point.x, point.y);
+            _strokingHand = hand;
+            Touched();
             return true;
         }
 
+        public void StrokeMove(int hand, Vector2 point)
+        {
+            if (!_live || _done || hand != _strokingHand) return;
+            if (Canvas.AddPoint(point.x, point.y)) Touched();
+        }
+
+        public void StrokeEnd(int hand)
+        {
+            if (hand == _strokingHand) _strokingHand = -1;
+        }
+
+        public bool Press(int button, int hand)
+        {
+            if (!_live || _done) return false;
+            if (button == ButtonClear)
+            {
+                if (Canvas.StrokeCount == 0) return false;
+                Canvas.Clear();
+                _saidNudge = false;
+                Touched();
+                return true;
+            }
+
+            if (button != ButtonDone) return false;
+            if (!Canvas.HasEnoughInk)
+            {
+                if (!_saidBigger)
+                {
+                    _saidBigger = true;
+                    Director.Say(RideLine.DrawBigger);
+                }
+
+                return false;
+            }
+
+            _done = true;
+            return true;
+        }
+
+        public void Release(int button, int hand)
+        {
+        }
+
+        protected override int StarsEarned() => 3;
+
+        protected override bool PlayedItself => !KeptRidersDrawing;
+
         protected override IEnumerator Play()
         {
-            Prepare();
-            _puzzle.Clear();
-            _strokes = 0;
+            Canvas.Clear();
+            Array.Clear(_pixels, 0, _pixels.Length);
             _hurry = false;
-            _auto = false;
-            _byRider = true;
-            _saidHint = false;
-            SetHint(-1);
+            _done = false;
+            _saidNudge = false;
+            _saidBigger = false;
+            _strokingHand = -1;
+            KeptRidersDrawing = false;
             _live = true;
             LiveChanged?.Invoke(true);
-            Changed(-1);
+            InkChanged?.Invoke();
+            PixelsChanged?.Invoke(_pixels);
             float opened = Time.time;
-            _lastTouch = opened;
-            float nextAuto = 0f;
-            while (!_puzzle.Passed)
+            _lastInk = opened;
+            SetGoal("Hold the trigger and draw a 3");
+
+            while (!_done)
             {
                 float now = Time.time;
-                if (!_auto && (_hurry || now - opened > giveUpAfter))
+                if (_pixelsDirty && now >= _nextPixels) UpdatePixels();
+                bool enough = Canvas.HasEnoughInk;
+                Progress = Mathf.Clamp01((float)(Canvas.InkLength / Canvas.InkNeeded)) * 0.9f;
+                if (enough && _strokingHand < 0)
                 {
-                    _auto = true;
-                    _byRider = false;
+                    float idle = now - _lastInk;
+                    if (!_saidNudge && idle > nudgeAfterIdle)
+                    {
+                        _saidNudge = true;
+                        SetGoal("Shoot DONE when it looks like a 3");
+                        Director.Say(RideLine.DrawDoneNudge);
+                    }
+
+                    if (idle > keepAfterIdle) _done = true;
                 }
 
-                if (_auto)
-                {
-                    if (now >= nextAuto)
-                    {
-                        nextAuto = now + (_hurry ? autoStepSeconds * 0.3f : autoStepSeconds);
-                        int cell = _puzzle.Hint(out bool ink);
-                        if (cell >= 0)
-                        {
-                            _puzzle.Set(cell, ink);
-                            SetHint(cell);
-                            Changed(cell);
-                        }
-                    }
-                }
-                else if (_hintCell < 0 && now - _lastTouch > hintAfterIdle)
-                {
-                    SetHint(_puzzle.Hint(out _));
-                    if (!_saidHint)
-                    {
-                        _saidHint = true;
-                        Director.Say(RideLine.DrawHint);
-                    }
-                }
-
+                if (_hurry || now - opened > giveUpAfter) break;
                 yield return null;
             }
 
+            UpdatePixels();
             _live = false;
-            SetHint(-1);
             LiveChanged?.Invoke(false);
+            KeptRidersDrawing = Canvas.HasEnoughInk;
+            if (KeptRidersDrawing) session.SetDigit(_pixels, true);
+            else
+            {
+                Array.Copy(session.Data.File.hero.pixels7, _pixels, _pixels.Length);
+                session.SetDigit(_pixels, false);
+                PixelsChanged?.Invoke(_pixels);
+            }
+
+            Kept?.Invoke(KeptRidersDrawing);
+            SetGoal(KeptRidersDrawing ? "Your 3, as 49 numbers" : "A real handwritten 3, as 49 numbers");
         }
 
-        protected override int StarsEarned()
+        private void Touched()
         {
-            int needed = _puzzle.CoverCount;
-            return _strokes <= needed + 3 ? 3 : _strokes <= needed * 2 ? 2 : 1;
+            _lastInk = Time.time;
+            _pixelsDirty = true;
+            InkChanged?.Invoke();
         }
 
-        protected override bool PlayedItself => !_byRider;
-
-        private void Changed(int cell)
+        private void UpdatePixels()
         {
-            Progress = (float)_puzzle.Progress;
-            SetGoal("Inked " + _puzzle.Covered + " of " + _puzzle.TargetCount + " squares (" + _puzzle.CoverCount + " to win)" + (_puzzle.Stray > _puzzle.StrayAllowed ? "  (rub out the extra ink!)" : ""));
-            CellChanged?.Invoke(cell);
-        }
-
-        private void SetHint(int cell)
-        {
-            if (cell == _hintCell) return;
-            _hintCell = cell;
-            HintChanged?.Invoke(cell);
+            _pixelsDirty = false;
+            _nextPixels = Time.time + pixelsEvery;
+            _pixels = Canvas.ToPixels7();
+            PixelsChanged?.Invoke(_pixels);
+            Refresh();
         }
     }
 }

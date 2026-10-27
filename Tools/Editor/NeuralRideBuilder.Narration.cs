@@ -86,8 +86,9 @@ namespace Convergence.EditorTools
         }
 
         /// <summary>
-        /// The narrator's numbers come from the bake: the untrained guess, the training count, the test accuracy. If the
-        /// data and the script disagree, the script changes, never the data (HANDOFF_LEVEL1_FULL_BUILD, rule 3).
+        /// The narrator's numbers come from the bake and the network (v6): the batch of the training game, the test digits
+        /// it is scored on, the weights and all the numbers of the network. If the data and the script disagree, the
+        /// script changes, never the data (HANDOFF_LEVEL1_FULL_BUILD, rule 3).
         /// </summary>
         private static void AssertNarrationMatchesBake()
         {
@@ -98,10 +99,15 @@ namespace Convergence.EditorTools
                 if (!spoken.Contains(words)) problems.Add(line + " must say \"" + words + "\" (from the bake) but says \"" + spoken + "\"");
             }
 
-            Expect(RideLine.WrongSays, "says... " + RideNarrationData.Words(_data.File.hero.untrainedGuess));
-            Expect(RideLine.RightTraining, RideNarrationData.Words(_data.File.trainCount));
-            Expect(RideLine.RightAccuracy, RideNarrationData.Words(_data.TestAccuracyPercent) + " out of a hundred");
-            Expect(RideLine.RightSays, "says... " + RideNarrationData.Words(Convergence.Gameplay.Ride.Level1.Level1Data.HeroDigit));
+            Convergence.Gameplay.Ride.Level1.Level1Live live = _data.File.live;
+            int weights = Convergence.Core.Training.DigitNetwork.Hidden * Convergence.Core.Training.DigitNetwork.Inputs
+                + Convergence.Core.Training.DigitNetwork.Outputs * Convergence.Core.Training.DigitNetwork.Hidden;
+            Expect(RideLine.TrainYourTurn, RideNarrationData.Words(live.batch) + " real digits");
+            Expect(RideLine.RightAccuracy, RideNarrationData.Words(live.testLabels.Length) + " digits");
+            Expect(RideLine.NetworkWire, RideNarrationData.Words(weights) + " weights");
+            Expect(RideLine.StumpDone, RideNarrationData.Words(Convergence.Core.Training.DigitNetwork.ParameterCount) + " numbers");
+            // "almost nine out of ten": the game is won at the target, and live training lands a little above it.
+            if (live.targetAccuracy < 0.8 || live.targetAccuracy >= 0.9) problems.Add("RightAccuracy says \"almost nine out of ten\" but the target is " + live.targetAccuracy);
             if (problems.Count > 0) throw new InvalidOperationException("Narration disagrees with the bake: " + string.Join("; ", problems) + ". Fix Tools/Editor/RideNarrationData.cs.");
         }
 

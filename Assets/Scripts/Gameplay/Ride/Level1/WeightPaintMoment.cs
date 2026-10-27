@@ -104,6 +104,17 @@ namespace Convergence.Gameplay.Ride.Level1
             return true;
         }
 
+        /// <summary>
+        /// A held laser swept onto a cell (v6): it takes the brush's colour, and a cell already that colour stays. So a
+        /// sweep paints a whole stroke; only a fresh press on a cell of the same colour clears it.
+        /// </summary>
+        public bool Spray(int cell, int brush)
+        {
+            if (!_live || _auto || cell < 0 || cell >= _weights.Length || _weights[cell] == brush) return false;
+            Stroke(cell, brush, brush);
+            return true;
+        }
+
         private void Stroke(int cell, int value, int brush)
         {
             _lastTouch = Time.time;
@@ -115,7 +126,8 @@ namespace Convergence.Gameplay.Ride.Level1
         protected override int StarsEarned()
         {
             int best = source != null ? Mathf.Max(1, source.Data.File.puzzle.hintMovesFromEmpty) : 4;
-            return _strokes <= best * 2 ? 3 : _strokes <= best * 4 ? 2 : 1;
+            // A sweep paints a cell per stroke, so a clean solution is a few sweeps of cells, not a few clicks.
+            return _strokes <= best * 4 ? 3 : _strokes <= best * 8 ? 2 : 1;
         }
 
         protected override bool PlayedItself => !SolvedByRider;

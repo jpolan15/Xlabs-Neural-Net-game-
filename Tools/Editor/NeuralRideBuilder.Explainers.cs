@@ -24,7 +24,7 @@ namespace Convergence.EditorTools
     {
         // The segments (Flow): which one explains each beat and by which one it must have unfolded.
         private const int SegPixels = 0, SegOverPixels = 1, SegNeuronExplain = 2, SegNeuronPlay = 3, SegNetworkExplain = 4, SegNetworkSend = 5,
-            SegWrong = 6, SegBackExplain = 7, SegRewind = 8, SegSwitch = 9, SegRim = 10, SegValley = 11, SegRight = 12, SegTokens = 13;
+            SegWrong = 6, SegBackExplain = 7, SegRewind = 8, SegSwitch = 9, SegRim = 10, SegValley = 11, SegRight = 12, SegStump = 13, SegTokens = 14;
 
         private static readonly Color BoardDark = new Color(0.11f, 0.13f, 0.18f);
 
@@ -237,10 +237,10 @@ namespace Convergence.EditorTools
                 new List<UnfoldSpec> { new UnfoldSpec(null, T(2, "Neuron"), grow, 1.1f, 1.4f), new UnfoldSpec(null, T(2, "Panel"), grow, 0.6f, 1.2f) }), regions[2]);
             BuildNetworkDiagram(Add<NetworkExplainer>(new[] { RideLine.NetworkTeam, RideLine.NetworkAnswers, RideLine.NetworkWire, RideLine.NetworkSend },
                 SegNetworkExplain, SegNetworkSend, true, null, new[] { Child(3, "Network") }, null), regions[3]);
-            BuildLoss(Add<LossExplainer>(new[] { RideLine.WrongSays, RideLine.WrongRandom, RideLine.WrongWanted, RideLine.WrongLoss }, SegWrong, SegWrong, false, null, null, null), regions[4]);
-            BuildBackprop(Add<BackpropExplainer>(new[] { RideLine.BackWish, RideLine.BackFlows, RideLine.BackHot, RideLine.BackGrab }, SegBackExplain, SegRewind, false,
+            BuildLoss(Add<LossExplainer>(new[] { RideLine.WrongSays, RideLine.WrongWanted, RideLine.WrongLoss }, SegWrong, SegWrong, false, null, null, null), regions[4]);
+            BuildBackprop(Add<BackpropExplainer>(new[] { RideLine.BackWish, RideLine.BackFlows, RideLine.BackGrab }, SegBackExplain, SegRewind, false,
                 null, new[] { Child(5, "Blame") }, new List<UnfoldSpec> { new UnfoldSpec(null, T(5, "Blame"), Explainer.UnfoldStyle.Show, 0f, 0.1f) }), regions[5]);
-            BuildDescent(Add<DescentExplainer>(new[] { RideLine.DescentHill, RideLine.DescentStep, RideLine.DescentTooBig, RideLine.DescentRealHill }, SegRim, SegValley, true,
+            BuildDescent(Add<DescentExplainer>(new[] { RideLine.DescentHill, RideLine.DescentStep, RideLine.DescentTooBig, RideLine.TrainYourTurn }, SegRim, SegValley, true,
                 null, new[] { Child(6, "Ground"), Child(6, "Deck"), Child(6, "Sign"), Child(6, "Sun") },
                 new List<UnfoldSpec>
                 {
@@ -249,7 +249,7 @@ namespace Convergence.EditorTools
                     new UnfoldSpec(null, T(6, "Sign"), grow, 1.4f, 1f),
                     new UnfoldSpec(null, T(6, "Sun"), grow, 1.7f, 1.5f),
                 }), regions[6]);
-            BuildTraining(Add<TrainingExplainer>(new[] { RideLine.RightSays, RideLine.RightTraining, RideLine.RightAccuracy }, SegRight, SegRight, false, null, null, null), regions[7]);
+            BuildTraining(Add<TrainingExplainer>(new[] { RideLine.RightYours, RideLine.RightAccuracy, RideLine.RightLoop }, SegRight, SegRight, false, null, null, null), regions[7]);
             BuildTokens(Add<TokensExplainer>(new[] { RideLine.TokensWords, RideLine.TokensNumbers, RideLine.TokensPredict, RideLine.TokensNext }, SegTokens, SegTokens, false, null, null, null), regions[7]);
         }
 

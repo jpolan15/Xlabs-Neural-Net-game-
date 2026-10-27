@@ -8,8 +8,9 @@ using UnityEngine;
 namespace Convergence.Gameplay.Ride.Level1
 {
     /// <summary>
-    /// Region 5: backpropagation. Core runs the untrained network forward on the hero "3", measures the cross-entropy
-    /// against the answer 3, and runs <see cref="NetworkModel.Backward"/>; every wire's blame is its real ∂loss/∂w.
+    /// Region 5: backpropagation. Core runs the rider's untrained network forward on the rider's own digit (v6; the hero 3
+    /// if they never drew), measures the cross-entropy against the answer 3, and runs <see cref="NetworkModel.Backward"/>;
+    /// every wire's blame is its real ∂loss/∂w, and every nudge is kept in the rider's network for the training game.
     /// A mini-game, the hot-wire hunt: the rider grabs the hottest wires with a laser (trigger or A) and drags each one's
     /// loose end to the answer "3" before they cool down. The wire snaps onto the 3 once its end comes within a few
     /// degrees of it, and that is one real gradient step on that weight (w ← w − η ∂loss/∂w); a hotter wire scores more.
@@ -39,6 +40,8 @@ namespace Convergence.Gameplay.Ride.Level1
         }
 
         [SerializeField] private Level1DataSource source;
+        [Tooltip("v6: the blame is the rider's own digit's, on the rider's own network, and every nudge stays in it.")]
+        [SerializeField] private Level1Session session;
         [Tooltip("How many of the brightest wires the rider is asked to connect.")]
         [SerializeField] private int topCount = 4;
         [Tooltip("Seconds of the hunt: the wires cool down over this time.")]
@@ -72,7 +75,7 @@ namespace Convergence.Gameplay.Ride.Level1
         /// <summary>The learning rate of a nudge: the bake's own.</summary>
         public double LearningRate => source.Data.File.learningRate;
 
-        /// <summary>The loss of the hero "3" with the weights as nudged so far.</summary>
+        /// <summary>The loss of the rider's digit (the hero 3 until they draw) with the weights as nudged so far.</summary>
         public double HeroLoss { get; private set; }
 
         /// <summary>The loss before any nudge.</summary>
@@ -150,18 +153,41 @@ namespace Convergence.Gameplay.Ride.Level1
             return wires;
         }
 
+        /// <summary>The blame changed (the rider drew their digit): views re-aim the hunt's wires.</summary>
+        public event Action BlameChanged;
+
         /// <summary>Computes the blame so views can draw it before the moment opens.</summary>
         public void Prepare()
         {
             if (_wires != null || source == null) return;
-            _net = source.Data.CreateUntrained();
-            _wires = ComputeBlame(_net, source.Data.File.hero.pixels7, out double loss);
+            _net = session != null ? session.Network.ToModel() : source.Data.CreateUntrained();
+            _wires = ComputeBlame(_net, Digit, out double loss);
             StartLoss = loss;
             HeroLoss = loss;
             _nudged = new bool[Mathf.Min(topCount, _wires.Count)];
+            BlameChanged?.Invoke();
         }
 
-        private void Start() => Prepare();
+        /// <summary>The digit the blame is for: the rider's (the hero 3 until they draw).</summary>
+        private double[] Digit => session != null ? session.Digit : source.Data.File.hero.pixels7;
+
+        private void Start()
+        {
+            if (session != null) session.DigitChanged += OnDigitChanged;
+            Prepare();
+        }
+
+        private void OnDestroy()
+        {
+            if (session != null) session.DigitChanged -= OnDigitChanged;
+        }
+
+        private void OnDigitChanged()
+        {
+            if (_live) return;
+            _wires = null;
+            Prepare();
+        }
 
         /// <summary>Connects top wire k to the 3 at once: one real gradient step on it. The desk and the tests use this.</summary>
         public void Nudge(int k) => Connect(k, -1, true);
@@ -275,6 +301,8 @@ namespace Convergence.Gameplay.Ride.Level1
 
         protected override IEnumerator Play()
         {
+            // The rider's network as it is now (nothing has trained it yet), and their digit.
+            _wires = null;
             Prepare();
             _hurry = false;
             _byRider = true;
@@ -326,7 +354,13 @@ namespace Convergence.Gameplay.Ride.Level1
             double after = before - LearningRate * w.Gradient;
             neuron.SetWeight(w.Input, after);
             _nudged[k] = true;
-            HeroLoss = LossFunctions.CategoricalCrossEntropy(_net.Forward(source.Data.File.hero.pixels7), Level1Data.HeroDigit);
+            HeroLoss = LossFunctions.CategoricalCrossEntropy(_net.Forward(Digit), Level1Data.HeroDigit);
+            if (session != null)
+            {
+                session.Network.CopyFrom(_net);
+                session.NotifyWeightsChanged();
+            }
+
             Nudged?.Invoke(k, before, after);
         }
 

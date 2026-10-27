@@ -309,8 +309,6 @@ namespace Convergence.EditorTools
             var gridView = pod.AddComponent<WeightGridView>();
             Ref(gridView, "director", director);
             Ref(gridView, "moment", moments.Paint);
-            Ref(gridView, "draw", moments.Draw);
-            Int(gridView, "drawSegment", SegPixels);
             Ref(gridView, "theme", _theme);
             Ref(gridView, "grid", grid.gameObject);
             Ref(gridView, "cells", grid.Find("Cells").GetComponent<MeshFilter>());

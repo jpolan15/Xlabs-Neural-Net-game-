@@ -29,6 +29,22 @@ namespace Convergence.Gameplay.Ride
     }
 
     /// <summary>
+    /// A surface a hand draws or sweeps on while its trigger (or A / X) is held: the drawing canvas, the weight grid.
+    /// XR calls <see cref="StrokeBegin"/> when the held laser lands on it (pressed: the trigger went down right here;
+    /// false: the laser was swept onto it), <see cref="StrokeMove"/> every frame it stays, and <see cref="StrokeEnd"/>
+    /// when the trigger comes up or the laser leaves. The target's moment decides what a stroke does.
+    /// </summary>
+    public interface IRideStrokeTarget
+    {
+        /// <summary>Returns true when the target took the stroke (XR then follows it and buzzes the hand).</summary>
+        bool StrokeBegin(int hand, Vector3 point, bool pressed);
+
+        void StrokeMove(int hand, Vector3 point);
+
+        void StrokeEnd(int hand);
+    }
+
+    /// <summary>
     /// A hand's fingertip: a small trigger that follows the controller, so a moment or view can tell a hand reached it
     /// (a poke on a grid cell, a rub on Pixel) without knowing about XR. XR implements it; it decides nothing.
     /// </summary>

@@ -329,6 +329,7 @@ namespace Convergence.EditorTools
             GameObject root = RegionRoot(3, layout.BlueNetwork);
             _blueParts = BuildNetwork(root.transform, false, "Blue");
             AddNetworkView(root, _blueParts, director, dash, moment, Color.white, "wrong", 5);
+            AddLiveView(root, _blueParts, "Blue", false, _theme.networkBlue);
             return root;
         }
 
@@ -362,9 +363,13 @@ namespace Convergence.EditorTools
             Vector3 To(BlameMoment.Wire w) => w.Layer == 0 ? HiddenPosition(w.Neuron) : OutputPosition(w.Neuron);
 
             // Every wire burns by its real blame. Progress runs backward (answers 0, pixels 1), so the light flows back.
+            // The wires go in the network's own order (hidden neuron j's 49, then answer k's 16), so BlameView can re-size
+            // each one for the rider's own digit (v6).
+            var ordered = new BlameMoment.Wire[wires.Count];
+            foreach (BlameMoment.Wire w in wires) ordered[w.Layer == 0 ? w.Neuron * 49 + w.Input : 16 * 49 + w.Neuron * 16 + w.Input] = w;
             var all = new Ribbons();
             var rng = new System.Random(5);
-            foreach (BlameMoment.Wire w in wires)
+            foreach (BlameMoment.Wire w in ordered)
             {
                 float size = Mathf.Sqrt((float)(System.Math.Abs(w.Gradient) / biggest));
                 float from = w.Layer == 0 ? 1f : 0.5f, to = w.Layer == 0 ? 0.5f : 0f;
@@ -383,6 +388,7 @@ namespace Convergence.EditorTools
             var origins = new List<Object>();
             var ends = new List<Object>();
             var cables = new List<Object>();
+            var targetList = new List<Object>();
             for (int k = 0; k < top; k++)
             {
                 BlameMoment.Wire w = wires[k];
@@ -394,6 +400,7 @@ namespace Convergence.EditorTools
                 capsule.direction = 2;
                 capsule.height = Vector3.Distance(a, b);
                 capsule.radius = 0.8f;
+                targetList.Add(target.transform);
                 var interactable = target.AddComponent<BlameWireInteractable>();
                 interactable.SetWire(k);
                 Ref(interactable, "moment", moment);
@@ -445,7 +452,30 @@ namespace Convergence.EditorTools
             Refs(view, "cables", cables);
             Ref(view, "glows", glows.GetComponent<MeshFilter>());
             Ref(view, "sparks", sparks);
+            Refs(view, "targets", targetList);
+            Set(view, "inputPositions", p => Positions(p, 49, InputPosition));
+            Set(view, "hiddenPositions", p => Positions(p, 16, HiddenPosition));
+            Set(view, "outputPositions", p => Positions(p, 10, OutputPosition));
+            Ref(moment, "session", _session);
             return root;
+        }
+
+        private static void Positions(SerializedProperty p, int count, System.Func<int, Vector3> at)
+        {
+            p.arraySize = count;
+            for (int i = 0; i < count; i++) p.GetArrayElementAtIndex(i).vector3Value = at(i);
+        }
+
+        /// <summary>Keeps a network diagram on the rider's own digit (and, for the trained one, their own weights): v6.</summary>
+        private static void AddLiveView(GameObject host, NetworkParts parts, string tag, bool followWeights, Color ink)
+        {
+            var live = host.AddComponent<NetworkLiveView>();
+            Ref(live, "session", _session);
+            Ref(live, "links", parts.Links.GetComponent<MeshFilter>());
+            Ref(live, "nodes", parts.Nodes.GetComponent<MeshFilter>());
+            Ref(live, "plate", parts.Root.transform.Find("PixelPlate" + tag).GetComponent<MeshFilter>());
+            Set(live, "followWeights", p => p.boolValue = followWeights);
+            Set(live, "ink", p => p.colorValue = ink);
         }
 
         // ---------- region 7: right ----------
@@ -456,15 +486,19 @@ namespace Convergence.EditorTools
             NetworkParts gold = BuildNetwork(root.transform, true, "Gold");
             AddNetworkView(root, gold, director, dash, moment, _theme.gold, "", -1);
 
-            // The accuracy and the count, from the bake, over the middle of the network.
+            AddLiveView(root, gold, "Gold", true, _theme.gold);
+
+            // What the rider's training reached, over the middle of the network (TrainedSignView writes it once trained).
             Transform accuracy = Make("AccuracySign", root.transform, new Vector3(0f, 12.3f, -0.5f)).transform;
-            TextMeshPro acc = Text("Text", accuracy, Vector3.zero,
-                _data.TestAccuracyPercent + "% RIGHT ON " + _data.File.testCount.ToString("N0", System.Globalization.CultureInfo.InvariantCulture)
-                + " NEW DIGITS\nTRAINED ON " + _data.File.trainCount.ToString("N0", System.Globalization.CultureInfo.InvariantCulture),
-                1.2f, _theme.gold, 24f, bold: true);
+            TextMeshPro acc = Text("Text", accuracy, Vector3.zero, "", 1.2f, _theme.gold, 24f, bold: true);
             acc.rectTransform.sizeDelta = new Vector2(24f, 3.2f);
-            LabelBacking(acc, "92% RIGHT ON 10,000 NEW DIGITS\nTRAINED ON 60,000", 0.25f);
+            acc.text = "85% RIGHT ON 500 NEW DIGITS\nYOU TRAINED IT: 10,000 DIGITS";
+            LabelBacking(acc, "100% RIGHT ON 500 NEW DIGITS\nYOU TRAINED IT: 100,000 DIGITS", 0.25f);
+            acc.text = "";
             FaceToward(accuracy, layout.RightView.position + Vector3.up * 1.3f);
+            var sign = accuracy.gameObject.AddComponent<TrainedSignView>();
+            Ref(sign, "session", _session);
+            Ref(sign, "text", acc);
 
             BuildDigitWalls(root.transform);
 
@@ -472,7 +506,10 @@ namespace Convergence.EditorTools
             return root;
         }
 
-        /// <summary>The 60 real test digits the trained network read, with its real answer under each (wrong ones in red).</summary>
+        /// <summary>
+        /// 60 real test digits, digits the network never trained on, on two walls (v6: without the bake's answers under
+        /// them, since the network here is the one the rider trained).
+        /// </summary>
         private static void BuildDigitWalls(Transform root)
         {
             Level1Digit[] digits = _data.File.finale.digits;
@@ -507,9 +544,6 @@ namespace Convergence.EditorTools
                         }
                     }
 
-                    Color answer = d.prediction == d.label ? _theme.offWhite : _theme.wrongRed;
-                    answer.a = 1f;
-                    AddGlyph(tiles, d.prediction, along, up - 0.86f, 0.075f, -sign, new Vector3(-sign, 0f, 0f), answer);
                 }
 
                 var wall = Make(side == 0 ? "Left" : "Right", walls, new Vector3(sign * 6.5f, 0f, 0f));
@@ -517,31 +551,13 @@ namespace Convergence.EditorTools
             }
         }
 
-        // A 3×5 bitmap font for the answers under the finale's digits, drawn as tiles in the same mesh: exact
+        // A 3×5 bitmap font for digits drawn as tiles in a board's mesh (the bonus round's bar labels, FaceGlyph): exact
         // alignment and no extra draw calls. Rows top to bottom, '#' = lit.
         private static readonly string[] DigitGlyphs =
         {
             "###|#.#|#.#|#.#|###", "..#|..#|..#|..#|..#", "###|..#|###|#..|###", "###|..#|###|..#|###", "#.#|#.#|###|..#|..#",
             "###|#..|###|..#|###", "###|#..|###|#.#|###", "###|..#|..#|..#|..#", "###|#.#|###|#.#|###", "###|#.#|###|..#|###",
         };
-
-        /// <summary>Adds digit n as 3×5 tiles centred at (along, up) on a wall facing normal; columns run toward +right.</summary>
-        private static void AddGlyph(TileMesh tiles, int n, float along, float up, float cell, float rightSign, Vector3 normal, Color color)
-        {
-            string[] rows = DigitGlyphs[n].Split('|');
-            for (int r = 0; r < 5; r++)
-            {
-                for (int c = 0; c < 3; c++)
-                {
-                    if (rows[r][c] != '#') continue;
-                    float z = along + (c - 1) * cell * rightSign;
-                    float y = up + (2 - r) * cell;
-                    float h = cell * 0.45f;
-                    tiles.Quad(new Vector3(0.01f * normal.x, y - h, z - h), new Vector3(0.01f * normal.x, y - h, z + h),
-                        new Vector3(0.01f * normal.x, y + h, z + h), new Vector3(0.01f * normal.x, y + h, z - h), normal, color);
-                }
-            }
-        }
 
         // ---------- meshes ----------
 

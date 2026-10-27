@@ -8,9 +8,9 @@ namespace Convergence.EditorTools
 {
     /// <summary>
     /// The narration script of Level 1, the single source for subtitles, pauses, pacing, and what the rider sees while
-    /// each clause is spoken. It is the locked v4 script of TASK_LEVEL1_V4_EXPLAINERS.md section 3 (2026-10-20),
-    /// with the bake's numbers written in (the untrained guess, the training count, the test accuracy); the builder
-    /// fails if they ever disagree with Assets/_Project/Data/Level1/level1_digits.json. One narrator, the Guide.
+    /// each clause is spoken. It is the v6 script of TASK_LEVEL1_V6_TRAIN.md (2026-10-26, 3Blue1Brown-style: real terms, brisk),
+    /// with the bake's numbers written in (the batch, the test digits, the weights, the target accuracy); the tests
+    /// fail if they ever disagree with Assets/_Project/Data/Level1/level1_digits.json. One narrator, the Guide.
     /// [p0.8] marks a pause of 0.8 s inside a line: subtitles change clause by clause at the marks, and the reading
     /// time includes them. {cue} at the start of a clause names what to show while that clause is spoken (several:
     /// {a,b}); the views that know a cue react to it. A voice file only plays when its sidecar text matches this text,
@@ -44,77 +44,80 @@ namespace Convergence.EditorTools
 
         public static readonly Line[] Lines =
         {
-            // E0, the dock: what is this? (intro and dock line)
-            new Line(RideLine.Threes, "{threes}Look! [p0.2] Lots of threes. [p0.2] All different. [p0.2] And you know every one.", 0.4f),
-            new Line(RideLine.MeetPixel, "{pixel}This is Pixel. [p0.2] Pixel is a little robot, [p0.1] and Pixel can't read yet.", 0.3f),
-            new Line(RideLine.PixelBrain, "{brain}Let's go inside Pixel's brain, [p0.1] and teach it to read threes.", 0.3f),
-            new Line(RideLine.PullGo, "{go}Pull the orange lever, [p0.1] or press A. [p0.1] Let's go!", 0.2f),
+            // E0, the dock: every one of these is a three, and Pixel can't read any of them (intro and dock line).
+            new Line(RideLine.Threes, "{threes}Every one of these is a three. [p0.15] Different shapes, [p0.1] different slants, [p0.1] and you read them all without thinking.", 0.3f),
+            new Line(RideLine.MeetPixel, "{pixel}This is Pixel. [p0.15] Pixel can't read a single one.", 0.2f),
+            new Line(RideLine.PixelBrain, "{brain}So let's build a brain for Pixel, [p0.1] and teach it, [p0.1] right here.", 0.2f),
+            new Line(RideLine.PullGo, "{go}Pull the orange lever, [p0.1] or press A.", 0.2f),
 
-            // E1, pixels.
-            new Line(RideLine.PixelsSquares, "{grid}To a computer, [p0.1] a picture is tiny squares. [p0.2] They're called pixels.", 0.4f),
-            new Line(RideLine.PixelsNumbers, "{numbers}Every pixel is just a number. [p0.2] {zero}Dark is zero. [p0.2] {one}Bright is one.", 0.4f),
-            new Line(RideLine.PixelsFortyNine, "{shrink}We'll use seven by seven. [p0.2] {column}That's forty-nine numbers. [p0.2] It's all Pixel ever sees.", 0.4f),
-            new Line(RideLine.DrawYourTurn, "{unfold}Your turn! [p0.1] Draw a three. [p0.2] Point your laser, [p0.1] and pull the trigger. [p0.1] Your left hand rubs out.", 0.2f),
-            new Line(RideLine.DrawHint, "Follow the faint shape. [p0.1] Fill in the glowing squares."),
-            new Line(RideLine.DrawDone, "That's a three! [p0.2] Stop clear! [p0.1] Pull GO!", 0.2f),
-            new Line(RideLine.ZapIntro, "Look out, [p0.1] noise! [p0.1] Zap it with your laser!", 0.2f),
+            // E1, pixels, then draw your 3 (the drawing is the input for the rest of the ride).
+            new Line(RideLine.PixelsSquares, "{grid}To a computer, [p0.1] a picture is a grid of tiny squares, [p0.1] called pixels.", 0.2f),
+            new Line(RideLine.PixelsNumbers, "{numbers}And every pixel is just a number. [p0.15] {zero}Zero for blank. [p0.1] {one}One for full ink.", 0.2f),
+            new Line(RideLine.PixelsFortyNine, "{shrink}We'll use seven by seven. [p0.15] {column}Forty-nine numbers. [p0.1] That's all the network ever sees.", 0.2f),
+            new Line(RideLine.DrawYourTurn, "{unfold}Now draw your own three. [p0.15] Hold the trigger, [p0.1] and write on the board. [p0.1] Shoot DONE when you're happy.", 0.1f),
+            new Line(RideLine.DrawBigger, "Bigger! [p0.1] Fill the board.", 0.1f),
+            new Line(RideLine.DrawDoneNudge, "Looks like a three to me. [p0.1] Shoot DONE.", 0.1f),
+            new Line(RideLine.DrawDone, "That's your three, [p0.1] as forty-nine numbers. [p0.15] Hang on to it.", 0.1f),
+            new Line(RideLine.ZapIntro, "Noise incoming. [p0.1] Zap it!", 0.1f),
 
-            // E2, one neuron.
-            new Line(RideLine.NeuronHolds, "{neuron}This circle is a neuron. [p0.2] It holds one number. [p0.2] {glow}The bigger the number, [p0.1] the brighter it glows."),
-            new Line(RideLine.NeuronWires, "{wires}It's wired to every pixel. [p0.2] Each wire has a weight."),
-            new Line(RideLine.NeuronGreenRed, "{green}Green means: [p0.1] I like ink here. [p0.2] {red}Red means: [p0.1] no ink here, please."),
-            new Line(RideLine.NeuronAdds, "{add}The neuron adds it all up. [p0.2] {line}If the total is big enough, [p0.1] it lights up!", 0.4f),
-            new Line(RideLine.NeuronYourTurn, "{paint}Your turn! [p0.1] Make it light up for threes, [p0.1] and stay dark for the others. [p0.2] Right hand paints green. [p0.1] Left hand paints red."),
-            new Line(RideLine.NeuronLitForOther, "Oops, it lit up for the wrong digit. [p0.2] Paint red where that one has ink."),
-            new Line(RideLine.NeuronMissedThree, "A three stayed dark. [p0.2] Paint green where threes have ink."),
-            new Line(RideLine.NeuronSolved, "You did it! [p0.2] You taught a neuron a shape. [p0.1] Pull GO!", 0.2f),
+            // E2, one neuron, then spray its weights.
+            new Line(RideLine.NeuronHolds, "{neuron}This is a neuron. [p0.1] It holds one number, [p0.1] its activation. [p0.15] {glow}The bigger the number, [p0.1] the brighter it glows.", 0.2f),
+            new Line(RideLine.NeuronWires, "{wires}It's connected to all forty-nine pixels, [p0.1] and every connection has a weight.", 0.2f),
+            new Line(RideLine.NeuronGreenRed, "{green}A positive weight says: [p0.1] ink in this spot means three. [p0.15] {red}A negative weight says: [p0.1] ink in this spot means not a three.", 0.2f),
+            new Line(RideLine.NeuronAdds, "{add}Multiply each pixel by its weight, [p0.1] add them up, [p0.1] and add a bias. [p0.15] {line}A sigmoid squishes the total between zero and one. [p0.1] High means the neuron fires.", 0.2f),
+            new Line(RideLine.NeuronYourTurn, "{paint}Your turn. [p0.1] Paint the weights so this neuron fires for threes, [p0.1] and only threes. [p0.15] Right hand paints positive, [p0.1] left hand negative. [p0.1] Hold the trigger and sweep.", 0.1f),
+            new Line(RideLine.NeuronLitForOther, "It fired for the wrong digit. [p0.1] Paint negative where that one has ink."),
+            new Line(RideLine.NeuronMissedThree, "A three slipped past. [p0.1] Paint positive where the threes have ink."),
+            new Line(RideLine.NeuronSolved, "You just built a three detector, [p0.1] by hand.", 0.1f),
 
-            // E3, the network.
-            new Line(RideLine.NetworkTeam, "{copy}One neuron finds one shape. [p0.2] {layer}So line up lots of them. [p0.2] That's a layer."),
-            new Line(RideLine.NetworkAnswers, "{answers}At the end, [p0.1] ten answer neurons, [p0.1] zero to nine."),
-            new Line(RideLine.NetworkWire, "{connect}Wire them all together, [p0.1] and it's a neural network. [p0.2] This is Pixel's brain!", 0.4f),
-            new Line(RideLine.NetworkSend, "{race}Let's send our three through. [p0.2] Watch the lights!", 0.2f),
+            // E3, the network: send your 3 through it.
+            new Line(RideLine.NetworkTeam, "{copy}One neuron spots one pattern. [p0.15] {layer}Put sixteen side by side, [p0.1] and you have a layer. [p0.1] Each one can learn a different stroke.", 0.2f),
+            new Line(RideLine.NetworkAnswers, "{answers}Then ten output neurons, [p0.1] one for each digit.", 0.2f),
+            new Line(RideLine.NetworkWire, "{connect}Connect every neuron to the next layer, [p0.1] and that's a neural network. [p0.15] Nine hundred and forty-four weights.", 0.2f),
+            new Line(RideLine.NetworkSend, "{race}Shoot your three, [p0.1] and send it in.", 0.1f),
 
-            // E4, wrong, and the loss. The guess is the bake's untrainedGuess.
-            new Line(RideLine.WrongSays, "{guess}Pixel says... [p0.3] one?", 0.2f),
-            new Line(RideLine.WrongRandom, "{wrong}Wrong! [p0.2] Pixel never learned. [p0.2] Its weights are random.", 0.4f),
-            new Line(RideLine.WrongWanted, "{want}We wanted the three bright, [p0.1] and all the others dark."),
-            new Line(RideLine.WrongLoss, "{oops}Add up how far off each answer is. [p0.2] That's the loss. [p0.2] A big loss means a big mistake.", 0.4f),
+            // E4, the guess and the loss (the guess itself is on the network: it depends on the rider's drawing).
+            new Line(RideLine.WrongSays, "{guess}Pixel's guess is in. [p0.15] {wrong}But look how unsure it is. [p0.1] Every weight is still random, [p0.1] so it's only guessing.", 0.2f),
+            new Line(RideLine.WrongWanted, "{want}What we want is the three's neuron at one, [p0.1] and every other at zero.", 0.2f),
+            new Line(RideLine.WrongLoss, "{oops}Add up how far off it is, [p0.1] and you get one number: [p0.1] the loss. [p0.15] Training means just one thing. [p0.1] Make the loss small.", 0.3f),
 
-            new Line(RideLine.PlugYourTurn, "{plug}Let's fix it by hand! [p0.1] Grab a glowing string, [p0.1] and plug it into the three.", 0.2f),
-            new Line(RideLine.PlugWrong, "Uh oh, [p0.1] that made a different answer brighter. [p0.1] Plug it into the three!"),
-            new Line(RideLine.PlugDone, "Now Pixel says three! [p0.2] Stop clear! [p0.1] Pull GO!", 0.2f),
-            // E5, backpropagation.
-            new Line(RideLine.PlugTooMany, "But Pixel's brain has hundreds of strings. [p0.2] Nobody can plug them all by hand."),
-            new Line(RideLine.BackWish, "{wish}The three wants to be brighter. [p0.2] {dim}The one wants to be dimmer."),
-            new Line(RideLine.BackFlows, "{back}That wish flows backwards, [p0.1] through every wire. [p0.2] That's backpropagation.", 0.4f),
-            new Line(RideLine.BackHot, "{hot}The wires to blame glow hot.", 0.4f),
-            new Line(RideLine.BackGrab, "{grab}Hot-wire hunt! [p0.1] Shoot the hot wires, [p0.1] before they cool down!", 0.2f),
-            new Line(RideLine.BackHurry, "Quick, [p0.1] they're cooling down!", 0.2f),
-            new Line(RideLine.StopClear, "Stop clear! [p0.1] Pull GO!", 0.2f),
-            new Line(RideLine.BackDone, "Nice shooting! [p0.2] Now every wire knows which way to change. [p0.1] Pull GO!", 0.2f),
+            // E5, backpropagation, then the hot-wire hunt on the rider's own 3.
+            new Line(RideLine.BackWish, "{nudges}So which weights should change, [p0.1] and which way? [p0.15] {wish}The three's output wants to go up. [p0.1] {dim}Every other output wants to go down.", 0.2f),
+            new Line(RideLine.BackFlows, "{back}Those wishes flow backwards, [p0.1] layer by layer, [p0.1] with the chain rule. [p0.15] That's backpropagation. [p0.1] It gives every weight a gradient: [p0.1] which way to move, [p0.1] and how much.", 0.3f),
+            new Line(RideLine.BackGrab, "{grab}The hottest wires matter most. [p0.1] Grab each one, [p0.1] and drag it to the three, [p0.1] before it cools.", 0.1f),
+            new Line(RideLine.BackHurry, "Quick, [p0.1] they're cooling!", 0.1f),
+            new Line(RideLine.BackDone, "Each wire you moved was one real gradient step. [p0.15] Now imagine every weight, [p0.1] over thousands of digits.", 0.1f),
+            new Line(RideLine.StopClear, "Stage clear. [p0.1] Pull GO.", 0.1f),
 
-            // E6, gradient descent.
-            new Line(RideLine.DescentHill, "{hill}Think of the loss as a hill. [p0.2] {ball}High up means lots of mistakes. [p0.2] Down low means hardly any."),
-            new Line(RideLine.DescentStep, "{slope}Feel which way is down, [p0.1] and take a step. [p0.2] That's gradient descent.", 0.4f),
-            new Line(RideLine.DescentTooBig, "{bigstep}Take too big a step, [p0.1] and you fly past the bottom. [p0.2] {smallsteps}Small steps settle in.", 0.4f),
-            new Line(RideLine.DescentYourTurn, "{steps}Your turn! [p0.1] Roll the ball to the bottom. [p0.2] Shoot a step button. [p0.1] Don't fly past!", 0.2f),
-            new Line(RideLine.DescentGameOvershoot, "Too big! [p0.1] It flew right past the bottom."),
-            new Line(RideLine.DescentGameSlow, "Tiny steps are slow. [p0.1] Try a bigger one."),
-            new Line(RideLine.DescentRealHill, "{landscape}You made it to the bottom! [p0.2] And now, the real hill. [p0.2] Pull GO, [p0.1] and hold on tight!", 0.2f),
-            new Line(RideLine.DescentOvershoot, "Oops! [p0.2] Too far!", 0.2f),
-            new Line(RideLine.DescentSettle, "Small steps now. [p0.2] Down... [p0.2] and down... [p0.2] and down.", 0.4f),
+            // E6, gradient descent, then the training game: real training, live.
+            new Line(RideLine.DescentHill, "{hill}Picture the loss as a landscape. [p0.15] {ball}Where you stand is a choice of weights. [p0.1] The height is how wrong they are.", 0.2f),
+            new Line(RideLine.DescentStep, "{slope}The gradient points uphill, [p0.1] so take a step the other way. [p0.15] That's gradient descent.", 0.2f),
+            new Line(RideLine.DescentTooBig, "{bigstep}The size of the step is the learning rate. [p0.15] Too big, [p0.1] and you leap clean over the valley. [p0.15] {smallsteps}Too small, [p0.1] and you'll be here all day.", 0.2f),
+            new Line(RideLine.TrainYourTurn, "{landscape}This valley is Pixel's real loss. [p0.15] Pick a step size, [p0.1] and hold its button to train. [p0.1] Every step learns from thirty-two real digits.", 0.1f),
+            new Line(RideLine.TrainTooBig, "Way too big! [p0.1] The loss exploded. [p0.15] Let's undo that. [p0.1] Try a smaller step.", 0.1f),
+            new Line(RideLine.TrainTooSmall, "It's learning, [p0.1] but painfully slowly. [p0.1] Try a bigger step.", 0.1f),
+            new Line(RideLine.TrainGood, "That's the one. [p0.1] Watch the loss go down.", 0.1f),
+            new Line(RideLine.TrainDone, "Pixel is trained. [p0.15] You just ran gradient descent on a real neural network.", 0.1f),
 
-            // E7, right, and training. The count and the accuracy are the bake's trainCount and testAccuracy (rounded down).
-            new Line(RideLine.RightSays, "{right}Same three. [p0.2] New weights. [p0.2] Pixel says... [p0.3] three! [p0.2] Yes!", 0.4f),
-            new Line(RideLine.RightTraining, "{practice}Pixel practised on sixty thousand digits. [p0.2] That's called training.", 0.4f),
-            new Line(RideLine.RightAccuracy, "{accuracy}Now Pixel reads ninety-two out of a hundred, [p0.1] even ones it has never seen.", 0.5f),
+            // E7, Pixel reads the rider's own 3 with the weights the rider trained.
+            new Line(RideLine.RightYours, "{right}Now, [p0.1] the real test: [p0.15] the three you drew. [p0.2] Pixel says...", 0.2f),
+            new Line(RideLine.RightYes, "Three! [p0.15] It can read your handwriting.", 0.3f),
+            new Line(RideLine.RightStudy, "Not quite. [p0.1] Your three is unusual. [p0.15] So Pixel studies it, [p0.1] a few more steps...", 0.1f),
+            new Line(RideLine.RightNowYes, "And now it's a three.", 0.3f),
+            new Line(RideLine.RightAccuracy, "{accuracy}On five hundred digits it has never seen, [p0.1] Pixel gets almost nine out of ten right.", 0.3f),
+            new Line(RideLine.RightLoop, "{practice}That's how every neural network learns. [p0.15] Guess. [p0.1] Measure the loss. [p0.1] Backpropagate. [p0.1] Step. [p0.15] Repeat.", 0.3f),
 
-            // E8, tokens: the bridge to Level 2.
-            new Line(RideLine.TokensWords, "{sentence}Words work the same way. [p0.2] {tokens}We chop a sentence into pieces called tokens."),
-            new Line(RideLine.TokensNumbers, "{vectors}Each token becomes a list of numbers, [p0.1] just like pixels."),
-            new Line(RideLine.TokensPredict, "{predict}A giant network guesses the next word. [p0.2] {mat}That's how a chatbot talks.", 0.4f),
-            new Line(RideLine.TokensNext, "{next}Next time, [p0.1] Pixel learns words! [p0.2] See you there.", 0.5f),
+            // Bonus: stump Pixel.
+            new Line(RideLine.StumpYourTurn, "Bonus round. [p0.1] Draw the digit on the screen, [p0.1] and shoot DONE. [p0.1] Can Pixel read it?", 0.1f),
+            new Line(RideLine.StumpRight, "Got it!", 0.1f),
+            new Line(RideLine.StumpWrong, "Fooled it! [p0.1] Even trained networks make mistakes.", 0.1f),
+            new Line(RideLine.StumpDone, "Not bad, [p0.1] for nine hundred and seventy numbers.", 0.1f),
+
+            // E8, tokens: the same idea, for words.
+            new Line(RideLine.TokensWords, "{sentence}Language works the same way. [p0.15] {tokens}Text gets chopped into pieces called tokens.", 0.2f),
+            new Line(RideLine.TokensNumbers, "{vectors}Each token becomes a list of numbers, [p0.1] just like your pixels.", 0.2f),
+            new Line(RideLine.TokensPredict, "{predict}A far bigger network, [p0.1] trained the same way, [p0.1] predicts the next token. [p0.15] {mat}That's how a chatbot writes.", 0.3f),
+            new Line(RideLine.TokensNext, "{next}Next time, [p0.1] Pixel learns to read words.", 0.5f),
         };
 
         /// <summary>The intro at the dock (E0's explainer plays with it): GO holds (two seconds of holding skips it). Then the dock says DockLine and GO goes live.</summary>
@@ -128,25 +131,27 @@ namespace Convergence.EditorTools
         /// </summary>
         public static readonly (string Name, RideLine[] Lines)[] Sequences =
         {
-            ("E1 pixels: explain, then draw", new[] { RideLine.PixelsSquares, RideLine.PixelsNumbers, RideLine.PixelsFortyNine, RideLine.DrawYourTurn }),   // 0
-            ("E2 neuron: explain", new[] { RideLine.NeuronHolds, RideLine.NeuronWires, RideLine.NeuronGreenRed, RideLine.NeuronAdds }),       // 1
-            ("E2 neuron: your turn", new[] { RideLine.NeuronYourTurn }),                                                                      // 2
-            ("E3 network: explain", new[] { RideLine.NetworkTeam, RideLine.NetworkAnswers, RideLine.NetworkWire }),                          // 3
-            ("E3 network: send it through", new[] { RideLine.NetworkSend }),                                                                  // 4
-            ("E4 wrong: explain, then plug", new[] { RideLine.WrongSays, RideLine.WrongRandom, RideLine.WrongWanted, RideLine.WrongLoss, RideLine.PlugYourTurn }),   // 5
-            ("E5 backprop: explain", new[] { RideLine.PlugTooMany, RideLine.BackWish, RideLine.BackFlows, RideLine.BackHot }),                                      // 6
-            ("E5 backprop: grab", new[] { RideLine.BackGrab }),                                                                               // 7
-            ("E6 descent: explain, then roll", new[] { RideLine.DescentHill, RideLine.DescentStep, RideLine.DescentTooBig, RideLine.DescentYourTurn }),  // 8
-            ("E8 tokens: explain", new[] { RideLine.TokensWords, RideLine.TokensNumbers, RideLine.TokensPredict, RideLine.TokensNext }),      // 9
+            ("E1 pixels: explain, then draw your 3", new[] { RideLine.PixelsSquares, RideLine.PixelsNumbers, RideLine.PixelsFortyNine, RideLine.DrawYourTurn }),   // 0
+            ("E2 neuron: explain", new[] { RideLine.NeuronHolds, RideLine.NeuronWires, RideLine.NeuronGreenRed, RideLine.NeuronAdds }),                      // 1
+            ("E2 neuron: your turn", new[] { RideLine.NeuronYourTurn }),                                                                                     // 2
+            ("E3 network: explain", new[] { RideLine.NetworkTeam, RideLine.NetworkAnswers, RideLine.NetworkWire }),                                         // 3
+            ("E3 network: send your 3", new[] { RideLine.NetworkSend }),                                                                                     // 4
+            ("E4 the guess and the loss", new[] { RideLine.WrongSays, RideLine.WrongWanted, RideLine.WrongLoss }),                                          // 5
+            ("E5 backprop: explain", new[] { RideLine.BackWish, RideLine.BackFlows }),                                                                      // 6
+            ("E5 backprop: grab", new[] { RideLine.BackGrab }),                                                                                              // 7
+            ("E6 descent: explain, then train", new[] { RideLine.DescentHill, RideLine.DescentStep, RideLine.DescentTooBig, RideLine.TrainYourTurn }),     // 8
+            ("E8 tokens: explain", new[] { RideLine.TokensWords, RideLine.TokensNumbers, RideLine.TokensPredict, RideLine.TokensNext }),                     // 9
         };
 
-        /// <summary>Lines the moments say (not in a sequence): the puzzle's feedback, the blame's end, the drop, the trained pass.</summary>
+        /// <summary>Lines the moments say (not in a sequence): reactions, win lines, the training game's calls, the reading of the rider's 3.</summary>
         public static readonly RideLine[] MomentLines =
         {
-            RideLine.NeuronLitForOther, RideLine.NeuronMissedThree, RideLine.NeuronSolved, RideLine.BackDone, RideLine.BackHurry,
-            RideLine.DrawHint, RideLine.DrawDone, RideLine.ZapIntro, RideLine.PlugWrong, RideLine.PlugDone, RideLine.StopClear,
-            RideLine.DescentGameOvershoot, RideLine.DescentGameSlow, RideLine.DescentRealHill,
-            RideLine.DescentOvershoot, RideLine.DescentSettle, RideLine.RightSays, RideLine.RightTraining, RideLine.RightAccuracy
+            RideLine.DrawBigger, RideLine.DrawDoneNudge, RideLine.DrawDone, RideLine.ZapIntro,
+            RideLine.NeuronLitForOther, RideLine.NeuronMissedThree, RideLine.NeuronSolved,
+            RideLine.BackHurry, RideLine.BackDone, RideLine.StopClear,
+            RideLine.TrainTooBig, RideLine.TrainTooSmall, RideLine.TrainGood, RideLine.TrainDone,
+            RideLine.RightYours, RideLine.RightYes, RideLine.RightStudy, RideLine.RightNowYes, RideLine.RightAccuracy, RideLine.RightLoop,
+            RideLine.StumpYourTurn, RideLine.StumpRight, RideLine.StumpWrong, RideLine.StumpDone
         };
 
         /// <summary>

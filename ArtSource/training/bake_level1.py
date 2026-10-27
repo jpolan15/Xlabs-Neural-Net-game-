@@ -19,6 +19,7 @@ ActivationFunctions.Sigmoid; softmax is layer-wide with the max shift; weights a
 """
 
 import argparse
+import base64
 import datetime
 import gzip
 import hashlib
@@ -60,6 +61,17 @@ SEED_FINALE = 2026
 
 W_DEC = 9                # decimals kept for weights
 PX_DEC = 4               # decimals kept for pixels
+
+# Live training (v6, ADR-020): the rider trains the network in the headset with mini-batch SGD from the same initial
+# weights, on a balanced subset of the real training digits, and is scored on a balanced subset of the test digits.
+LIVE_TRAIN_PER_CLASS = 300
+LIVE_TEST_PER_CLASS = 50
+LIVE_SEED = 11            # which digits go into the subsets
+LIVE_BATCH = 32
+LIVE_RATES = [0.15, 4.0, 40.0]   # the three step-size buttons: tiny, good, huge
+LIVE_TARGET = 0.85        # the training game is won at this test accuracy
+LIVE_SAMPLER_SEED = 2463534242  # xorshift32 seed of the batch sampler (LiveTrainer uses the same one)
+LIVE_MAX_STEPS = 900
 
 
 class BakeError(Exception):
@@ -167,6 +179,45 @@ def init_theta(seed):
     w1 = rng.uniform(-a1, a1, size=(N_HID, N_IN))
     w2 = rng.uniform(-a2, a2, size=(N_OUT, N_HID))
     return np.concatenate([w1.ravel(), np.zeros(N_HID), w2.ravel(), np.zeros(N_OUT)])
+
+
+class XorShift32:
+    """The batch sampler LiveTrainer uses (Convergence.Core.Training), so the bake can replay the game's run."""
+
+    def __init__(self, seed):
+        self.state = seed & 0xFFFFFFFF
+
+    def next(self):
+        x = self.state
+        x ^= (x << 13) & 0xFFFFFFFF
+        x ^= x >> 17
+        x ^= (x << 5) & 0xFFFFFFFF
+        self.state = x
+        return x
+
+
+def live_subset(x, y, per_class, rng):
+    """A balanced, shuffled subset; pixels quantized to bytes exactly as the game stores them."""
+    idx = np.concatenate([np.sort(rng.choice(np.nonzero(y == d)[0], per_class, replace=False)) for d in range(10)])
+    idx = idx[rng.permutation(len(idx))]
+    q = np.round(x[idx] * 255.0).astype(np.uint8)
+    return q, y[idx].astype(np.int64)
+
+
+def live_run(theta0, tx, ty, vx, vy, lr, steps):
+    """Replays the training game: xorshift batches with replacement, plain SGD. Returns (losses, accuracies per 10 steps)."""
+    sampler = XorShift32(LIVE_SAMPLER_SEED)
+    theta = theta0.copy()
+    batch_losses, accuracies = [], []
+    for step in range(1, steps + 1):
+        i = np.array([sampler.next() % len(ty) for _ in range(LIVE_BATCH)])
+        g, loss = gradient(theta, tx[i], ty[i])
+        batch_losses.append(loss)
+        theta = theta - lr * g
+        if step % 10 == 0:
+            _, p = forward(theta, vx)
+            accuracies.append(float((p.argmax(axis=1) == vy).mean()))
+    return np.array(batch_losses), np.array(accuracies)
 
 
 def weights_json(theta):
@@ -392,6 +443,24 @@ def main():
                        "confidence": round(float(p_test[i].max()), 6), "pixels7": test_x[i].tolist()})
     finale_right = sum(1 for d in finale if d["label"] == d["prediction"])
 
+    # ---- live training (v6): the subsets the rider trains on and is tested on, and a replay of each button
+    rng_live = np.random.default_rng(LIVE_SEED)
+    live_tq, live_ty = live_subset(train_x, train_y, LIVE_TRAIN_PER_CLASS, rng_live)
+    live_vq, live_vy = live_subset(test_x, test_y, LIVE_TEST_PER_CLASS, rng_live)
+    live_tx, live_vx = live_tq.astype(np.float64) / 255.0, live_vq.astype(np.float64) / 255.0
+    start_loss_live = loss_of(theta0, live_tx, live_ty)
+    tiny_l, tiny_a = live_run(theta0, live_tx, live_ty, live_vx, live_vy, LIVE_RATES[0], 300)
+    good_l, good_a = live_run(theta0, live_tx, live_ty, live_vx, live_vy, LIVE_RATES[1], LIVE_MAX_STEPS)
+    huge_l, huge_a = live_run(theta0, live_tx, live_ty, live_vx, live_vy, LIVE_RATES[2], 60)
+    reached = np.nonzero(good_a >= LIVE_TARGET)[0]
+    check(len(reached) > 0, f"the good step size never reaches {LIVE_TARGET:.0%} in {LIVE_MAX_STEPS} steps")
+    steps_to_target = int((reached[0] + 1) * 10)
+    check(steps_to_target <= 600, f"the good step size takes {steps_to_target} steps to {LIVE_TARGET:.0%}")
+    check(tiny_a[-1] < 0.5, f"the tiny step size is not slow: {tiny_a[-1]:.0%} after 300 steps")
+    huge_peak = float(huge_l[:20].max())
+    check(huge_peak > 2.5 * start_loss_live, f"the huge step size does not blow up (peak loss {huge_peak:.2f})")
+    check(huge_a[-1] < 0.3, f"the huge step size still learns: {huge_a[-1]:.0%} after 60 steps")
+
     out = {
         "meta": {
             "version": 1,
@@ -439,6 +508,19 @@ def main():
         },
         "finale": {"digits": finale, "correct": finale_right},
         "threes": gallery,
+        "live": {
+            "batch": LIVE_BATCH, "rates": LIVE_RATES, "targetAccuracy": LIVE_TARGET,
+            "samplerSeed": LIVE_SAMPLER_SEED, "dataSeed": LIVE_SEED,
+            "trainPixels": base64.b64encode(live_tq.tobytes()).decode("ascii"),
+            "trainLabels": live_ty.tolist(),
+            "testPixels": base64.b64encode(live_vq.tobytes()).decode("ascii"),
+            "testLabels": live_vy.tolist(),
+            "startLoss": round(start_loss_live, 6),
+            "stepsToTarget": steps_to_target,
+            "goodAccuracyAt300": round(float(good_a[29]), 6),
+            "tinyAccuracyAt300": round(float(tiny_a[-1]), 6),
+            "hugePeakLoss": round(huge_peak, 6),
+        },
     }
     os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
     with open(args.out, "w", encoding="utf-8", newline="\n") as f:
@@ -459,6 +541,8 @@ def main():
     print(f"| valley walls (side min - centre) | min {wall_rise[0]:+.3f}, median {wall_rise[1]:+.3f}, max {wall_rise[2]:+.3f} |")
     print(f"| big first step | {seg[0]:.3f} -> dips to {dip:.3f} -> climbs to {seg[-1]:.3f} |")
     print(f"| finale | {finale_right}/{FINALE_COUNT} right |")
+    print(f"| live | {len(live_ty)} train / {len(live_vy)} test digits; start loss {start_loss_live:.3f}; good lr {LIVE_RATES[1]} hits "
+          f"{LIVE_TARGET:.0%} at step {steps_to_target} ({good_a[29]:.0%} at 300); tiny {tiny_a[-1]:.0%} at 300; huge peak loss {huge_peak:.1f}, {huge_a[-1]:.0%} at 60 |")
     print(f"| gallery | {GALLERY_COUNT} real test threes (28x28): " + ", ".join(f"#{g['testIndex']}" for g in gallery) + " |")
     print("| hops (step:real steps:loss) | " +
           "; ".join(f"{h['step']}:{h['realSteps']}:{h['loss']:.3f}" for h in hops) + " |")

@@ -29,13 +29,15 @@ namespace Convergence.Tests.EditMode.Ride
         // Lines said by moments, not by a sequence (RideNarrationData.MomentLines).
         private static readonly RideLine[] MomentLines =
         {
-            RideLine.NeuronLitForOther, RideLine.NeuronMissedThree, RideLine.NeuronSolved, RideLine.BackDone, RideLine.BackHurry,
-            RideLine.DrawHint, RideLine.DrawDone, RideLine.ZapIntro, RideLine.PlugWrong, RideLine.PlugDone, RideLine.StopClear,
-            RideLine.DescentGameOvershoot, RideLine.DescentGameSlow, RideLine.DescentRealHill,
-            RideLine.DescentOvershoot, RideLine.DescentSettle, RideLine.RightSays, RideLine.RightTraining, RideLine.RightAccuracy
+            RideLine.DrawBigger, RideLine.DrawDoneNudge, RideLine.DrawDone, RideLine.ZapIntro,
+            RideLine.NeuronLitForOther, RideLine.NeuronMissedThree, RideLine.NeuronSolved,
+            RideLine.BackHurry, RideLine.BackDone, RideLine.StopClear,
+            RideLine.TrainTooBig, RideLine.TrainTooSmall, RideLine.TrainGood, RideLine.TrainDone,
+            RideLine.RightYours, RideLine.RightYes, RideLine.RightStudy, RideLine.RightNowYes, RideLine.RightAccuracy, RideLine.RightLoop,
+            RideLine.StumpYourTurn, RideLine.StumpRight, RideLine.StumpWrong, RideLine.StumpDone
         };
 
-        /// <summary>The first line of the v4 script; 1 to 63 are reserved (v3 and the first Level 1 script).</summary>
+        /// <summary>The first line of the v6 script; 1 to 118 are reserved (v3, the first Level 1 script, v4 and v5).</summary>
         private const RideLine FirstLine = RideLine.Threes;
 
         private static NarrationLibrary Library()
@@ -111,7 +113,7 @@ namespace Convergence.Tests.EditMode.Ride
             NarrationLibrary library = Library();
             foreach (RideLine line in Enum.GetValues(typeof(RideLine)))
             {
-                if ((int)line < (int)FirstLine) Assert.IsFalse(library.TryGet(line, out _), line + " (reserved, before 64) is still in the library");
+                if ((int)line < (int)FirstLine) Assert.IsFalse(library.TryGet(line, out _), line + " (reserved, before 119) is still in the library");
             }
 
             foreach (NarrationLibrary.Entry entry in library.entries)
@@ -139,14 +141,24 @@ namespace Convergence.Tests.EditMode.Ride
             Assert.AreEqual(61, (int)RideLine.V3RightAccuracy);
             Assert.AreEqual(63, (int)RideLine.RightNextLevel);
 
-            // v4, appended from 64.
-            Assert.AreEqual(64, (int)RideLine.Threes);
-            Assert.AreEqual(68, (int)RideLine.PixelsSquares);
-            Assert.AreEqual(76, (int)RideLine.NeuronYourTurn);
-            Assert.AreEqual(84, (int)RideLine.WrongSays);
-            Assert.AreEqual(93, (int)RideLine.DescentHill);
-            Assert.AreEqual(101, (int)RideLine.RightAccuracy);
-            Assert.AreEqual(105, (int)RideLine.TokensNext);
+            // v4 and v5, appended from 64, reserved since v6 (V5 prefix).
+            Assert.AreEqual(64, (int)RideLine.V5Threes);
+            Assert.AreEqual(68, (int)RideLine.V5PixelsSquares);
+            Assert.AreEqual(76, (int)RideLine.V5NeuronYourTurn);
+            Assert.AreEqual(84, (int)RideLine.V5WrongSays);
+            Assert.AreEqual(93, (int)RideLine.V5DescentHill);
+            Assert.AreEqual(101, (int)RideLine.V5RightAccuracy);
+            Assert.AreEqual(105, (int)RideLine.V5TokensNext);
+            Assert.AreEqual(118, (int)RideLine.V5DescentGameSlow);
+
+            // v6, appended from 119.
+            Assert.AreEqual(119, (int)RideLine.Threes);
+            Assert.AreEqual(123, (int)RideLine.PixelsSquares);
+            Assert.AreEqual(135, (int)RideLine.NeuronYourTurn);
+            Assert.AreEqual(143, (int)RideLine.WrongSays);
+            Assert.AreEqual(152, (int)RideLine.DescentHill);
+            Assert.AreEqual(164, (int)RideLine.RightAccuracy);
+            Assert.AreEqual(173, (int)RideLine.TokensNext);
         }
 
         [Test]
@@ -199,13 +211,16 @@ namespace Convergence.Tests.EditMode.Ride
             var asset = AssetDatabase.LoadAssetAtPath<TextAsset>(Level1Data.AssetPath);
             Level1Data data = Level1Data.Parse(asset.text);
             NarrationLibrary library = Library();
-            string[] ones = { "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" };
-            StringAssert.Contains("says... " + ones[data.File.hero.untrainedGuess], Spoken(library, RideLine.WrongSays));
-            StringAssert.Contains("says... three", Spoken(library, RideLine.RightSays));
-            Assert.AreEqual(60000, data.File.trainCount);
-            StringAssert.Contains("sixty thousand", Spoken(library, RideLine.RightTraining));
-            Assert.AreEqual(92, data.TestAccuracyPercent, "Re-baked? Update RightAccuracy's words in RideNarrationData to the new accuracy.");
-            StringAssert.Contains("ninety-two out of a hundred", Spoken(library, RideLine.RightAccuracy));
+            Assert.AreEqual(32, data.File.live.batch, "Re-baked? Update TrainYourTurn's words to the new batch.");
+            StringAssert.Contains("thirty-two real digits", Spoken(library, RideLine.TrainYourTurn));
+            Assert.AreEqual(500, data.File.live.testLabels.Length, "Re-baked? Update RightAccuracy's words to the new test set.");
+            StringAssert.Contains("five hundred digits", Spoken(library, RideLine.RightAccuracy));
+            StringAssert.Contains("almost nine out of ten", Spoken(library, RideLine.RightAccuracy));
+            Assert.That(data.File.live.targetAccuracy, Is.InRange(0.8, 0.9), "almost nine out of ten");
+            Assert.AreEqual(944, 16 * 49 + 10 * 16);
+            StringAssert.Contains("nine hundred and forty-four weights", Spoken(library, RideLine.NetworkWire));
+            Assert.AreEqual(970, Convergence.Core.Training.DigitNetwork.ParameterCount);
+            StringAssert.Contains("nine hundred and seventy numbers", Spoken(library, RideLine.StumpDone));
         }
 
         [Test]
