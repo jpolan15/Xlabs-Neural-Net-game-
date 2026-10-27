@@ -80,6 +80,29 @@ game, R restarts.
 Next (after the demo, agreed): training game -> a live step-size dial and a race to 85 % (honest: the gradient picks the
 direction, the rider only the step size), with a leaderboard for Ignite.
 
+### 3b. Look pass and cleanup (owner, 2026-10-28 night: "scenes shouldn't be all black, make everything look awesome";
+"clean up old stuff so new agents don't read unnecessary context; keep it readable and working")
+
+Cleanup (move, don't destroy: everything stays in git history)
+- [x] Stale task files to `.agents/tasks/archive/` (v3 master plan, digits restructure, its handoff and remaining-work);
+      `IN_PROGRESS.md` and `BACKLOG.md` rewritten to today's state; live references (skills, READMEs) point to archive.
+- [x] `Documentation/Design`: `GDD_OVERVIEW.md` rewritten as the current Level 1 overview; superseded design docs
+      (v3 story, Chamber 01 level design and art bible) removed; old capture folders of cut versions removed.
+- [x] Nothing breaks: layout validator 46/0, recompile 0 errors, EditMode 148/148 (PlayMode runs with the look pass).
+      Removed 319 files (v2/v3 captures, 18 orphan model sheets of cut models, 3 superseded design docs); 4 plans archived.
+- [ ] Not tonight (code; risky before a demo): the old Chamber 01 / asteroid-defense editor tools and
+      `Level01_AwakeningGate.unity` (still referenced by old tests). Remove after the demo with their tests.
+
+Look (every stop its own lit world, not a black void; diagrams stay readable; Quest 2 budget holds)
+- [ ] `Convergence/RideSky` sky shader: vertical gradient, horizon glow, sparse stars, a faint grid floor far below
+      (all in the sky pass: no extra objects); camera clears to it; capture cameras too.
+- [ ] `RideTheme` region looks gain sky colours (zenith, horizon, glow, floor, stars); `RegionAtmosphere` blends them;
+      the explainers' "blackboard" becomes a dark tint of the region's own sky instead of near-black.
+- [ ] A palette per stop (dock dawn, pixels cyan, neuron amber, network deep blue, loss red, backprop violet,
+      valley sunset, right gold).
+- [ ] Rebuild: sightlines and text readable, draw calls within 100, EditMode + PlayMode green.
+- [ ] Live shots of every stop at real lighting; fix what they show; commit.
+
 ## 4. Progress log
 
 ### 2026-10-27 — review, grill, plan (Claude)

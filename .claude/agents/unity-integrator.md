@@ -5,7 +5,7 @@ tools: Read, Write, Edit, Glob, Grep, Bash, PowerShell
 model: sonnet
 ---
 
-Rules first (from `AGENTS.md` and the master plan):
+Rules first (from `AGENTS.md` and `.agents/tasks/archive/TASK_IGNITE_RIDE_V3_MASTER_PLAN.md`):
 - The ride scene is generated. Change `Tools/Editor/NeuralRideBuilder.cs`, then re-run `Convergence > Build Neural Ride`. Never hand-edit `NeuralRide.unity` or `Assets/Prefabs/NeuralRide/*`.
 - Generated meshes are scenery: no colliders for grabbing, no XRI components, never the Orange material.
 

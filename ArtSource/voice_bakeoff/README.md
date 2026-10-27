@@ -4,7 +4,7 @@ Goal: the human and one classmate pick the Guide voice, blind. This folder holds
 
 The agent did not render, listen to, or judge any audio. Nothing here has been generated yet.
 
-Sources: `.agents/tasks/TASK_IGNITE_RIDE_V3_MASTER_PLAN.md` (WP4 and Appendix A). `ArtSource/AGENTS.md` applies: every generated file keeps its tool, settings and license next to it, and raw art stays out of `Assets/`.
+Sources: `.agents/tasks/archive/TASK_IGNITE_RIDE_V3_MASTER_PLAN.md` (WP4 and Appendix A). `ArtSource/AGENTS.md` applies: every generated file keeps its tool, settings and license next to it, and raw art stays out of `Assets/`.
 
 Run every command below from `ArtSource\voice_bakeoff\`.
 

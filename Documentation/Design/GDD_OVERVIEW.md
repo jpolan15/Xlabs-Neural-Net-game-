@@ -1,45 +1,41 @@
-# Game Design Document: Project Convergence
+# Game Design Overview: Convergence, Level 1 ("Teach Pixel to read")
+
+Current as of Level 1 v7 (2026-10-28). Decisions: ADR-016 to ADR-021. Live plan: `.agents/tasks/TASK_LEVEL1_V7_DEMO.md`.
+Older versions (the A.U.R.A. spaceship ride, Chamber 01) are in git history and `.agents/tasks/archive/`.
 
 ## Premise
 
-You are a passenger on the ship *Neural*. Its AI, A.U.R.A., has lost its targeting skills. You ride a small probe pod down a rail into A.U.R.A.'s glowing neural core and, one stop at a time, teach it three ideas. The goal: leave knowing, by feel, that an AI is just math, and that learning means rolling downhill. Decision record: ADR-011.
+A seated VR ride (Quest 2) through a real neural network. Pixel, a small robot, can't read handwriting. The rider
+builds Pixel a real network and trains it, live, to read the 3 the rider draws. Everything that lights up is computed:
+real MNIST digits, a real 49 → 16 → 10 network (970 numbers), real backpropagation and gradient descent.
 
-## Design pillars
+## Pillars
 
-1. **One idea per stop, one new control per stop.** Anything you can touch is orange. Nothing else is.
-2. **Math is the payoff, not the instructions.** You feel a lever first. At the end of each stop the equation assembles itself from the numbers you just set.
-3. **Data goes in, you watch what happens.** Objects float past a scanner, sensors light, pulses travel the pipes, the core fills, and it fires or does not.
-4. **Enclosed and readable.** Near: the dash with up to five levers and one screen. Middle: the scanner arch and data stream. Far: the neuron core.
-5. **Comfortable.** The pod moves slowly with eased stops and never pitches or rolls. Locomotion is off while seated.
+1. **Real, not a cartoon.** The rider's own 3 goes through the rider's own network; nothing is scripted to look right.
+2. **A game, not a lecture.** Every stop is explain (short, 3Blue1Brown style) → play (a game with a win) → stage clear.
+3. **One thread.** Draw a 3, build a detector by hand, send the 3 through, find the blame, train, see it read the 3.
+4. **Orange means you can press it.** Lasers in both hands (trigger or A); right hand green (+), left red (−).
+5. **Comfortable.** Seated, eased moves, no roll; the table follows eye height.
 
-Language rule: every instruction is short enough for a small child, with icons doing most of the work.
+## The ride (about 7 minutes)
 
-## The ride (about 10 minutes)
+| Stop | Idea | The game |
+|---|---|---|
+| Dock | What we'll build; the five stops | Pull GO |
+| Pixels | A picture is 49 numbers | Draw your own 3 |
+| Neuron | Weights, bias, sigmoid | Spray weights until it fires for 3s only |
+| Network | Layers; the untrained guess; the loss | Shoot your 3 into the network |
+| Backpropagation | Blame flows back with the chain rule | Drag the hottest wires before they cool |
+| Gradient descent | Learning rate; real mini-batch training | Hold a step size to train to 85 % |
+| Right | What the 16 hidden neurons learned; test accuracy | Pixel reads your 3 |
+| Bonus | Even trained networks make mistakes | Stump Pixel |
+| End | Tokens: the same idea for words | Level 2 teaser |
 
-| Stop | Idea | Control | What you see |
-|---|---|---|---|
-| Dock | Start | Pull the orange GO lever | The pod drops into the core |
-| 1. One Signal | Weight × input against a trigger | Slide TRIGGER down | Rocks get zapped. Too low and the friendly drone gets zapped too. Then `fire if 1 × rock >= 0.5` assembles |
-| 2. Two Signals | A weighted sum (OR) | Three levers: ROCK, ICE, TRIGGER | The ICE pipe starts wired backwards and drains the core. A four-tile board shows zap or pass and right or wrong for every object at once |
-| 3. It Learns | Loss and gradient descent | Pull LEARN, choose a learning rate | A marble rolls down a contour-banded error hill while the weight levers move by themselves. Too high a rate overshoots and flies off. Then `w <- w - 0.5 × slope` assembles |
+Between stops: **blast the 3s**. Real handwritten digits fly at the pod; blast every 3, spare the rest (streaks multiply
+the score, mistakes cost). The rider is the classifier Pixel is learning to be.
 
-Not built yet: ship intro and outro scenes, the 3-question quiz, credits, and the stretch stop for XOR and hidden layers (where backpropagation through layers becomes visible).
+## Where the details live
 
-## Teaching map
-
-- Stop 1: a neuron multiplies an input by a weight and compares it to a threshold.
-- Stop 2: two weighted inputs added together decide an OR gate.
-- Stop 3: error is a hill, the gradient is the slope, and training steps downhill. Under the hood the trainer runs real backpropagation through the neuron (`Forward`, then `Backward`) to get the slope.
-
-## Audio
-
-Narration is 15 AI-synthesized lines (`vo_ride_01` to `vo_ride_15`) spoken from the dash, with subtitles on the same screen. Background music streams from `Assets/_Project/Audio/Music/telstar.wav` and ducks under speech.
-
-## Controls
-
-- **Headset (Quest over Link):** point and grab the orange handles with the XRI Starter rig. Haptics tick at each detent.
-- **Desktop fallback:** hold the right mouse button to look around the cockpit, left-click and drag a lever.
-
-## Source of truth
-
-Architecture: `Documentation/Architecture/ADRs/ADR-011-neural-ride.md`. Math: `Documentation/Mathematics/FORMULAS.md`. Level 01 design documents (`LEVEL_DESIGN_L01.md`, `ART_BIBLE_CHAMBER01.md`) describe the superseded console and are kept for reference.
+Architecture and rules: `AGENTS.md`, `.agents/PROJECT_MAP.md`, `Documentation/Architecture/ADRs/`. Math:
+`Documentation/Mathematics/FORMULAS.md`. Script: `Tools/Editor/RideNarrationData.cs`. Presenting it:
+`Documentation/Design/TEAM_BRIEFING.md`. Playtests: `Documentation/Design/PLAYTEST.md`.

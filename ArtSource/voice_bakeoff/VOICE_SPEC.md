@@ -7,7 +7,7 @@ predicted naturalness, pitch range) instead of the blind bake-off planned below;
 rendered. A human and one classmate should still listen to the installed set before Ignite and either approve it or
 swap a voice (one command, see the README).
 
-Governing plan: `.agents/tasks/TASK_IGNITE_RIDE_V3_MASTER_PLAN.md`, WP4.
+Governing plan: `.agents/tasks/archive/TASK_IGNITE_RIDE_V3_MASTER_PLAN.md`, WP4.
 
 | Field | Guide | AURA |
 |---|---|---|
