@@ -96,14 +96,21 @@ Cleanup (deleted outright on the owner's word; everything stays in git history)
       `Level01_AwakeningGate.unity` (still referenced by old tests). Remove after the demo with their tests.
 
 Look (every stop its own lit world, not a black void; diagrams stay readable; Quest 2 budget holds)
-- [ ] `Convergence/RideSky` sky shader: vertical gradient, horizon glow, sparse stars, a faint grid floor far below
+- [x] `Convergence/RideSky` sky shader: vertical gradient, horizon glow, sparse stars, a faint grid floor far below
       (all in the sky pass: no extra objects); camera clears to it; capture cameras too.
-- [ ] `RideTheme` region looks gain sky colours (zenith, horizon, glow, floor, stars); `RegionAtmosphere` blends them;
+- [x] `RideTheme` region looks gain sky colours (zenith, horizon, glow, floor, stars); `RegionAtmosphere` blends them;
       the explainers' "blackboard" becomes a dark tint of the region's own sky instead of near-black.
-- [ ] A palette per stop (dock dawn, pixels cyan, neuron amber, network deep blue, loss red, backprop violet,
+- [x] A palette per stop (dock dawn, pixels cyan, neuron amber, network deep blue, loss red, backprop violet,
       valley sunset, right gold).
-- [ ] Rebuild: sightlines and text readable, draw calls within 100, EditMode + PlayMode green.
-- [ ] Live shots of every stop at real lighting; fix what they show; commit.
+- [x] Rebuild: sightlines and text readable, draw calls within 100, EditMode + PlayMode green.
+- [x] Live shots of every stop at real lighting; fix what they show; commit.
+      Evidence: `Documentation/Design/captures/level1_v7/sky_*.png` (dock, pixels, travel, neuron, network, loss, backprop,
+      valley, right). Fixed from the first set: explaining stops were still dark and floorless, so the blackboard now
+      dims the region's sky to 0.78 (was near-black) and keeps the floor at half strength; the old pod-relative grid is
+      off (two grids at one depth). Build: sightlines clear, no stop over 100 draw calls (the sky is one draw); EditMode
+      148/148 (the near-black blackboard test now checks every horizon is lit but dark enough for white text), PlayMode
+      30/30. Not judged: how the moving floor grid feels in a headset (comfort; lower `floor` alpha in
+      `NeuralRideBuilder.cs` if it is too strong).
 
 ## 4. Progress log
 

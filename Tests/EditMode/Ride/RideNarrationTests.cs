@@ -258,9 +258,18 @@ namespace Convergence.Tests.EditMode.Ride
                 StringAssert.DoesNotMatch("[0-9·]", look.tag, "an elegant title, no numbering");
             }
 
-            Color.RGBToHSV(theme.blackboard.background, out _, out float sat, out float value);
-            Assert.Less(value, 0.1f, "the blackboard is near-black");
-            Assert.AreEqual(theme.blackboard.background, theme.blackboard.fog, "the blackboard's fog has no colour cast");
+            // v7 (owner: "the scenes shouldn't be all black"): every region is a lit sky, dark enough at eye level for
+            // white text; far things sink into its horizon; explaining dims the region's own sky, never to black.
+            foreach (RideTheme.RegionLook look in theme.regions)
+            {
+                Color.RGBToHSV(look.skyHorizon, out _, out _, out float value);
+                Assert.Greater(value, 0.08f, look.tag + ": the horizon is lit, not a black void");
+                Assert.Less(value, 0.5f, look.tag + ": the horizon stays dark enough for white text");
+                Assert.AreEqual(look.skyHorizon, look.fog, look.tag + ": the fog matches the horizon");
+                Assert.LessOrEqual(look.skyGlow.a, 0.75f, look.tag + ": the horizon glow never washes out the text");
+            }
+
+            Assert.That(theme.blackboardDim, Is.InRange(0.4f, 0.85f), "explaining dims the region's sky, never to black");
         }
 
         [Test]

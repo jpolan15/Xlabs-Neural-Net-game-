@@ -92,7 +92,7 @@ namespace Convergence.EditorTools
                 cam.aspect = (float)Width / Height;
                 cam.nearClipPlane = 0.03f;
                 cam.farClipPlane = 160f;
-                cam.clearFlags = CameraClearFlags.SolidColor;
+                cam.clearFlags = RenderSettings.skybox != null ? CameraClearFlags.Skybox : CameraClearFlags.SolidColor;
                 rt = new RenderTexture(Width, Height, GraphicsFormat.R8G8B8A8_UNorm, UnityEngine.Rendering.CoreUtils.GetDefaultDepthOnlyFormat()) { antiAliasing = 4 };
                 cam.targetTexture = rt;
                 tex = new Texture2D(Width, Height, TextureFormat.RGB24, false);
@@ -115,6 +115,7 @@ namespace Convergence.EditorTools
                     RenderSettings.fogColor = look.fog;
                     RenderSettings.fogDensity = look.fogDensity;
                     cam.backgroundColor = look.background;
+                    if (theme != null) RegionAtmosphere.ApplySky(look, theme);
 
                     podT.SetPositionAndRotation(vp.transform.position, vp.transform.rotation);
                     string dir = Path.Combine(outDir, vp.label);

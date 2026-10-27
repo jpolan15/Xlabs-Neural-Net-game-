@@ -100,17 +100,22 @@ namespace Convergence.EditorTools
             // Each region its own sky and its topic's name on the dash. No region's sky is orange (orange = press this).
             // The dock is the blackboard's own dark navy (a shade lighter), so the lit page reads like 3Blue1Brown's figures
             // on the dark and the unfold does not change the sky.
+            // v7: each region a lit world (Convergence/RideSky), not a black void: zenith, horizon (= fog), a horizon glow,
+            // a grid floor far below, stars. Dark enough at eye level that white text and the explainers stay crisp.
             theme.regions = new[]
             {
-                Look("MEET PIXEL", "#0E1118", "#0E1118", 0.010f),
-                Look("PIXELS", "#030407", "#030407", 0.018f),
-                Look("NEURON", "#140B04", "#1C1006", 0.020f),
-                Look("NEURAL NETWORK", "#061024", "#061024", 0.011f),
-                Look("LOSS", "#1C0407", "#2C060A", 0.014f),
-                Look("BACKPROPAGATION", "#16041C", "#22062C", 0.013f),
-                Look("GRADIENT DESCENT", "#3B1640", "#6B2D5E", 0.009f),
-                Look("TRAINING", "#140F04", "#1E1606", 0.011f),
+                Sky("MEET PIXEL", "#05081A", "#16224A", "#4A6FD0", 0.55f, "#4FB8FF", 0.35f, 1.0f, 0.010f),
+                Sky("PIXELS", "#02070E", "#072A3C", "#1497B8", 0.50f, "#2FE0FF", 0.40f, 0.6f, 0.016f),
+                Sky("NEURON", "#0B0603", "#2E1806", "#C2661A", 0.50f, "#FFB347", 0.30f, 0.5f, 0.018f),
+                Sky("NEURAL NETWORK", "#03051A", "#0D1C52", "#3D5FE0", 0.55f, "#4FC3FF", 0.30f, 1.2f, 0.010f),
+                Sky("LOSS", "#0C0205", "#33080E", "#C42532", 0.50f, "#FF4D5A", 0.30f, 0.4f, 0.013f),
+                Sky("BACKPROPAGATION", "#0B0316", "#2C0B40", "#9A2BC8", 0.55f, "#E04DFF", 0.30f, 0.8f, 0.012f),
+                Sky("GRADIENT DESCENT", "#1C0C36", "#7A3466", "#FF8A5C", 0.70f, "#000000", 0f, 0.4f, 0.008f),
+                Sky("TRAINING", "#0A0803", "#2E2408", "#C9922A", 0.55f, "#FFD166", 0.30f, 0.8f, 0.010f),
             };
+            theme.blackboardDim = 0.78f;
+            theme.floorDepth = 7f;
+            theme.floorSpacing = 3f;
 
             // The explainers' blackboard and palette (TASK_LEVEL1_V4_EXPLAINERS section 2).
             theme.blackboard = Look("", "#0B0E14", "#0B0E14", 0.002f);
@@ -122,6 +127,34 @@ namespace Convergence.EditorTools
             theme.explainGrey = Hex("#888888");
             EditorUtility.SetDirty(theme);
             return theme;
+        }
+
+        private static RideTheme.RegionLook Sky(string tag, string top, string horizon, string glow, float glowStrength, string floor, float floorStrength, float stars, float density)
+        {
+            Color h = Hex(horizon), g = Hex(glow), f = Hex(floor);
+            return new RideTheme.RegionLook
+            {
+                tag = tag, background = h, fog = h, fogDensity = density, skyTop = Hex(top), skyHorizon = h,
+                skyGlow = new Color(g.r, g.g, g.b, glowStrength), floor = new Color(f.r, f.g, f.b, floorStrength), stars = stars,
+            };
+        }
+
+        /// <summary>The ride's sky material (Convergence/RideSky; its colours are globals RegionAtmosphere sets).</summary>
+        private static Material SkyMaterial()
+        {
+            Shader shader = Shader.Find("Convergence/RideSky");
+            if (shader == null) throw new FileNotFoundException("Shader Convergence/RideSky is missing (Assets/Shaders/RideSky.shader).");
+            string path = MatDir + "/RideSky.mat";
+            var m = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (m == null)
+            {
+                m = new Material(shader);
+                AssetDatabase.CreateAsset(m, path);
+            }
+
+            m.shader = shader;
+            EditorUtility.SetDirty(m);
+            return m;
         }
 
         private static RideTheme.RegionLook Look(string tag, string background, string fog, float density)
@@ -458,7 +491,8 @@ namespace Convergence.EditorTools
             RenderSettings.fogMode = FogMode.Exponential;
             RenderSettings.fogDensity = dock.fogDensity;
             RenderSettings.fogColor = dock.fog;
-            RenderSettings.skybox = null;
+            RenderSettings.skybox = SkyMaterial();
+            RegionAtmosphere.ApplySky(dock, _theme); // so the Scene view and edit-mode captures show the dock's sky
             RenderSettings.ambientMode = AmbientMode.Flat;
             RenderSettings.ambientLight = _theme.voidNavy;
 
@@ -473,7 +507,7 @@ namespace Convergence.EditorTools
             rig.transform.localRotation = Quaternion.identity;
             Camera head = rig.GetComponentInChildren<Camera>();
             head.tag = "MainCamera";
-            head.clearFlags = CameraClearFlags.SolidColor;
+            head.clearFlags = CameraClearFlags.Skybox;
             head.backgroundColor = dock.background;
             head.nearClipPlane = 0.03f;
             head.farClipPlane = 160f;   // the Valley and the networks are big

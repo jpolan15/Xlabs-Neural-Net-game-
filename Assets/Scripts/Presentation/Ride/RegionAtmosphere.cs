@@ -5,12 +5,14 @@ using Convergence.Gameplay.Ride;
 namespace Convergence.Presentation.Ride
 {
     /// <summary>
-    /// Each region has its own sky and fog (RideTheme.regions): a dark warm room at the dock, a black void for the
-    /// pixels, navy for the network, red for the wrong guess, magenta for the rewind, a sunset for the Valley, gold at
-    /// the end. When the ride crosses into a region this blends the camera background, fog colour and fog density over
-    /// a few seconds, so a rider feels the border without a cut. While an explainer explains it holds the sky on the
-    /// blackboard (RideTheme.blackboard: near-black navy, no colour cast) and fades in the faint distant grid; when the
-    /// last holder lets go, the region's own sky comes back.
+    /// Each region has its own sky and fog (RideTheme.regions): since v7 a lit sky (Convergence/RideSky: a gradient,
+    /// a glow on the horizon, stars, a grid floor far below) in the region's colours: dawn blue at the dock, cyan for the
+    /// pixels, amber for the neuron, deep blue for the network, red for the wrong guess, violet for backpropagation, a
+    /// sunset for the Valley, gold at the end. When the ride crosses into a region this blends the sky, fog colour and
+    /// fog density over a few seconds, so a rider feels the border without a cut. While an explainer explains it holds
+    /// the "blackboard": the region's own sky dimmed (RideTheme.blackboardDim), its floor at half strength; when the last
+    /// holder lets go, the region's full sky comes back. The sky's floor replaced the old pod-relative blackboard grid,
+    /// which now stays off (two grids at one depth would shimmer against each other).
     /// </summary>
     public sealed class RegionAtmosphere : MonoBehaviour
     {
@@ -22,10 +24,34 @@ namespace Convergence.Presentation.Ride
         [Tooltip("The blackboard's faint distant grid (its material's _BaseColor alpha follows the blackboard).")]
         [SerializeField] private Renderer grid;
 
+        /// <summary>Everything that blends between looks.</summary>
+        private struct State
+        {
+            public Color Background, Fog, Top, Horizon, Glow, Floor;
+            public float Density, Stars;
+
+            public static State Lerp(State a, State b, float t) => new State
+            {
+                Background = Color.Lerp(a.Background, b.Background, t),
+                Fog = Color.Lerp(a.Fog, b.Fog, t),
+                Top = Color.Lerp(a.Top, b.Top, t),
+                Horizon = Color.Lerp(a.Horizon, b.Horizon, t),
+                Glow = Color.Lerp(a.Glow, b.Glow, t),
+                Floor = Color.Lerp(a.Floor, b.Floor, t),
+                Density = Mathf.Lerp(a.Density, b.Density, t),
+                Stars = Mathf.Lerp(a.Stars, b.Stars, t),
+            };
+        }
+
+        private static readonly int SkyTop = Shader.PropertyToID("_RideSkyTop");
+        private static readonly int SkyHorizon = Shader.PropertyToID("_RideSkyHorizon");
+        private static readonly int SkyGlow = Shader.PropertyToID("_RideSkyGlow");
+        private static readonly int SkyFloor = Shader.PropertyToID("_RideSkyFloor");
+        private static readonly int SkyParams = Shader.PropertyToID("_RideSkyParams");
+
         private readonly HashSet<object> _holders = new HashSet<object>();
         private Camera _camera;
-        private Color _fromBackground, _fromFog;
-        private float _fromDensity;
+        private State _from, _now;
         private int _region;
         private float _t = 1f;
         private float _seconds = 3f;
@@ -56,13 +82,13 @@ namespace Convergence.Presentation.Ride
         private void Start()
         {
             _region = director != null ? director.Region : 0;
-            RideTheme.RegionLook look = Target();
-            Apply(look.background, look.fog, look.fogDensity);
-            _gridAlpha = _gridTo = IsBlackboard ? 1f : 0f;
+            _now = Target();
+            Apply(_now);
+            _gridAlpha = _gridTo = 0f;
             ApplyGrid(_gridAlpha);
         }
 
-        /// <summary>An explainer starts explaining: the sky goes to the blackboard (at once at load).</summary>
+        /// <summary>An explainer starts explaining: the sky dims to the blackboard (at once at load).</summary>
         public void HoldBlackboard(object owner, bool instant = false)
         {
             if (!_holders.Add(owner) || _holders.Count > 1) return;
@@ -83,16 +109,45 @@ namespace Convergence.Presentation.Ride
             BlendTo(blendSeconds);
         }
 
-        private RideTheme.RegionLook Target() => IsBlackboard ? theme.blackboard : theme.Region(_region);
+        private State Target()
+        {
+            if (theme == null) return _now;
+            State s = From(theme.Region(_region));
+            if (!IsBlackboard) return s;
+
+            // The blackboard is the region's own sky, dimmed, with its floor at half strength.
+            float k = theme.blackboardDim;
+            s.Top = Scale(s.Top, k);
+            s.Horizon = Scale(s.Horizon, k);
+            s.Glow = Scale(s.Glow, k);
+            s.Floor.a *= 0.5f;
+            s.Stars *= 0.7f;
+            s.Fog = Scale(s.Fog, k);
+            s.Background = s.Horizon;
+            s.Density = theme.blackboard.fogDensity;
+            return s;
+        }
+
+        private static Color Scale(Color c, float k) => new Color(c.r * k, c.g * k, c.b * k, c.a);
+
+        private static State From(RideTheme.RegionLook look) => new State
+        {
+            Background = look.background,
+            Fog = look.fog,
+            Density = look.fogDensity,
+            Top = look.skyTop,
+            Horizon = look.skyHorizon,
+            Glow = look.skyGlow,
+            Floor = look.floor,
+            Stars = look.stars,
+        };
 
         private void BlendTo(float seconds)
         {
             if (theme == null) return;
-            _fromBackground = CurrentBackground();
-            _fromFog = RenderSettings.fogColor;
-            _fromDensity = RenderSettings.fogDensity;
+            _from = _now;
             _gridFrom = _gridAlpha;
-            _gridTo = IsBlackboard ? 1f : 0f;
+            _gridTo = 0f;
             _seconds = seconds;
             _t = 0f;
         }
@@ -100,8 +155,8 @@ namespace Convergence.Presentation.Ride
         private void Snap()
         {
             _t = 1f;
-            RideTheme.RegionLook look = Target();
-            Apply(look.background, look.fog, look.fogDensity);
+            _now = Target();
+            Apply(_now);
             _gridAlpha = _gridTo;
             ApplyGrid(_gridAlpha);
         }
@@ -111,24 +166,31 @@ namespace Convergence.Presentation.Ride
             if (_t >= 1f || theme == null) return;
             _t = Mathf.Min(1f, _t + Time.deltaTime / Mathf.Max(0.05f, _seconds));
             float e = Explainers.Rate.Smooth(_t);
-            RideTheme.RegionLook look = Target();
-            Apply(Color.Lerp(_fromBackground, look.background, e), Color.Lerp(_fromFog, look.fog, e), Mathf.Lerp(_fromDensity, look.fogDensity, e));
+            _now = State.Lerp(_from, Target(), e);
+            Apply(_now);
             _gridAlpha = Mathf.Lerp(_gridFrom, _gridTo, e);
             ApplyGrid(_gridAlpha);
         }
 
-        private Color CurrentBackground()
+        private void Apply(State s)
         {
             if (_camera == null) _camera = Camera.main;
-            return _camera != null ? _camera.backgroundColor : RenderSettings.fogColor;
+            if (_camera != null) _camera.backgroundColor = s.Background;
+            RenderSettings.fogColor = s.Fog;
+            RenderSettings.fogDensity = s.Density;
+            ApplySky(s.Top, s.Horizon, s.Glow, s.Floor, s.Stars, theme);
         }
 
-        private void Apply(Color background, Color fog, float density)
+        /// <summary>Sets the sky shader's globals for one region look (the capture tools use it to light a viewpoint).</summary>
+        public static void ApplySky(RideTheme.RegionLook look, RideTheme theme) => ApplySky(look.skyTop, look.skyHorizon, look.skyGlow, look.floor, look.stars, theme);
+
+        private static void ApplySky(Color top, Color horizon, Color glow, Color floor, float stars, RideTheme theme)
         {
-            if (_camera == null) _camera = Camera.main;
-            if (_camera != null) _camera.backgroundColor = background;
-            RenderSettings.fogColor = fog;
-            RenderSettings.fogDensity = density;
+            Shader.SetGlobalColor(SkyTop, top);
+            Shader.SetGlobalColor(SkyHorizon, horizon);
+            Shader.SetGlobalColor(SkyGlow, glow);
+            Shader.SetGlobalColor(SkyFloor, floor);
+            Shader.SetGlobalVector(SkyParams, new Vector4(stars, theme != null ? theme.floorDepth : 7f, theme != null ? theme.floorSpacing : 3f, 0f));
         }
 
         private void ApplyGrid(float alpha)

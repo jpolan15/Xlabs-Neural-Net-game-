@@ -36,7 +36,13 @@ shot, pop, win) had no clips, so they were silent.
    honest line: nobody told them what to look for; they are not neat strokes, but together they read handwriting.
 5. **Script fixes.** The loss line says "measure how far off" (true of cross-entropy and of the gap picture shown);
    the hidden layer "will learn to look for something different". New lines 174 to 177; temporary Kokoro voice.
-6. **Game sounds wired.** fire, pop, plugIn, win and winShimmer get Kenney clips leveled by measured LUFS; the blaster
+6. **A lit world at every stop** (owner: "the scenes shouldn't be all black"). The camera clears to one procedural
+   sky (`Assets/Shaders/RideSky.shader`: a zenith-to-horizon gradient, a glow band, static stars, an infinite grid
+   floor 7 m below the eye with per-eye depth), one draw. Each region has its own colours in `RideTheme`
+   (dawn blue, cyan, amber, deep blue, red, violet, sunset, gold); `RegionAtmosphere` blends them and sets the fog to
+   the horizon. While an explainer explains, the sky is the region's own, dimmed to 0.78, floor at half strength;
+   the near-black 3Blue1Brown blackboard and its pod-relative grid are retired.
+7. **Game sounds wired.** fire, pop, plugIn, win and winShimmer get Kenney clips leveled by measured LUFS; the blaster
    shot plays only while digits fly (a soft click elsewhere).
 
 ## Consequences
@@ -44,4 +50,5 @@ shot, pop, win) had no clips, so they were silent.
 - Travel legs are now a scored classification game; the score means something (3s blasted, mistakes).
 - The training game keeps v6's three buttons for the demo. A live step-size dial and a race to 85 % is the planned
   next step (the gradient picks the direction; the rider only the step size).
-- Not verified: headset feel (aiming at moving digits with the laser, the size of the 7×7 weights at 4 m).
+- Not verified: headset feel (aiming at moving digits with the laser, the size of the 7×7 weights at 4 m, and the
+  floor grid scrolling under the pod: comfort).

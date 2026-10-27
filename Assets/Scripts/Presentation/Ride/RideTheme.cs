@@ -18,6 +18,20 @@ namespace Convergence.Presentation.Ride
             public Color background;
             public Color fog;
             public float fogDensity;
+
+            [Tooltip("The sky (Convergence/RideSky, v7): zenith colour.")]
+            public Color skyTop;
+
+            [Tooltip("Horizon colour (the fog should match it).")]
+            public Color skyHorizon;
+
+            [Tooltip("Horizon glow colour; alpha is its strength.")]
+            public Color skyGlow;
+
+            [Tooltip("The grid floor below the eye; alpha is its strength (0: none).")]
+            public Color floor;
+
+            [Range(0f, 2f)] public float stars;
         }
 
         [Header("Shared")]
@@ -54,6 +68,12 @@ namespace Convergence.Presentation.Ride
 
         [Tooltip("Regions 0 (The Page) to 7 (Right).")]
         public RegionLook[] regions = new RegionLook[0];
+
+        [Header("Sky (v7)")]
+        [Tooltip("While an explainer explains, the region's own sky dimmed by this (the old near-black blackboard was a void).")]
+        [Range(0f, 1f)] public float blackboardDim = 0.78f;
+        public float floorDepth = 7f;
+        public float floorSpacing = 3f;
 
         [Header("Network")]
         [Range(0f, 1f)] public float networkDim = 0.3f;
