@@ -48,6 +48,8 @@ namespace Convergence.XR.Ride
             _tip = new GameObject("Fingertip").transform;
             _tip.SetParent(transform, false);
             _tip.localPosition = new Vector3(0f, 0f, tipForward);
+            // Ignore Raycast: the fingertip sits on the controller's forward axis, so any ray from the hand would stop on it.
+            _tip.gameObject.layer = 2;
 
             var sphere = _tip.gameObject.AddComponent<SphereCollider>();
             sphere.isTrigger = true;

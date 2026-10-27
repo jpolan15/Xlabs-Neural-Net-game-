@@ -350,26 +350,30 @@ MonoBehaviour:
     tag: GUIDE
     clip: {fileID: 8300000, guid: cff81aa453179fd408eb8f13a47ac876, type: 3}
     pauseAfter: 0.1
-    readSeconds: 10.179629
+    readSeconds: 12.181481
     segments:
-    - text: Your turn.
+    - text: 'Your turn:'
       weight: 0.79
       cues:
       - paint
-    - text: Paint the weights so this neuron fires for threes,
-      weight: 2.788
+    - text: build a three detector.
+      weight: 1.34
       cues: []
-    - text: and only threes.
-      weight: 1.14
+    - text: Right hand paints green,
+      weight: 1.38
       cues: []
-    - text: Right hand paints positive,
-      weight: 1.637
-      cues: []
-    - text: left hand negative.
-      weight: 1.263
+    - text: left hand red.
+      weight: 1.05
       cues: []
     - text: Hold the trigger and sweep.
-      weight: 1.31
+      weight: 1.46
+      cues: []
+    - text: Light up every three beside the grid,
+      weight: 1.95
+      cues:
+      - digits
+    - text: and keep the other digits dark.
+      weight: 1.55
       cues: []
   - line: 136
     speaker: 0
@@ -981,6 +985,120 @@ MonoBehaviour:
       cues: []
     - text: for nine hundred and seventy numbers.
       weight: 1.81
+      cues: []
+  - line: 178
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: 3ced51136a11c81409e6bdc7b687dd42, type: 3}
+    pauseAfter: 0.1
+    readSeconds: 1.5814815
+    segments:
+    - text: Quick recap.
+      weight: 0.92
+      cues:
+      - recap
+    - text: Five stops.
+      weight: 0.9
+      cues: []
+  - line: 179
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: db0396cc14db79d47b14d8e2d998d348, type: 3}
+    pauseAfter: 0.1
+    readSeconds: 2.7925925
+    segments:
+    - text: One,
+      weight: 0.56
+      cues:
+      - r1
+    - text: 'pixels:'
+      weight: 0.8
+      cues: []
+    - text: your three became forty-nine numbers.
+      weight: 1.93
+      cues: []
+  - line: 180
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: b1bd03643678aa046a8ff73111f7b346, type: 3}
+    pauseAfter: 0.1
+    readSeconds: 4.1037035
+    segments:
+    - text: Two,
+      weight: 0.58
+      cues:
+      - r2
+    - text: 'a neuron:'
+      weight: 0.81
+      cues: []
+    - text: weigh the pixels,
+      weight: 1.04
+      cues: []
+    - text: add them up,
+      weight: 0.8
+      cues: []
+    - text: squish.
+      weight: 0.58
+      cues: []
+  - line: 181
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: fdec1622dce5c474e8595ed92f307fdd, type: 3}
+    pauseAfter: 0.1
+    readSeconds: 3.6333332
+    segments:
+    - text: Three,
+      weight: 0.64
+      cues:
+      - r3
+    - text: 'the network:'
+      weight: 0.83
+      cues: []
+    - text: layers of neurons,
+      weight: 1.19
+      cues: []
+    - text: all wired together.
+      weight: 1.09
+      cues: []
+  - line: 182
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: 442fd371967c5b74783c2a22f2b183c7, type: 3}
+    pauseAfter: 0.1
+    readSeconds: 3.6333332
+    segments:
+    - text: Four,
+      weight: 0.63
+      cues:
+      - r4
+    - text: 'backpropagation:'
+      weight: 1.09
+      cues: []
+    - text: measure the loss,
+      weight: 1.01
+      cues: []
+    - text: send the blame backwards.
+      weight: 1.32
+      cues: []
+  - line: 183
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: ed6ae1c5cbcd34c4181de46cfa0e382f, type: 3}
+    pauseAfter: 0.3
+    readSeconds: 3.312963
+    segments:
+    - text: And five,
+      weight: 0.84
+      cues:
+      - r5
+    - text: 'training:'
+      weight: 0.71
+      cues: []
+    - text: step downhill,
+      weight: 0.98
+      cues: []
+    - text: again and again.
+      weight: 0.9
       cues: []
   - line: 170
     speaker: 0

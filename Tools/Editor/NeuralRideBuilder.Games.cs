@@ -163,7 +163,8 @@ namespace Convergence.EditorTools
             title.rectTransform.sizeDelta = new Vector2(0.46f, 0.045f);
             TextMeshPro score = Text("Score", table, new Vector3(0.175f, top - 0.088f, -0.006f), "SCORE 0", 0.042f, _theme.cyan, 0.3f, TextAlignmentOptions.Right, true);
             score.rectTransform.sizeDelta = new Vector2(0.3f, 0.048f);
-            TextMeshPro goal = Text("Goal", table, new Vector3(-0.06f, top - 0.124f, -0.006f), "", 0.026f, Color.white, 0.52f, TextAlignmentOptions.Left);
+            // In front of the weight grid's frame, which reaches up to this line.
+            TextMeshPro goal = Text("Goal", table, new Vector3(-0.06f, top - 0.124f, -0.014f), "", 0.026f, Color.white, 0.52f, TextAlignmentOptions.Left);
             goal.rectTransform.sizeDelta = new Vector2(0.52f, 0.036f);
             goal.enableAutoSizing = true;
             goal.fontSizeMin = 0.2f;
@@ -177,15 +178,75 @@ namespace Convergence.EditorTools
 
             Transform grid = BuildWeightGrid(table);
             grid.localPosition = BoardCentre + new Vector3(0, 0, -0.006f);
+            BuildPaintDigits(grid);
             BuildDrawBoard(table);
             BuildSendBoard(table);
             BuildTrainBoard(table);
+
+            BuildCoachArrow(table);
 
             var shoot = Make("HuntBoard", table, BoardCentre).transform;
             Text("Shoot", shoot, new Vector3(0, 0.03f, -0.006f), "DRAG HOT WIRES\nTO THE 3!", 0.05f, _theme.rewindMagenta, 0.6f, bold: true).rectTransform.sizeDelta = new Vector2(0.6f, 0.16f);
             Text("Up", shoot, new Vector3(0, -0.1f, -0.006f), "look up: grab a glowing wire end, drag it to the 3", 0.02f, Color.white, 0.6f);
             shoot.gameObject.SetActive(false);
             return table;
+        }
+
+        /// <summary>
+        /// The paint game's real test digits beside the weight grid (owner, 2026-10-27: "I don't get the point of the game"):
+        /// the ones the neuron should fire for on the left under GLOW, the rest on the right under DARK, so every
+        /// stroke shows its effect where the rider is looking. One tile mesh: per digit, in the puzzle's order, a ring (green
+        /// while the neuron is right about it, red while wrong) then its 7×7 pixels; WeightGridView colours them live (a digit
+        /// the neuron fires for glows gold with dark ink). Children of the grid, so they show and hide with it.
+        /// </summary>
+        private static void BuildPaintDigits(Transform grid)
+        {
+            Level1Digit[] digits = _data.File.puzzle.digits;
+            const float pitch = 0.0088f, ring = 0.08f, rowPitch = 0.085f, columnX = 0.284f, topRow = 0.09f;
+            const int perColumn = 4;
+            var tiles = new TileMesh();
+            int fire = 0, quiet = 0;
+            for (int d = 0; d < digits.Length; d++)
+            {
+                int row = digits[d].shouldFire ? fire++ : quiet++;
+                if (row >= perColumn) throw new System.InvalidOperationException("The paint puzzle has more than " + perColumn + " digits on one side; the table fits " + perColumn + " per column.");
+                Vector3 c = new Vector3(digits[d].shouldFire ? -columnX : columnX, topRow - row * rowPitch, -0.004f);
+                tiles.Face(c, ring, ring, new Color(0.2f, 0.25f, 0.3f, 1f));
+                for (int i = 0; i < 49; i++) tiles.Face(c + new Vector3((i % 7 - 3) * pitch, (3 - i / 7) * pitch, -0.002f), pitch * 0.92f, pitch * 0.92f, Color.white);
+            }
+
+            TileObject("Digits", grid, tiles, "Tiles");
+            // One short word each: the sightline check wants 1.5 degrees of text, and a column is only 11 cm wide.
+            foreach (var (name, word, x, color) in new[] { ("FireLabel", "GLOW", -columnX, _theme.gold), ("QuietLabel", "DARK", columnX, Color.white) })
+            {
+                TextMeshPro label = Text(name, grid, new Vector3(x, topRow + 0.066f, -0.006f), word, 0.04f, color, 0.16f, bold: true);
+                label.textWrappingMode = TextWrappingModes.NoWrap;
+            }
+        }
+
+        /// <summary>
+        /// The coach's arrow (GameCoachView moves it): a gold chevron pointing down with its tip at its origin, a wide dim one
+        /// behind a bright one for a glow, in one additive mesh (one draw call, no collider, so it never stops a laser).
+        /// </summary>
+        private static void BuildCoachArrow(Transform table)
+        {
+            var tiles = new TileMesh();
+            void Bar(Vector3 a, Vector3 b, float width, Color color)
+            {
+                Vector3 side = Vector3.Cross(b - a, Vector3.forward).normalized * (width * 0.5f);
+                tiles.Quad(a - side, b - side, b + side, a + side, Vector3.back, color);
+            }
+
+            Color glow = new Color(_theme.gold.r, _theme.gold.g, _theme.gold.b, 0.35f), core = new Color(1f, 0.92f, 0.55f, 1f);
+            foreach (var (width, color, z) in new[] { (0.026f, glow, 0.001f), (0.011f, core, 0f) })
+            {
+                Bar(new Vector3(-0.034f, 0.034f, z), new Vector3(0f, 0f, z), width, color);
+                Bar(new Vector3(0.034f, 0.034f, z), new Vector3(0f, 0f, z), width, color);
+                Bar(new Vector3(0f, 0.075f, z), new Vector3(0f, 0.006f, z), width, color);
+            }
+
+            GameObject arrow = TileObject("CoachArrow", table, tiles, "Laser");
+            arrow.SetActive(false);
         }
 
         /// <summary>A line renderer in a board's own frame (the boards move with the table).</summary>
@@ -300,8 +361,13 @@ namespace Convergence.EditorTools
             for (int k = 0; k < 10; k++) FaceGlyph(tiles, k, new Vector3(ReadoutX + (k - 4.5f) * barPitch, barBottom - 0.016f, -0.006f), 0.005f, Color.white);
             TileObject("Tiles", board, tiles, "Laser");
 
-            // "Count" is the hint in the empty canvas (DrawBoardView hides it once there is ink).
-            TextMeshPro hint = Text("Count", board, CanvasCentre + new Vector3(0f, 0f, -0.003f), "HOLD TRIGGER\nAND DRAW", 0.032f, new Color(0.55f, 0.95f, 1f, 0.8f), 0.26f, bold: true);
+            // A faint 3 to trace, behind the ink (owner, 2026-10-27: "make the games intuitive"); DrawBoardView shows it in
+            // "draw your 3" until there is enough ink.
+            TextMeshPro ghost = Text("Ghost", board, CanvasCentre + new Vector3(0f, 0.045f, -0.0025f), "3", 0.17f, new Color(0.55f, 0.95f, 1f, 0.24f), 0.26f, bold: true);
+            ghost.rectTransform.sizeDelta = new Vector2(0.26f, 0.24f);
+            ghost.gameObject.SetActive(false);
+            // "Count" is the hint in the empty canvas, under the 3 to trace (DrawBoardView hides it once there is ink).
+            TextMeshPro hint = Text("Count", board, CanvasCentre + new Vector3(0f, -0.07f, -0.003f), "HOLD TRIGGER\nAND DRAW", 0.032f, new Color(0.55f, 0.95f, 1f, 0.9f), 0.26f, bold: true);
             hint.rectTransform.sizeDelta = new Vector2(0.26f, 0.09f);
             TextMeshPro prompt = Text("Prompt", board, new Vector3(ReadoutX, 0.128f, -0.006f), "PIXEL SEES", 0.026f, _theme.gold, 0.2f, bold: true);
             prompt.rectTransform.sizeDelta = new Vector2(0.2f, 0.034f);
@@ -422,7 +488,7 @@ namespace Convergence.EditorTools
             pr.shadowCastingMode = ShadowCastingMode.Off;
             pr.receiveShadows = false;
 
-            TextMeshPro popup = Text("Popup", pod, new Vector3(0, 1.2f, 0.7f), "+10", 0.035f, _theme.gold, 0.3f, bold: true);
+            TextMeshPro popup = Text("Popup", pod, new Vector3(0, 1.2f, 0.7f), "+10", 0.035f, _theme.gold, 0.5f, bold: true);
             popup.gameObject.AddComponent<FaceCamera>();
             popup.gameObject.SetActive(false);
             stamp.SetActive(false);
@@ -624,6 +690,29 @@ namespace Convergence.EditorTools
                 Int(step, "button", b);
             }
 
+            // The coach: a gold arrow at the next thing to aim at, in every game on the table (owner, 2026-10-27).
+            var coach = pod.AddComponent<GameCoachView>();
+            Ref(coach, "director", rd);
+            Ref(coach, "table", table);
+            Ref(coach, "arrow", table.Find("CoachArrow"));
+            Ref(coach, "draw", m.Draw);
+            Ref(coach, "stump", m.Stump);
+            Ref(coach, "paint", m.Paint);
+            Ref(coach, "send", m.Forward);
+            Ref(coach, "train", m.Train);
+            Ref(coach, "blame", m.Blame);
+            Ref(coach, "canvas", draw.Find("Canvas"));
+            Ref(coach, "done", draw.Find("Done"));
+            Ref(coach, "grid", table.Find("WeightGrid"));
+            var cellTargets = new List<Object>();
+            for (int c = 0; c < 49; c++) cellTargets.Add(table.Find("WeightGrid/Taps/Cell" + c));
+            Refs(coach, "cells", cellTargets);
+            Ref(coach, "card", send.Find("Card"));
+            Ref(coach, "steps", train.Find("StepButton1"));
+            Ref(drawView, "ghost", draw.Find("Ghost").GetComponent<TextMeshPro>());
+            // The first hint cell shows almost at once, so the arrow has somewhere to point from the start.
+            Float(m.Paint, "hintAfterIdle", 2.5f);
+
             // The hunt's card on the table while the wires are live.
             var hunt = table.Find("HuntBoard").gameObject;
             var huntShow = pod.AddComponent<CueShowView>();
@@ -709,7 +798,7 @@ namespace Convergence.EditorTools
             }
 
             Game(m.Draw, "DRAW YOUR 3", "Hold the trigger and draw a 3", RideLine.DrawDone, 90f);
-            Game(m.Paint, "TEACH ONE NEURON", "Fire for 3s only. Right hand +, left hand -", RideLine.NeuronSolved, 120f);
+            Game(m.Paint, "3 DETECTOR", "Make the 3s glow, keep the rest dark", RideLine.NeuronSolved, 120f);
             Game(m.Blame, "HOT-WIRE HUNT", "Drag each hot wire to the 3 before it cools", RideLine.BackDone, 60f);
             Game(m.Train, "TRAIN PIXEL", "Hold a step size to train", RideLine.TrainDone, 90f);
             Game(m.Stump, "STUMP PIXEL", "Draw the digit Pixel asks for", RideLine.StumpDone, 75f);

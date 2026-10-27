@@ -30,8 +30,14 @@ namespace Convergence.Presentation.Ride
         [SerializeField] private Transform popupAnchor;
         [SerializeField] private ZapGame zap;
         [SerializeField] private float stampSeconds = 4.5f;
+        [Tooltip("How long \"BLAST THE 3s!\" stays up when digits start flying.")]
+        [SerializeField] private float blastSeconds = 2.4f;
 
+        private const float PopupSeconds = 0.9f;
         private RideGame _game;
+        private float _popupLife = PopupSeconds;
+        private int _blastSaidAt = int.MinValue;
+        private bool _popupInPod;
         private float _shownFill;
         private float _stampAt = -100f;
         private int _starsShown;
@@ -56,13 +62,40 @@ namespace Convergence.Presentation.Ride
 
         private void OnEnable()
         {
-            if (zap != null) zap.Shot += OnShot;
+            if (zap != null)
+            {
+                zap.Shot += OnShot;
+                zap.SpeckSpawned += OnSpeckSpawned;
+            }
         }
 
         private void OnDisable()
         {
             Watch(null);
-            if (zap != null) zap.Shot -= OnShot;
+            if (zap != null)
+            {
+                zap.Shot -= OnShot;
+                zap.SpeckSpawned -= OnSpeckSpawned;
+            }
+        }
+
+        // The first digit of every travel leg: "BLAST THE 3s!" straight ahead, so the game between stops says what it is.
+        private void OnSpeckSpawned(Vector3 where)
+        {
+            if (popup == null || director == null || director.SegmentIndex == _blastSaidAt) return;
+            _blastSaidAt = director.SegmentIndex;
+            Camera eye = Camera.main;
+            if (eye == null) return;
+            Vector3 ahead = Vector3.ProjectOnPlane(eye.transform.forward, Vector3.up).normalized;
+            if (ahead.sqrMagnitude < 0.01f) ahead = director.Pod.forward;
+            popup.text = "BLAST THE " + zap.TargetLabel + "s!";
+            popup.color = _popupColor;
+            _popupAt = Time.time;
+            _popupLife = blastSeconds;
+            // Held in the pod's frame: the pod travels at several metres a second and would fly through a world-space sign.
+            _popupFrom = director.Pod.InverseTransformPoint(eye.transform.position + ahead * 3f + Vector3.up * 0.15f);
+            _popupInPod = true;
+            popup.gameObject.SetActive(true);
         }
 
         // Blast the 3s: "+10", "+20 x2" on a streak, "NOT A 3  -10" in red for a mistake.
@@ -73,6 +106,8 @@ namespace Convergence.Presentation.Ride
             popup.text = right ? (multiplier > 1 ? "+" + points + "  x" + multiplier : "+" + points) : "NOT A " + zap.TargetLabel + (points < 0 ? "  " + points : "");
             popup.color = right ? _popupColor : WrongColor;
             _popupAt = Time.time;
+            _popupLife = PopupSeconds;
+            _popupInPod = false;
             _popupFrom = where;
             popup.gameObject.SetActive(true);
         }
@@ -153,6 +188,8 @@ namespace Convergence.Presentation.Ride
             popup.text = "+" + points;
             popup.color = _popupColor;
             _popupAt = Time.time;
+            _popupLife = PopupSeconds;
+            _popupInPod = false;
             _popupFrom = where == Vector3.zero && popupAnchor != null ? popupAnchor.position : where;
             popup.gameObject.SetActive(true);
         }
@@ -183,20 +220,21 @@ namespace Convergence.Presentation.Ride
         {
             if (popup == null || !popup.gameObject.activeSelf) return;
             float t = Time.time - _popupAt;
-            if (t > 0.9f)
+            if (t > _popupLife)
             {
                 popup.gameObject.SetActive(false);
                 return;
             }
 
-            popup.transform.position = _popupFrom + Vector3.up * (0.05f + t * 0.25f);
+            Vector3 from = _popupInPod && director != null ? director.Pod.TransformPoint(_popupFrom) : _popupFrom;
+            popup.transform.position = from + Vector3.up * (0.05f + t * 0.25f * PopupSeconds / _popupLife);
 
             // Same angular size wherever it pops: a blasted digit 6 m out gets text as readable as one on the table.
             Camera eye = Camera.main;
             float distance = eye != null ? Vector3.Distance(eye.transform.position, popup.transform.position) : 0.7f;
             popup.transform.localScale = Vector3.one * Mathf.Max(1f, distance / 0.7f);
             Color c = popup.color;
-            c.a = 1f - t / 0.9f;
+            c.a = Mathf.Clamp01((_popupLife - t) / 0.9f);
             popup.color = c;
         }
     }

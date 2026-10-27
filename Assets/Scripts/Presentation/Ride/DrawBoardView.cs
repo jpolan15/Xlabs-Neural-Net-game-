@@ -35,6 +35,8 @@ namespace Convergence.Presentation.Ride
         [SerializeField] private TextMeshPro answer;
         [Tooltip("The hint in the empty canvas (\"hold trigger and draw\"), shown while a game is live and the canvas has no ink.")]
         [SerializeField] private TextMeshPro count;
+        [Tooltip("A faint 3 to trace, shown in \"draw your 3\" until there is enough ink.")]
+        [SerializeField] private TextMeshPro ghost;
         [SerializeField] private float barHeight = 0.12f;
         [SerializeField] private Color inkColor = new Color(0.85f, 0.98f, 1f, 1f);
         [SerializeField] private Color cellDark = new Color(0.04f, 0.06f, 0.12f, 0.9f);
@@ -170,6 +172,8 @@ namespace Convergence.Presentation.Ride
             bool playing = bonus ? stump != null && stump.IsLive : draw != null && draw.IsLive;
             bool hint = playing && live != null && live.StrokeCount == 0;
             if (count != null && count.gameObject.activeSelf != hint) count.gameObject.SetActive(hint);
+            bool trace = playing && !bonus && live != null && !live.HasEnoughInk;
+            if (ghost != null && ghost.gameObject.activeSelf != trace) ghost.gameObject.SetActive(trace);
             if (_tiles == null) return;
 
             for (int i = 0; i < CellFaces; i++) Face(i, bonus ? Color.clear : Color.Lerp(cellDark, cellInk, Mathf.Clamp01((float)_pixels[i])));

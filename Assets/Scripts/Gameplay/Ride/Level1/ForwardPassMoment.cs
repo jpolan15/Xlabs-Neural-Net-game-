@@ -19,6 +19,8 @@ namespace Convergence.Gameplay.Ride.Level1
         [SerializeField] private bool trained;
         [SerializeField] private float raceSeconds = 3.5f;
         [SerializeField] private float holdAfter = 0.6f;
+        [Tooltip("Region 7: seconds the trained neurons stay on show after the lines about them, before the real test.")]
+        [SerializeField] private float learnedDwell = 6f;
         [Tooltip("Region 3: seconds to wait for the rider to shoot their digit before it goes in by itself.")]
         [SerializeField] private float throwWait = 9f;
         [Tooltip("Region 7: studying the rider's 3 stops after this many steps (it reads it long before).")]
@@ -95,6 +97,8 @@ namespace Convergence.Gameplay.Ride.Level1
                 // First, what training learned (v7): the hidden neurons' real weights beside the one the rider painted.
                 yield return Say(RideLine.LearnedPainted);
                 yield return Say(RideLine.LearnedHonest);
+                // The sixteen stay up a while in silence: they cleared as the line ended and nobody could take them in.
+                yield return Hold(learnedDwell);
                 yield return Say(RideLine.RightYours);
                 yield return Race();
                 yield return Hold(holdAfter);

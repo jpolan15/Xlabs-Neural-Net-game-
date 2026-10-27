@@ -112,6 +112,32 @@ Look (every stop its own lit world, not a black void; diagrams stay readable; Qu
       30/30. Not judged: how the moving floor grid feels in a headset (comfort; lower `floor` alpha in
       `NeuralRideBuilder.cs` if it is too strong).
 
+### 3c. First Quest ride of v7 (owner, 2026-10-27, over Quest Link: "the games literally do not work")
+
+Found live in the owner's Link session (UnityMCP reads the running headset game):
+- [x] Every laser stopped 7.8 cm out on its own controller's fingertip trigger (HandPolarityController), so nothing
+      could be drawn, shot, grabbed or pressed; shots landed only when the hand moved (the trigger's physics pose lags).
+      `RideHandLasers` now skips both hands' colliders; fingertip on Ignore Raycast. PlayMode `RideHandLasersTests`.
+- [x] Eye 2.59 m above the pod floor (target 1.30): PodSeat only normalised while `userPresence` read true, and Link
+      reports false while worn, so every board sat 78 degrees down. Presence no longer gates; a far-off eye (> 0.6 m)
+      re-seats within 0.75 s even mid-game; normalising also centres x/z on the seat (the owner sat 33 cm forward).
+- [x] Aim help: a press that just misses fires the nearest flying digit, button or hot wire within 5 degrees.
+- [x] "Blast every three" was cut off by the pixels stop: the director now waits for said lines before arrival lines.
+      A stray press during the intro no longer latches GO (which skipped the intro after 2 s).
+- [x] "What it learned" vanished after ~10 s (the {right} cue; not the joystick: locomotion is off): 6 s dwell added.
+- [x] 3 detector legible: the eight test digits beside the grid (3s under GLOW, others under DARK), gold when the
+      neuron fires, ringed green/red; title "3 DETECTOR"; line 135 rewritten.
+- [x] Hints in every game (`GameCoachView`): a bouncing gold arrow on the next thing to aim at (draw box, then DONE;
+      Core's hint cell, lit after 2.5 s; the card; the step buttons; up at the wires), hidden while a trigger is held;
+      a faint 3 to trace; "BLAST THE 3s!" at the first digit of each leg.
+- [x] Recap before the tokens teaser: "Quick recap. Five stops." then one numbered line per stop (178-183) with rows
+      lighting on the E8 card; the end card lists 1-5. Voice: Kokoro af_heart 1.1 (temp), Whisper 0 % on all 7.
+      Narration cap raised 270 -> 300 s for it (now 284 s).
+- [x] Build (sightlines, text >= 1.5 degrees, draw calls) passes; EditMode 148/148, PlayMode 31/31 on the final build.
+      Play Mode shots of the draw and 3-detector boards checked (arrow, trace 3, GLOW/DARK columns).
+- [ ] Owner: ride it again on the Quest (Link or APK). Not verifiable on desktop: aim help feel, the re-seat on Link,
+      the arrow's size in the headset.
+
 ## 4. Progress log
 
 ### 2026-10-27 — review, grill, plan (Claude)

@@ -429,8 +429,10 @@ namespace Convergence.Gameplay.Ride
                 yield return Travel(s.to, duration, plain);
             }
 
-            // The lesson of the way is never cut off by what happens at the stop.
+            // The lesson of the way is never cut off by what happens at the stop, nor is a line said on the way (the
+            // first "blast every three" was cut off by the pixels stop, 2026-10-27).
             while (_narrating) yield return null;
+            yield return WaitForSpeech();
             _segmentFraction = 1f;
             SetState(RideState.AtStop);
             SegmentArrived?.Invoke(index);

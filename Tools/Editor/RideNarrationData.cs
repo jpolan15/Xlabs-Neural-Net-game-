@@ -67,7 +67,7 @@ namespace Convergence.EditorTools
             new Line(RideLine.NeuronWires, "{wires}It's connected to all forty-nine pixels, [p0.1] and every connection has a weight.", 0.2f),
             new Line(RideLine.NeuronGreenRed, "{green}A positive weight says: [p0.1] ink in this spot means three. [p0.15] {red}A negative weight says: [p0.1] ink in this spot means not a three.", 0.2f),
             new Line(RideLine.NeuronAdds, "{add}Multiply each pixel by its weight, [p0.1] add them up, [p0.1] and add a bias. [p0.15] {line}A sigmoid squishes the total between zero and one. [p0.1] High means the neuron fires.", 0.2f),
-            new Line(RideLine.NeuronYourTurn, "{paint}Your turn. [p0.1] Paint the weights so this neuron fires for threes, [p0.1] and only threes. [p0.15] Right hand paints positive, [p0.1] left hand negative. [p0.1] Hold the trigger and sweep.", 0.1f),
+            new Line(RideLine.NeuronYourTurn, "{paint}Your turn: [p0.1] build a three detector. [p0.15] Right hand paints green, [p0.1] left hand red. [p0.1] Hold the trigger and sweep. [p0.15] {digits}Light up every three beside the grid, [p0.1] and keep the other digits dark.", 0.1f),
             new Line(RideLine.NeuronLitForOther, "It fired for the wrong digit. [p0.1] Paint negative where that one has ink."),
             new Line(RideLine.NeuronMissedThree, "A three slipped past. [p0.1] Paint positive where the threes have ink."),
             new Line(RideLine.NeuronSolved, "You just built a three detector, [p0.1] by hand.", 0.1f),
@@ -117,6 +117,14 @@ namespace Convergence.EditorTools
             new Line(RideLine.StumpWrong, "Fooled it! [p0.1] Even trained networks make mistakes.", 0.1f),
             new Line(RideLine.StumpDone, "Not bad, [p0.1] for nine hundred and seventy numbers.", 0.1f),
 
+            // The recap (owner, 2026-10-27): the five stops again, numbered, the way the intro promised them, before the teaser.
+            new Line(RideLine.RecapIntro, "{recap}Quick recap. [p0.1] Five stops.", 0.1f),
+            new Line(RideLine.RecapPixels, "{r1}One, [p0.1] pixels: [p0.1] your three became forty-nine numbers.", 0.1f),
+            new Line(RideLine.RecapNeuron, "{r2}Two, [p0.1] a neuron: [p0.1] weigh the pixels, [p0.1] add them up, [p0.1] squish.", 0.1f),
+            new Line(RideLine.RecapNetwork, "{r3}Three, [p0.1] the network: [p0.1] layers of neurons, [p0.1] all wired together.", 0.1f),
+            new Line(RideLine.RecapBackprop, "{r4}Four, [p0.1] backpropagation: [p0.1] measure the loss, [p0.1] send the blame backwards.", 0.1f),
+            new Line(RideLine.RecapTraining, "{r5}And five, [p0.15] training: [p0.1] step downhill, [p0.1] again and again.", 0.3f),
+
             // E8, tokens: the same idea, for words.
             new Line(RideLine.TokensWords, "{sentence}Language works the same way. [p0.15] {tokens}Text gets chopped into pieces called tokens.", 0.2f),
             new Line(RideLine.TokensNumbers, "{vectors}Each token becomes a list of numbers, [p0.1] just like your pixels.", 0.2f),
@@ -144,7 +152,7 @@ namespace Convergence.EditorTools
             ("E5 backprop: explain", new[] { RideLine.BackWish, RideLine.BackFlows }),                                                                      // 6
             ("E5 backprop: grab", new[] { RideLine.BackGrab }),                                                                                              // 7
             ("E6 descent: explain, then train", new[] { RideLine.DescentHill, RideLine.DescentStep, RideLine.DescentTooBig, RideLine.TrainYourTurn }),     // 8
-            ("E8 tokens: explain", new[] { RideLine.TokensWords, RideLine.TokensNumbers, RideLine.TokensPredict, RideLine.TokensNext }),                     // 9
+            ("E8 recap, then tokens", new[] { RideLine.RecapIntro, RideLine.RecapPixels, RideLine.RecapNeuron, RideLine.RecapNetwork, RideLine.RecapBackprop, RideLine.RecapTraining, RideLine.TokensWords, RideLine.TokensNumbers, RideLine.TokensPredict, RideLine.TokensNext }),                     // 9
         };
 
         /// <summary>Lines the moments say (not in a sequence): reactions, win lines, the training game's calls, the reading of the rider's 3.</summary>

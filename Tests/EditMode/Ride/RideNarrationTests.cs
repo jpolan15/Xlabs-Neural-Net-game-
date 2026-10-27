@@ -163,6 +163,10 @@ namespace Convergence.Tests.EditMode.Ride
             // v7, appended from 174.
             Assert.AreEqual(174, (int)RideLine.IntroStops);
             Assert.AreEqual(177, (int)RideLine.LearnedHonest);
+
+            // The end recap, appended from 178.
+            Assert.AreEqual(178, (int)RideLine.RecapIntro);
+            Assert.AreEqual(183, (int)RideLine.RecapTraining);
         }
 
         [Test]
@@ -192,12 +196,13 @@ namespace Convergence.Tests.EditMode.Ride
         [Test]
         public void Narration_FitsTheRide()
         {
-            // Level 1 is about five to six minutes; the talk is most of it, broken up by the puzzle, the race, the blame and the drop.
+            // Level 1 is about six minutes; the talk is most of it, broken up by the puzzle, the race, the blame and the drop.
+            // The owner asked for the numbered recap at the end (2026-10-27): about 20 s more, so the cap went from 270 to 300.
             NarrationLibrary library = Library();
             RideScript script = Script();
             float all = 0f;
             foreach (NarrationLibrary.Entry e in library.entries) all += e.TotalSeconds;
-            Assert.LessOrEqual(all, 270f, "All the narration together should stay under four and a half minutes");
+            Assert.LessOrEqual(all, 300f, "All the narration together should stay under five minutes");
             foreach (RideScript.Sequence s in script.sequences) Assert.LessOrEqual(s.TotalSeconds, 40f, s.name + " runs over 40 s; a first-time rider drifts");
         }
 

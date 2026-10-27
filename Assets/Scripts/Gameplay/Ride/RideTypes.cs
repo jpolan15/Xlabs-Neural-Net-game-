@@ -243,7 +243,15 @@ namespace Convergence.Gameplay.Ride
         IntroStops = 174,
         ZapWrong = 175,
         LearnedPainted = 176,
-        LearnedHonest = 177
+        LearnedHonest = 177,
+
+        // The end recap (owner, 2026-10-27): the five stops again, numbered, before the tokens teaser.
+        RecapIntro = 178,
+        RecapPixels = 179,
+        RecapNeuron = 180,
+        RecapNetwork = 181,
+        RecapBackprop = 182,
+        RecapTraining = 183
     }
 
     /// <summary>Stable ids for the pod's control channels. Level 1 has one: GO.</summary>

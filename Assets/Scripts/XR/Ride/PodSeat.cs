@@ -10,10 +10,11 @@ namespace Convergence.XR.Ride
     /// Seats the XRI Starter Assets rig in the pod: parents it to the seat anchor and turns off every locomotion
     /// provider, so the player cannot teleport or turn out of the seat while the pod moves. The rig and its
     /// interactors are otherwise untouched (ADR-007).
-    /// Normalizes eye height so the eye sits at targetEyeHeight above the pod floor and the dash is always the same
-    /// size and place in view. It re-applies whenever the headset goes back on the head (user presence), on every
-    /// tracking origin update (recenter), and when the eye has stayed far from the target for a while with the head
-    /// still and no game running (never mid-lean or mid-game), so a height measured while the headset was still in a
+    /// Normalizes the eye so it sits targetEyeHeight right above the seat (height and x/z) and the dash and the game
+    /// table are always the same size and place in view. It re-applies whenever the headset goes back on the head (user
+    /// presence; never required, Link reports it wrong), on every tracking origin update (recenter), when the eye has
+    /// stayed somewhat off for a while with the head still and no game running (never mid-lean or mid-game), and soon
+    /// after the eye is far off (over 0.6 m, game or not), so a height measured while the headset was still in a
     /// hand or on a table never sticks. The XR input subsystem is found
     /// lazily, because OpenXR can start it after this component is enabled. The tracking origin mode is never changed.
     /// </summary>
@@ -27,6 +28,10 @@ namespace Convergence.XR.Ride
         [SerializeField] private float driftTolerance = 0.35f;
         [Tooltip("...for this many seconds in a row.")]
         [SerializeField] private float driftSeconds = 3f;
+        [Tooltip("Re-seat, even mid-game, when the eye has been this far from the seat (up/down or sideways)...")]
+        [SerializeField] private float resetTolerance = 0.6f;
+        [Tooltip("...for this many seconds in a row.")]
+        [SerializeField] private float resetSeconds = 0.75f;
 
         private readonly List<XRInputSubsystem> inputSubsystems = new List<XRInputSubsystem>(1);
         private XRInputSubsystem inputSubsystem;
@@ -34,6 +39,7 @@ namespace Convergence.XR.Ride
         private bool eyeHeightPending = true;
         private bool wasPresent;
         private float driftSince = -1f;
+        private float farSince = -1f;
         private Vector3 lastHead;
         private RideDirector director;
 
@@ -82,13 +88,25 @@ namespace Convergence.XR.Ride
             if (inputSubsystem == null && !FindSubsystem()) return;
             if (!IsTracking()) return;
 
-            // Headset put back on: measure again, the old height was taken without a head in it.
+            // Headset put back on: measure again, the old height was taken without a head in it. Presence only triggers a
+            // new measure and never blocks one: over Quest Link it reads "not present" while worn (2026-10-27), and the
+            // seat never corrected, so the rider sat 1.3 m too high with every board 78 degrees down.
             bool present = UserPresent();
             if (present && !wasPresent) eyeHeightPending = true;
             wasPresent = present;
-            if (!present) return;
 
             if (eyeHeightPending)
+            {
+                NormalizeEyeHeight();
+                return;
+            }
+
+            // Far off (a height taken before the head pose settled, a rider who stood up): re-seat soon, game or not.
+            Vector3 eye = seatAnchor.InverseTransformPoint(headCamera.position);
+            float off = Mathf.Max(Mathf.Abs(eye.y - targetEyeHeight), new Vector2(eye.x, eye.z).magnitude);
+            if (off < resetTolerance) farSince = -1f;
+            else if (farSince < 0f) farSince = Time.unscaledTime;
+            else if (Time.unscaledTime - farSince > resetSeconds)
             {
                 NormalizeEyeHeight();
                 return;
@@ -145,14 +163,15 @@ namespace Convergence.XR.Ride
         {
             if (headCamera == null || cameraFloorOffset == null || seatAnchor == null) return;
 
-            float worldLift = targetEyeHeight - EyeAboveFloor();
-
-            // Vertical only, converted into the offset's parent space, so the seated x/z position is never shifted.
+            // The eye goes to targetEyeHeight right above the seat: the height, and the x/z too (a rider sitting 33 cm ahead
+            // of the play area's centre had the table at half its distance). Converted into the offset's parent space.
+            Vector3 eye = seatAnchor.InverseTransformPoint(headCamera.position);
+            Vector3 worldShift = seatAnchor.TransformVector(new Vector3(-eye.x, targetEyeHeight - eye.y, -eye.z));
             Transform parent = cameraFloorOffset.parent;
-            float localLift = parent != null ? parent.InverseTransformVector(Vector3.up * worldLift).y : worldLift;
-            cameraFloorOffset.localPosition += new Vector3(0f, localLift, 0f);
+            cameraFloorOffset.localPosition += parent != null ? parent.InverseTransformVector(worldShift) : worldShift;
             eyeHeightPending = false;
             driftSince = -1f;
+            farSince = -1f;
         }
     }
 }

@@ -7,8 +7,10 @@ namespace Convergence.Presentation.Ride
     /// <summary>
     /// The rider's 7×7 weight grid on the game table (Region 2, paint the weights; v6 draws the 3 on its own canvas):
     /// each cell is a tile plus two bars that draw "+" or "−" on it: green for +, red for −, dark for 0. The orange
-    /// frame says "press this" while a game is live, and an orange ring pulses on the cell Core's hint points at.
-    /// Display only: presses go through the XR cells to the live game, and Core decides everything.
+    /// frame says "press this" while a game is live, and an orange ring pulses on the cell Core's hint points at. Beside
+    /// it, the puzzle's real test digits (the 3s under GLOW, the rest under DARK) glow gold when the neuron
+    /// fires for them, ringed green when it is right. Display only: presses go through the XR cells to the live game,
+    /// and Core decides everything.
     /// </summary>
     public sealed class WeightGridView : MonoBehaviour
     {
@@ -31,6 +33,17 @@ namespace Convergence.Presentation.Ride
         [SerializeField] private Color flashPositive = new Color(0.180f, 0.800f, 0.443f, 1f);
         [SerializeField] private Color flashNegative = new Color(0.906f, 0.298f, 0.235f, 1f);
 
+        [Header("Test digits beside the grid")]
+        [Tooltip("Per digit, in the puzzle's order: a ring (green while the neuron is right about it, red while wrong), then its 49 pixels.")]
+        [SerializeField] private MeshFilter digits;
+        [SerializeField] private Color digitLit = new Color(1f, 0.78f, 0.25f, 1f);
+        [SerializeField] private Color digitLitInk = new Color(0.12f, 0.06f, 0.02f, 1f);
+        [SerializeField] private Color digitDark = new Color(0.07f, 0.09f, 0.14f, 1f);
+
+        private const int DigitFaces = 50;
+        private Mesh _digitMesh;
+        private Color32[] _digitColors;
+
         private readonly float[] _flash = new float[49];
         private readonly bool[] _flashPositive = new bool[49];
         private bool _flashing;
@@ -48,6 +61,12 @@ namespace Convergence.Presentation.Ride
             _zero = new Color(0.10f, 0.13f, 0.20f, 0f);
             _mark = new Color(0.02f, 0.03f, 0.06f, 0f);
             if (hintRing != null) hintRing.gameObject.SetActive(false);
+            if (digits != null && digits.sharedMesh != null)
+            {
+                _digitMesh = Instantiate(digits.sharedMesh);
+                digits.sharedMesh = _digitMesh;
+                _digitColors = _digitMesh.colors32;
+            }
         }
 
         private void OnEnable()
@@ -92,6 +111,7 @@ namespace Convergence.Presentation.Ride
         {
             grid.SetActive(false);
             Paint();
+            PaintDigits();
             OnLive(false);
         }
 
@@ -103,6 +123,7 @@ namespace Convergence.Presentation.Ride
             if (!show) return;
             moment.Prepare();
             Paint();
+            PaintDigits();
         }
 
         private void OnSegmentEnded(int index)
@@ -110,7 +131,37 @@ namespace Convergence.Presentation.Ride
             if (index == showFromSegment) grid.SetActive(false);
         }
 
-        private void OnChanged(Convergence.Core.Puzzles.WeightPaintResult result) => Paint();
+        private void OnChanged(Convergence.Core.Puzzles.WeightPaintResult result)
+        {
+            Paint();
+            PaintDigits();
+        }
+
+        /// <summary>The test digits: gold with dark ink when the neuron fires for one, dark with white ink when not; the ring says right or wrong.</summary>
+        private void PaintDigits()
+        {
+            if (_digitColors == null || moment == null || moment.Puzzle == null || moment.Result == null) return;
+            Convergence.Core.Puzzles.WeightPaintPuzzle puzzle = moment.Puzzle;
+            Convergence.Core.Puzzles.WeightPaintResult result = moment.Result;
+            for (int d = 0; d < puzzle.DigitCount && (d + 1) * DigitFaces * 4 <= _digitColors.Length; d++)
+            {
+                bool lit = result.Fired(d);
+                SetFace(d * DigitFaces, result.Correct(d) ? theme.explainGreen : theme.explainRed);
+                for (int i = 0; i < 49; i++)
+                {
+                    float ink = Mathf.Clamp01((float)puzzle.Pixel(d, i));
+                    SetFace(d * DigitFaces + 1 + i, lit ? Color.Lerp(digitLit, digitLitInk, ink) : Color.Lerp(digitDark, Color.white, ink));
+                }
+            }
+
+            _digitMesh.colors32 = _digitColors;
+        }
+
+        private void SetFace(int face, Color color)
+        {
+            Color32 c = color;
+            for (int k = 0; k < 4; k++) _digitColors[face * 4 + k] = c;
+        }
 
         private void OnLive(bool live)
         {

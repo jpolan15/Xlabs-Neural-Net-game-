@@ -48,7 +48,7 @@ MonoBehaviour:
   - name: 'E2 neuron: your turn'
     beats:
     - line: 135
-      seconds: 9.018667
+      seconds: 9.610001
   - name: 'E3 network: explain'
     beats:
     - line: 139
@@ -89,8 +89,20 @@ MonoBehaviour:
       seconds: 6.62
     - line: 155
       seconds: 7.2186666
-  - name: 'E8 tokens: explain'
+  - name: E8 recap, then tokens
     beats:
+    - line: 178
+      seconds: 1.91
+    - line: 179
+      seconds: 3.3799999
+    - line: 180
+      seconds: 3.8999999
+    - line: 181
+      seconds: 3.84
+    - line: 182
+      seconds: 4.14
+    - line: 183
+      seconds: 3.72
     - line: 170
       seconds: 4.159333
     - line: 171
@@ -137,7 +149,7 @@ MonoBehaviour:
   - line: 134
     seconds: 8.58
   - line: 135
-    seconds: 9.018667
+    seconds: 9.610001
   - line: 136
     seconds: 3.76
   - line: 137
@@ -210,6 +222,18 @@ MonoBehaviour:
     seconds: 2.7513332
   - line: 169
     seconds: 2.6999998
+  - line: 178
+    seconds: 1.91
+  - line: 179
+    seconds: 3.3799999
+  - line: 180
+    seconds: 3.8999999
+  - line: 181
+    seconds: 3.84
+  - line: 182
+    seconds: 4.14
+  - line: 183
+    seconds: 3.72
   - line: 170
     seconds: 4.159333
   - line: 171

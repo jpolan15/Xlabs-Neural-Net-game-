@@ -147,10 +147,14 @@ namespace Convergence.EditorTools
 
             // End card: 2.6 m out, a little above the eye (low enough that the title clears the top of the view at 1.15 m). Solid board with a back, so nothing reads mirrored.
             var end = Make("EndCard", pod.transform, new Vector3(0, 2.08f, 2.6f));
-            Board("Plate", end.transform, Vector3.zero, new Vector2(3.5f, 1.2f), "PlateSolid");
+            // The plate grows downward for the recap rows, so the title stays where it was.
+            Board("Plate", end.transform, new Vector3(0f, -0.15f, 0f), new Vector2(3.5f, 1.5f), "PlateSolid");
             TextMeshPro title = Text("Title", end.transform, new Vector3(0, 0.40f, -0.01f), "YOU WATCHED A MACHINE LEARN", 0.15f, _theme.gold, 3.4f, bold: true);
-            TextMeshPro next = Text("Next", end.transform, new Vector3(0, 0.15f, -0.01f), "NEXT: LEVEL 2 - WORDS", 0.15f, _theme.cyan, 2.8f, bold: true);
-            var credits = Make("Credits", end.transform, new Vector3(0, -0.28f, -0.01f));
+            // What the ride went over, numbered as the intro and the recap named it (owner, 2026-10-27).
+            TextMeshPro recap = Text("Recap", end.transform, new Vector3(0, 0.17f, -0.01f), "1 PIXELS    2 NEURON    3 NETWORK\n4 BACKPROP    5 TRAINING", 0.11f, Color.white, 3.4f, bold: true);
+            recap.rectTransform.sizeDelta = new Vector2(3.4f, 0.28f);
+            TextMeshPro next = Text("Next", end.transform, new Vector3(0, -0.07f, -0.01f), "NEXT: LEVEL 2 - WORDS", 0.13f, _theme.cyan, 2.8f, bold: true);
+            var credits = Make("Credits", end.transform, new Vector3(0, -0.5f, -0.01f));
             TextMeshPro creditText = Text("Text", credits.transform, Vector3.zero, RideNarrationData.Credits, 0.1f, _theme.offWhite, 3.4f);
             creditText.rectTransform.sizeDelta = new Vector2(3.4f, 0.5f);
             creditText.lineSpacing = 8f;
@@ -316,6 +320,7 @@ namespace Convergence.EditorTools
             Ref(gridView, "frameLive", Mat("Orange"));
             Ref(gridView, "frameLocked", Mat("Locked"));
             Ref(gridView, "hintRing", grid.Find("HintRing"));
+            Ref(gridView, "digits", grid.Find("Digits").GetComponent<MeshFilter>());
             Int(gridView, "showFromSegment", SegNeuronPlay);
             Float(gridView, "cellPitch", CellPitch);
             WireSfx(pod, director, moments);

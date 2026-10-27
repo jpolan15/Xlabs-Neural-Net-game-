@@ -10,7 +10,9 @@ namespace Convergence.XR.Ride
     /// The trigger, or A / X (or B / Y), fires the hand's laser at whatever it points at: a noise speck, a grid cell, a
     /// string or socket, a step button, a hot wire, the GO lever, Pixel. With nothing in its sights, a press pulls GO
     /// whenever GO is live, so pressing A to go just works. Held on a stroke surface (v6) it draws on the canvas or
-    /// sprays the weight grid cell by cell as it sweeps. Letting go of the trigger drops a carried wire. It turns input into commands and decides nothing (ADR-007); grip and finger pokes still work
+    /// sprays the weight grid cell by cell as it sweeps. Letting go of the trigger drops a carried wire. The beam passes
+    /// through both controllers' own colliders, and a press that just misses a flying digit, a button or a hot wire still
+    /// fires it (aim help). It turns input into commands and decides nothing (ADR-007); grip and finger pokes still work
     /// through XRI as before.
     /// </summary>
     public sealed class RideHandLasers : MonoBehaviour
@@ -26,6 +28,15 @@ namespace Convergence.XR.Ride
         [SerializeField] private float fireHaptic = 0.45f;
         [SerializeField] private float missHaptic = 0.1f;
         [SerializeField] private float strokeHaptic = 0.08f;
+        [Tooltip("A press that misses still fires a shootable thing this many degrees off the beam (aim help on moving digits).")]
+        [SerializeField] private float assistDegrees = 5f;
+        [Tooltip("How wide the aim help looks around the beam, metres (caps the degrees far away).")]
+        [SerializeField] private float assistRadius = 1.2f;
+
+        private readonly RaycastHit[] _rayHits = new RaycastHit[32];
+        private readonly RaycastHit[] _assistHits = new RaycastHit[64];
+        private readonly Collider[] _nearHits = new Collider[32];
+        private readonly System.Collections.Generic.List<Collider> _candidates = new System.Collections.Generic.List<Collider>(96);
 
         private sealed class Hand
         {
@@ -45,6 +56,7 @@ namespace Convergence.XR.Ride
 
         private Hand[] _hands;
         private PodLeverInteractable _go;
+        private RideDirector _director;
 
         private void Awake()
         {
@@ -149,7 +161,7 @@ namespace Convergence.XR.Ride
             }
 
             var ray = new Ray(h.Pose.position, h.Pose.forward);
-            bool hit = Physics.Raycast(ray, out RaycastHit info, reach, ~0, QueryTriggerInteraction.Collide);
+            bool hit = CastPastHands(ray, out RaycastHit info);
             h.Aimed = hit ? info.collider : null;
             h.AimPoint = hit ? info.point : ray.GetPoint(idleLength);
             RideAim.Set(h.Index, ray.origin, h.AimPoint, true);
@@ -180,6 +192,7 @@ namespace Convergence.XR.Ride
                 else
                 {
                     did = h.Aimed != null && RideTargeting.Fire(h.Aimed, h.Index);
+                    if (!did) did = FireNearMiss(ray, h.Index);
                     if (!did) did = PullGoIfLive();
                 }
 
@@ -214,6 +227,70 @@ namespace Convergence.XR.Ride
             }
         }
 
+        /// <summary>
+        /// The nearest thing on the ray that is not part of a hand. Each controller carries its own colliders (the fingertip
+        /// trigger 9 cm ahead, XRI's interactors): a plain raycast from the controller stops on them, so the laser never
+        /// reached anything (found on the Quest, 2026-10-27).
+        /// </summary>
+        private bool CastPastHands(Ray ray, out RaycastHit nearest)
+        {
+            nearest = default;
+            int count = Physics.RaycastNonAlloc(ray, _rayHits, reach, ~0, QueryTriggerInteraction.Collide);
+            bool found = false;
+            for (int i = 0; i < count; i++)
+            {
+                if (IsHand(_rayHits[i].collider) || (found && _rayHits[i].distance >= nearest.distance)) continue;
+                nearest = _rayHits[i];
+                found = true;
+            }
+
+            return found;
+        }
+
+        private bool IsHand(Collider c)
+        {
+            Transform t = c.transform;
+            return (leftHand != null && t.IsChildOf(leftHand)) || (rightHand != null && t.IsChildOf(rightHand));
+        }
+
+        /// <summary>
+        /// A press that just missed: fires the shootable thing (a flying digit, a button, a hot wire) closest to the ray
+        /// within <see cref="assistDegrees"/>, so a shot that is almost on a moving 3 still counts.
+        /// </summary>
+        private bool FireNearMiss(Ray ray, int hand)
+        {
+            // The sweep misses what already overlaps the hand's sphere (the table's buttons), so those are added too.
+            _candidates.Clear();
+            int swept = Physics.SphereCastNonAlloc(ray, assistRadius, _assistHits, reach, ~0, QueryTriggerInteraction.Collide);
+            for (int i = 0; i < swept; i++) _candidates.Add(_assistHits[i].collider);
+            int near = Physics.OverlapSphereNonAlloc(ray.origin, assistRadius, _nearHits, ~0, QueryTriggerInteraction.Collide);
+            for (int i = 0; i < near; i++) _candidates.Add(_nearHits[i]);
+
+            for (int tries = 0; tries < 3; tries++)
+            {
+                int best = -1;
+                float bestAngle = assistDegrees;
+                for (int i = 0; i < _candidates.Count; i++)
+                {
+                    Collider c = _candidates[i];
+                    if (c == null || IsHand(c) || !RideTargeting.IsShootable(c)) continue;
+                    Vector3 to = c.bounds.center - ray.origin;
+                    if (Vector3.Dot(to, ray.direction) <= 0f) continue;
+                    float halfSize = Mathf.Atan2(c.bounds.extents.magnitude * 0.7f, Mathf.Max(0.05f, to.magnitude)) * Mathf.Rad2Deg;
+                    float angle = Vector3.Angle(ray.direction, to) - halfSize;
+                    if (angle >= bestAngle) continue;
+                    bestAngle = angle;
+                    best = i;
+                }
+
+                if (best < 0) return false;
+                if (RideTargeting.Fire(_candidates[best], hand)) return true;
+                _candidates[best] = null;
+            }
+
+            return false;
+        }
+
         private static void EndStroke(Hand h)
         {
             if (h.Stroking == null) return;
@@ -223,6 +300,9 @@ namespace Convergence.XR.Ride
 
         private bool PullGoIfLive()
         {
+            // During the intro GO is a hold-to-skip handle: a stray press must not latch it and skip the intro.
+            if (_director == null) _director = FindAnyObjectByType<RideDirector>();
+            if (_director != null && _director.State == RideState.Intro) return false;
             if (_go == null) _go = RideTargeting.FindGo();
             if (_go == null || _go.Channel == null || _go.Channel.Locked || !_go.Channel.Visible) return false;
             if (_go.Channel.Value >= _go.Channel.Max) return false;
@@ -269,6 +349,15 @@ namespace Convergence.XR.Ride
             }
 
             return false;
+        }
+
+        /// <summary>True for what a near miss may still fire: a target (a flying digit, a button, the card) or a hot wire.</summary>
+        public static bool IsShootable(Collider c)
+        {
+            if (!c.gameObject.activeInHierarchy) return false;
+            if (c.GetComponentInParent<IRideTarget>() != null) return true;
+            BlameWireInteractable wire = c.GetComponentInParent<BlameWireInteractable>();
+            return wire != null && wire.isActiveAndEnabled;
         }
 
         /// <summary>The trigger let go over a collider (drop a dragged string on a socket).</summary>

@@ -339,7 +339,8 @@ namespace Convergence.EditorTools
                     new UnfoldSpec(null, T(6, "Sun"), grow, 1.7f, 1.5f),
                 }), regions[6]);
             BuildTraining(Add<TrainingExplainer>(new[] { RideLine.LearnedPainted, RideLine.LearnedHonest, RideLine.RightYours, RideLine.RightAccuracy, RideLine.RightLoop }, SegRight, SegRight, false, null, null, null), regions[7]);
-            BuildTokens(Add<TokensExplainer>(new[] { RideLine.TokensWords, RideLine.TokensNumbers, RideLine.TokensPredict, RideLine.TokensNext }, SegTokens, SegTokens, false, null, null, null), regions[7]);
+            BuildTokens(Add<TokensExplainer>(new[] { RideLine.RecapIntro, RideLine.RecapPixels, RideLine.RecapNeuron, RideLine.RecapNetwork, RideLine.RecapBackprop, RideLine.RecapTraining,
+                RideLine.TokensWords, RideLine.TokensNumbers, RideLine.TokensPredict, RideLine.TokensNext }, SegTokens, SegTokens, false, null, null, null), regions[7]);
         }
 
         // ---------- E0, the dock ----------
@@ -1215,6 +1216,34 @@ namespace Convergence.EditorTools
 
             var card = new List<Shape> { new Shape { kind = Shape.Kind.Quad, position = new Vector3(0.35f, -0.08f, 0.05f), size = new Vector2(5.6f, 2.0f), round = 0.08f, color = new Color(0.04f, 0.05f, 0.08f, 0.92f) } };
             Batch("Card", stage, card, "ExplainerFlat", 20);
+
+            // The recap (owner, 2026-10-27), on the same card before the sentence: the intro's five stops as numbered rows,
+            // each with what it showed. Shape k is row k's bar; TokensExplainer lights them as the narrator counts.
+            string[] recapNames = { "PIXELS", "NEURON", "NETWORK", "BACKPROP", "TRAINING" };
+            int weights = Convergence.Core.Training.DigitNetwork.Inputs * Convergence.Core.Training.DigitNetwork.Hidden
+                + Convergence.Core.Training.DigitNetwork.Hidden * Convergence.Core.Training.DigitNetwork.Outputs;
+            string[] recapWhat =
+            {
+                "your 3 became " + Convergence.Core.Training.DigitNetwork.Inputs + " numbers",
+                "weigh the pixels, add them up, squish",
+                Convergence.Core.Training.DigitNetwork.Hidden + " neurons, " + Convergence.Core.Training.DigitNetwork.Outputs + " answers, " + weights + " weights",
+                "measure the loss, send the blame backwards",
+                "step downhill, again and again",
+            };
+            const float rowTop = 0.4f, rowPitch = 0.3f, rowLeft = -2.05f;
+            var recapBars = new List<Shape>();
+            var recapNameTexts = new List<Object>();
+            var recapWhatTexts = new List<Object>();
+            for (int k = 0; k < recapNames.Length; k++)
+            {
+                float y = rowTop - k * rowPitch;
+                recapBars.Add(new Shape { kind = Shape.Kind.Quad, position = new Vector3(0.35f, y, 0f), size = new Vector2(5.2f, 0.25f), round = 0.5f, color = new Color(0.08f, 0.1f, 0.16f, 0.95f), stroke = yellow, strokeWidth = 0.012f });
+                recapNameTexts.Add(Serif("RecapName" + k, stage, new Vector3(rowLeft + 0.8f, y, -0.02f), (k + 1) + "   " + recapNames[k], 0.16f, yellow, 1.6f, TextAlignmentOptions.Left, 24));
+                recapWhatTexts.Add(Serif("RecapWhat" + k, stage, new Vector3(-0.3f + 1.7f, y, -0.02f), recapWhat[k], 0.14f, white, 3.4f, TextAlignmentOptions.Left, 24));
+            }
+
+            ShapeBatch bRecap = Batch("Recap", stage, recapBars, "ExplainerFlat", 21);
+            TextMeshPro recapTitle = Serif("RecapTitle", stage, new Vector3(0.35f, rowTop + 0.33f, -0.02f), "FIVE STOPS", 0.2f, white, 4f, TextAlignmentOptions.Center, 24);
             ShapeBatch bChips = Batch("Chips", stage, chips, "ExplainerFlat", 21);
             ShapeBatch bVectors = Batch("Vectors", stage, vectors, "ExplainerFlat", 22);
             ShapeBatch bNet = Batch("Net", stage, net, "ExplainerFlat", 21);
@@ -1237,6 +1266,10 @@ namespace Convergence.EditorTools
             Ref(e, "sparks", bSparks);
             Int(e, "perToken", perToken);
             Set(e, "netInput", p => p.vector3Value = netAt + new Vector3(-0.55f, 0f, 0f));
+            Ref(e, "recap", bRecap);
+            Ref(e, "recapTitle", recapTitle);
+            Refs(e, "recapNames", recapNameTexts);
+            Refs(e, "recapLines", recapWhatTexts);
             content.gameObject.SetActive(false);
         }
 
