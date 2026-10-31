@@ -22,6 +22,13 @@ namespace Convergence.EditorTools
         public const float WordsPerSecond = 2.7f;
         public const float DefaultPauseAfter = 0.3f;
 
+        /// <summary>
+        /// How much longer the ride rests after every line than the script's own number says (owner, 2026-10-30: the teacher
+        /// loved the explanations but they "moved a bit too fast for anyone not knowing the space"). The pause after a line is
+        /// played by the ride, never baked into a clip, so this changes the pace without re-recording a word.
+        /// </summary>
+        public const float Breath = 2.2f;
+
         public struct Line
         {
             public RideLine Id;
@@ -37,7 +44,7 @@ namespace Convergence.EditorTools
                 Speaker = NarrationLibrary.Speaker.Guide;
                 Tag = "GUIDE";
                 Text = text;
-                PauseAfter = pauseAfter;
+                PauseAfter = pauseAfter * Breath;
                 FixedSpeakSeconds = 0f;
             }
         }
@@ -55,6 +62,7 @@ namespace Convergence.EditorTools
             new Line(RideLine.PixelsSquares, "{grid}To a computer, [p0.1] a picture is a grid of tiny squares, [p0.1] called pixels.", 0.2f),
             new Line(RideLine.PixelsNumbers, "{numbers}And every pixel is just a number. [p0.15] {zero}Zero for blank. [p0.1] {one}One for full ink.", 0.2f),
             new Line(RideLine.PixelsFortyNine, "{shrink}We'll use seven by seven. [p0.15] {column}Forty-nine numbers. [p0.1] That's all the network ever sees.", 0.2f),
+            new Line(RideLine.PixelsWhy49, "A real photo has millions of pixels. [p0.15] We squash ours down, [p0.1] so Pixel's little brain can handle it.", 0.2f),
             new Line(RideLine.DrawYourTurn, "{unfold}Now draw your own three. [p0.15] Hold the trigger, [p0.1] and write on the board. [p0.1] Shoot DONE when you're happy.", 0.1f),
             new Line(RideLine.DrawBigger, "Bigger! [p0.1] Fill the board.", 0.1f),
             new Line(RideLine.DrawDoneNudge, "Looks like a three to me. [p0.1] Shoot DONE.", 0.1f),
@@ -64,7 +72,9 @@ namespace Convergence.EditorTools
 
             // E2, one neuron, then spray its weights.
             new Line(RideLine.NeuronHolds, "{neuron}This is a neuron. [p0.1] It holds one number, [p0.1] its activation. [p0.15] {glow}The bigger the number, [p0.1] the brighter it glows.", 0.2f),
+            new Line(RideLine.NeuronJudge, "Think of it as a tiny judge. [p0.15] It looks at the evidence, [p0.1] and says how sure it is.", 0.2f),
             new Line(RideLine.NeuronWires, "{wires}It's connected to all forty-nine pixels, [p0.1] and every connection has a weight.", 0.2f),
+            new Line(RideLine.WeightPlain, "A weight is just how much that pixel matters.", 0.2f),
             new Line(RideLine.NeuronGreenRed, "{green}A positive weight says: [p0.1] ink in this spot means three. [p0.15] {red}A negative weight says: [p0.1] ink in this spot means not a three.", 0.2f),
             new Line(RideLine.NeuronAdds, "{add}Multiply each pixel by its weight, [p0.1] add them up, [p0.1] and add a bias. [p0.15] {line}A sigmoid squishes the total between zero and one. [p0.1] High means the neuron fires.", 0.2f),
             new Line(RideLine.NeuronYourTurn, "{paint}Your turn: [p0.1] build a three detector. [p0.15] Right hand paints green, [p0.1] left hand red. [p0.1] Hold the trigger and sweep. [p0.15] {digits}Light up every three beside the grid, [p0.1] and keep the other digits dark.", 0.1f),
@@ -81,12 +91,13 @@ namespace Convergence.EditorTools
             // E4, the guess and the loss (the guess itself is on the network: it depends on the rider's drawing).
             new Line(RideLine.WrongSays, "{guess}Pixel's guess is in. [p0.15] {wrong}But look how unsure it is. [p0.1] Every weight is still random, [p0.1] so it's only guessing.", 0.2f),
             new Line(RideLine.WrongWanted, "{want}What we want is the three's neuron at one, [p0.1] and every other at zero.", 0.2f),
-            new Line(RideLine.WrongLoss, "{oops}Measure how far off it is, [p0.1] and you get one number: [p0.1] the loss. [p0.15] Training means just one thing. [p0.1] Make the loss small.", 0.3f),
+            new Line(RideLine.WrongLoss, "{oops}Now we score the guess. [p0.15] How far off was it? [p0.2] That score is called the loss. [p0.25] Big loss, [p0.1] very wrong. [p0.15] Small loss, [p0.1] nearly right. [p0.25] Training means one thing: [p0.1] make the loss small.", 0.3f),
 
             // E5, backpropagation, then the hot-wire hunt on the rider's own 3.
             new Line(RideLine.BackWish, "{nudges}So which weights should change, [p0.1] and which way? [p0.15] {wish}The three's output wants to go up. [p0.1] {dim}Every other output wants to go down.", 0.2f),
             new Line(RideLine.BackFlows, "{back}Those wishes flow backwards, [p0.1] layer by layer, [p0.1] with the chain rule. [p0.15] That's backpropagation. [p0.1] It gives every weight a gradient: [p0.1] which way to move, [p0.1] and how much.", 0.3f),
-            new Line(RideLine.BackGrab, "{grab}The hottest wires matter most. [p0.1] Grab each one, [p0.1] and drag it to the three, [p0.1] before it cools.", 0.1f),
+            new Line(RideLine.BackPlain, "In plain words: [p0.15] it works out how much each wire is to blame for the mistake.", 0.2f),
+            new Line(RideLine.BackGrab, "{grab}Look up. [p0.15] The glowing wires are the most to blame. [p0.2] Point at the glowing end of one, [p0.1] hold the trigger, [p0.1] and drag it onto the three. [p0.2] Each wire you drag is one real nudge, [p0.1] and it makes the three more likely.", 0.1f),
             new Line(RideLine.BackHurry, "Quick, [p0.1] they're cooling!", 0.1f),
             new Line(RideLine.BackDone, "Each wire you moved was one real gradient step. [p0.15] Now imagine every weight, [p0.1] over thousands of digits.", 0.1f),
             new Line(RideLine.StopClear, "Stage clear. [p0.1] Pull GO.", 0.1f),
@@ -94,6 +105,7 @@ namespace Convergence.EditorTools
             // E6, gradient descent, then the training game: real training, live.
             new Line(RideLine.DescentHill, "{hill}Picture the loss as a landscape. [p0.15] {ball}Where you stand is a choice of weights. [p0.1] The height is how wrong they are.", 0.2f),
             new Line(RideLine.DescentStep, "{slope}The gradient points uphill, [p0.1] so take a step the other way. [p0.15] That's gradient descent.", 0.2f),
+            new Line(RideLine.DescentFog, "It's like walking downhill in fog. [p0.15] You can't see the bottom, [p0.1] but you can feel which way is down.", 0.2f),
             new Line(RideLine.DescentTooBig, "{bigstep}The size of the step is the learning rate. [p0.15] Too big, [p0.1] and you leap clean over the valley. [p0.15] {smallsteps}Too small, [p0.1] and you'll be here all day.", 0.2f),
             new Line(RideLine.TrainYourTurn, "{landscape}This valley is Pixel's real loss. [p0.15] Pick a step size, [p0.1] and hold its button to train. [p0.1] Every step learns from thirty-two real digits.", 0.1f),
             new Line(RideLine.TrainTooBig, "Way too big! [p0.1] The loss exploded. [p0.15] Let's undo that. [p0.1] Try a smaller step.", 0.1f),
@@ -143,15 +155,15 @@ namespace Convergence.EditorTools
         /// </summary>
         public static readonly (string Name, RideLine[] Lines)[] Sequences =
         {
-            ("E1 pixels: explain, then draw your 3", new[] { RideLine.PixelsSquares, RideLine.PixelsNumbers, RideLine.PixelsFortyNine, RideLine.DrawYourTurn }),   // 0
-            ("E2 neuron: explain", new[] { RideLine.NeuronHolds, RideLine.NeuronWires, RideLine.NeuronGreenRed, RideLine.NeuronAdds }),                      // 1
+            ("E1 pixels: explain, then draw your 3", new[] { RideLine.PixelsSquares, RideLine.PixelsNumbers, RideLine.PixelsFortyNine, RideLine.PixelsWhy49, RideLine.DrawYourTurn }),   // 0
+            ("E2 neuron: explain", new[] { RideLine.NeuronHolds, RideLine.NeuronJudge, RideLine.NeuronWires, RideLine.WeightPlain, RideLine.NeuronGreenRed, RideLine.NeuronAdds }),                      // 1
             ("E2 neuron: your turn", new[] { RideLine.NeuronYourTurn }),                                                                                     // 2
             ("E3 network: explain", new[] { RideLine.NetworkTeam, RideLine.NetworkAnswers, RideLine.NetworkWire }),                                         // 3
             ("E3 network: send your 3", new[] { RideLine.NetworkSend }),                                                                                     // 4
             ("E4 the guess and the loss", new[] { RideLine.WrongSays, RideLine.WrongWanted, RideLine.WrongLoss }),                                          // 5
-            ("E5 backprop: explain", new[] { RideLine.BackWish, RideLine.BackFlows }),                                                                      // 6
+            ("E5 backprop: explain", new[] { RideLine.BackWish, RideLine.BackFlows, RideLine.BackPlain }),                                                                      // 6
             ("E5 backprop: grab", new[] { RideLine.BackGrab }),                                                                                              // 7
-            ("E6 descent: explain, then train", new[] { RideLine.DescentHill, RideLine.DescentStep, RideLine.DescentTooBig, RideLine.TrainYourTurn }),     // 8
+            ("E6 descent: explain, then train", new[] { RideLine.DescentHill, RideLine.DescentStep, RideLine.DescentFog, RideLine.DescentTooBig, RideLine.TrainYourTurn }),     // 8
             ("E8 recap, then tokens", new[] { RideLine.RecapIntro, RideLine.RecapPixels, RideLine.RecapNeuron, RideLine.RecapNetwork, RideLine.RecapBackprop, RideLine.RecapTraining, RideLine.TokensWords, RideLine.TokensNumbers, RideLine.TokensPredict, RideLine.TokensNext }),                     // 9
         };
 

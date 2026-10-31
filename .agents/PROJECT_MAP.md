@@ -2,7 +2,7 @@
 
 Read this before scanning the repository. Each entry is a one-line description of the directory's purpose.
 
-Last updated: 2026-10-27 (Level 1 v7: blast the 3s, intro roadmap, what training learned, ADR-021)
+Last updated: 2026-10-30 (Level 2, the Word Machine, ADR-022; Level 1 pacing and backprop coach)
 
 ---
 
@@ -43,13 +43,14 @@ Last updated: 2026-10-27 (Level 1 v7: blast the 3s, intro roadmap, what training
 |---|---|
 | `Assets/_Project/` | First-party assets: Audio, Materials, Prefabs, Scenes, ScriptableObjects |
 | `Assets/_Project/Data/Level1/` | `level1_digits.json`: the baked Level 1 network (both weight sets), hero digit, puzzle, Valley ribbon, finale digits, the training game's digits (`live`) and the travel game's targets (`targets`), written by `ArtSource/training/bake_level1.py` |
+| `Assets/_Project/Data/Level2/` | `level2_words.json`: everything Level 2 shows as a number, baked from the real GPT-2 small by `ArtSource/training/bake_level2.py` (tokens and ids, the 3-d embedding picture of 40 words, attention head, next-word odds, temperature odds, the story road) |
 | `Assets/_Project/Audio/` | **Canonical** audio assets location — see `Assets/_Project/Audio/AGENTS.md`. Ride: `Voice/vo_ride_NN.wav` (+ `.txt` sidecars), `Sfx/` (derived loops and buzzer), `Kenney/` (CC0 effects), `Music/` |
 | `Assets/AudioAssets/` | **Deprecated** — redirect to `Assets/_Project/Audio/` (no files; only AGENTS.md) |
 | `Assets/Materials/` | Shared materials. `NeuralRide/` holds the ride's materials (HoloLit solids, unlit icons and lines, additive glows, the two network materials) |
 | `Assets/Shaders/` | Hand-written URP shaders for the Neural Ride: `HoloLit`, `NeuralLinks`, `NeuralNodes` (ADR-013), `ExplainerFlat`, and `RideSky` (every region's lit sky and grid floor, ADR-021) |
 | `Assets/Prefabs/` | Shared prefabs. `NeuralRide/` holds Pod, Station, and Track (built by `Tools/Editor/NeuralRideBuilder*.cs`); `NeuralRide/Meshes/` holds the generated tub and network meshes |
 | `Assets/Puzzles/` | Per-chamber puzzle data: test cases, rules, configuration |
-| `Assets/Scenes/` | Unity scene files. `NeuralRide.unity` is build scene 0 (ADR-011); `Level01_AwakeningGate.unity` is kept |
+| `Assets/Scenes/` | Unity scene files. `NeuralRide.unity` is build scene 0 (ADR-011); `WordMachine.unity` is Level 2 (build scene 1, ADR-022); `Level01_AwakeningGate.unity` is kept |
 | `Assets/ScriptableObjects/` | Shared ScriptableObject data. `RideTheme`, `RideScript` (narration pacing) and `NarrationLibrary` (subtitles, clips, chapter cards) are written by the ride builder |
 | `Assets/Samples/` | SDK sample imports (third-party; do not modify) |
 | `Assets/ThirdParty/` | Third-party plugin assets (do not modify) |
@@ -59,11 +60,11 @@ Last updated: 2026-10-27 (Level 1 v7: blast the 3s, intro roadmap, what training
 | Path | Purpose |
 |---|---|
 | `Assets/Scripts/Core/` | Engine-independent C# — Math, Neural, Training, Puzzles |
-| `Assets/Scripts/Gameplay/` | MonoBehaviour orchestration — chamber state, blast doors, facility. `Ride/` is the Neural Ride segment director, `RideScript` and moments; `RideGame` is the mini-game base (score, stars, win, pull GO), `ZapGame` the travel game (blast the 3s: real digits fly at the pod); `Ride/Level1/` loads the bake (`Level1Data`), holds the rider's run (`Level1Session`: their digit and network) and Level 1's moments (draw, weight paint, forward pass and reading, blame hunt, training game, valley run, stump Pixel), the canvas and button inputs |
+| `Assets/Scripts/Gameplay/` | MonoBehaviour orchestration — chamber state, blast doors, facility. `Ride/` is the Neural Ride segment director, `RideScript` and moments; `RideGame` is the mini-game base (score, stars, win, pull GO), `ZapGame` the travel game (blast the 3s: real digits fly at the pod); `Ride/Level1/` loads the bake (`Level1Data`), holds the rider's run (`Level1Session`: their digit and network) and Level 1's moments (draw, weight paint, forward pass and reading, blame hunt, training game, valley run, stump Pixel), the canvas and button inputs. `Ride/Level2/` is Level 2's rules: `Level2Data` (the bake, validated), `Level2Session` (the rider's story), `Level2Game` + `PickTarget` (games take laser picks) and the five moments (slice, galaxy, spotlight, predict, story) |
 | `Assets/Scripts/XR/` | XR input translation — converts interaction to gameplay commands |
 | `Assets/Scripts/XR/Ride/` | Hand lasers (`RideHandLasers`: trigger/A fires, right green / left red), `HandPolarityController` (hand colour, fingertip orb and touch trigger), pod lever, pod seat (eye-height normalisation), and desktop fallback with operator keys: Space skips narration, R restarts (ADR-011) |
 | `Assets/Scripts/XR/Meta/` | Meta-specific adapters only (isolated from Core and Gameplay) |
-| `Assets/Scripts/Presentation/` | Visualization, audio, haptics — observes state, never decides it. `Ride/` holds the ride views, `NarrationLibrary`, `PixelBuddyView` (the buddy, pettable), `BlameView` (the wires you drag to the 3, re-aimed at the rider's digit), `DrawBoardView`/`TrainBoardView`/`SendCardView` (the v6 boards), `NetworkLiveView` (the diagrams follow the rider's digit and weights), `RideBoot` (black fade + warm-up before the ride starts), `BlasterView` (the flying digits in one batch, the bolt, the pixel burst), `GameCoachView` (the gold arrow at the next thing to aim at in every game); `Ride/Explainers/` the explainer kit (Rate, Tween, Anim, ShapeBatch) and E0–E8 (ADR-017) |
+| `Assets/Scripts/Presentation/` | Visualization, audio, haptics — observes state, never decides it. `Ride/` holds the ride views, `NarrationLibrary`, `PixelBuddyView` (the buddy, pettable), `BlameView` (the wires you drag to the 3, re-aimed at the rider's digit), `DrawBoardView`/`TrainBoardView`/`SendCardView` (the v6 boards), `NetworkLiveView` (the diagrams follow the rider's digit and weights), `RideBoot` (black fade + warm-up before the ride starts), `BlasterView` (the flying digits in one batch, the bolt, the pixel burst), `GameCoachView` (the gold arrow at the next thing to aim at in every game); `Ride/Explainers/` the explainer kit (Rate, Tween, Anim, ShapeBatch) and E0–E8 (ADR-017). `Ride/Level2/` draws Level 2 (one MonoBehaviour per file): `Level2Kit`, `GlowField`, `RibbonField`, the worlds (dock, tokens, galaxy, hall, odds, road, end), the explainers and the five game views |
 | `Assets/Scripts/Infrastructure/` | Cross-cutting utilities: logging, events, telemetry contracts |
 
 > Note: `Assets/Scripts/Visualization/` and `Assets/Scripts/Audio/` are being consolidated into `Assets/Scripts/Presentation/` in a future migration task. Do not move files yet.
@@ -92,7 +93,7 @@ Last updated: 2026-10-27 (Level 1 v7: blast the 3s, intro roadmap, what training
 | `Tests/EditMode/Core/` | Core.Math, Core.Neural, Core.Training, Core.Puzzles tests |
 | `Tests/EditMode/Puzzles/` | Puzzle evaluation tests |
 | `Tests/PlayMode/` | Scene, Gameplay, and XR tests; requires Unity playmode |
-| `Tests/PlayMode/Gameplay/` | Chamber state machine and facility tests |
+| `Tests/PlayMode/Gameplay/` | Chamber state machine and facility tests; `Level2RideTests` plays the whole of Level 2 as a rider |
 | `Tests/PlayMode/XR/` | Interaction and locomotion tests |
 | `Tests/AgentScenarios/` | Smoke tests driven by Meta XR Operator (development tooling only) |
 

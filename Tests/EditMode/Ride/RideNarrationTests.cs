@@ -58,7 +58,7 @@ namespace Convergence.Tests.EditMode.Ride
         {
             foreach (RideLine line in Enum.GetValues(typeof(RideLine)))
             {
-                if ((int)line >= (int)FirstLine) yield return line;
+                if ((int)line >= (int)FirstLine && (int)line < (int)RideLine.L2Hello) yield return line;
             }
         }
 
@@ -167,6 +167,11 @@ namespace Convergence.Tests.EditMode.Ride
             // The end recap, appended from 178.
             Assert.AreEqual(178, (int)RideLine.RecapIntro);
             Assert.AreEqual(183, (int)RideLine.RecapTraining);
+
+            // The plain-words pass (2026-10-30) and Level 2 (200 and up).
+            Assert.AreEqual(184, (int)RideLine.PixelsWhy49);
+            Assert.AreEqual(188, (int)RideLine.DescentFog);
+            Assert.AreEqual(200, (int)RideLine.L2Hello);
         }
 
         [Test]
@@ -198,19 +203,22 @@ namespace Convergence.Tests.EditMode.Ride
         {
             // Level 1 is about six minutes; the talk is most of it, broken up by the puzzle, the race, the blame and the drop.
             // The owner asked for the numbered recap at the end (2026-10-27): about 20 s more, so the cap went from 270 to 300.
+            // The teacher found it "a bit too fast for anyone not knowing the space" (2026-10-30): a breath after every line, plain-words
+            // lines for the 49 pixels, the judge, the weight, the blame and the fog, and a slower voice: the cap is now 400 and a stop's
+            // lines may run to 60 s.
             NarrationLibrary library = Library();
             RideScript script = Script();
             float all = 0f;
             foreach (NarrationLibrary.Entry e in library.entries) all += e.TotalSeconds;
-            Assert.LessOrEqual(all, 300f, "All the narration together should stay under five minutes");
-            foreach (RideScript.Sequence s in script.sequences) Assert.LessOrEqual(s.TotalSeconds, 40f, s.name + " runs over 40 s; a first-time rider drifts");
+            Assert.LessOrEqual(all, 400f, "All the narration together should stay under about six and a half minutes");
+            foreach (RideScript.Sequence s in script.sequences) Assert.LessOrEqual(s.TotalSeconds, 60f, s.name + " runs over 60 s; a first-time rider drifts");
         }
 
         [Test]
-        public void Intro_GetsTheRidersHandOnGoInUnder25Seconds()
+        public void Intro_GetsTheRidersHandOnGoInUnder35Seconds()
         {
             RideScript script = Script();
-            Assert.LessOrEqual(script.intro.TotalSeconds + script.SecondsOf(script.dockLine), 25f, "The intro and the dock line run too long before GO");
+            Assert.LessOrEqual(script.intro.TotalSeconds + script.SecondsOf(script.dockLine), 35f, "The intro and the dock line run too long before GO");
             Assert.AreEqual(RideLine.PullGo, script.dockLine);
         }
 

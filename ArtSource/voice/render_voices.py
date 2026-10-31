@@ -38,6 +38,8 @@ from scipy.signal import butter, resample_poly, sosfilt
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
 DATA_CS = REPO / "Tools" / "Editor" / "RideNarrationData.cs"
+# Level 2's script lives in its own file (same Line format); every id is global, so the two files never overlap.
+DATA_FILES = [DATA_CS, REPO / "Tools" / "Editor" / "Level2NarrationData.cs"]
 TYPES_CS = REPO / "Assets" / "Scripts" / "Gameplay" / "Ride" / "RideTypes.cs"
 VOICE_DIR = REPO / "Assets" / "_Project" / "Audio" / "Voice"
 
@@ -59,6 +61,7 @@ SPOKEN = [
     (r"\bgo lever\b", "go-lever"),  # run together it was heard as "GoLaver"
     (r"\borange lever\b", "orange-lever"),  # "Pull the orange lever" was heard as "orange laver" (WER 7.7 %)
     (r"\bpress A\b", "press, A"),  # the A button, said as the letter, not the article
+    (r"\buphill\b", "up hill"),  # "points uphill" was heard as "points a pill" (WER 14.3 %)
 ]
 
 # Where AURA's stutter lands is seeded; on these lines the default seed put it inside a word the transcription then
@@ -71,7 +74,7 @@ SPEAKERS = {"G": "guide", "A": "aura", "C": "aura_clean", "X": "archival"}
 # ----------------------------------------------------------------------------------------------- script parsing
 
 def load_script() -> list[dict]:
-    cs = DATA_CS.read_text(encoding="utf-8")
+    cs = "\n".join(f.read_text(encoding="utf-8") for f in DATA_FILES if f.exists())
     types = TYPES_CS.read_text(encoding="utf-8")
     enum_body = re.search(r"enum RideLine\s*\{(.*?)\}", types, re.S).group(1)
     ids = {name: int(num) for name, num in re.findall(r"(\w+)\s*=\s*(\d+)", enum_body)}
@@ -79,7 +82,7 @@ def load_script() -> list[dict]:
     # v3 lines named a speaker and tag: new Line(RideLine.X, G, "GUIDE", "text", ...). Level 1 has one narrator and
     # drops them: new Line(RideLine.X, "text", ...), always the Guide.
     line_re = re.compile(
-        r'new Line\(RideLine\.(\w+),\s*(?:([GACX]),\s*"((?:[^"\\]|\\.)*)",\s*)?"((?:[^"\\]|\\.)*)"'
+        r'new (?:RideNarrationData\.)?Line\(RideLine\.(\w+),\s*(?:([GACX]),\s*"((?:[^"\\]|\\.)*)",\s*)?"((?:[^"\\]|\\.)*)"'
         r'\s*(?:,\s*([\d.]+)f)?\s*(?:,\s*([\d.]+)f)?\s*\)', re.S)
     lines = []
     for m in line_re.finditer(cs):
@@ -249,7 +252,8 @@ class Kokoro:
     pitch range, because nobody on the build side can listen. A human listen is still the final word.
     """
 
-    VOICES = {"guide": ("af_heart", 1.10, "en-us"), "aura": ("af_heart", 1.0, "en-us")}
+    # 2026-10-30: the guide slowed from 1.10 to 1.0 (owner: the teacher found the ride "a bit too fast for anyone not knowing the space").
+    VOICES = {"guide": ("af_heart", 1.0, "en-us"), "aura": ("af_heart", 1.0, "en-us")}
 
     # Lines at their own speed because the transcription check heard different words otherwise: "Too big a step"
     # became "two biggest step" at 0.95 and above; a lone "Lower." became "slower" below 1.0.

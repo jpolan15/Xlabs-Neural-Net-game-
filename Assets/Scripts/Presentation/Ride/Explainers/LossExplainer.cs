@@ -123,11 +123,11 @@ namespace Convergence.Presentation.Ride.Explainers
                 return list;
             });
 
-            // "That's the loss."
-            s.AtClause(RideLine.WrongLoss, 1, () => new[] { Anim.Write(lossTitle, 0.9f) });
+            // "Now we score the guess. How far off was it? That score is called the loss."
+            s.AtClause(RideLine.WrongLoss, 2, () => new[] { Anim.Write(lossTitle, 0.9f) });
 
-            // "A big loss means a big mistake."
-            s.AtClause(RideLine.WrongLoss, 2, () => Anim.Each(Anim.Range(0, gaps.Count), 0.03f, k => Anim.Indicate(gaps, k, yellow, 0.8f, 1.1f)));
+            // "Big loss, very wrong."
+            s.AtClause(RideLine.WrongLoss, 3, () => Anim.Each(Anim.Range(0, gaps.Count), 0.03f, k => Anim.Indicate(gaps, k, yellow, 0.8f, 1.1f)));
         }
     }
 }

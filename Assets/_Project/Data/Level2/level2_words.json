@@ -1,0 +1,2069 @@
+{
+ "meta": {
+  "model": "GPT-2 small (124M), Radford et al. 2019, MIT license",
+  "vocab": 50257,
+  "layers": 12,
+  "heads": 12,
+  "dims": 768,
+  "parameters": 124439808,
+  "date": "2026-10-30",
+  "source": "ArtSource/training/bake_level2.py"
+ },
+ "thread": {
+  "text": "Because the cat was hungry, it chased the mouse.",
+  "tokens": [
+   {
+    "text": "Because",
+    "id": 8128
+   },
+   {
+    "text": " the",
+    "id": 262
+   },
+   {
+    "text": " cat",
+    "id": 3797
+   },
+   {
+    "text": " was",
+    "id": 373
+   },
+   {
+    "text": " hungry",
+    "id": 14720
+   },
+   {
+    "text": ",",
+    "id": 11
+   },
+   {
+    "text": " it",
+    "id": 340
+   },
+   {
+    "text": " chased",
+    "id": 26172
+   },
+   {
+    "text": " the",
+    "id": 262
+   },
+   {
+    "text": " mouse",
+    "id": 10211
+   },
+   {
+    "text": ".",
+    "id": 13
+   }
+  ]
+ },
+ "words": [
+  {
+   "word": "cat",
+   "tokens": [
+    " cat"
+   ],
+   "ids": [
+    3797
+   ]
+  },
+  {
+   "word": "the",
+   "tokens": [
+    " the"
+   ],
+   "ids": [
+    262
+   ]
+  },
+  {
+   "word": "pizza",
+   "tokens": [
+    " pizza"
+   ],
+   "ids": [
+    14256
+   ]
+  },
+  {
+   "word": "robot",
+   "tokens": [
+    " robot"
+   ],
+   "ids": [
+    9379
+   ]
+  },
+  {
+   "word": "happy",
+   "tokens": [
+    " happy"
+   ],
+   "ids": [
+    3772
+   ]
+  },
+  {
+   "word": "moon",
+   "tokens": [
+    " moon"
+   ],
+   "ids": [
+    8824
+   ]
+  },
+  {
+   "word": "dog",
+   "tokens": [
+    " dog"
+   ],
+   "ids": [
+    3290
+   ]
+  },
+  {
+   "word": "tree",
+   "tokens": [
+    " tree"
+   ],
+   "ids": [
+    5509
+   ]
+  },
+  {
+   "word": "unbelievable",
+   "tokens": [
+    " unbelievable"
+   ],
+   "ids": [
+    24479
+   ]
+  },
+  {
+   "word": "tokenization",
+   "tokens": [
+    " token",
+    "ization"
+   ],
+   "ids": [
+    11241,
+    1634
+   ]
+  },
+  {
+   "word": "strawberry",
+   "tokens": [
+    " strawberry"
+   ],
+   "ids": [
+    41236
+   ]
+  },
+  {
+   "word": "astronaut",
+   "tokens": [
+    " astronaut"
+   ],
+   "ids": [
+    33779
+   ]
+  },
+  {
+   "word": "rollercoaster",
+   "tokens": [
+    " roller",
+    "co",
+    "aster"
+   ],
+   "ids": [
+    24471,
+    1073,
+    1603
+   ]
+  },
+  {
+   "word": "microscope",
+   "tokens": [
+    " microscope"
+   ],
+   "ids": [
+    36396
+   ]
+  },
+  {
+   "word": "jellyfish",
+   "tokens": [
+    " jelly",
+    "fish"
+   ],
+   "ids": [
+    27644,
+    11084
+   ]
+  },
+  {
+   "word": "hamburger",
+   "tokens": [
+    " hamb",
+    "urger"
+   ],
+   "ids": [
+    41478,
+    32650
+   ]
+  },
+  {
+   "word": "skateboard",
+   "tokens": [
+    " skate",
+    "board"
+   ],
+   "ids": [
+    22647,
+    3526
+   ]
+  },
+  {
+   "word": "dinosaur",
+   "tokens": [
+    " dinosaur"
+   ],
+   "ids": [
+    28257
+   ]
+  },
+  {
+   "word": "refrigerator",
+   "tokens": [
+    " refrigerator"
+   ],
+   "ids": [
+    30500
+   ]
+  },
+  {
+   "word": "unhappiness",
+   "tokens": [
+    " unh",
+    "appiness"
+   ],
+   "ids": [
+    14274,
+    42661
+   ]
+  },
+  {
+   "word": "watermelon",
+   "tokens": [
+    " water",
+    "melon"
+   ],
+   "ids": [
+    1660,
+    45690
+   ]
+  },
+  {
+   "word": "spaceship",
+   "tokens": [
+    " spaceship"
+   ],
+   "ids": [
+    40663
+   ]
+  },
+  {
+   "word": "chatbot",
+   "tokens": [
+    " chat",
+    "bot"
+   ],
+   "ids": [
+    8537,
+    13645
+   ]
+  },
+  {
+   "word": "supercalifragilisticexpialidocious",
+   "tokens": [
+    " super",
+    "cal",
+    "if",
+    "rag",
+    "il",
+    "ist",
+    "ice",
+    "xp",
+    "ial",
+    "id",
+    "ocious"
+   ],
+   "ids": [
+    2208,
+    9948,
+    361,
+    22562,
+    346,
+    396,
+    501,
+    42372,
+    498,
+    312,
+    32346
+   ]
+  },
+  {
+   "word": "Pixel",
+   "tokens": [
+    " Pixel"
+   ],
+   "ids": [
+    11349
+   ]
+  },
+  {
+   "word": "neural",
+   "tokens": [
+    " neural"
+   ],
+   "ids": [
+    17019
+   ]
+  },
+  {
+   "word": "backpropagation",
+   "tokens": [
+    " back",
+    "prop",
+    "ag",
+    "ation"
+   ],
+   "ids": [
+    736,
+    22930,
+    363,
+    341
+   ]
+  },
+  {
+   "word": "marshmallow",
+   "tokens": [
+    " marsh",
+    "mallow"
+   ],
+   "ids": [
+    22397,
+    42725
+   ]
+  },
+  {
+   "word": "toothbrush",
+   "tokens": [
+    " tooth",
+    "brush"
+   ],
+   "ids": [
+    16162,
+    32680
+   ]
+  }
+ ],
+ "galaxy": {
+  "explained": [
+   0.0834,
+   0.076,
+   0.0621
+  ],
+  "centroids": [
+   {
+    "category": "animals",
+    "x": 0.2413,
+    "y": 0.0505,
+    "z": 0.634
+   },
+   {
+    "category": "feelings",
+    "x": -0.8007,
+    "y": -0.302,
+    "z": 0.0138
+   },
+   {
+    "category": "food",
+    "x": -0.0825,
+    "y": 0.7786,
+    "z": -0.195
+   },
+   {
+    "category": "places",
+    "x": 0.1935,
+    "y": -0.1871,
+    "z": -0.137
+   },
+   {
+    "category": "vehicles",
+    "x": 0.4484,
+    "y": -0.3401,
+    "z": -0.3158
+   }
+  ],
+  "words": [
+   {
+    "word": "cat",
+    "category": "animals",
+    "x": 0.2173,
+    "y": -0.0506,
+    "z": 0.5564
+   },
+   {
+    "word": "dog",
+    "category": "animals",
+    "x": 0.2606,
+    "y": -0.0258,
+    "z": 0.4621
+   },
+   {
+    "word": "horse",
+    "category": "animals",
+    "x": 0.499,
+    "y": -0.0191,
+    "z": 0.4721
+   },
+   {
+    "word": "lion",
+    "category": "animals",
+    "x": 0.0855,
+    "y": -0.0846,
+    "z": 0.9596
+   },
+   {
+    "word": "rabbit",
+    "category": "animals",
+    "x": 0.1353,
+    "y": 0.3055,
+    "z": 0.8906
+   },
+   {
+    "word": "tiger",
+    "category": "animals",
+    "x": 0.1977,
+    "y": -0.0363,
+    "z": 0.975
+   },
+   {
+    "word": "bird",
+    "category": "animals",
+    "x": 0.2723,
+    "y": 0.0196,
+    "z": 0.5062
+   },
+   {
+    "word": "fish",
+    "category": "animals",
+    "x": 0.2631,
+    "y": 0.2956,
+    "z": 0.2504
+   },
+   {
+    "word": "pizza",
+    "category": "food",
+    "x": -0.0764,
+    "y": 0.8171,
+    "z": -0.439
+   },
+   {
+    "word": "bread",
+    "category": "food",
+    "x": -0.162,
+    "y": 0.9142,
+    "z": -0.5069
+   },
+   {
+    "word": "cheese",
+    "category": "food",
+    "x": -0.1169,
+    "y": 0.8725,
+    "z": -0.2568
+   },
+   {
+    "word": "apple",
+    "category": "food",
+    "x": -0.01,
+    "y": 0.703,
+    "z": 0.23
+   },
+   {
+    "word": "banana",
+    "category": "food",
+    "x": 0.001,
+    "y": 0.7972,
+    "z": 0.0691
+   },
+   {
+    "word": "soup",
+    "category": "food",
+    "x": -0.0822,
+    "y": 0.6482,
+    "z": -0.2578
+   },
+   {
+    "word": "rice",
+    "category": "food",
+    "x": -0.0907,
+    "y": 0.6584,
+    "z": -0.1865
+   },
+   {
+    "word": "cake",
+    "category": "food",
+    "x": -0.1229,
+    "y": 0.818,
+    "z": -0.2124
+   },
+   {
+    "word": "car",
+    "category": "vehicles",
+    "x": 0.4554,
+    "y": -0.3563,
+    "z": -0.2131
+   },
+   {
+    "word": "bus",
+    "category": "vehicles",
+    "x": 0.3516,
+    "y": -0.2528,
+    "z": -0.5644
+   },
+   {
+    "word": "train",
+    "category": "vehicles",
+    "x": 0.3946,
+    "y": -0.518,
+    "z": -0.2957
+   },
+   {
+    "word": "plane",
+    "category": "vehicles",
+    "x": 0.4675,
+    "y": -0.4178,
+    "z": -0.3766
+   },
+   {
+    "word": "bike",
+    "category": "vehicles",
+    "x": 0.4187,
+    "y": -0.2117,
+    "z": -0.1996
+   },
+   {
+    "word": "truck",
+    "category": "vehicles",
+    "x": 0.4006,
+    "y": -0.2387,
+    "z": -0.3388
+   },
+   {
+    "word": "boat",
+    "category": "vehicles",
+    "x": 0.6358,
+    "y": -0.368,
+    "z": -0.2901
+   },
+   {
+    "word": "ship",
+    "category": "vehicles",
+    "x": 0.4626,
+    "y": -0.3574,
+    "z": -0.248
+   },
+   {
+    "word": "happy",
+    "category": "feelings",
+    "x": -0.8263,
+    "y": -0.2736,
+    "z": -0.0551
+   },
+   {
+    "word": "sad",
+    "category": "feelings",
+    "x": -0.7354,
+    "y": -0.2611,
+    "z": -0.047
+   },
+   {
+    "word": "angry",
+    "category": "feelings",
+    "x": -0.7789,
+    "y": -0.2828,
+    "z": 0.0381
+   },
+   {
+    "word": "scared",
+    "category": "feelings",
+    "x": -0.791,
+    "y": -0.3013,
+    "z": 0.2072
+   },
+   {
+    "word": "proud",
+    "category": "feelings",
+    "x": -1.0,
+    "y": -0.2948,
+    "z": -0.0666
+   },
+   {
+    "word": "tired",
+    "category": "feelings",
+    "x": -0.7814,
+    "y": -0.3192,
+    "z": -0.1371
+   },
+   {
+    "word": "calm",
+    "category": "feelings",
+    "x": -0.5639,
+    "y": -0.2879,
+    "z": 0.1301
+   },
+   {
+    "word": "excited",
+    "category": "feelings",
+    "x": -0.9284,
+    "y": -0.3952,
+    "z": 0.0407
+   },
+   {
+    "word": "city",
+    "category": "places",
+    "x": 0.1354,
+    "y": -0.3708,
+    "z": -0.3495
+   },
+   {
+    "word": "forest",
+    "category": "places",
+    "x": 0.2528,
+    "y": -0.1404,
+    "z": 0.2088
+   },
+   {
+    "word": "beach",
+    "category": "places",
+    "x": 0.1792,
+    "y": -0.1191,
+    "z": -0.306
+   },
+   {
+    "word": "school",
+    "category": "places",
+    "x": 0.076,
+    "y": -0.2928,
+    "z": -0.3459
+   },
+   {
+    "word": "castle",
+    "category": "places",
+    "x": 0.1742,
+    "y": -0.0349,
+    "z": -0.0037
+   },
+   {
+    "word": "river",
+    "category": "places",
+    "x": 0.3479,
+    "y": -0.1738,
+    "z": -0.048
+   },
+   {
+    "word": "mountain",
+    "category": "places",
+    "x": 0.2484,
+    "y": -0.1872,
+    "z": 0.0085
+   },
+   {
+    "word": "village",
+    "category": "places",
+    "x": 0.134,
+    "y": -0.1774,
+    "z": -0.2602
+   }
+  ]
+ },
+ "analogies": [
+  {
+   "a": "king",
+   "b": "man",
+   "c": "woman",
+   "answers": [
+    {
+     "word": "queen",
+     "similarity": 0.709
+    },
+    {
+     "word": "princess",
+     "similarity": 0.605
+    },
+    {
+     "word": "kings",
+     "similarity": 0.593
+    },
+    {
+     "word": "monarch",
+     "similarity": 0.525
+    },
+    {
+     "word": "queens",
+     "similarity": 0.519
+    }
+   ]
+  },
+  {
+   "a": "walking",
+   "b": "walk",
+   "c": "swim",
+   "answers": [
+    {
+     "word": "swimming",
+     "similarity": 0.729
+    },
+    {
+     "word": "bathing",
+     "similarity": 0.562
+    },
+    {
+     "word": "sailing",
+     "similarity": 0.509
+    },
+    {
+     "word": "aquatic",
+     "similarity": 0.506
+    },
+    {
+     "word": "surfing",
+     "similarity": 0.481
+    }
+   ]
+  }
+ ],
+ "neighbours": [
+  {
+   "word": "cat",
+   "nearest": [
+    {
+     "word": "cats",
+     "similarity": 0.693
+    },
+    {
+     "word": "dog",
+     "similarity": 0.55
+    },
+    {
+     "word": "kitten",
+     "similarity": 0.501
+    },
+    {
+     "word": "kittens",
+     "similarity": 0.466
+    },
+    {
+     "word": "catcher",
+     "similarity": 0.455
+    },
+    {
+     "word": "pet",
+     "similarity": 0.454
+    }
+   ]
+  },
+  {
+   "word": "king",
+   "nearest": [
+    {
+     "word": "kings",
+     "similarity": 0.733
+    },
+    {
+     "word": "queen",
+     "similarity": 0.657
+    },
+    {
+     "word": "prince",
+     "similarity": 0.59
+    },
+    {
+     "word": "monarch",
+     "similarity": 0.581
+    },
+    {
+     "word": "emperor",
+     "similarity": 0.557
+    },
+    {
+     "word": "ruler",
+     "similarity": 0.551
+    }
+   ]
+  }
+ ],
+ "attention": [
+  {
+   "sentence": "The tiny green dragon ate the pizza",
+   "query": 3,
+   "answers": [
+    1,
+    2
+   ],
+   "words": [
+    "The",
+    "tiny",
+    "green",
+    "dragon",
+    "ate",
+    "the",
+    "pizza"
+   ],
+   "weights": [
+    0.099,
+    0.5512,
+    0.3498
+   ],
+   "layer": 4,
+   "head": 3
+  },
+  {
+   "sentence": "The dog chased the cat, then it climbed a tree",
+   "query": 7,
+   "answers": [
+    4
+   ],
+   "words": [
+    "The",
+    "dog",
+    "chased",
+    "the",
+    "cat",
+    ",",
+    "then",
+    "it",
+    "climbed",
+    "a",
+    "tree"
+   ],
+   "weights": [
+    0.0343,
+    0.38,
+    0.0431,
+    0.0108,
+    0.3987,
+    0.0472,
+    0.086
+   ],
+   "layer": 4,
+   "head": 3
+  },
+  {
+   "sentence": "She poured milk into the glass and drank it",
+   "query": 8,
+   "answers": [
+    2
+   ],
+   "words": [
+    "She",
+    "poured",
+    "milk",
+    "into",
+    "the",
+    "glass",
+    "and",
+    "drank",
+    "it"
+   ],
+   "weights": [
+    0.0084,
+    0.0038,
+    0.8868,
+    0.0116,
+    0.0069,
+    0.069,
+    0.0067,
+    0.0067
+   ],
+   "layer": 4,
+   "head": 3
+  },
+  {
+   "sentence": "The fluffy blue creature walked the quiet forest",
+   "query": 3,
+   "answers": [
+    1,
+    2
+   ],
+   "words": [
+    "The",
+    "fluffy",
+    "blue",
+    "creature",
+    "walked",
+    "the",
+    "quiet",
+    "forest"
+   ],
+   "weights": [
+    0.1173,
+    0.4489,
+    0.4338
+   ],
+   "layer": 4,
+   "head": 3
+  }
+ ],
+ "predict": [
+  {
+   "prompt": "Once upon a",
+   "truth": " time",
+   "truthP": 0.99195,
+   "truthRank": 1,
+   "entropy": 0.143,
+   "top": [
+    {
+     "word": " time",
+     "p": 0.99195,
+     "id": 640
+    },
+    {
+     "word": " Time",
+     "p": 0.00082,
+     "id": 3862
+    },
+    {
+     "word": " while",
+     "p": 0.00025,
+     "id": 981
+    },
+    {
+     "word": " times",
+     "p": 0.00021,
+     "id": 1661
+    },
+    {
+     "word": " year",
+     "p": 0.0002,
+     "id": 614
+    },
+    {
+     "word": "time",
+     "p": 0.00019,
+     "id": 2435
+    },
+    {
+     "word": " world",
+     "p": 0.00013,
+     "id": 995
+    },
+    {
+     "word": " summer",
+     "p": 0.00013,
+     "id": 3931
+    },
+    {
+     "word": " night",
+     "p": 0.00011,
+     "id": 1755
+    },
+    {
+     "word": " galaxy",
+     "p": 0.0001,
+     "id": 16161
+    },
+    {
+     "word": " rainy",
+     "p": 0.0001,
+     "id": 37259
+    },
+    {
+     "word": " day",
+     "p": 8e-05,
+     "id": 1110
+    }
+   ]
+  },
+  {
+   "prompt": "Peanut butter and",
+   "truth": " jelly",
+   "truthP": 0.29433,
+   "truthRank": 1,
+   "entropy": 6.132,
+   "top": [
+    {
+     "word": " jelly",
+     "p": 0.29433,
+     "id": 27644
+    },
+    {
+     "word": " chocolate",
+     "p": 0.08245,
+     "id": 11311
+    },
+    {
+     "word": " peanut",
+     "p": 0.04892,
+     "id": 26636
+    },
+    {
+     "word": " cream",
+     "p": 0.02987,
+     "id": 8566
+    },
+    {
+     "word": " sugar",
+     "p": 0.02815,
+     "id": 7543
+    },
+    {
+     "word": " cheese",
+     "p": 0.02364,
+     "id": 9891
+    },
+    {
+     "word": " eggs",
+     "p": 0.01668,
+     "id": 9653
+    },
+    {
+     "word": " vanilla",
+     "p": 0.01429,
+     "id": 16858
+    },
+    {
+     "word": " coconut",
+     "p": 0.01396,
+     "id": 20132
+    },
+    {
+     "word": " ice",
+     "p": 0.01362,
+     "id": 4771
+    },
+    {
+     "word": " honey",
+     "p": 0.0106,
+     "id": 12498
+    },
+    {
+     "word": " butter",
+     "p": 0.00946,
+     "id": 9215
+    }
+   ]
+  },
+  {
+   "prompt": "In the morning I drink a cup of",
+   "truth": " tea",
+   "truthP": 0.2028,
+   "truthRank": 2,
+   "entropy": 5.157,
+   "top": [
+    {
+     "word": " coffee",
+     "p": 0.3715,
+     "id": 6891
+    },
+    {
+     "word": " tea",
+     "p": 0.2028,
+     "id": 8887
+    },
+    {
+     "word": " water",
+     "p": 0.05338,
+     "id": 1660
+    },
+    {
+     "word": " milk",
+     "p": 0.01541,
+     "id": 7545
+    },
+    {
+     "word": " cold",
+     "p": 0.01431,
+     "id": 4692
+    },
+    {
+     "word": " hot",
+     "p": 0.01266,
+     "id": 3024
+    },
+    {
+     "word": " wine",
+     "p": 0.00913,
+     "id": 8237
+    },
+    {
+     "word": " beer",
+     "p": 0.00728,
+     "id": 6099
+    },
+    {
+     "word": " warm",
+     "p": 0.00639,
+     "id": 5814
+    },
+    {
+     "word": " espresso",
+     "p": 0.00564,
+     "id": 48247
+    },
+    {
+     "word": " white",
+     "p": 0.00551,
+     "id": 2330
+    },
+    {
+     "word": " the",
+     "p": 0.00493,
+     "id": 262
+    }
+   ]
+  },
+  {
+   "prompt": "Roses are red, violets are",
+   "truth": " blue",
+   "truthP": 0.20722,
+   "truthRank": 2,
+   "entropy": 4.92,
+   "top": [
+    {
+     "word": " green",
+     "p": 0.21088,
+     "id": 4077
+    },
+    {
+     "word": " blue",
+     "p": 0.20722,
+     "id": 4171
+    },
+    {
+     "word": " white",
+     "p": 0.09755,
+     "id": 2330
+    },
+    {
+     "word": " yellow",
+     "p": 0.08524,
+     "id": 7872
+    },
+    {
+     "word": " black",
+     "p": 0.04845,
+     "id": 2042
+    },
+    {
+     "word": " pink",
+     "p": 0.03664,
+     "id": 11398
+    },
+    {
+     "word": " purple",
+     "p": 0.03266,
+     "id": 14032
+    },
+    {
+     "word": " orange",
+     "p": 0.02952,
+     "id": 10912
+    },
+    {
+     "word": " brown",
+     "p": 0.02333,
+     "id": 7586
+    },
+    {
+     "word": " red",
+     "p": 0.01665,
+     "id": 2266
+    },
+    {
+     "word": " grey",
+     "p": 0.01185,
+     "id": 13791
+    },
+    {
+     "word": " gold",
+     "p": 0.00987,
+     "id": 3869
+    }
+   ]
+  },
+  {
+   "prompt": "I opened the fridge and grabbed a glass of",
+   "truth": " milk",
+   "truthP": 0.09724,
+   "truthRank": 2,
+   "entropy": 7.472,
+   "top": [
+    {
+     "word": " water",
+     "p": 0.17834,
+     "id": 1660
+    },
+    {
+     "word": " milk",
+     "p": 0.09724,
+     "id": 7545
+    },
+    {
+     "word": " wine",
+     "p": 0.06609,
+     "id": 8237
+    },
+    {
+     "word": " cold",
+     "p": 0.02516,
+     "id": 4692
+    },
+    {
+     "word": " ice",
+     "p": 0.02023,
+     "id": 4771
+    },
+    {
+     "word": " orange",
+     "p": 0.01765,
+     "id": 10912
+    },
+    {
+     "word": " lemon",
+     "p": 0.01398,
+     "id": 18873
+    },
+    {
+     "word": " red",
+     "p": 0.0138,
+     "id": 2266
+    },
+    {
+     "word": " white",
+     "p": 0.01101,
+     "id": 2330
+    },
+    {
+     "word": " beer",
+     "p": 0.01067,
+     "id": 6099
+    },
+    {
+     "word": " the",
+     "p": 0.01031,
+     "id": 262
+    },
+    {
+     "word": " coffee",
+     "p": 0.0093,
+     "id": 6891
+    }
+   ]
+  },
+  {
+   "prompt": "The cat chased the mouse because it was",
+   "truth": " hungry",
+   "truthP": 0.01322,
+   "truthRank": 12,
+   "entropy": 8.282,
+   "top": [
+    {
+     "word": " too",
+     "p": 0.09287,
+     "id": 1165
+    },
+    {
+     "word": " so",
+     "p": 0.05082,
+     "id": 523
+    },
+    {
+     "word": " trying",
+     "p": 0.04546,
+     "id": 2111
+    },
+    {
+     "word": " chasing",
+     "p": 0.03185,
+     "id": 20023
+    },
+    {
+     "word": " afraid",
+     "p": 0.02749,
+     "id": 7787
+    },
+    {
+     "word": " scared",
+     "p": 0.02564,
+     "id": 12008
+    },
+    {
+     "word": " a",
+     "p": 0.02533,
+     "id": 257
+    },
+    {
+     "word": " in",
+     "p": 0.02027,
+     "id": 287
+    },
+    {
+     "word": " \"",
+     "p": 0.01692,
+     "id": 366
+    },
+    {
+     "word": " running",
+     "p": 0.01604,
+     "id": 2491
+    },
+    {
+     "word": " not",
+     "p": 0.01534,
+     "id": 407
+    },
+    {
+     "word": " hungry",
+     "p": 0.01322,
+     "id": 14720
+    }
+   ]
+  }
+ ],
+ "temperature": {
+  "prompt": "My robot loves to",
+  "settings": [
+   {
+    "temperature": 0.2,
+    "top": [
+     {
+      "word": " play",
+      "p": 0.53806,
+      "id": 711
+     },
+     {
+      "word": " talk",
+      "p": 0.38403,
+      "id": 1561
+     },
+     {
+      "word": " be",
+      "p": 0.04843,
+      "id": 307
+     },
+     {
+      "word": " do",
+      "p": 0.01894,
+      "id": 466
+     },
+     {
+      "word": " make",
+      "p": 0.0027,
+      "id": 787
+     },
+     {
+      "word": " work",
+      "p": 0.00207,
+      "id": 670
+     }
+    ]
+   },
+   {
+    "temperature": 0.5,
+    "top": [
+     {
+      "word": " play",
+      "p": 0.26159,
+      "id": 711
+     },
+     {
+      "word": " talk",
+      "p": 0.22857,
+      "id": 1561
+     },
+     {
+      "word": " be",
+      "p": 0.09984,
+      "id": 307
+     },
+     {
+      "word": " do",
+      "p": 0.06859,
+      "id": 466
+     },
+     {
+      "word": " make",
+      "p": 0.03149,
+      "id": 787
+     },
+     {
+      "word": " work",
+      "p": 0.02831,
+      "id": 670
+     }
+    ]
+   },
+   {
+    "temperature": 1.0,
+    "top": [
+     {
+      "word": " play",
+      "p": 0.05604,
+      "id": 711
+     },
+     {
+      "word": " talk",
+      "p": 0.05238,
+      "id": 1561
+     },
+     {
+      "word": " be",
+      "p": 0.03462,
+      "id": 307
+     },
+     {
+      "word": " do",
+      "p": 0.02869,
+      "id": 466
+     },
+     {
+      "word": " make",
+      "p": 0.01944,
+      "id": 787
+     },
+     {
+      "word": " work",
+      "p": 0.01843,
+      "id": 670
+     }
+    ]
+   },
+   {
+    "temperature": 1.5,
+    "top": [
+     {
+      "word": " play",
+      "p": 0.01481,
+      "id": 711
+     },
+     {
+      "word": " talk",
+      "p": 0.01416,
+      "id": 1561
+     },
+     {
+      "word": " be",
+      "p": 0.01075,
+      "id": 307
+     },
+     {
+      "word": " do",
+      "p": 0.00948,
+      "id": 466
+     },
+     {
+      "word": " make",
+      "p": 0.00731,
+      "id": 787
+     },
+     {
+      "word": " work",
+      "p": 0.00706,
+      "id": 670
+     }
+    ]
+   },
+   {
+    "temperature": 2.5,
+    "top": [
+     {
+      "word": " play",
+      "p": 0.00244,
+      "id": 711
+     },
+     {
+      "word": " talk",
+      "p": 0.00238,
+      "id": 1561
+     },
+     {
+      "word": " be",
+      "p": 0.00202,
+      "id": 307
+     },
+     {
+      "word": " do",
+      "p": 0.00187,
+      "id": 466
+     },
+     {
+      "word": " make",
+      "p": 0.0016,
+      "id": 787
+     },
+     {
+      "word": " work",
+      "p": 0.00157,
+      "id": 670
+     }
+    ]
+   }
+  ]
+ },
+ "story": {
+  "start": "My robot loves to",
+  "forks": 3,
+  "nodes": [
+   {
+    "path": "",
+    "text": "My robot loves to",
+    "lanes": [
+     {
+      "word": "play",
+      "p": 0.05604,
+      "id": 711
+     },
+     {
+      "word": "talk",
+      "p": 0.05238,
+      "id": 1561
+     },
+     {
+      "word": "do",
+      "p": 0.02869,
+      "id": 466
+     },
+     {
+      "word": "eat",
+      "p": 0.01477,
+      "id": 4483
+     }
+    ]
+   },
+   {
+    "path": "0",
+    "text": "My robot loves to play",
+    "lanes": [
+     {
+      "word": "with",
+      "p": 0.20231,
+      "id": 351
+     },
+     {
+      "word": "games",
+      "p": 0.07919,
+      "id": 1830
+     },
+     {
+      "word": "the",
+      "p": 0.02275,
+      "id": 262
+     },
+     {
+      "word": "around",
+      "p": 0.01361,
+      "id": 1088
+     }
+    ]
+   },
+   {
+    "path": "00",
+    "text": "My robot loves to play with",
+    "lanes": [
+     {
+      "word": "me",
+      "p": 0.10158,
+      "id": 502
+     },
+     {
+      "word": "my",
+      "p": 0.08692,
+      "id": 616
+     },
+     {
+      "word": "its",
+      "p": 0.04481,
+      "id": 663
+     },
+     {
+      "word": "robots",
+      "p": 0.01376,
+      "id": 14193
+     }
+    ]
+   },
+   {
+    "path": "01",
+    "text": "My robot loves to play games",
+    "lanes": [
+     {
+      "word": "and",
+      "p": 0.12516,
+      "id": 290
+     },
+     {
+      "word": "with",
+      "p": 0.08726,
+      "id": 351
+     },
+     {
+      "word": "on",
+      "p": 0.01563,
+      "id": 319
+     },
+     {
+      "word": "too",
+      "p": 0.00712,
+      "id": 1165
+     }
+    ]
+   },
+   {
+    "path": "02",
+    "text": "My robot loves to play the",
+    "lanes": [
+     {
+      "word": "piano",
+      "p": 0.07955,
+      "id": 19132
+     },
+     {
+      "word": "game",
+      "p": 0.05776,
+      "id": 983
+     },
+     {
+      "word": "violin",
+      "p": 0.02486,
+      "id": 38283
+     },
+     {
+      "word": "computer",
+      "p": 0.01015,
+      "id": 3644
+     }
+    ]
+   },
+   {
+    "path": "03",
+    "text": "My robot loves to play around",
+    "lanes": [
+     {
+      "word": "with",
+      "p": 0.61644,
+      "id": 351
+     },
+     {
+      "word": "and",
+      "p": 0.06368,
+      "id": 290
+     },
+     {
+      "word": "on",
+      "p": 0.02078,
+      "id": 319
+     },
+     {
+      "word": "too",
+      "p": 0.00232,
+      "id": 1165
+     }
+    ]
+   },
+   {
+    "path": "1",
+    "text": "My robot loves to talk",
+    "lanes": [
+     {
+      "word": "to",
+      "p": 0.26115,
+      "id": 284
+     },
+     {
+      "word": "about",
+      "p": 0.15024,
+      "id": 546
+     },
+     {
+      "word": "with",
+      "p": 0.01284,
+      "id": 351
+     },
+     {
+      "word": "like",
+      "p": 0.00333,
+      "id": 588
+     }
+    ]
+   },
+   {
+    "path": "10",
+    "text": "My robot loves to talk to",
+    "lanes": [
+     {
+      "word": "me",
+      "p": 0.49523,
+      "id": 502
+     },
+     {
+      "word": "people",
+      "p": 0.11082,
+      "id": 661
+     },
+     {
+      "word": "other",
+      "p": 0.02757,
+      "id": 584
+     },
+     {
+      "word": "others",
+      "p": 0.00642,
+      "id": 1854
+     }
+    ]
+   },
+   {
+    "path": "11",
+    "text": "My robot loves to talk about",
+    "lanes": [
+     {
+      "word": "how",
+      "p": 0.07483,
+      "id": 703
+     },
+     {
+      "word": "the",
+      "p": 0.07448,
+      "id": 262
+     },
+     {
+      "word": "things",
+      "p": 0.03335,
+      "id": 1243
+     },
+     {
+      "word": "stuff",
+      "p": 0.01309,
+      "id": 3404
+     }
+    ]
+   },
+   {
+    "path": "12",
+    "text": "My robot loves to talk with",
+    "lanes": [
+     {
+      "word": "me",
+      "p": 0.42869,
+      "id": 502
+     },
+     {
+      "word": "people",
+      "p": 0.07789,
+      "id": 661
+     },
+     {
+      "word": "us",
+      "p": 0.03047,
+      "id": 514
+     },
+     {
+      "word": "a",
+      "p": 0.00985,
+      "id": 257
+     }
+    ]
+   },
+   {
+    "path": "13",
+    "text": "My robot loves to talk like",
+    "lanes": [
+     {
+      "word": "a",
+      "p": 0.32428,
+      "id": 257
+     },
+     {
+      "word": "me",
+      "p": 0.07809,
+      "id": 502
+     },
+     {
+      "word": "I",
+      "p": 0.05572,
+      "id": 314
+     },
+     {
+      "word": "the",
+      "p": 0.01333,
+      "id": 262
+     }
+    ]
+   },
+   {
+    "path": "2",
+    "text": "My robot loves to do",
+    "lanes": [
+     {
+      "word": "things",
+      "p": 0.1696,
+      "id": 1243
+     },
+     {
+      "word": "the",
+      "p": 0.03713,
+      "id": 262
+     },
+     {
+      "word": "a",
+      "p": 0.02981,
+      "id": 257
+     },
+     {
+      "word": "stuff",
+      "p": 0.01596,
+      "id": 3404
+     }
+    ]
+   },
+   {
+    "path": "20",
+    "text": "My robot loves to do things",
+    "lanes": [
+     {
+      "word": "that",
+      "p": 0.14324,
+      "id": 326
+     },
+     {
+      "word": "for",
+      "p": 0.07876,
+      "id": 329
+     },
+     {
+      "word": "with",
+      "p": 0.03622,
+      "id": 351
+     },
+     {
+      "word": "on",
+      "p": 0.02113,
+      "id": 319
+     }
+    ]
+   },
+   {
+    "path": "21",
+    "text": "My robot loves to do the",
+    "lanes": [
+     {
+      "word": "things",
+      "p": 0.08304,
+      "id": 1243
+     },
+     {
+      "word": "same",
+      "p": 0.07942,
+      "id": 976
+     },
+     {
+      "word": "right",
+      "p": 0.03097,
+      "id": 826
+     },
+     {
+      "word": "little",
+      "p": 0.0103,
+      "id": 1310
+     }
+    ]
+   },
+   {
+    "path": "22",
+    "text": "My robot loves to do a",
+    "lanes": [
+     {
+      "word": "lot",
+      "p": 0.26182,
+      "id": 1256
+     },
+     {
+      "word": "little",
+      "p": 0.0577,
+      "id": 1310
+     },
+     {
+      "word": "bunch",
+      "p": 0.02967,
+      "id": 7684
+     },
+     {
+      "word": "series",
+      "p": 0.00952,
+      "id": 2168
+     }
+    ]
+   },
+   {
+    "path": "23",
+    "text": "My robot loves to do stuff",
+    "lanes": [
+     {
+      "word": "that",
+      "p": 0.10457,
+      "id": 326
+     },
+     {
+      "word": "for",
+      "p": 0.07656,
+      "id": 329
+     },
+     {
+      "word": "like",
+      "p": 0.04259,
+      "id": 588
+     },
+     {
+      "word": "when",
+      "p": 0.00911,
+      "id": 618
+     }
+    ]
+   },
+   {
+    "path": "3",
+    "text": "My robot loves to eat",
+    "lanes": [
+     {
+      "word": "and",
+      "p": 0.05226,
+      "id": 290
+     },
+     {
+      "word": "my",
+      "p": 0.04318,
+      "id": 616
+     },
+     {
+      "word": "me",
+      "p": 0.02425,
+      "id": 502
+     },
+     {
+      "word": "all",
+      "p": 0.01017,
+      "id": 477
+     }
+    ]
+   },
+   {
+    "path": "30",
+    "text": "My robot loves to eat and",
+    "lanes": [
+     {
+      "word": "I",
+      "p": 0.06283,
+      "id": 314
+     },
+     {
+      "word": "it",
+      "p": 0.05722,
+      "id": 340
+     },
+     {
+      "word": "is",
+      "p": 0.03496,
+      "id": 318
+     },
+     {
+      "word": "my",
+      "p": 0.01381,
+      "id": 616
+     }
+    ]
+   },
+   {
+    "path": "31",
+    "text": "My robot loves to eat my",
+    "lanes": [
+     {
+      "word": "food",
+      "p": 0.16549,
+      "id": 2057
+     },
+     {
+      "word": "own",
+      "p": 0.02678,
+      "id": 898
+     },
+     {
+      "word": "veggies",
+      "p": 0.01586,
+      "id": 39425
+     },
+     {
+      "word": "heart",
+      "p": 0.00927,
+      "id": 2612
+     }
+    ]
+   },
+   {
+    "path": "32",
+    "text": "My robot loves to eat me",
+    "lanes": [
+     {
+      "word": "and",
+      "p": 0.05238,
+      "id": 290
+     },
+     {
+      "word": "up",
+      "p": 0.03101,
+      "id": 510
+     },
+     {
+      "word": "out",
+      "p": 0.00789,
+      "id": 503
+     },
+     {
+      "word": "a",
+      "p": 0.00556,
+      "id": 257
+     }
+    ]
+   },
+   {
+    "path": "33",
+    "text": "My robot loves to eat all",
+    "lanes": [
+     {
+      "word": "the",
+      "p": 0.21296,
+      "id": 262
+     },
+     {
+      "word": "kinds",
+      "p": 0.1884,
+      "id": 6982
+     },
+     {
+      "word": "my",
+      "p": 0.07581,
+      "id": 616
+     },
+     {
+      "word": "its",
+      "p": 0.01215,
+      "id": 663
+     }
+    ]
+   }
+  ]
+ }
+}

@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using Convergence.Gameplay.Ride;
 using Convergence.Gameplay.Ride.Level1;
@@ -46,6 +47,17 @@ namespace Convergence.Presentation.Ride
         [SerializeField] private float snapBuzz = 0.75f;
         [SerializeField] private float snapBuzzSeconds = 0.12f;
 
+        [Header("Showing how (owner, 2026-10-30: the teacher could not tell the glowing wires are dragged to the 3)")]
+        [Tooltip("A ring around the 3, the place to let go (a closed line renderer of unit radius; the view sizes it).")]
+        [SerializeField] private Transform dropRing;
+        [Tooltip("The words beside the 3, all the time the wires are live.")]
+        [SerializeField] private TextMeshPro dropLabel;
+        [Tooltip("The words that ride with the ghost hand: 1 GRAB IT, 2 DRAG IT, 3 LET GO.")]
+        [SerializeField] private TextMeshPro stepLabel;
+        [Tooltip("Seconds without a grab before a ghost hand shows how, and again after every lap.")]
+        [SerializeField] private float showAfterIdle = 4f;
+        [SerializeField] private float demoSeconds = 7f;
+
         [Header("Re-aiming at the rider's digit (v6)")]
         [Tooltip("Where the 49 pixels, 16 hidden neurons and 10 answers sit, in the blame meshes' frame.")]
         [SerializeField] private Vector3[] inputPositions = new Vector3[0];
@@ -64,7 +76,15 @@ namespace Convergence.Presentation.Ride
         private float _flash;
         private Camera _camera;
 
-        // The glows: per wire a handle and a pulse, then the 3's glow, then its flash. Four vertices each.
+        // The glows: per wire a handle and a pulse, then the ghost hand (a cursor, its trail, the dotted guide), then the 3's glow,
+        // then its flash. Four vertices each.
+        private const int TrailCount = 6;
+        private const int GuideCount = 8;
+        private const int GhostSlots = 1 + TrailCount + GuideCount;
+        private float _lastActivity = -100f;
+        private float _demoStarted = -1f;
+        private bool _demoFlashed;
+        private static readonly Color GhostColor = new Color(1f, 1f, 1f, 0.9f);
         private Mesh _glowMesh;
         private Vector3[] _glowVerts;
         private Color[] _glowColors;
@@ -94,7 +114,7 @@ namespace Convergence.Presentation.Ride
         private void BuildGlowMesh()
         {
             if (glows == null) return;
-            _glowCount = origins.Length * 2 + 2;
+            _glowCount = origins.Length * 2 + GhostSlots + 2;
             _glowVerts = new Vector3[_glowCount * 4];
             _glowColors = new Color[_glowCount * 4];
             var uv = new Vector2[_glowCount * 4];
@@ -135,6 +155,7 @@ namespace Convergence.Presentation.Ride
             moment.Grabbed += OnGrabbed;
             moment.Dropped += OnDropped;
             moment.Connected += OnConnected;
+            moment.LiveChanged += OnLive;
         }
 
         private void OnDisable()
@@ -146,12 +167,14 @@ namespace Convergence.Presentation.Ride
             moment.Grabbed -= OnGrabbed;
             moment.Dropped -= OnDropped;
             moment.Connected -= OnConnected;
+            moment.LiveChanged -= OnLive;
         }
 
         private void Start()
         {
             foreach (LineRenderer cable in cables) if (cable != null) cable.enabled = false;
             if (glows != null) glows.gameObject.SetActive(false);
+            ShowCoach(false, false);
             Reaim();
         }
 
@@ -300,6 +323,8 @@ namespace Convergence.Presentation.Ride
                 Glow(k * 2 + 1, Cable(from, end, 1f - u), pulseSize * (0.7f + 0.5f * Mathf.Sin(u * Mathf.PI)), Color.white);
             }
 
+            UpdateCoach(live, socket, radius);
+
             // The 3: a gold glow the size of the snap zone, swelling as a wire's end comes near, and a flash when one snaps on.
             if (live)
             {
@@ -315,6 +340,140 @@ namespace Convergence.Presentation.Ride
             if (!glows.gameObject.activeSelf) return;
             _glowMesh.vertices = _glowVerts;
             _glowMesh.colors = _glowColors;
+        }
+
+
+        // ---------- showing how ----------
+
+        private void OnLive(bool live)
+        {
+            _demoStarted = -1f;
+            // The first lap starts soon after the hunt opens: a rider who has never seen it should not wait to be shown.
+            _lastActivity = live ? Time.time - showAfterIdle + 1.5f : -100f;
+        }
+
+        private int FirstLoose()
+        {
+            int wires = Mathf.Min(origins.Length, Mathf.Min(ends.Length, cables.Length));
+            for (int k = 0; k < wires; k++) if (!moment.IsNudged(k)) return k;
+            return -1;
+        }
+
+        private void ShowCoach(bool ring, bool step)
+        {
+            if (dropRing != null && dropRing.gameObject.activeSelf != ring) dropRing.gameObject.SetActive(ring);
+            if (dropLabel != null && dropLabel.gameObject.activeSelf != ring) dropLabel.gameObject.SetActive(ring);
+            if (stepLabel != null && stepLabel.gameObject.activeSelf != step) stepLabel.gameObject.SetActive(step);
+        }
+
+        /// <summary>
+        /// While the hunt is live the 3 wears a ring and "DROP ON THE 3". While a wire is carried, a dotted trail of lights runs from
+        /// its end to the 3. When nobody has grabbed anything for a few seconds, a ghost hand shows the whole move: it presses on
+        /// the loose end of the hottest wire (1 GRAB IT), drags it along the path (2 DRAG IT) and lets go on the 3 (3 LET GO).
+        /// </summary>
+        private void UpdateCoach(bool live, Vector3 socket, float radius)
+        {
+            int carried = moment.Carrying(RideHand.Left) >= 0 ? RideHand.Left : moment.Carrying(RideHand.Right) >= 0 ? RideHand.Right : -1;
+            if (carried >= 0) _lastActivity = Time.time;
+            int k = live ? FirstLoose() : -1;
+            bool demo = live && carried < 0 && k >= 0 && Time.time - _lastActivity >= showAfterIdle;
+            ShowCoach(live, demo);
+            if (!live)
+            {
+                _demoStarted = -1f;
+                return;
+            }
+
+            if (dropRing != null)
+            {
+                float pulse = 1f + 0.07f * Mathf.Sin(Time.time * 4.5f);
+                dropRing.position = socket;
+                dropRing.localScale = Vector3.one * radius * 1.05f * pulse;
+            }
+
+            int ghost = origins.Length * 2;
+            if (carried >= 0)
+            {
+                if (moment.TryGetCursor(carried, out Vector3 hand)) Guide(ghost + 1 + TrailCount, hand, socket, new Color(1f, 0.9f, 0.45f, 0.9f));
+                _demoStarted = -1f;
+                return;
+            }
+
+            if (!demo)
+            {
+                _demoStarted = -1f;
+                return;
+            }
+
+            if (_demoStarted < 0f)
+            {
+                _demoStarted = Time.time;
+                _demoFlashed = false;
+            }
+
+            float t = Time.time - _demoStarted;
+            if (t >= demoSeconds)
+            {
+                // A lap is over: rest a moment, then show it again.
+                _lastActivity = Time.time - showAfterIdle + 1.2f;
+                _demoStarted = -1f;
+                if (stepLabel != null) stepLabel.gameObject.SetActive(false);
+                return;
+            }
+
+            Vector3 from = ends[k].position;
+            const float press = 1.1f, travel = 2.6f;
+            float along = Mathf.Clamp01((t - press) / travel);
+            float eased = along * along * (3f - 2f * along);
+            Vector3 at = Vector3.Lerp(from, socket, eased) + Vector3.up * (Mathf.Sin(eased * Mathf.PI) * 0.9f);
+            string words = t < press ? "1  GRAB THE GLOWING END" : t < press + travel ? "2  DRAG IT" : "3  LET GO ON THE 3";
+
+            float scale = handleSize * 1.5f;
+            if (t < press) scale *= 1f + 0.5f * Mathf.Abs(Mathf.Sin(t / press * Mathf.PI * 2f));   // the press: the cursor pulses on the end
+            float fade = Mathf.Clamp01((demoSeconds - t) / 0.6f);
+            Glow(ghost, at, scale, new Color(GhostColor.r, GhostColor.g, GhostColor.b, GhostColor.a * fade));
+            for (int i = 0; i < TrailCount; i++)
+            {
+                float back = Mathf.Clamp01(along - (i + 1) * 0.055f);
+                float be = back * back * (3f - 2f * back);
+                Vector3 p = Vector3.Lerp(from, socket, be) + Vector3.up * (Mathf.Sin(be * Mathf.PI) * 0.9f);
+                float visible = along > 0f && along < 1f ? 1f : 0f;
+                Glow(ghost + 1 + i, p, handleSize * (0.95f - 0.12f * i), new Color(1f, 0.85f, 0.4f, 0.55f * (1f - i / (float)TrailCount) * visible * fade));
+            }
+
+            if (t >= press && t < press + travel) Guide(ghost + 1 + TrailCount, at, socket, new Color(1f, 0.9f, 0.45f, 0.7f));
+            if (!_demoFlashed && t >= press + travel)
+            {
+                _demoFlashed = true;
+                _flash = 0.7f;
+            }
+
+            // The ghost cable, so the rider sees the wire come along with the hand.
+            LineRenderer line = cables[k];
+            line.enabled = true;
+            DrawCable(line, origins[k].position, at, new Color(1f, 1f, 1f, 0.75f * fade));
+
+            if (stepLabel != null)
+            {
+                stepLabel.text = words;
+                stepLabel.transform.position = at + new Vector3(0f, handleSize * 1.6f, -0.2f);
+                Color c = stepLabel.color;
+                c.a = fade;
+                stepLabel.color = c;
+            }
+        }
+
+        /// <summary>A line of lights marching from a point to the 3, so the way is plain.</summary>
+        private void Guide(int first, Vector3 from, Vector3 to, Color color)
+        {
+            float phase = Mathf.Repeat(Time.time * 1.1f, 1f);
+            for (int i = 0; i < GuideCount; i++)
+            {
+                float u = (i + phase) / GuideCount;
+                Color c = color;
+                c.a *= Mathf.Sin(u * Mathf.PI);
+                Glow(first + i, Vector3.Lerp(from, to, u), pulseSize * (0.55f + 0.35f * Mathf.Sin(u * Mathf.PI)), c);
+            }
         }
 
         /// <summary>Writes glow i as a camera-facing square (size 0 hides it).</summary>
@@ -366,12 +525,21 @@ namespace Convergence.Presentation.Ride
 
         // ---------- what the moment says ----------
 
-        private void OnGrabbed(int wire, int hand) => SetWireHeat(wire, 0.35f, false); // the fixed wire dims while its cable is dragged
+        private void OnGrabbed(int wire, int hand)
+        {
+            _lastActivity = Time.time;
+            SetWireHeat(wire, 0.35f, false); // the fixed wire dims while its cable is dragged
+        }
 
-        private void OnDropped(int wire, int hand) => SetWireHeat(wire, 1f, false);
+        private void OnDropped(int wire, int hand)
+        {
+            _lastActivity = Time.time;
+            SetWireHeat(wire, 1f, false);
+        }
 
         private void OnConnected(int wire, int hand, int order)
         {
+            _lastActivity = Time.time;
             _flash = 1f;
             if (sparks != null)
             {

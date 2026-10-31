@@ -159,10 +159,16 @@ namespace Convergence.EditorTools
             subtitle.fontSizeMin = 0.2f;
             subtitle.fontSizeMax = 0.26f;
             // The table sits farther away and smaller than it did (TableScale), so the title and score are bigger to stay readable.
-            TextMeshPro title = Text("Title", table, new Vector3(-0.09f, top - 0.088f, -0.006f), "DRAW YOUR 3", 0.039f, _theme.gold, 0.46f, TextAlignmentOptions.Left, true);
-            title.rectTransform.sizeDelta = new Vector2(0.46f, 0.045f);
+            // The title shrinks to fit its half of the row, so a long game name never runs into the score.
+            TextMeshPro title = Text("Title", table, new Vector3(-0.15f, top - 0.088f, -0.006f), "DRAW YOUR 3", 0.039f, _theme.gold, 0.34f, TextAlignmentOptions.Left, true);
+            title.rectTransform.sizeDelta = new Vector2(0.34f, 0.045f);
+            title.textWrappingMode = TextWrappingModes.NoWrap;
+            title.enableAutoSizing = true;
+            title.fontSizeMin = 0.22f;   // auto-size works in the units of the builder's Text(): ten times the size it was given
+            title.fontSizeMax = 0.39f;
             TextMeshPro score = Text("Score", table, new Vector3(0.175f, top - 0.088f, -0.006f), "SCORE 0", 0.042f, _theme.cyan, 0.3f, TextAlignmentOptions.Right, true);
             score.rectTransform.sizeDelta = new Vector2(0.3f, 0.048f);
+            score.textWrappingMode = TextWrappingModes.NoWrap;
             // In front of the weight grid's frame, which reaches up to this line.
             TextMeshPro goal = Text("Goal", table, new Vector3(-0.06f, top - 0.124f, -0.014f), "", 0.026f, Color.white, 0.52f, TextAlignmentOptions.Left);
             goal.rectTransform.sizeDelta = new Vector2(0.52f, 0.036f);
@@ -176,6 +182,8 @@ namespace Convergence.EditorTools
             Quad("Bar", fillPivot, new Vector3((TableSize.x - 0.06f) * 0.5f, 0, 0), new Vector2(TableSize.x - 0.06f, 0.012f), "GlowGreen");
             Make("PopupAnchor", table, new Vector3(0.2f, top - 0.18f, -0.03f));
 
+            if (_level2) return table; // Level 2's games are played in the world around the rider; the table is only their score board
+
             Transform grid = BuildWeightGrid(table);
             grid.localPosition = BoardCentre + new Vector3(0, 0, -0.006f);
             BuildPaintDigits(grid);
@@ -186,8 +194,11 @@ namespace Convergence.EditorTools
             BuildCoachArrow(table);
 
             var shoot = Make("HuntBoard", table, BoardCentre).transform;
-            Text("Shoot", shoot, new Vector3(0, 0.03f, -0.006f), "DRAG HOT WIRES\nTO THE 3!", 0.05f, _theme.rewindMagenta, 0.6f, bold: true).rectTransform.sizeDelta = new Vector2(0.6f, 0.16f);
-            Text("Up", shoot, new Vector3(0, -0.1f, -0.006f), "look up: grab a glowing wire end, drag it to the 3", 0.02f, Color.white, 0.6f);
+            Text("Shoot", shoot, new Vector3(0, 0.085f, -0.006f), "DRAG THE GLOWING WIRES\nONTO THE 3!", 0.04f, _theme.rewindMagenta, 0.62f, bold: true).rectTransform.sizeDelta = new Vector2(0.62f, 0.1f);
+            TextMeshPro steps = Text("Steps", shoot, new Vector3(0, -0.035f, -0.006f), "1  POINT at a glowing wire end\n2  HOLD the trigger and DRAG\n3  LET GO on the 3", 0.03f, Color.white, 0.62f, TextAlignmentOptions.Left, true);
+            steps.rectTransform.sizeDelta = new Vector2(0.62f, 0.12f);
+            steps.lineSpacing = 6f;
+            Text("Up", shoot, new Vector3(0, -0.125f, -0.006f), "look up: the network is ahead of you", 0.026f, _theme.cyan, 0.62f);
             shoot.gameObject.SetActive(false);
             return table;
         }
@@ -804,7 +815,7 @@ namespace Convergence.EditorTools
 
             Game(m.Draw, "DRAW YOUR 3", "Hold the trigger and draw a 3", RideLine.DrawDone, 90f);
             Game(m.Paint, "3 DETECTOR", "Make the 3s glow, keep the rest dark", RideLine.NeuronSolved, 120f);
-            Game(m.Blame, "WIRE HUNT", "Drag each hot wire to the 3 before it cools", RideLine.BackDone, 60f);
+            Game(m.Blame, "WIRE HUNT", "Drag each glowing wire onto the 3", RideLine.BackDone, 90f);
             Game(m.Train, "TRAIN PIXEL", "Hold a step size to train", RideLine.TrainDone, 90f);
             Game(m.Stump, "STUMP PIXEL", "Draw the digit Pixel asks for", RideLine.StumpDone, 75f);
             // The plunge after the training game is a quick victory ride.

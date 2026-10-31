@@ -26,6 +26,9 @@ namespace Convergence.EditorTools
 
         private const float CellPitch = 0.058f;
 
+        /// <summary>True while the Level 2 pod is being built: the same cockpit, with Level 2's end card and without Level 1's boards.</summary>
+        private static bool _level2;
+
         private sealed class MeshData
         {
             public readonly List<Vector3> Vertices = new List<Vector3>();
@@ -63,6 +66,7 @@ namespace Convergence.EditorTools
 
         private static Mesh SaveMesh(Mesh mesh, string file)
         {
+            if (_level2 && !file.StartsWith("L2_")) file = "L2_" + file;
             string dir = PrefabDir + "/Meshes";
             if (!AssetDatabase.IsValidFolder(dir)) AssetDatabase.CreateFolder(PrefabDir, "Meshes");
             string path = dir + "/" + file + ".asset";
@@ -149,19 +153,23 @@ namespace Convergence.EditorTools
             var end = Make("EndCard", pod.transform, new Vector3(0, 2.08f, 2.6f));
             // The plate grows downward for the recap rows, so the title stays where it was.
             Board("Plate", end.transform, new Vector3(0f, -0.15f, 0f), new Vector2(3.5f, 1.5f), "PlateSolid");
-            TextMeshPro title = Text("Title", end.transform, new Vector3(0, 0.40f, -0.01f), "YOU WATCHED A MACHINE LEARN", 0.15f, _theme.gold, 3.4f, bold: true);
+            TextMeshPro title = Text("Title", end.transform, new Vector3(0, 0.40f, -0.01f), _level2 ? "YOU RODE INSIDE A LANGUAGE MODEL" : "YOU WATCHED A MACHINE LEARN", 0.15f, _theme.gold, 3.4f, bold: true);
             // What the ride went over, numbered as the intro and the recap named it (owner, 2026-10-27).
-            TextMeshPro recap = Text("Recap", end.transform, new Vector3(0, 0.17f, -0.01f), "1 PIXELS    2 NEURON    3 NETWORK\n4 BACKPROP    5 TRAINING", 0.11f, Color.white, 3.4f, bold: true);
+            TextMeshPro recap = Text("Recap", end.transform, new Vector3(0, 0.17f, -0.01f), _level2 ? "1 TOKENS    2 MEANING    3 ATTENTION\n4 PREDICTION    5 WRITING" : "1 PIXELS    2 NEURON    3 NETWORK\n4 BACKPROP    5 TRAINING", 0.11f, Color.white, 3.4f, bold: true);
             recap.rectTransform.sizeDelta = new Vector2(3.4f, 0.28f);
-            TextMeshPro next = Text("Next", end.transform, new Vector3(0, -0.07f, -0.01f), "NEXT: LEVEL 2 - WORDS", 0.13f, _theme.cyan, 2.8f, bold: true);
-            var credits = Make("Credits", end.transform, new Vector3(0, -0.5f, -0.01f));
-            TextMeshPro creditText = Text("Text", credits.transform, Vector3.zero, RideNarrationData.Credits, 0.1f, _theme.offWhite, 3.4f);
+            TextMeshPro next = Text("Next", end.transform, new Vector3(0, -0.07f, -0.01f), _level2 ? "LEVEL 2 COMPLETE" : "NEXT: LEVEL 2 - WORDS", 0.13f, _theme.cyan, 2.8f, bold: true);
+            TextMeshPro goHint = Text("GoHint", end.transform, new Vector3(0, -0.245f, -0.01f), _level2 ? "PULL GO TO RIDE LEVEL 1 AGAIN" : "PULL GO TO RIDE LEVEL 2", 0.085f, _theme.gold, 2.8f, bold: true);
+            goHint.gameObject.SetActive(false);
+            var credits = Make("Credits", end.transform, new Vector3(0, -0.62f, -0.01f));
+            TextMeshPro creditText = Text("Text", credits.transform, Vector3.zero, _level2 ? Level2NarrationData.Credits : RideNarrationData.Credits, 0.1f, _theme.offWhite, 3.4f);
             creditText.rectTransform.sizeDelta = new Vector2(3.4f, 0.5f);
             creditText.lineSpacing = 8f;
             var finale = pod.AddComponent<FinaleView>();
             Ref(finale, "panel", end);
             Ref(finale, "toBeContinued", next.gameObject);
             Ref(finale, "credits", credits);
+            Ref(finale, "goHint", goHint.gameObject);
+            Set(finale, "nextScene", p => p.stringValue = _level2 ? "NeuralRide" : "WordMachine");
 
             var hints = pod.AddComponent<HintArrowView>();
             Set(hints, "arrows", p =>
@@ -187,7 +195,7 @@ namespace Convergence.EditorTools
             Ref(tagView, "dash", screen);
             Set(tagView, "cueTags", p =>
             {
-                var tags = new[] { ("neuron", "NEURON"), ("wires", "WEIGHTS"), ("connect", "NEURAL NETWORK"), ("oops", "LOSS"), ("sentence", "TOKENS") };
+                var tags = _level2 ? new (string, string)[0] : new[] { ("neuron", "NEURON"), ("wires", "WEIGHTS"), ("connect", "NEURAL NETWORK"), ("oops", "LOSS"), ("sentence", "TOKENS") };
                 p.arraySize = tags.Length;
                 for (int i = 0; i < tags.Length; i++)
                 {

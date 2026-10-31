@@ -1,4 +1,4 @@
-Source: AI synthesized, Kokoro-82M v1.0 (hexgrad, Apache-2.0) via kokoro-onnx 0.6.1 (MIT); voice af_heart, speed 1.1, lang en-us; one sentence per call, explicit pauses, -16 LUFS / -1 dBTP / mono 48 kHz; ArtSource/voice/render_voices.py, 2026-10-27
-Segments: 0.790 1.340 1.380 1.050 1.460 1.950 1.550
+Source: AI synthesized, Kokoro-82M v1.0 (hexgrad, Apache-2.0) via kokoro-onnx 0.6.1 (MIT); voice af_heart, speed 1.0, lang en-us; one sentence per call, explicit pauses, -16 LUFS / -1 dBTP / mono 48 kHz; ArtSource/voice/render_voices.py, 2026-10-30
+Segments: 0.840 1.470 1.470 1.110 1.500 2.050 1.590
 
 Your turn: build a three detector. Right hand paints green, left hand red. Hold the trigger and sweep. Light up every three beside the grid, and keep the other digits dark.

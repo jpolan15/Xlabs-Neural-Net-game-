@@ -11,7 +11,7 @@ It lives outside `Assets/` on purpose: Unity imports everything under `Assets/`,
 | `ArtSource/<asset_id>/` | One folder per asset (snake_case): `brief.md`, `concept/`, `views/`, `raw/`, `clean/`, `verify/` |
 | `ArtSource/voice/` | The narration pipeline: `render_voices.py` (script → `vo_ride_NN.wav` + sidecars, transcription check, install), its README, and engine backends. Model weights and render candidates are git-ignored |
 | `ArtSource/sfx/` | `make_sfx.py`: derives the ride's loops and buzzer from the CC0 Kenney packs and prints the loudness table the builder's effect levels come from |
-| `ArtSource/training/` | `bake_level1.py`: trains Level 1's tiny 49-16-10 network on real MNIST (NumPy, deterministic, fails loudly) and writes `Assets/_Project/Data/Level1/level1_digits.json`. The MNIST download cache `mnist/` is git-ignored. MNIST: LeCun & Cortes, CC BY-SA 3.0 |
+| `ArtSource/training/` | `bake_level2.py`: runs the real GPT-2 small (124M, MIT; PyTorch + transformers via `uv run`) and bakes Level 2's tokens, embedding picture, attention head, next-word odds and story road into `Assets/_Project/Data/Level2/level2_words.json`. `bake_level1.py`: trains Level 1's tiny 49-16-10 network on real MNIST (NumPy, deterministic, fails loudly) and writes `Assets/_Project/Data/Level1/level1_digits.json`. The MNIST download cache `mnist/` is git-ignored. MNIST: LeCun & Cortes, CC BY-SA 3.0 |
 
 ## Rules
 

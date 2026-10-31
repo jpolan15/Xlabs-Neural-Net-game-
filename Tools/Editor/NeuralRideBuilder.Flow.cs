@@ -27,7 +27,14 @@ namespace Convergence.EditorTools
             public Pose To;
             public float Cruise, MinSeconds, Hold;
             public RideMoment Moment;
+            public bool ArrivalWithMoment;
         }
+
+        /// <summary>
+        /// Seconds an explaining stop stays on its finished picture once the narrator has stopped (owner, 2026-10-30: the explanations
+        /// "moved a bit too fast for anyone not knowing the space"). Space skips it.
+        /// </summary>
+        private const float ExplainHold = 3.5f;
 
         private static List<SegmentSpec> Segments(Layout L, Moments m)
         {
@@ -46,15 +53,15 @@ namespace Convergence.EditorTools
                 new SegmentSpec { Name = "E1 pixels: explain, then draw your 3", Region = 1, Leg = A, To = L.GridStop, Cruise = 4f, MinSeconds = 5f, Travel = -1, Arrival = 0, Hold = 0.5f, Moment = m.Draw, Mask = R(0, 1) },
                 new SegmentSpec { Name = "E1 to the neuron: zap the noise", Region = 1, Leg = A, To = L.NeuronStop, Cruise = 7f, MinSeconds = 6f, Travel = -1, Arrival = -1, Mask = R(1, 2) },
                 // E2: one neuron, then spray its weights.
-                new SegmentSpec { Name = "E2 neuron: explain", Region = 2, Leg = A, To = L.NeuronStop, Cruise = 3f, MinSeconds = 0f, Travel = -1, Arrival = 1, Mask = R(2) },
+                new SegmentSpec { Name = "E2 neuron: explain", Region = 2, Leg = A, To = L.NeuronStop, Cruise = 3f, MinSeconds = 0f, Travel = -1, Arrival = 1, Hold = ExplainHold, Mask = R(2) },
                 new SegmentSpec { Name = "E2 neuron: your turn", Region = 2, Leg = A, To = L.NeuronStop, Cruise = 3f, MinSeconds = 0f, Travel = -1, Arrival = 2, Moment = m.Paint, Mask = R(2) },
                 // E3: the network, then the rider sends their own 3 through it.
-                new SegmentSpec { Name = "E3 network: explain", Region = 3, Leg = A, To = L.NetViewStop, Cruise = 8f, MinSeconds = 7f, Travel = -1, Arrival = 3, Mask = R(2, 3) },
+                new SegmentSpec { Name = "E3 network: explain", Region = 3, Leg = A, To = L.NetViewStop, Cruise = 8f, MinSeconds = 7f, Travel = -1, Arrival = 3, Hold = ExplainHold, Mask = R(2, 3) },
                 new SegmentSpec { Name = "E3 network: send your 3", Region = 3, Leg = A, To = L.NetViewStop, Cruise = 4f, MinSeconds = 0f, Travel = -1, Arrival = 4, Moment = m.Forward, Mask = R(3) },
                 // E4: the guess (random: nothing is trained yet) and the loss.
-                new SegmentSpec { Name = "E4 the guess and the loss", Region = 4, Leg = A, To = L.WrongStop, Cruise = 4f, MinSeconds = 0f, Travel = -1, Arrival = 5, Mask = R(3, 4) },
+                new SegmentSpec { Name = "E4 the guess and the loss", Region = 4, Leg = A, To = L.WrongStop, Cruise = 4f, MinSeconds = 0f, Travel = -1, Arrival = 5, Hold = ExplainHold + 1.5f, Mask = R(3, 4) },
                 // E5: backpropagation, then the rewind with the hot-wire hunt on the rider's 3.
-                new SegmentSpec { Name = "E5 backprop: explain", Region = 5, Leg = B, To = L.NetViewStop, Cruise = 1.2f, MinSeconds = 0f, Travel = -1, Arrival = 6, Mask = R(3, 5) },
+                new SegmentSpec { Name = "E5 backprop: explain", Region = 5, Leg = B, To = L.NetViewStop, Cruise = 1.2f, MinSeconds = 0f, Travel = -1, Arrival = 6, Hold = ExplainHold, Mask = R(3, 5) },
                 new SegmentSpec { Name = "E5 backprop: rewind, hot-wire hunt", Region = 5, Leg = B, To = L.BlameStop, Cruise = 1.2f, MinSeconds = 6f, Travel = -1, Arrival = 7, Moment = m.Blame, Mask = R(3, 5) },
                 new SegmentSpec { Name = "Back to the switch", Region = 5, Leg = B, To = L.SpurEnd, Cruise = 5f, MinSeconds = 5f, Travel = -1, Arrival = -1, Mask = R(3, 5) },
                 // E6: gradient descent at the rim, then the training game (real training, live), then the plunge.
@@ -83,6 +90,7 @@ namespace Convergence.EditorTools
             Ref(rd, "pod", pod.transform);
             Ref(rd, "controls", pod.GetComponent<RideControlSet>());
             Ref(rd, "script", _script);
+            Float(rd, "speechPadSeconds", 1.0f);
             Set(rd, "legs", p =>
             {
                 p.arraySize = legs.Length;

@@ -1,0 +1,186 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f52b15080431d4e4fa718f132c709fde, type: 3}
+  m_Name: RideScript_L2
+  m_EditorClassIdentifier: Convergence.Gameplay::Convergence.Gameplay.Ride.RideScript
+  intro:
+    name: Intro
+    beats:
+    - line: 200
+      seconds: 4.856
+    - line: 201
+      seconds: 8.4
+    - line: 202
+      seconds: 9.969999
+  dockLine: 122
+  sequences:
+  - name: 'T1 tokens: explain'
+    beats:
+    - line: 203
+      seconds: 7.6566668
+    - line: 204
+      seconds: 5.318
+    - line: 205
+      seconds: 5.7200003
+  - name: 'T1 tokens: your turn'
+    beats:
+    - line: 206
+      seconds: 6.89
+  - name: 'T2 meaning: explain'
+    beats:
+    - line: 210
+      seconds: 5.56
+    - line: 212
+      seconds: 7.386667
+    - line: 211
+      seconds: 5.544
+    - line: 213
+      seconds: 6.48
+  - name: 'T2 meaning: your turn'
+    beats:
+    - line: 214
+      seconds: 6.39
+  - name: 'T3 attention: explain'
+    beats:
+    - line: 217
+      seconds: 5.73
+    - line: 218
+      seconds: 4.38
+    - line: 219
+      seconds: 5.15
+    - line: 220
+      seconds: 4.2173333
+  - name: 'T3 attention: your turn'
+    beats:
+    - line: 221
+      seconds: 7.7799997
+  - name: 'T4 prediction: explain'
+    beats:
+    - line: 225
+      seconds: 4.2599998
+    - line: 226
+      seconds: 8.61
+    - line: 227
+      seconds: 5.4086666
+    - line: 228
+      seconds: 11.275332
+  - name: 'T4 prediction: your turn'
+    beats:
+    - line: 229
+      seconds: 8.900001
+  - name: 'T5 writing: explain'
+    beats:
+    - line: 233
+      seconds: 8.33
+    - line: 234
+      seconds: 7.6
+  - name: 'T5 writing: your turn'
+    beats:
+    - line: 235
+      seconds: 7.68
+  - name: Finale
+    beats:
+    - line: 239
+      seconds: 7.09
+    - line: 240
+      seconds: 9.577999
+    - line: 241
+      seconds: 6.8199997
+  lines:
+  - line: 200
+    seconds: 4.856
+  - line: 201
+    seconds: 8.4
+  - line: 202
+    seconds: 9.969999
+  - line: 203
+    seconds: 7.6566668
+  - line: 204
+    seconds: 5.318
+  - line: 205
+    seconds: 5.7200003
+  - line: 206
+    seconds: 6.89
+  - line: 207
+    seconds: 2.81
+  - line: 208
+    seconds: 2.42
+  - line: 209
+    seconds: 3.94
+  - line: 210
+    seconds: 5.56
+  - line: 211
+    seconds: 5.544
+  - line: 212
+    seconds: 7.386667
+  - line: 213
+    seconds: 6.48
+  - line: 214
+    seconds: 6.39
+  - line: 215
+    seconds: 2.65
+  - line: 216
+    seconds: 3.26
+  - line: 217
+    seconds: 5.73
+  - line: 218
+    seconds: 4.38
+  - line: 219
+    seconds: 5.15
+  - line: 220
+    seconds: 4.2173333
+  - line: 221
+    seconds: 7.7799997
+  - line: 222
+    seconds: 2.42
+  - line: 223
+    seconds: 2.84
+  - line: 224
+    seconds: 3.65
+  - line: 225
+    seconds: 4.2599998
+  - line: 226
+    seconds: 8.61
+  - line: 227
+    seconds: 5.4086666
+  - line: 228
+    seconds: 11.275332
+  - line: 229
+    seconds: 8.900001
+  - line: 230
+    seconds: 1.75
+  - line: 231
+    seconds: 2.52
+  - line: 232
+    seconds: 3.1200001
+  - line: 233
+    seconds: 8.33
+  - line: 234
+    seconds: 7.6
+  - line: 235
+    seconds: 7.68
+  - line: 236
+    seconds: 1.98
+  - line: 237
+    seconds: 1.34
+  - line: 238
+    seconds: 2.97
+  - line: 239
+    seconds: 7.09
+  - line: 240
+    seconds: 9.577999
+  - line: 241
+    seconds: 6.8199997
+  - line: 122
+    seconds: 2.67
+  - line: 151
+    seconds: 1.9100001

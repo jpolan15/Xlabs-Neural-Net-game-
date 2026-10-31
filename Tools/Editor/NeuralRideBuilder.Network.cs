@@ -440,6 +440,33 @@ namespace Convergence.EditorTools
             Ref(moment, "socket", socket);
             Float(moment, "snapDegrees", 3f);
 
+            // Where to let go (owner, 2026-10-30: the teacher could not tell the glowing wires are dragged onto the 3): a ring
+            // on the 3, "DROP ON THE 3" beside its digit, and the words that ride with the ghost hand's demonstration.
+            Transform ring = Make("DropRing", steer, socketAt).transform;
+            LineRenderer ringLine = ring.gameObject.AddComponent<LineRenderer>();
+            ringLine.useWorldSpace = false;
+            ringLine.loop = true;
+            ringLine.positionCount = 48;
+            for (int i = 0; i < 48; i++)
+            {
+                float a = i / 48f * Mathf.PI * 2f;
+                ringLine.SetPosition(i, new Vector3(Mathf.Cos(a), Mathf.Sin(a), 0f));
+            }
+
+            ringLine.widthMultiplier = 0.22f;
+            ringLine.numCornerVertices = 2;
+            ringLine.sharedMaterial = Mat("Laser");
+            ringLine.startColor = ringLine.endColor = new Color(1f, 0.85f, 0.35f, 0.95f);
+            ringLine.shadowCastingMode = ShadowCastingMode.Off;
+            ringLine.receiveShadows = false;
+            TextMeshPro dropLabel = Text("DropLabel", steer, socketAt + new Vector3(2.5f, 0f, -0.3f), "< DROP ON THE 3", 1.0f, _theme.gold, 9f, TextAlignmentOptions.Left, true);
+            dropLabel.textWrappingMode = TextWrappingModes.NoWrap;
+            TextMeshPro stepLabel = Text("StepLabel", steer, socketAt, "1  GRAB THE GLOWING END", 1.1f, Color.white, 14f, TextAlignmentOptions.Center, true);
+            stepLabel.textWrappingMode = TextWrappingModes.NoWrap;
+            ring.gameObject.SetActive(false);
+            dropLabel.gameObject.SetActive(false);
+            stepLabel.gameObject.SetActive(false);
+
             var view = root.AddComponent<BlameView>();
             Ref(view, "director", director);
             Ref(view, "dash", dash);
@@ -452,6 +479,9 @@ namespace Convergence.EditorTools
             Refs(view, "cables", cables);
             Ref(view, "glows", glows.GetComponent<MeshFilter>());
             Ref(view, "sparks", sparks);
+            Ref(view, "dropRing", ring);
+            Ref(view, "dropLabel", dropLabel);
+            Ref(view, "stepLabel", stepLabel);
             Refs(view, "targets", targetList);
             Set(view, "inputPositions", p => Positions(p, 49, InputPosition));
             Set(view, "hiddenPositions", p => Positions(p, 16, HiddenPosition));

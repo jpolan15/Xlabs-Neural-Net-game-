@@ -251,7 +251,71 @@ namespace Convergence.Gameplay.Ride
         RecapNeuron = 180,
         RecapNetwork = 181,
         RecapBackprop = 182,
-        RecapTraining = 183
+        RecapTraining = 183,
+
+        // Level 1 pacing pass (owner, 2026-10-30: the teacher loved it but "moved a bit too fast for anyone not knowing the
+        // space"): a plain-words sentence at the hardest ideas (the 49 pixels, a neuron, a weight, blame, a hill in the fog).
+        PixelsWhy49 = 184,
+        NeuronJudge = 185,
+        WeightPlain = 186,
+        BackPlain = 187,
+        DescentFog = 188,
+
+        // Level 2, "Inside the Word Machine" (TASK_LEVEL2_WORD_MACHINE, ADR-022): lines 200 and up. The dock.
+        L2Hello = 200,
+        L2Chatbot = 201,
+        L2Stops = 202,
+
+        // Stop 1, tokens (the chopper).
+        TokChop = 203,
+        TokNumbers = 204,
+        TokRare = 205,
+        TokSliceGo = 206,
+        TokWhole = 207,
+        TokBoss = 208,
+        TokDone = 209,
+
+        // Stop 2, meaning (the word galaxy).
+        EmbName = 210,
+        EmbSpace = 211,
+        EmbSquash = 212,
+        EmbMath = 213,
+        EmbSortGo = 214,
+        EmbWrong = 215,
+        EmbDone = 216,
+
+        // Stop 3, attention (the spotlight hall).
+        AttMeaning = 217,
+        AttLookBack = 218,
+        AttShares = 219,
+        AttReal = 220,
+        AttGo = 221,
+        AttSpread = 222,
+        AttWrong = 223,
+        AttDone = 224,
+
+        // Stop 4, prediction (the odds city).
+        PredJob = 225,
+        PredOdds = 226,
+        PredUnsure = 227,
+        PredLearn = 228,
+        PredGo = 229,
+        PredBeat = 230,
+        PredMiss = 231,
+        PredDone = 232,
+
+        // Stop 5, writing (the story road).
+        GenLoop = 233,
+        GenTemp = 234,
+        GenGo = 235,
+        GenWild = 236,
+        GenSafe = 237,
+        GenDone = 238,
+
+        // The finale.
+        OutTalk = 239,
+        OutScale = 240,
+        OutEnd = 241
     }
 
     /// <summary>Stable ids for the pod's control channels. Level 1 has one: GO.</summary>

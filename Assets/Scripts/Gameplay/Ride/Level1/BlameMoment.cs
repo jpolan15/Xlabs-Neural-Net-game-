@@ -45,7 +45,7 @@ namespace Convergence.Gameplay.Ride.Level1
         [Tooltip("How many of the brightest wires the rider is asked to connect.")]
         [SerializeField] private int topCount = 4;
         [Tooltip("Seconds of the hunt: the wires cool down over this time.")]
-        [SerializeField] private float timeout = 40f;
+        [SerializeField] private float timeout = 75f;
         [SerializeField] private float autoStepSeconds = 1.2f;
         [Tooltip("The answer node the wires are dragged to (the 3). Set by the scene builder.")]
         [SerializeField] private Transform socket;
@@ -318,7 +318,7 @@ namespace Convergence.Gameplay.Ride.Level1
             while (Count() < _nudged.Length)
             {
                 Progress = (float)Count() / _nudged.Length;
-                SetGoal("Wires on the 3: " + Count() + " of " + _nudged.Length);
+                SetGoal("Drag glowing wires onto the 3:  " + Count() + " of " + _nudged.Length);
                 if (!_saidHurry && Time.time - opened > timeout * 0.6f && Count() * 2 < _nudged.Length)
                 {
                     _saidHurry = true;

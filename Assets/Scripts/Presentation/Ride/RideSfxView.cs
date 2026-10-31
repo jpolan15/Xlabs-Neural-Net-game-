@@ -3,6 +3,7 @@ using UnityEngine;
 using Convergence.Core.Puzzles;
 using Convergence.Gameplay.Ride;
 using Convergence.Gameplay.Ride.Level1;
+using Convergence.Gameplay.Ride.Level2;
 
 namespace Convergence.Presentation.Ride
 {
@@ -105,6 +106,7 @@ namespace Convergence.Presentation.Ride
             if (stump != null) stump.Judged += OnJudged;
             if (send != null) send.Thrown += OnThrown;
             RideAim.Fired += OnFired;
+            RideSounds.Requested += OnRequested;
         }
 
         private void OnDisable()
@@ -136,6 +138,7 @@ namespace Convergence.Presentation.Ride
             if (stump != null) stump.Judged -= OnJudged;
             if (send != null) send.Thrown -= OnThrown;
             RideAim.Fired -= OnFired;
+            RideSounds.Requested -= OnRequested;
             WatchGame(null);
         }
 
@@ -231,6 +234,27 @@ namespace Convergence.Presentation.Ride
         private void OnRegion(int index) => Play(region, Mathf.Lerp(0.85f, 1.2f, index / 7f));
 
         private void OnSkipped() => Play(skip, 1f);
+
+        /// <summary>A moment or a view asked for a sound by name (Level 2's games): the same effects, the same levels.</summary>
+        private void OnRequested(string cue, float pitch)
+        {
+            switch (cue)
+            {
+                case "tick": Play(tick, pitch); break;
+                case "solved": Play(solved, pitch); break;
+                case "solvedShimmer": Play(solvedShimmer, pitch); break;
+                case "wrong": Play(wrong, pitch); break;
+                case "fire": Play(fire, pitch); break;
+                case "pop": Play(pop, pitch); break;
+                case "plugIn": Play(plugIn, pitch); break;
+                case "win": Play(win, pitch); break;
+                case "winShimmer": Play(winShimmer, pitch); break;
+                case "nudge": Play(nudge, pitch); break;
+                case "hop": Play(hop, pitch); break;
+                case "region": Play(region, pitch); break;
+                case "skip": Play(skip, pitch); break;
+            }
+        }
 
         // The right hand paints +, green, with a bright high click; the left paints −, red, with a lower one; a rub-out
         // (the same colour again) is a soft middle tick. The pitch also climbs a little as more digits come out right.

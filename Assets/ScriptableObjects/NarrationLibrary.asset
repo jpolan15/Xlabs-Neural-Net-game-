@@ -17,1150 +17,1242 @@ MonoBehaviour:
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 7e78c7b7e7e3de045816657db83ecdac, type: 3}
-    pauseAfter: 0.2
+    pauseAfter: 0.44000003
     readSeconds: 5.0648146
     segments:
     - text: Every one of these is a three.
-      weight: 1.55
+      weight: 1.65
       cues:
       - threes
     - text: You read them all,
-      weight: 0.96
+      weight: 1.04
       cues: []
     - text: without thinking.
-      weight: 0.89
+      weight: 0.98
       cues: []
   - line: 120
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 384ac93b52ccc904cbf803bfa913c32e, type: 3}
-    pauseAfter: 0.2
+    pauseAfter: 0.44000003
     readSeconds: 3.4833333
     segments:
     - text: This is Pixel.
-      weight: 1.05
+      weight: 1.1
       cues:
       - pixel
     - text: Pixel can't read a single one.
-      weight: 1.55
+      weight: 1.64
       cues: []
   - line: 121
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 44ea593b0279a7143a76dc747f63650a, type: 3}
-    pauseAfter: 0.2
+    pauseAfter: 0.44000003
     readSeconds: 9.9796295
     segments:
     - text: In the next few minutes,
-      weight: 1.23
+      weight: 1.3
       cues:
       - brain
     - text: you'll build Pixel a real neural network,
-      weight: 2.331
+      weight: 2.4
       cues: []
     - text: the kind behind face unlock and chatbots,
-      weight: 2.434
+      weight: 2.58
       cues: []
     - text: and train it to read your handwriting.
-      weight: 1.83
+      weight: 1.89
       cues: []
   - line: 174
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 4c5ad4ffba1e0cd41a4b5b786d5b97c5, type: 3}
-    pauseAfter: 0.2
+    pauseAfter: 0.44000003
     readSeconds: 6.9259257
     segments:
     - text: 'Five stops:'
-      weight: 1.03
+      weight: 1.1
       cues:
       - stops
     - text: pixels,
-      weight: 0.86
+      weight: 0.87
       cues: []
     - text: neurons,
-      weight: 0.82
+      weight: 0.91
       cues: []
     - text: the network,
-      weight: 0.88
+      weight: 0.92
       cues: []
     - text: backpropagation,
-      weight: 1.11
+      weight: 1.13
       cues: []
     - text: and training.
-      weight: 0.9
+      weight: 0.93
       cues: []
     - text: In between,
-      weight: 0.87
+      weight: 0.9
       cues:
       - blast
     - text: blast every three you see.
-      weight: 1.33
+      weight: 1.48
       cues: []
   - line: 122
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 779c66de64cff1e41a6a95d8d8053c69, type: 3}
-    pauseAfter: 0.2
+    pauseAfter: 0.44000003
     readSeconds: 2.6925926
     segments:
     - text: Pull the orange lever,
-      weight: 1.28
+      weight: 1.3
       cues:
       - go
     - text: or press A.
-      weight: 0.87
+      weight: 0.94
       cues: []
   - line: 123
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 23705d47636b11840a4c6bce5ad7d2be, type: 3}
-    pauseAfter: 0.2
+    pauseAfter: 0.44000003
     readSeconds: 5.014815
     segments:
     - text: To a computer,
-      weight: 0.95
+      weight: 1.01
       cues:
       - grid
     - text: a picture is a grid of tiny squares,
-      weight: 2.1
+      weight: 2.16
       cues: []
     - text: called pixels.
-      weight: 0.95
+      weight: 1.03
       cues: []
   - line: 124
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: f88a61314ddb9f14083b59653d5391d1, type: 3}
-    pauseAfter: 0.2
+    pauseAfter: 0.44000003
     readSeconds: 5.435185
     segments:
     - text: And every pixel is just a number.
-      weight: 1.98
+      weight: 2.08
       cues:
       - numbers
     - text: Zero for blank.
-      weight: 1.17
+      weight: 1.22
       cues:
       - zero
     - text: One for full ink.
-      weight: 1.03
+      weight: 1.07
       cues:
       - one
   - line: 125
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: d59b6de0f322eaf47bf2408f26baaaab, type: 3}
-    pauseAfter: 0.2
+    pauseAfter: 0.44000003
     readSeconds: 5.0648146
     segments:
     - text: We'll use seven by seven.
-      weight: 1.52
+      weight: 1.57
       cues:
       - shrink
     - text: Forty-nine numbers.
-      weight: 1.25
+      weight: 1.33
       cues:
       - column
     - text: That's all the network ever sees.
-      weight: 1.67
+      weight: 1.71
+      cues: []
+  - line: 184
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: 3117bb5b37fc3b04a9ae7e687c769c61, type: 3}
+    pauseAfter: 0.44000003
+    readSeconds: 6.9166665
+    segments:
+    - text: A real photo has millions of pixels.
+      weight: 2.593
+      cues: []
+    - text: We squash ours down,
+      weight: 1.37
+      cues: []
+    - text: so Pixel's little brain can handle it.
+      weight: 2
       cues: []
   - line: 126
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: ff64cb627ebb7cc4fbcc5b0e51161f49, type: 3}
-    pauseAfter: 0.1
+    pauseAfter: 0.22000001
     readSeconds: 7.0166664
     segments:
     - text: Now draw your own three.
-      weight: 1.27
+      weight: 1.4
       cues:
       - unfold
     - text: Hold the trigger,
-      weight: 0.99
+      weight: 1.03
       cues: []
     - text: and write on the board.
-      weight: 1.26
+      weight: 1.33
       cues: []
     - text: Shoot DONE when you're happy.
-      weight: 1.22
+      weight: 1.25
       cues: []
   - line: 127
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: cba661b33d140fe4392af83fdd20ce0f, type: 3}
-    pauseAfter: 0.1
+    pauseAfter: 0.22000001
     readSeconds: 1.5814815
     segments:
     - text: Bigger!
-      weight: 0.62
+      weight: 0.66
       cues: []
     - text: Fill the board.
-      weight: 0.85
+      weight: 0.88
       cues: []
   - line: 128
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: ecdf4222a5906794d964ebff02bc1077, type: 3}
-    pauseAfter: 0.1
+    pauseAfter: 0.22000001
     readSeconds: 3.062963
     segments:
     - text: Looks like a three to me.
-      weight: 1.27
+      weight: 1.36
       cues: []
     - text: Shoot DONE.
-      weight: 0.68
+      weight: 0.74
       cues: []
   - line: 129
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 4cae00587ceb1214ca00411f87909272, type: 3}
-    pauseAfter: 0.1
+    pauseAfter: 0.22000001
     readSeconds: 3.9537036
     segments:
     - text: That's your three,
-      weight: 0.96
+      weight: 0.98
       cues: []
     - text: as forty-nine numbers.
-      weight: 1.47
+      weight: 1.51
       cues: []
     - text: Hang on to it.
-      weight: 0.87
+      weight: 0.96
       cues: []
   - line: 130
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: d2b0af61b2811184fa94319b8f03a9d7, type: 3}
-    pauseAfter: 0.1
+    pauseAfter: 0.22000001
     readSeconds: 5.6351852
     segments:
     - text: Digits incoming!
-      weight: 1.1
+      weight: 1.16
       cues: []
     - text: Blast every three,
-      weight: 1.24
+      weight: 1.26
       cues: []
     - text: and spare the rest.
-      weight: 1.12
+      weight: 1.17
       cues: []
     - text: For now,
-      weight: 0.69
+      weight: 0.72
       cues: []
     - text: you're the classifier.
-      weight: 1.06
+      weight: 1.09
       cues: []
   - line: 175
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 89d21469310ee5a479dc225e9c1f6703, type: 3}
-    pauseAfter: 0.1
+    pauseAfter: 0.22000001
     readSeconds: 2.3222222
     segments:
     - text: Careful!
-      weight: 0.68
+      weight: 0.71
       cues: []
     - text: That one wasn't a three.
-      weight: 1.2
+      weight: 1.29
       cues: []
   - line: 131
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 6f1474d40ad75274493a01005b5e09aa, type: 3}
-    pauseAfter: 0.2
+    pauseAfter: 0.44000003
     readSeconds: 7.116667
     segments:
     - text: This is a neuron.
-      weight: 1.09
+      weight: 1.19
       cues:
       - neuron
     - text: It holds one number,
-      weight: 1.19
+      weight: 1.23
       cues: []
     - text: its activation.
-      weight: 1.19
+      weight: 1.23
       cues: []
     - text: The bigger the number,
-      weight: 1.14
+      weight: 1.21
       cues:
       - glow
     - text: the brighter it glows.
-      weight: 1.13
+      weight: 1.22
+      cues: []
+  - line: 185
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: 3c5f392ba3cdf7f459e9d5560bdddaad, type: 3}
+    pauseAfter: 0.44000003
+    readSeconds: 6.9166665
+    segments:
+    - text: Think of it as a tiny judge.
+      weight: 1.8
+      cues: []
+    - text: It looks at the evidence,
+      weight: 1.32
+      cues: []
+    - text: and says how sure it is.
+      weight: 1.34
       cues: []
   - line: 132
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: d5ab33c6afcae9044a0af82422104502, type: 3}
-    pauseAfter: 0.2
+    pauseAfter: 0.44000003
     readSeconds: 4.5444446
     segments:
     - text: It's connected to all forty-nine pixels,
-      weight: 2.223
+      weight: 2.34
       cues:
       - wires
     - text: and every connection has a weight.
-      weight: 1.68
+      weight: 1.75
+      cues: []
+  - line: 186
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: e9c64006767ec264c8abaed379fab8c3, type: 3}
+    pauseAfter: 0.44000003
+    readSeconds: 3.3333333
+    segments:
+    - text: A weight is just how much that pixel matters.
+      weight: 2.43
       cues: []
   - line: 133
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 67be11652ae670a41891191382edd943, type: 3}
-    pauseAfter: 0.2
+    pauseAfter: 0.44000003
     readSeconds: 8.498148
     segments:
     - text: 'A positive weight says:'
-      weight: 1.47
+      weight: 1.49
       cues:
       - green
     - text: ink in this spot means three.
-      weight: 1.62
+      weight: 1.66
       cues: []
     - text: 'A negative weight says:'
-      weight: 1.39
+      weight: 1.42
       cues:
       - red
     - text: ink in this spot means not a three.
-      weight: 1.8
+      weight: 1.87
       cues: []
   - line: 134
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 56ff94324f9d73240b273f310651a7fc, type: 3}
-    pauseAfter: 0.2
+    pauseAfter: 0.44000003
     readSeconds: 10.45
     segments:
     - text: Multiply each pixel by its weight,
-      weight: 2.05
+      weight: 2.21
       cues:
       - add
     - text: add them up,
-      weight: 0.8
+      weight: 0.83
       cues: []
     - text: and add a bias.
-      weight: 1.08
+      weight: 1.13
       cues: []
     - text: A sigmoid squishes the total between zero and one.
-      weight: 2.9
+      weight: 3.1
       cues:
       - line
     - text: High means the neuron fires.
-      weight: 1.56
+      weight: 1.66
       cues: []
   - line: 135
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: cff81aa453179fd408eb8f13a47ac876, type: 3}
-    pauseAfter: 0.1
+    pauseAfter: 0.22000001
     readSeconds: 12.181481
     segments:
     - text: 'Your turn:'
-      weight: 0.79
+      weight: 0.84
       cues:
       - paint
     - text: build a three detector.
-      weight: 1.34
+      weight: 1.47
       cues: []
     - text: Right hand paints green,
-      weight: 1.38
+      weight: 1.47
       cues: []
     - text: left hand red.
-      weight: 1.05
+      weight: 1.11
       cues: []
     - text: Hold the trigger and sweep.
-      weight: 1.46
+      weight: 1.5
       cues: []
     - text: Light up every three beside the grid,
-      weight: 1.95
+      weight: 2.05
       cues:
       - digits
     - text: and keep the other digits dark.
-      weight: 1.55
+      weight: 1.59
       cues: []
   - line: 136
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 19062894394b46f4194d70089e3add23, type: 3}
-    pauseAfter: 0.3
+    pauseAfter: 0.66
     readSeconds: 4.914815
     segments:
     - text: It fired for the wrong digit.
-      weight: 1.64
+      weight: 1.69
       cues: []
     - text: Paint negative where that one has ink.
-      weight: 1.83
+      weight: 1.96
       cues: []
   - line: 137
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 1675e8e597046fa41b695af5dcdf5af1, type: 3}
-    pauseAfter: 0.3
+    pauseAfter: 0.66
     readSeconds: 4.174074
     segments:
     - text: A three slipped past.
-      weight: 1.29
+      weight: 1.37
       cues: []
     - text: Paint positive where the threes have ink.
-      weight: 1.97
+      weight: 2.1
       cues: []
   - line: 138
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: d36e867bef326c74e9f646b7333f426a, type: 3}
-    pauseAfter: 0.1
+    pauseAfter: 0.22000001
     readSeconds: 3.062963
     segments:
     - text: You just built a three detector,
-      weight: 1.59
+      weight: 1.67
       cues: []
     - text: by hand.
-      weight: 0.68
+      weight: 0.71
       cues: []
   - line: 139
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 23ef8449969935047bf37c601c8d0241, type: 3}
-    pauseAfter: 0.2
+    pauseAfter: 0.44000003
     readSeconds: 9.238889
     segments:
     - text: One neuron spots one pattern.
-      weight: 1.89
+      weight: 1.96
       cues:
       - copy
     - text: Put sixteen side by side,
-      weight: 1.58
+      weight: 1.66
       cues:
       - layer
     - text: and you have a layer.
-      weight: 1.05
+      weight: 1.1
       cues: []
     - text: Each one will learn to look for something different.
-      weight: 2.23
+      weight: 2.46
       cues: []
   - line: 140
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: b88d6c7aedc3a9d4cb1977f7aef79aa5, type: 3}
-    pauseAfter: 0.2
+    pauseAfter: 0.44000003
     readSeconds: 3.062963
     segments:
     - text: Then ten output neurons,
-      weight: 1.542
+      weight: 1.637
       cues:
       - answers
     - text: one for each digit.
-      weight: 1.2
+      weight: 1.25
       cues: []
   - line: 141
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 20d5c0b0d99e0bb428ee924f446e774a, type: 3}
-    pauseAfter: 0.2
+    pauseAfter: 0.44000003
     readSeconds: 6.546296
     segments:
     - text: Connect every neuron to the next layer,
-      weight: 2.03
+      weight: 2.08
       cues:
       - connect
     - text: and that's a neural network.
-      weight: 1.5
+      weight: 1.54
       cues: []
     - text: Nine hundred and forty-four weights.
-      weight: 1.954
+      weight: 2.072
       cues: []
   - line: 142
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 1b66abf6706d54847851ea8a5401167c, type: 3}
-    pauseAfter: 0.1
+    pauseAfter: 0.22000001
     readSeconds: 2.6925926
     segments:
     - text: Shoot your three,
-      weight: 0.96
+      weight: 0.98
       cues:
       - race
     - text: and send it in.
-      weight: 0.85
+      weight: 0.87
       cues: []
   - line: 143
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 95cbac5d599be9446b3c4d2af6c8723a, type: 3}
-    pauseAfter: 0.2
+    pauseAfter: 0.44000003
     readSeconds: 7.387037
     segments:
     - text: Pixel's guess is in.
-      weight: 1.31
+      weight: 1.33
       cues:
       - guess
     - text: But look how unsure it is.
-      weight: 1.46
+      weight: 1.54
       cues:
       - wrong
     - text: Every weight is still random,
-      weight: 1.49
+      weight: 1.57
       cues: []
     - text: so it's only guessing.
-      weight: 1.11
+      weight: 1.15
       cues: []
   - line: 144
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: c8770ddb497ee2a4987445a32a36caee, type: 3}
-    pauseAfter: 0.2
+    pauseAfter: 0.44000003
     readSeconds: 5.285185
     segments:
     - text: What we want is the three's neuron at one,
-      weight: 2.23
+      weight: 2.29
       cues:
       - want
     - text: and every other at zero.
-      weight: 1.27
+      weight: 1.31
       cues: []
   - line: 145
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: e6017452d7209ac45a9ec20d3fc4da13, type: 3}
-    pauseAfter: 0.3
-    readSeconds: 8.598148
+    pauseAfter: 0.66
+    readSeconds: 13.151852
     segments:
-    - text: Measure how far off it is,
-      weight: 1.52
+    - text: Now we score the guess.
+      weight: 1.4
       cues:
       - oops
-    - text: 'and you get one number:'
-      weight: 1.2
+    - text: How far off was it?
+      weight: 1.41
       cues: []
-    - text: the loss.
-      weight: 0.79
+    - text: That score is called the loss.
+      weight: 1.75
       cues: []
-    - text: Training means just one thing.
-      weight: 1.61
+    - text: Big loss,
+      weight: 0.84
       cues: []
-    - text: Make the loss small.
-      weight: 1.08
+    - text: very wrong.
+      weight: 0.97
+      cues: []
+    - text: Small loss,
+      weight: 0.9
+      cues: []
+    - text: nearly right.
+      weight: 1.15
+      cues: []
+    - text: 'Training means one thing:'
+      weight: 1.46
+      cues: []
+    - text: make the loss small.
+      weight: 1.11
       cues: []
   - line: 146
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 66f95f06b1805344d809521ade1d71c5, type: 3}
-    pauseAfter: 0.2
+    pauseAfter: 0.44000003
     readSeconds: 8.498148
     segments:
     - text: So which weights should change,
-      weight: 1.4
+      weight: 1.47
       cues:
       - nudges
     - text: and which way?
-      weight: 0.93
+      weight: 0.98
       cues: []
     - text: The three's output wants to go up.
-      weight: 1.84
+      weight: 1.88
       cues:
       - wish
     - text: Every other output wants to go down.
-      weight: 1.82
+      weight: 2.04
       cues:
       - dim
   - line: 147
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 4a3fa773d04a5dc4db6ca878b815d89c, type: 3}
-    pauseAfter: 0.3
+    pauseAfter: 0.66
     readSeconds: 10.27963
     segments:
     - text: Those wishes flow backwards,
-      weight: 1.59
+      weight: 1.67
       cues:
       - back
     - text: layer by layer,
-      weight: 0.97
+      weight: 1.04
       cues: []
     - text: with the chain rule.
-      weight: 1.11
+      weight: 1.21
       cues: []
     - text: That's backpropagation.
-      weight: 1.34
+      weight: 1.42
       cues: []
     - text: 'It gives every weight a gradient:'
-      weight: 1.76
+      weight: 1.77
       cues: []
     - text: which way to move,
-      weight: 1.08
+      weight: 1.15
       cues: []
     - text: and how much.
-      weight: 0.82
+      weight: 0.86
+      cues: []
+  - line: 187
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: b0f33498378073c49baad1d7453a6313, type: 3}
+    pauseAfter: 0.44000003
+    readSeconds: 6.075926
+    segments:
+    - text: 'In plain words:'
+      weight: 1.16
+      cues: []
+    - text: it works out how much each wire is to blame for the mistake.
+      weight: 3.25
       cues: []
   - line: 148
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 147ab369b57c9f8498a9191fdaff7ff0, type: 3}
-    pauseAfter: 0.1
-    readSeconds: 6.5962963
+    pauseAfter: 0.22000001
+    readSeconds: 16.035185
     segments:
-    - text: The hottest wires matter most.
-      weight: 1.69
+    - text: Look up.
+      weight: 0.79
       cues:
       - grab
-    - text: Grab each one,
-      weight: 0.96
+    - text: The glowing wires are the most to blame.
+      weight: 2.33
       cues: []
-    - text: and drag it to the three,
-      weight: 1.3
+    - text: Point at the glowing end of one,
+      weight: 1.68
       cues: []
-    - text: before it cools.
-      weight: 0.92
+    - text: hold the trigger,
+      weight: 1.03
+      cues: []
+    - text: and drag it onto the three.
+      weight: 1.63
+      cues: []
+    - text: Each wire you drag is one real nudge,
+      weight: 2.55
+      cues: []
+    - text: and it makes the three more likely.
+      weight: 1.55
       cues: []
   - line: 149
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: cba2660cbe44a6d4b94572ba931f7fd0, type: 3}
-    pauseAfter: 0.1
+    pauseAfter: 0.22000001
     readSeconds: 1.2111111
     segments:
     - text: Quick,
-      weight: 0.6
+      weight: 0.62
       cues: []
     - text: they're cooling!
-      weight: 0.79
+      weight: 0.82
       cues: []
   - line: 150
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 9c41d688207adcf4bb6ea5a70c03e3d7, type: 3}
-    pauseAfter: 0.1
+    pauseAfter: 0.22000001
     readSeconds: 6.546296
     segments:
     - text: Each wire you moved was one real gradient step.
-      weight: 3.01
+      weight: 3.17
       cues: []
     - text: Now imagine every weight,
-      weight: 1.5
+      weight: 1.617
       cues: []
     - text: over thousands of digits.
-      weight: 1.43
+      weight: 1.57
       cues: []
   - line: 151
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 1432a07469575a34f9cefea650d4072e, type: 3}
-    pauseAfter: 0.1
+    pauseAfter: 0.22000001
     readSeconds: 1.5814815
     segments:
     - text: Stage clear.
-      weight: 0.96
+      weight: 1
       cues: []
     - text: Pull GO.
-      weight: 0.67
+      weight: 0.7
       cues: []
   - line: 152
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 39126b5b0ad74594fbb788c89d823522, type: 3}
-    pauseAfter: 0.2
+    pauseAfter: 0.44000003
     readSeconds: 8.027778
     segments:
     - text: Picture the loss as a landscape.
-      weight: 1.81
+      weight: 1.86
       cues:
       - hill
     - text: Where you stand is a choice of weights.
-      weight: 1.916
+      weight: 2.01
       cues:
       - ball
     - text: The height is how wrong they are.
-      weight: 1.44
+      weight: 1.54
       cues: []
   - line: 153
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 41e36aac8bf6d964fb6b07d699b1839b, type: 3}
-    pauseAfter: 0.2
+    pauseAfter: 0.44000003
     readSeconds: 5.435185
     segments:
     - text: The gradient points uphill,
-      weight: 1.42
+      weight: 1.55
       cues:
       - slope
     - text: so take a step the other way.
-      weight: 1.63
+      weight: 1.69
       cues: []
     - text: That's gradient descent.
-      weight: 1.19
+      weight: 1.27
+      cues: []
+  - line: 188
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: 547d57fe9b0c60b48bd060c9e998e225, type: 3}
+    pauseAfter: 0.44000003
+    readSeconds: 7.287037
+    segments:
+    - text: It's like walking downhill in fog.
+      weight: 1.99
+      cues: []
+    - text: You can't see the bottom,
+      weight: 1.33
+      cues: []
+    - text: but you can feel which way is down.
+      weight: 1.77
       cues: []
   - line: 154
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 3d50c5fa41100e041a121a8e177d8f85, type: 3}
-    pauseAfter: 0.2
+    pauseAfter: 0.44000003
     readSeconds: 10.129629
     segments:
     - text: The size of the step is the learning rate.
-      weight: 2.07
+      weight: 2.21
       cues:
       - bigstep
     - text: Too big,
-      weight: 0.72
+      weight: 0.77
       cues: []
     - text: and you leap clean over the valley.
-      weight: 1.65
+      weight: 1.67
       cues: []
     - text: Too small,
-      weight: 0.76
+      weight: 0.8
       cues:
       - smallsteps
     - text: and you'll be here all day.
-      weight: 1.23
+      weight: 1.31
       cues: []
   - line: 155
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: d43807563d4ac034380713a2ee8008c9, type: 3}
-    pauseAfter: 0.1
+    pauseAfter: 0.22000001
     readSeconds: 8.868519
     segments:
     - text: This valley is Pixel's real loss.
-      weight: 2.039
+      weight: 2.16
       cues:
       - landscape
     - text: Pick a step size,
-      weight: 1.14
+      weight: 1.22
       cues: []
     - text: and hold its button to train.
-      weight: 1.48
+      weight: 1.57
       cues: []
     - text: Every step learns from thirty-two real digits.
-      weight: 2.47
+      weight: 2.55
       cues: []
   - line: 156
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: f1c0a404c545bcd4fb1c3e8139bafe82, type: 3}
-    pauseAfter: 0.1
+    pauseAfter: 0.22000001
     readSeconds: 5.164815
     segments:
     - text: Way too big!
-      weight: 0.97
+      weight: 1.02
       cues: []
     - text: The loss exploded.
-      weight: 1.3
+      weight: 1.35
       cues: []
     - text: Let's undo that.
-      weight: 1.08
+      weight: 1.17
       cues: []
     - text: Try a smaller step.
-      weight: 1.04
+      weight: 1.11
       cues: []
   - line: 157
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 7b4c59e7d2c33684ab515016d24a9b9e, type: 3}
-    pauseAfter: 0.1
+    pauseAfter: 0.22000001
     readSeconds: 3.5333333
     segments:
     - text: It's learning,
-      weight: 0.85
+      weight: 0.87
       cues: []
     - text: but painfully slowly.
-      weight: 1.3
+      weight: 1.32
       cues: []
     - text: Try a bigger step.
-      weight: 1.03
+      weight: 1.09
       cues: []
   - line: 158
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: d6a9318919f729d4b9750c1904be7229, type: 3}
-    pauseAfter: 0.1
+    pauseAfter: 0.22000001
     readSeconds: 3.062963
     segments:
     - text: That's the one.
-      weight: 0.89
+      weight: 0.91
       cues: []
     - text: Watch the loss go down.
-      weight: 1.29
+      weight: 1.43
       cues: []
   - line: 159
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: f414288ea0d4afb4e8c069a4842b2424, type: 3}
-    pauseAfter: 0.1
+    pauseAfter: 0.22000001
     readSeconds: 4.9648147
     segments:
     - text: Pixel is trained.
-      weight: 1.2
+      weight: 1.22
       cues: []
     - text: You just ran gradient descent on a real neural network.
-      weight: 3.053
+      weight: 3.277
       cues: []
   - line: 176
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 9856cc5e6149e4a469b498427bdf4465, type: 3}
-    pauseAfter: 0.2
+    pauseAfter: 0.44000003
     readSeconds: 6.646296
     segments:
     - text: Remember the neuron you painted by hand?
-      weight: 2.225
+      weight: 2.375
       cues:
       - learned
     - text: Training just painted all sixteen hidden neurons,
-      weight: 2.639
+      weight: 2.82
       cues:
       - sixteen
     - text: from real digits.
-      weight: 1.09
+      weight: 1.14
       cues: []
   - line: 177
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 69919e1c6a09c4d46aa8e26d5cba2511, type: 3}
-    pauseAfter: 0.2
+    pauseAfter: 0.44000003
     readSeconds: 6.2759256
     segments:
     - text: Nobody told them what to look for.
-      weight: 1.85
+      weight: 1.89
       cues:
       - blobs
     - text: They're not neat strokes,
-      weight: 1.3
+      weight: 1.33
       cues: []
     - text: but together,
-      weight: 0.81
+      weight: 0.86
       cues: []
     - text: they read handwriting.
-      weight: 1.24
+      weight: 1.25
       cues: []
   - line: 160
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 5c6284cfb42d0484e8c2044ac8e68781, type: 3}
-    pauseAfter: 0.2
+    pauseAfter: 0.44000003
     readSeconds: 4.1537037
     segments:
     - text: Now,
-      weight: 0.55
+      weight: 0.61
       cues:
       - right
     - text: 'the real test:'
-      weight: 1.01
+      weight: 1.09
       cues: []
     - text: the three you drew.
-      weight: 1.19
+      weight: 1.24
       cues: []
     - text: Pixel says...
-      weight: 0.84
+      weight: 0.93
       cues: []
   - line: 161
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 552bc6e3b35a6594a95695e4f6642d30, type: 3}
-    pauseAfter: 0.3
+    pauseAfter: 0.66
     readSeconds: 2.3722222
     segments:
     - text: Three!
-      weight: 0.7
+      weight: 0.74
       cues: []
     - text: It can read your handwriting.
-      weight: 1.37
+      weight: 1.43
       cues: []
   - line: 162
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 5b4b6e5933d70dc4fb075e4a67142a6d, type: 3}
-    pauseAfter: 0.1
+    pauseAfter: 0.22000001
     readSeconds: 5.535185
     segments:
     - text: Not quite.
-      weight: 0.87
+      weight: 0.9
       cues: []
     - text: Your three is unusual.
-      weight: 1.49
+      weight: 1.56
       cues: []
     - text: So Pixel studies it,
-      weight: 1.36
+      weight: 1.41
       cues: []
     - text: a few more steps...
-      weight: 1.04
+      weight: 1.08
       cues: []
   - line: 163
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 227a7fda6bdae5c47ba516b46cd3c8d4, type: 3}
-    pauseAfter: 0.3
+    pauseAfter: 0.66
     readSeconds: 1.8518518
     segments:
     - text: And now it's a three.
-      weight: 1.09
+      weight: 1.17
       cues: []
   - line: 164
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 8cc2b2f25fdb4c64b8717f65fe04b049, type: 3}
-    pauseAfter: 0.3
+    pauseAfter: 0.66
     readSeconds: 6.0259256
     segments:
     - text: On five hundred digits it has never seen,
-      weight: 2.36
+      weight: 2.43
       cues:
       - accuracy
     - text: Pixel gets almost nine out of ten right.
-      weight: 2.09
+      weight: 2.15
       cues: []
   - line: 165
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: f88c8db61b985a94d8cf109b16fdac6e, type: 3}
-    pauseAfter: 0.3
+    pauseAfter: 0.66
     readSeconds: 5.414815
     segments:
     - text: That's how every neural network learns.
-      weight: 2.125
+      weight: 2.255
       cues:
       - practice
     - text: Guess.
-      weight: 0.63
+      weight: 0.68
       cues: []
     - text: Measure the loss.
-      weight: 1.01
+      weight: 1.05
       cues: []
     - text: Backpropagate.
-      weight: 1
+      weight: 1.08
       cues: []
     - text: Step.
-      weight: 0.69
+      weight: 0.73
       cues: []
     - text: Repeat.
-      weight: 0.64
+      weight: 0.68
       cues: []
   - line: 166
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 8126b19fef4b01d4782c59d453bf2c3c, type: 3}
-    pauseAfter: 0.1
+    pauseAfter: 0.22000001
     readSeconds: 5.8555555
     segments:
     - text: Bonus round.
-      weight: 0.93
+      weight: 1.05
       cues: []
     - text: Draw the digit on the screen,
-      weight: 1.48
+      weight: 1.57
       cues: []
     - text: and shoot DONE.
-      weight: 0.93
+      weight: 0.97
       cues: []
     - text: Can Pixel read it?
-      weight: 1.06
+      weight: 1.14
       cues: []
   - line: 167
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 4db19b8a9991b734fa1dba6149f3484e, type: 3}
-    pauseAfter: 0.1
+    pauseAfter: 0.22000001
     readSeconds: 1.2
     segments:
     - text: Got it!
-      weight: 0.59
+      weight: 0.65
       cues: []
   - line: 168
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: e6acaeb9e999302419aac66e7e3c77a0, type: 3}
-    pauseAfter: 0.1
+    pauseAfter: 0.22000001
     readSeconds: 2.6925926
     segments:
     - text: Fooled it!
-      weight: 0.72
+      weight: 0.78
       cues: []
     - text: Even trained networks make mistakes.
-      weight: 1.941
+      weight: 2.06
       cues: []
   - line: 169
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 4fcbb6ec844c47749a2ae003c0377c24, type: 3}
-    pauseAfter: 0.1
+    pauseAfter: 0.22000001
     readSeconds: 3.062963
     segments:
     - text: Not bad,
-      weight: 0.8
+      weight: 0.83
       cues: []
     - text: for nine hundred and seventy numbers.
-      weight: 1.81
+      weight: 1.89
       cues: []
   - line: 178
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 3ced51136a11c81409e6bdc7b687dd42, type: 3}
-    pauseAfter: 0.1
+    pauseAfter: 0.22000001
     readSeconds: 1.5814815
     segments:
     - text: Quick recap.
-      weight: 0.92
+      weight: 0.95
       cues:
       - recap
     - text: Five stops.
-      weight: 0.9
+      weight: 0.93
       cues: []
   - line: 179
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: db0396cc14db79d47b14d8e2d998d348, type: 3}
-    pauseAfter: 0.1
+    pauseAfter: 0.22000001
     readSeconds: 2.7925925
     segments:
     - text: One,
-      weight: 0.56
+      weight: 0.59
       cues:
       - r1
     - text: 'pixels:'
-      weight: 0.8
+      weight: 0.82
       cues: []
     - text: your three became forty-nine numbers.
-      weight: 1.93
+      weight: 2.113
       cues: []
   - line: 180
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: b1bd03643678aa046a8ff73111f7b346, type: 3}
-    pauseAfter: 0.1
+    pauseAfter: 0.22000001
     readSeconds: 4.1037035
     segments:
     - text: Two,
-      weight: 0.58
+      weight: 0.61
       cues:
       - r2
     - text: 'a neuron:'
-      weight: 0.81
+      weight: 0.84
       cues: []
     - text: weigh the pixels,
-      weight: 1.04
+      weight: 1.15
       cues: []
     - text: add them up,
-      weight: 0.8
+      weight: 0.83
       cues: []
     - text: squish.
-      weight: 0.58
+      weight: 0.62
       cues: []
   - line: 181
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: fdec1622dce5c474e8595ed92f307fdd, type: 3}
-    pauseAfter: 0.1
+    pauseAfter: 0.22000001
     readSeconds: 3.6333332
     segments:
     - text: Three,
-      weight: 0.64
+      weight: 0.69
       cues:
       - r3
     - text: 'the network:'
-      weight: 0.83
+      weight: 0.87
       cues: []
     - text: layers of neurons,
-      weight: 1.19
+      weight: 1.29
       cues: []
     - text: all wired together.
-      weight: 1.09
+      weight: 1.11
       cues: []
   - line: 182
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 442fd371967c5b74783c2a22f2b183c7, type: 3}
-    pauseAfter: 0.1
+    pauseAfter: 0.22000001
     readSeconds: 3.6333332
     segments:
     - text: Four,
-      weight: 0.63
+      weight: 0.65
       cues:
       - r4
     - text: 'backpropagation:'
-      weight: 1.09
+      weight: 1.16
       cues: []
     - text: measure the loss,
-      weight: 1.01
+      weight: 1.05
       cues: []
     - text: send the blame backwards.
-      weight: 1.32
+      weight: 1.37
       cues: []
   - line: 183
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: ed6ae1c5cbcd34c4181de46cfa0e382f, type: 3}
-    pauseAfter: 0.3
+    pauseAfter: 0.66
     readSeconds: 3.312963
     segments:
     - text: And five,
-      weight: 0.84
+      weight: 0.89
       cues:
       - r5
     - text: 'training:'
-      weight: 0.71
+      weight: 0.73
       cues: []
     - text: step downhill,
-      weight: 0.98
+      weight: 1.07
       cues: []
     - text: again and again.
-      weight: 0.9
+      weight: 0.95
       cues: []
   - line: 170
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: c9f3affc1d879234ba26e47d973e8e28, type: 3}
-    pauseAfter: 0.2
+    pauseAfter: 0.44000003
     readSeconds: 4.5944443
     segments:
     - text: Language works the same way.
-      weight: 1.59
+      weight: 1.71
       cues:
       - sentence
     - text: Text gets chopped into pieces called tokens.
-      weight: 2.379
+      weight: 2.49
       cues:
       - tokens
   - line: 171
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: d02f841d97df1ea45b06245bb2994772, type: 3}
-    pauseAfter: 0.2
+    pauseAfter: 0.44000003
     readSeconds: 4.174074
     segments:
     - text: Each token becomes a list of numbers,
-      weight: 2.1
+      weight: 2.19
       cues:
       - vectors
     - text: just like your pixels.
-      weight: 1.2
+      weight: 1.27
       cues: []
   - line: 172
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: bca68ec40b361fc40ac52700784c7a18, type: 3}
-    pauseAfter: 0.3
+    pauseAfter: 0.66
     readSeconds: 6.646296
     segments:
     - text: A far bigger network,
-      weight: 1.37
+      weight: 1.44
       cues:
       - predict
     - text: trained the same way,
-      weight: 1.11
+      weight: 1.25
       cues: []
     - text: predicts the next token.
-      weight: 1.43
+      weight: 1.48
       cues: []
     - text: That's how a chatbot writes.
-      weight: 1.379
+      weight: 1.47
       cues:
       - mat
   - line: 173
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 440cff90ef76fb14f81cbc87047da0e6, type: 3}
-    pauseAfter: 0.5
+    pauseAfter: 1.1
     readSeconds: 2.6925926
     segments:
     - text: Next time,
-      weight: 0.89
+      weight: 0.93
       cues:
       - next
     - text: Pixel learns to read words.
-      weight: 1.47
+      weight: 1.57
       cues: []

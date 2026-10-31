@@ -1,0 +1,4 @@
+Source: AI synthesized, Kokoro-82M v1.0 (hexgrad, Apache-2.0) via kokoro-onnx 0.6.1 (MIT); voice af_heart, speed 1.0, lang en-us; one sentence per call, explicit pauses, -16 LUFS / -1 dBTP / mono 48 kHz; ArtSource/voice/render_voices.py, 2026-10-30
+Segments: 1.100 0.880 0.760 0.900 0.860 0.980 4.070
+
+Five stops: tokens, meaning, attention, prediction, and writing. Everything you'll see comes from a real language model, called GPT-2.

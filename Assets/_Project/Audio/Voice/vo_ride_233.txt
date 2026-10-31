@@ -1,0 +1,4 @@
+Source: AI synthesized, Kokoro-82M v1.0 (hexgrad, Apache-2.0) via kokoro-onnx 0.6.1 (MIT); voice af_heart, speed 1.0, lang en-us; one sentence per call, explicit pauses, -16 LUFS / -1 dBTP / mono 48 kHz; ArtSource/voice/render_voices.py, 2026-10-30
+Segments: 1.600 1.830 1.700 1.380 1.390
+
+The machine picks one word. It adds that word to the sentence, and runs the whole machine again. One word at a time. That's all a chatbot does.

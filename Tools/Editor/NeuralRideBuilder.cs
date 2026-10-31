@@ -76,11 +76,12 @@ namespace Convergence.EditorTools
 
         private static RideTheme LoadTheme()
         {
-            var theme = AssetDatabase.LoadAssetAtPath<RideTheme>(ThemePath);
+            string themePath = _level2 ? Theme2Path : ThemePath;
+            var theme = AssetDatabase.LoadAssetAtPath<RideTheme>(themePath);
             if (theme == null)
             {
                 theme = ScriptableObject.CreateInstance<RideTheme>();
-                AssetDatabase.CreateAsset(theme, ThemePath);
+                AssetDatabase.CreateAsset(theme, themePath);
             }
 
             theme.amber = Hex("#FFB547");
@@ -113,6 +114,7 @@ namespace Convergence.EditorTools
                 Sky("GRADIENT DESCENT", "#1C0C36", "#7A3466", "#FF8A5C", 0.70f, "#000000", 0f, 0.4f, 0.008f),
                 Sky("TRAINING", "#0A0803", "#2E2408", "#C9922A", 0.55f, "#FFD166", 0.30f, 0.8f, 0.010f),
             };
+            if (_level2) theme.regions = Level2Regions();
             theme.blackboardDim = 0.78f;
             theme.floorDepth = 7f;
             theme.floorSpacing = 3f;

@@ -4,8 +4,8 @@ Educational VR puzzle game. Unity (`ProjectSettings/ProjectVersion.txt`), Meta Q
 
 ## Current job
 
-Level 1 digits ride (pixels → neuron → network → backprop → gradient descent). Ignite demo April 2027.
-Plan: `.agents/tasks/TASK_LEVEL1_V7_DEMO.md` (v7 teacher-demo polish; its section 3 is the live checklist), on `TASK_LEVEL1_V6_TRAIN.md` (v6: your own 3, trained live, ADR-020), `TASK_LEVEL1_V5_GAMEPLAY.md` (games, ADR-018) and `TASK_LEVEL1_V4_EXPLAINERS.md` (explainers + Pixel).
+Level 1 digits ride (pixels → neuron → network → backprop → gradient descent) and Level 2, the Word Machine (a ride inside a real GPT-2: tokens → meaning → attention → prediction → writing). Ignite demo April 2027.
+Plan: `.agents/tasks/TASK_LEVEL2_WORD_MACHINE.md` (Level 2, ADR-022, and the Level 1 pacing fixes), `.agents/tasks/TASK_LEVEL1_V7_DEMO.md` (v7 teacher-demo polish; its section 3 is the live checklist), on `TASK_LEVEL1_V6_TRAIN.md` (v6: your own 3, trained live, ADR-020), `TASK_LEVEL1_V5_GAMEPLAY.md` (games, ADR-018) and `TASK_LEVEL1_V4_EXPLAINERS.md` (explainers + Pixel).
 Read only the section you need; don't read whole handoffs up front. Older plans (spaceship, Chamber 01, ride v3) were deleted; they live only in git history.
 
 ## Where things live

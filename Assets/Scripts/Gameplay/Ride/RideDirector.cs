@@ -57,6 +57,9 @@ namespace Convergence.Gameplay.Ride
             [Tooltip("Runs after the arrival lines; the ride moves on when it finishes.")]
             public RideMoment moment;
 
+            [Tooltip("Says the arrival lines while the moment already runs, so the rider can start playing at once (skipping then skips the lines, not the game).")]
+            public bool arrivalWithMoment;
+
             [Tooltip("Seconds the pod stays after the lines and the moment (an explainer unfolds into the place). Skippable.")]
             public float hold;
         }
@@ -438,7 +441,11 @@ namespace Convergence.Gameplay.Ride
             SegmentArrived?.Invoke(index);
 
             RideScript.Sequence arrivalLines = script != null ? script.SequenceAt(s.arrival) : default;
-            if (!arrivalLines.IsEmpty) yield return PlaySequence(arrivalLines);
+            if (!arrivalLines.IsEmpty)
+            {
+                if (s.arrivalWithMoment && s.moment != null) StartCoroutine(PlaySequence(arrivalLines));
+                else yield return PlaySequence(arrivalLines);
+            }
 
             if (s.moment != null)
             {
@@ -447,6 +454,8 @@ namespace Convergence.Gameplay.Ride
                 _moment = null;
             }
 
+            // Lines said alongside the moment are never cut off by what comes next.
+            while (_narrating) yield return null;
             yield return WaitForSpeech();
             if (s.hold > 0f)
             {
