@@ -1,45 +1,66 @@
-using System.Collections.Generic;
 using UnityEngine;
 using Convergence.Presentation.Ride.Explainers;
 
 namespace Convergence.Presentation.Ride.Level2
 {
     /// <summary>
-    /// The place after the last stop: a night of slow curtains of colour (an aurora) over the road's end, with stars. Dressing only.
+    /// The finish of Level 2 (ADR-023): a finish arch with a chequered banner over the road at dusk, a crowd of flags, and balloons that
+    /// keep rising into the sunset sky. Dressing only.
     /// </summary>
     public sealed class EndWorld : MonoBehaviour
     {
-        private RibbonField _curtains;
-        private GlowField _glows;
+        private const int Balloons = 14;
+        private Transform _balloons;
 
         private void Awake()
         {
             Level2Kit kit = Level2Kit.Current;
             if (kit == null) return;
-            Level2Scenery.Rails(transform, -40f, 40f, new Color(0.7f, 0.6f, 1f, 0.7f));
-            _curtains = RibbonField.Create(transform, "Aurora", 9, kit.Beam, -3);
-            _glows = GlowField.Create(transform, "Glows", 4, kit.Glow, -4);
-            var dust = new GameObject("Stars").AddComponent<DustField>();
-            dust.transform.SetParent(transform, false);
-            dust.Configure(140, new Vector3(18f, 8f, 24f), new Vector3(0f, 4f, 20f), 0.11f, 0.15f, new Color(0.8f, 0.8f, 1f, 0.9f), new Color(1f, 0.85f, 0.7f, 0.9f));
+            var m = new SolidMesh();
+            Color white = new Color(0.98f, 0.97f, 0.94f, 0f), ink = new Color(0.12f, 0.13f, 0.18f, 0f);
+
+            // The finish arch, behind the finale's board, and its chequered banner.
+            foreach (float s in new[] { -1f, 1f }) m.Post(new Vector3(s * 5f, 0f, 26f), 0.3f, 7.4f, 8, white, white);
+            for (int i = 0; i < 20; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    m.Block(new Vector3(-4.75f + i * 0.5f, 6.6f + j * 0.5f, 26f), new Vector3(0.5f, 0.5f, 0.2f), Quaternion.identity, (i + j) % 2 == 0 ? white : ink);
+                }
+            }
+
+            // Flags on poles along both sides.
+            for (int i = 0; i < 8; i++)
+            {
+                float s = i % 2 == 0 ? -1f : 1f;
+                Vector3 b = new Vector3(s * (9.5f + (i / 2) * 1.5f), 0f, 14f + (i / 2) * 4f);
+                m.Post(b, 0.06f, 4.4f, 5, white, white);
+                m.Block(b + new Vector3(-s * 0.55f, 4.0f, 0f), new Vector3(1.0f, 0.65f, 0.03f), Quaternion.identity, Level2Scenery.Bright[i % 6]);
+            }
+
+            m.Build(transform, "Finish", kit.Solid);
+
+            _balloons = new GameObject("Balloons").transform;
+            _balloons.SetParent(transform, false);
+            for (int i = 0; i < Balloons; i++)
+            {
+                var one = new SolidMesh();
+                one.Ball(Vector3.zero, new Vector3(0.45f, 0.55f, 0.45f), Level2Scenery.Bright[i % 6], 7, 5);
+                one.Block(new Vector3(0f, -0.9f, 0f), new Vector3(0.02f, 0.7f, 0.02f), Quaternion.identity, white);
+                one.Build(_balloons, "Balloon" + i, kit.Solid);
+            }
         }
 
         private void Update()
         {
-            if (_curtains == null) return;
-            Color[] tint = { new Color(0.4f, 1f, 0.8f), new Color(0.6f, 0.5f, 1f), new Color(1f, 0.5f, 0.8f) };
-            for (int i = 0; i < 9; i++)
+            if (_balloons == null) return;
+            for (int i = 0; i < _balloons.childCount; i++)
             {
-                float x = -24f + i * 6f;
-                float sway = Mathf.Sin(Time.time * 0.3f + i * 0.9f) * 3f;
-                Color c = tint[i % 3];
-                c.a = 0.18f + 0.08f * Mathf.Sin(Time.time * 0.5f + i);
-                _curtains.Set(i, new Vector3(x, 14f, 46f), new Vector3(x + sway, 1f, 44f + Mathf.Sin(i) * 6f), 0f, 3.2f + 1.4f * Mathf.Sin(i * 1.3f), c);
+                float r1 = Fx.Rand01(i * 3 + 1), r2 = Fx.Rand01(i * 3 + 2);
+                float t = Mathf.Repeat(Time.time * (0.05f + 0.03f * r2) + r1, 1f);
+                float side = i % 2 == 0 ? -1f : 1f;
+                _balloons.GetChild(i).localPosition = new Vector3(side * (9f + 10f * r2) + Mathf.Sin(Time.time * 0.6f + i) * 0.6f, -1f + t * 22f, 20f + r1 * 20f); // beside and behind the big screen
             }
-
-            _glows.Set(0, new Vector3(0f, 12f, 70f), 80f, new Color(0.6f, 0.5f, 1f, 0.16f));
-            _glows.Set(1, new Vector3(-20f, 8f, 60f), 40f, new Color(0.3f, 1f, 0.8f, 0.1f));
-            _glows.Set(2, new Vector3(22f, 10f, 64f), 44f, new Color(1f, 0.5f, 0.8f, 0.1f));
         }
     }
 }

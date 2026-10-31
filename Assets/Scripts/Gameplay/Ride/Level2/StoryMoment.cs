@@ -8,7 +8,7 @@ namespace Convergence.Gameplay.Ride.Level2
     /// <summary>
     /// Stop 5, writing: the story road. "My robot loves to ..." The road forks into four lanes, each a word GPT-2 could write next,
     /// and its real chance of writing it (the bake walked the model along every road). The rider shoots the gate of the word they
-    /// want; the road bends to it, and the machine runs again on the longer sentence. Three forks make a story. A lane's score is how
+    /// want and the bike rides down it; the machine runs again on the longer sentence. Three forks make a story. A lane's score is how
     /// surprising it was (minus log2 of its probability, times ten): the safe word is easy and worth little, a wild word is a long shot
     /// and worth a lot. At the end the rider is told how often the machine would have written exactly that story on its own, which is
     /// the product of the odds they steered through. Gameplay only: the pod travels on the director's leg, and the view slides the
@@ -44,7 +44,19 @@ namespace Convergence.Gameplay.Ride.Level2
         public L2StoryNode Node { get; private set; }
         public string Start => source.Data.File.story.start;
         public string SoFar => _words.Count == 0 ? Start : Start + " " + string.Join(" ", _words);
-        public string FinishedText => SoFar + ".";
+        /// <summary>
+        /// The story as told: a full stop after a word that can end a sentence, "..." after one that cannot ("talk like a ..."), because
+        /// three words are where the ride stops, not where the machine would; it would keep going.
+        /// </summary>
+        public string FinishedText => SoFar + (EndsOpen(_words.Count > 0 ? _words[_words.Count - 1] : "") ? " ..." : ".");
+
+        private static readonly HashSet<string> OpenEnds = new HashSet<string>
+        {
+            "a", "an", "the", "to", "with", "of", "my", "its", "his", "her", "their", "your", "our", "and", "or", "but", "in", "on", "at",
+            "for", "from", "like", "about", "into", "by", "as", "than", "that", "be", "is", "are", "was", "very", "so", "too",
+        };
+
+        public static bool EndsOpen(string word) => OpenEnds.Contains(word.ToLowerInvariant());
         public double Bits => _bits;
         public double Probability => _probability;
         public int LastLane { get; private set; } = -1;
@@ -98,7 +110,7 @@ namespace Convergence.Gameplay.Ride.Level2
                 _forkStarted = Time.time;
                 Stage = Phase.Fork;
                 ForkOpened?.Invoke(Fork, Node);
-                SetGoal("Shoot the word you want next  (" + (Fork + 1) + " of " + forks + ")");
+                SetGoal("Ride down the word you want  (" + (Fork + 1) + " of " + forks + ")");
                 Progress = Fork / (float)forks;
                 while (_chosen < 0)
                 {

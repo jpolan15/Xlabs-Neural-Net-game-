@@ -115,12 +115,12 @@ namespace Convergence.Presentation.Ride
             State s = From(theme.Region(_region));
             if (!IsBlackboard) return s;
 
-            // The blackboard is the region's own sky, dimmed, with its floor at half strength.
+            // The blackboard is the region's own sky, dimmed, with its floor weakened (Level 1: half strength).
             float k = theme.blackboardDim;
             s.Top = Scale(s.Top, k);
             s.Horizon = Scale(s.Horizon, k);
             s.Glow = Scale(s.Glow, k);
-            s.Floor.a *= 0.5f;
+            s.Floor.a *= theme.blackboardFloor;
             s.Stars *= 0.7f;
             s.Fog = Scale(s.Fog, k);
             s.Background = s.Horizon;

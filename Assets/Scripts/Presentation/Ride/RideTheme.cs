@@ -72,6 +72,8 @@ namespace Convergence.Presentation.Ride
         [Header("Sky (v7)")]
         [Tooltip("While an explainer explains, the region's own sky dimmed by this (the old near-black blackboard was a void).")]
         [Range(0f, 1f)] public float blackboardDim = 0.78f;
+        [Tooltip("While an explainer explains, the floor's strength is multiplied by this (Level 1's grid halves; Level 2's meadow stays, ADR-023).")]
+        [Range(0f, 1f)] public float blackboardFloor = 0.5f;
         public float floorDepth = 7f;
         public float floorSpacing = 3f;
 

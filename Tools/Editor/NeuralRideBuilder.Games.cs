@@ -502,6 +502,18 @@ namespace Convergence.EditorTools
             TextMeshPro popup = Text("Popup", pod, new Vector3(0, 1.2f, 0.7f), "+10", 0.035f, _theme.gold, 0.5f, bold: true);
             popup.gameObject.AddComponent<FaceCamera>();
             popup.gameObject.SetActive(false);
+
+            // The stamp and the popup are the nearest things the rider sees: they draw after the world's words and glows, which sort
+            // by order before distance (Level 2's world text sits at order 8).
+            foreach (Renderer r in stamp.GetComponentsInChildren<Renderer>(true)) r.sortingOrder = 20;
+            popup.GetComponent<Renderer>().sortingOrder = 20;
+            if (_level2)
+            {
+                // Gold on a daylight sky needs the dark outline Level 2's world text has (ADR-023).
+                Material outlined = OutlinedFont(_font, "L2TextOutline");
+                text.fontSharedMaterial = outlined;
+                popup.fontSharedMaterial = outlined;
+            }
             stamp.SetActive(false);
         }
 

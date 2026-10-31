@@ -1,4 +1,4 @@
-Source: AI synthesized, Kokoro-82M v1.0 (hexgrad, Apache-2.0) via kokoro-onnx 0.6.1 (MIT); voice af_heart, speed 1.0, lang en-us; one sentence per call, explicit pauses, -16 LUFS / -1 dBTP / mono 48 kHz; ArtSource/voice/render_voices.py, 2026-10-30
-Segments: 1.070 1.000 0.950 1.750 0.920 1.480
+Source: AI synthesized, Kokoro-82M v1.0 (hexgrad, Apache-2.0) via kokoro-onnx 0.6.1 (MIT); voice af_heart, speed 1.0, lang en-us; one sentence per call, explicit pauses, -16 LUFS / -1 dBTP / mono 48 kHz; ArtSource/voice/render_voices.py, 2026-10-31
+Segments: 1.813 1.200 1.050 2.650 1.020 1.997
 
-There's one knob: temperature. Turn it cold, and the machine plays it safe. Turn it hot, and it takes wild risks.
+One knob changes the dice: temperature. Turn it cold, and it nearly always picks the safest word. Turn it hot, and wild words get a real chance.

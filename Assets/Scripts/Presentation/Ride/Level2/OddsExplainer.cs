@@ -49,7 +49,7 @@ namespace Convergence.Presentation.Ride.Level2
 
             var shapes = new List<Shape>();
             _plate = shapes.Count;
-            shapes.Add(Level2Kit.Square(Centre + new Vector3(0f, 0.15f, 0.2f), new Vector2(11.2f, 4.9f), new Color(0.07f, 0.02f, 0.1f, 0.9f), 0.05f, new Color(1f, 0.45f, 0.75f, 0.9f), 0.04f));
+            shapes.Add(Level2Kit.Square(Centre + new Vector3(0f, 0.15f, 0.2f), new Vector2(11.2f, 4.9f), new Color(0.07f, 0.02f, 0.1f, 0.98f), 0.05f, new Color(1f, 0.45f, 0.75f, 0.9f), 0.04f));
             _barFirst = shapes.Count;
             _base = new Vector3[Shown + 1];
             for (int i = 0; i < Shown; i++)
@@ -94,7 +94,7 @@ namespace Convergence.Presentation.Ride.Level2
             float rest = 1f;
             for (int i = 0; i < Shown; i++) rest -= _p.top[i].p;
             _rest = _kit.Text(root, "Rest", "...AND 50,000 OTHER WORDS SHARE THE LAST " + Mathf.RoundToInt(rest * 100f) + "%", 0.26f, new Color(0.85f, 0.8f, 0.95f), Centre + new Vector3(0f, -1.95f, -0.1f), 10.4f);
-            _unsure = _kit.Text(root, "Unsure", "NO CLEAR WINNER", 0.5f, new Color(1f, 0.85f, 0.45f), Centre + new Vector3(0f, 0.95f, -0.1f), 8f);
+            _unsure = _kit.Text(root, "Unsure", "NO CLEAR\nWINNER", 0.44f, new Color(1f, 0.85f, 0.45f), Centre + new Vector3(4.0f, 0.75f, -0.1f), 3.4f); // in the empty column the hungry bar takes next
             _hungry = _kit.Text(root, "Hungry", Level2Data.Clean(_p.truth) + "\n" + (_p.truthP * 100f).ToString("0.0") + "%", 0.3f, new Color(1f, 0.85f, 0.4f), _base[Shown] + new Vector3(0f, 1.0f, -0.05f), 2.4f);
 
             _loop = new TextMeshPro[3];

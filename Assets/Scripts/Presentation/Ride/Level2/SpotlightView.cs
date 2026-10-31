@@ -46,7 +46,7 @@ namespace Convergence.Presentation.Ride.Level2
         private bool _shown;
         private float _roundAt;
         private string _lastLayout = "";
-        private static readonly Vector3 Centre = new Vector3(0f, 2.9f, 7.6f);
+        private static readonly Vector3 Centre = new Vector3(0f, 3.3f, 7.6f); // high enough that the legend clears the road (ADR-023)
         private static readonly Vector3 Eye = new Vector3(0f, 1.3f, 0f);
 
         private void Awake()
@@ -146,8 +146,8 @@ namespace Convergence.Presentation.Ride.Level2
             }
 
             // The verdict and its key sit under the sentence, clear of the numbers under the lower row.
-            _result.transform.localPosition = Centre + new Vector3(0f, two ? -2.35f : -1.7f, 0f);
-            _legend.transform.localPosition = Centre + new Vector3(0f, two ? -2.9f : -2.3f, 0f);
+            _result.transform.localPosition = Centre + new Vector3(0f, two ? -2.2f : -1.7f, 0f);
+            _legend.transform.localPosition = Centre + new Vector3(0f, two ? -2.65f : -2.2f, 0f);
             _banner.text = "HOLD YOUR LASER ON THE WORDS THAT EXPLAIN  \"" + a.words[a.query].ToUpperInvariant() + "\"";
             _lastLayout = a.sentence;
             _real.HideAll();

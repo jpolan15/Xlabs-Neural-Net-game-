@@ -256,7 +256,7 @@ namespace Convergence.Tests.EditMode.Ride
             var script = AssetDatabase.LoadAssetAtPath<RideScript>(ScriptPath);
             Assert.IsNotNull(library, LibraryPath + " is missing. Run Convergence > Build Word Machine (Level 2).");
             Assert.IsNotNull(script, ScriptPath + " is missing.");
-            Assert.GreaterOrEqual(library.entries.Length, 44, "the 42 lines of Level 2 and the two it shares with Level 1");
+            Assert.GreaterOrEqual(library.entries.Length, 49, "the 47 lines of Level 2 and the two it shares with Level 1");
             foreach (RideLine id in new[] { RideLine.L2Hello, RideLine.TokChop, RideLine.EmbMath, RideLine.AttGo, RideLine.PredOdds, RideLine.GenTemp, RideLine.OutEnd, RideLine.PullGo, RideLine.StopClear })
             {
                 Assert.IsTrue(library.TryGet(id, out _), id + " has no entry in the Level 2 library");
@@ -273,7 +273,7 @@ namespace Convergence.Tests.EditMode.Ride
             Assert.IsFalse(script.intro.IsEmpty);
             float all = 0f;
             foreach (NarrationLibrary.Entry e in library.entries) all += e.TotalSeconds;
-            Assert.LessOrEqual(all, 330f, "all the narration of Level 2, with the reactions");
+            Assert.LessOrEqual(all, 420f, "all the narration of Level 2, with the reactions (v2, ADR-023: pauses about twice as long, as the owner asked)");
             foreach (RideScript.Sequence s in script.sequences) Assert.LessOrEqual(s.TotalSeconds, 60f, s.name + " runs long");
         }
 
@@ -284,6 +284,7 @@ namespace Convergence.Tests.EditMode.Ride
             Assert.AreEqual(209, (int)RideLine.TokDone);
             Assert.AreEqual(224, (int)RideLine.AttDone);
             Assert.AreEqual(241, (int)RideLine.OutEnd);
+            Assert.AreEqual(246, (int)RideLine.OutCareful);
             Assert.AreEqual(184, (int)RideLine.PixelsWhy49);
             Assert.AreEqual(188, (int)RideLine.DescentFog);
         }
@@ -314,6 +315,24 @@ namespace Convergence.Tests.EditMode.Ride
                 {
                     Assert.GreaterOrEqual(seg.to, 0f);
                 }
+
+                // Every line an explainer's stop says must reach that explainer, or its steps for the line's cues fire late, all at once.
+                var script = AssetDatabase.LoadAssetAtPath<RideScript>(ScriptPath);
+                var byName = new Dictionary<string, int[]>
+                {
+                    { "MeaningExplainer", new[] { 2, 3 } }, { "AttentionExplainer", new[] { 4, 5 } }, { "OutroExplainer", new[] { 10 } },
+                };
+                foreach (var x in explainers)
+                {
+                    if (!byName.TryGetValue(x.GetType().Name, out int[] sequences)) continue;
+                    SerializedProperty lines = new SerializedObject(x).FindProperty("lines");
+                    var heard = new List<int>();
+                    for (int i = 0; i < lines.arraySize; i++) heard.Add(lines.GetArrayElementAtIndex(i).intValue);
+                    foreach (int q in sequences)
+                    {
+                        foreach (RideScript.Beat beat in script.sequences[q].beats) Assert.Contains((int)beat.line, heard, x.GetType().Name + " does not hear " + beat.line);
+                    }
+                }
             }
             finally
             {
@@ -322,16 +341,69 @@ namespace Convergence.Tests.EditMode.Ride
         }
 
         [Test]
-        public void TheLevel2Theme_HasSevenLitRegions_NoneOrange()
+        public void TheBuiltLevel2Scene_IsABikeRideInDaylight()
+        {
+            var scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Additive);
+            try
+            {
+                GameObject pod = null, track = null;
+                Convergence.Presentation.Ride.Level2.Level2Kit kit = null;
+                foreach (GameObject root in scene.GetRootGameObjects())
+                {
+                    if (root.name == "Pod") pod = root;
+                    if (root.name == "Track") track = root;
+                    if (kit == null) kit = root.GetComponentInChildren<Convergence.Presentation.Ride.Level2.Level2Kit>(true);
+                }
+
+                Assert.IsNotNull(pod, "the rider's Pod");
+                var bike = pod.GetComponent<Convergence.Presentation.Ride.Level2.BikeView>();
+                Assert.IsNotNull(bike, "Level 2's pod is a bike (ADR-023)");
+                foreach (string part in new[] { "frontWheel", "rearWheel", "crank", "bars" })
+                {
+                    Assert.IsNotNull(new SerializedObject(bike).FindProperty(part).objectReferenceValue, "the bike's " + part + " is wired");
+                }
+
+                Assert.IsNull(pod.transform.Find("Tub"), "no Level 1 cockpit tub on the bike");
+                Assert.IsNotNull(track, "the bike path runs the whole ride (Track)");
+                Assert.IsNotNull(track.GetComponent<Convergence.Presentation.Ride.Level2.TrackWorld>());
+                Assert.IsNotNull(kit, "the scene has the Level 2 kit");
+                Assert.IsNotNull(new SerializedObject(kit).FindProperty("outline").objectReferenceValue, "outlined text, readable on a bright sky");
+                // RenderSettings are the active scene's: make Level 2's active to read its sky.
+                UnityEngine.SceneManagement.Scene previous = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+                UnityEngine.SceneManagement.SceneManager.SetActiveScene(scene);
+                string sky = RenderSettings.skybox != null ? RenderSettings.skybox.shader.name : "";
+                UnityEngine.SceneManagement.SceneManager.SetActiveScene(previous);
+                Assert.AreEqual("Convergence/DaySky", sky, "Level 2's sky is daylight");
+            }
+            finally
+            {
+                EditorSceneManager.CloseScene(scene, true);
+            }
+        }
+
+        [Test]
+        public void AStoryEndsWithDots_WhenItsLastWordCannotEndASentence()
+        {
+            Assert.IsTrue(StoryMoment.EndsOpen("a"), "talk like a ...");
+            Assert.IsTrue(StoryMoment.EndsOpen("The"));
+            Assert.IsFalse(StoryMoment.EndsOpen("me"), "play with me.");
+            Assert.IsFalse(StoryMoment.EndsOpen("games"));
+        }
+
+        [Test]
+        public void TheLevel2Theme_IsDaylightWithAMeadow_NoneOrange()
         {
             var theme = AssetDatabase.LoadAssetAtPath<RideTheme>("Assets/ScriptableObjects/RideTheme_L2.asset");
             Assert.IsNotNull(theme);
             Assert.AreEqual(7, theme.regions.Length, "the dock, five stops and the end");
+            Assert.AreEqual(1f, theme.blackboardFloor, "the meadow stays green while a board explains");
             foreach (RideTheme.RegionLook look in theme.regions)
             {
                 Color.RGBToHSV(look.skyHorizon, out float h, out float s, out float v);
-                Assert.Greater(v, 0.08f, look.tag + ": a lit horizon, not a black void");
-                Assert.Less(v, 0.5f, look.tag + ": dark enough for white text");
+                Assert.Greater(v, 0.6f, look.tag + ": a daylight horizon; Level 2 must never look like Level 1's night (owner, 2026-10-31)");
+                Color.RGBToHSV(look.skyTop, out _, out _, out float top);
+                Assert.Greater(top, 0.35f, look.tag + ": a blue sky overhead, not black");
+                Assert.GreaterOrEqual(look.floor.a, 0.9f, look.tag + ": the bike rides over a meadow");
                 bool orange = h > 0.04f && h < 0.11f && s > 0.6f && v > 0.5f;
                 Assert.IsFalse(orange, look.tag + " must not be orange (orange means press this)");
             }

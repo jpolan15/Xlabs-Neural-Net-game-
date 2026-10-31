@@ -43,6 +43,7 @@ namespace Convergence.EditorTools
             _skill = skill;
             _swipeSlot = -1;
             _carry = -1;
+            _storyFork = -1;
             return "bot on, skill " + skill;
         }
 
@@ -223,9 +224,18 @@ namespace Convergence.EditorTools
 
         // ---------- stop 5: choose a lane ----------
 
+        private static int _storyFork = -1;
+
         private static void PlayStory(StoryMoment m)
         {
-            if (!m.IsLive || Time.time < _nextAction) return;
+            if (!m.IsLive) return;
+            if (m.Fork != _storyFork)
+            {
+                _storyFork = m.Fork;
+                _nextAction = Time.time + 3f; // reads the four gates first, as a rider would
+            }
+
+            if (Time.time < _nextAction) return;
             int lane = Random.value < _skill ? (m.Fork % 2 == 0 ? 1 : 3) : 0;
             if (m.PickHit(lane, RideHand.Right)) _nextAction = Time.time + 1.0f;
         }

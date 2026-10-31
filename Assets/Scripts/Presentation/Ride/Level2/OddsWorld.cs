@@ -1,68 +1,71 @@
-using System.Collections.Generic;
 using UnityEngine;
 using Convergence.Presentation.Ride.Explainers;
 
 namespace Convergence.Presentation.Ride.Level2
 {
     /// <summary>
-    /// Stop 4's place: a neon city at sunset, the city of odds. Towers of every height line both sides, windows lit in pink and cyan, and a
-    /// great striped sun sits on the horizon ahead. Dressing only.
+    /// Stop 4's place (ADR-023): the odds fair in the late afternoon, for prediction. Striped tents line both sides of the road, a big
+    /// wheel turns behind them on the right, and a string of pennants crosses over the way. Dressing only.
     /// </summary>
     public sealed class OddsWorld : MonoBehaviour
     {
-        private GlowField _sky;
+        private Transform _wheel;
 
         private void Awake()
         {
             Level2Kit kit = Level2Kit.Current;
             if (kit == null) return;
-            Level2Scenery.Rails(transform, -30f, 80f, new Color(1f, 0.45f, 0.75f, 0.8f));
+            var m = new SolidMesh();
+            Color white = new Color(0.98f, 0.97f, 0.94f, 0f);
 
-            var solids = new SolidMesh();
-            for (int i = 0; i < 16; i++)
+            // Tents, left and right, set back from the bets.
+            Vector3[] tents = { new Vector3(-13f, 0f, 12f), new Vector3(-16f, 0f, 22f), new Vector3(-12.5f, 0f, 31f), new Vector3(13.5f, 0f, 13f), new Vector3(12.5f, 0f, 26f) };
+            for (int i = 0; i < tents.Length; i++) Level2Scenery.Tent(m, tents[i], 2.4f + 0.5f * Fx.Rand01(i + 40), Level2Scenery.Bright[i % 6], white);
+
+            // The big wheel's stand, on the right behind the tents.
+            Vector3 hub = new Vector3(44f, 12f, 56f); // far right, behind the tents, clear of the bets
+            Color steel = new Color(0.92f, 0.92f, 0.96f, 0f);
+            foreach (float s in new[] { -1f, 1f })
             {
-                float z = 6f + i * 3.4f;
-                foreach (float side in new[] { -1f, 1f })
+                // Two legs from the hub down to the ground, 5 m out on either side, in front of and behind the wheel.
+                m.Block(hub + new Vector3(-2.5f, -6f, s * 1.2f), new Vector3(0.35f, 13f, 0.35f), Quaternion.Euler(0f, 0f, 22.6f), steel);
+                m.Block(hub + new Vector3(2.5f, -6f, s * 1.2f), new Vector3(0.35f, 13f, 0.35f), Quaternion.Euler(0f, 0f, -22.6f), steel);
+            }
+
+            // Strings of pennants between the tents on both sides (never behind the bets).
+            foreach (float s in new[] { -1f, 1f })
+            {
+                for (int i = 0; i < 14; i++)
                 {
-                    float r1 = Fx.Rand01(i * 5 + (side > 0 ? 1 : 2)), r2 = Fx.Rand01(i * 7 + (side > 0 ? 3 : 4)), r3 = Fx.Rand01(i * 11 + (side > 0 ? 5 : 6));
-                    float x = side * (8.2f + 4f * r1 + (i % 3) * 1.2f);
-                    float h = 4f + 12f * r2 * r2 + 1.5f;
-                    float w = 1.8f + 2.2f * r3;
-                    Color roof = side < 0 ? new Color(1f, 0.55f, 0.85f, 1f) : new Color(0.45f, 0.9f, 1f, 1f);
-                    solids.Box(new Vector3(x, 0f, z), new Vector3(w, h, w), roof, new Color(0.22f, 0.08f, 0.25f, 0.1f + 0.2f * r3));
-                    // A lit band of windows.
-                    solids.Box(new Vector3(x, h * 0.35f, z), new Vector3(w + 0.06f, 0.14f, w + 0.06f), roof, Fx.Mul(roof, 0.9f));
-                    solids.Box(new Vector3(x, h * 0.7f, z), new Vector3(w + 0.06f, 0.1f, w + 0.06f), roof, Fx.Mul(roof, 0.7f));
+                    float z = 10f + i * 1.3f;
+                    float y = 5.2f - 0.7f * Mathf.Sin(i / 13f * Mathf.PI);
+                    m.Block(new Vector3(s * 10.5f, y, z), new Vector3(0.03f, 0.6f, 0.5f), Quaternion.Euler(45f, 0f, 0f), Level2Scenery.Bright[i % 6]);
                 }
+
+                foreach (float z in new[] { 9.4f, 27.6f }) m.Post(new Vector3(s * 10.5f, 0f, z), 0.1f, 5.6f, 6, white, white);
+            }
+            Level2Scenery.Sign(m, transform, new Vector3(12.5f, 0f, 16f), new Vector2(3.4f, 1.1f), "THE ODDS FAIR", new Color(1f, 0.85f, 0.35f, 0f), new Color(0.6f, 0.15f, 0.3f));
+            m.Build(transform, "Fair", kit.Solid);
+
+            // The wheel itself: a rim of spokes and twelve gondolas, turning slowly.
+            var w = new SolidMesh();
+            for (int k = 0; k < 12; k++)
+            {
+                Quaternion turn = Quaternion.Euler(0f, 0f, k * 30f);
+                w.Block(turn * new Vector3(0f, 4.5f, 0f), new Vector3(0.18f, 9f, 0.18f), turn, steel);
+                w.Block(turn * new Vector3(0f, 9f, 0f), new Vector3(4.8f, 0.3f, 0.3f), turn, steel);
+                w.Box(turn * new Vector3(0f, 9f, 0f) + Vector3.down * 1.2f, new Vector3(1.2f, 1.1f, 1.2f), Level2Scenery.Bright[k % 6], Level2Scenery.Bright[k % 6]);
             }
 
-            solids.Build(transform, "City", kit.Solid);
-
-            // The sun: a disc with dark bars across its lower half.
-            var sun = new List<Shape>
-            {
-                Level2Kit.Square(new Vector3(0f, 11f, 120f), new Vector2(46f, 46f), new Color(1f, 0.45f, 0.5f, 0.95f), 1f),
-                Level2Kit.Square(new Vector3(0f, 11f, 119.5f), new Vector2(36f, 36f), new Color(1f, 0.78f, 0.45f, 0.95f), 1f),
-            };
-            for (int k = 0; k < 8; k++)
-            {
-                float y = 11f - 3f - k * 2.4f;
-                sun.Add(Level2Kit.Square(new Vector3(0f, y, 119f), new Vector2(50f, 0.35f + 0.22f * k), new Color(0.2f, 0.06f, 0.22f, 1f), 0f));
-            }
-
-            kit.Batch(transform, "Sun", sun, -4);
-            _sky = GlowField.Create(transform, "SunGlow", 3, kit.Glow, -5);
-            var dust = new GameObject("Sparkle").AddComponent<DustField>();
-            dust.transform.SetParent(transform, false);
-            dust.Configure(80, new Vector3(10f, 3f, 16f), new Vector3(0f, 3.5f, 20f), 0.1f, 0.2f, new Color(1f, 0.6f, 0.85f, 0.9f), new Color(0.6f, 0.95f, 1f, 0.9f));
+            w.Ball(Vector3.zero, Vector3.one * 0.8f, steel, 8, 4);
+            _wheel = w.Build(transform, "BigWheel", kit.Solid).transform;
+            _wheel.localPosition = hub;
+            _wheel.localRotation = Quaternion.identity;
         }
 
         private void Update()
         {
-            if (_sky == null) return;
-            _sky.Set(0, new Vector3(0f, 11f, 124f), 90f, new Color(1f, 0.4f, 0.55f, 0.28f));
-            _sky.Set(1, new Vector3(0f, 8f, 124f), 140f, new Color(0.8f, 0.3f, 0.8f, 0.16f));
-            _sky.Set(2, new Vector3(0f, 3f, 100f), new Vector2(160f, 14f), new Color(1f, 0.55f, 0.65f, 0.18f + 0.04f * Mathf.Sin(Time.time * 0.6f)), 0f);
+            if (_wheel != null) _wheel.localRotation = Quaternion.Euler(0f, 0f, Time.time * 6f);
         }
     }
 }

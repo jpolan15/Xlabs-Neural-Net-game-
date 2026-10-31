@@ -1,4 +1,4 @@
-Source: AI synthesized, Kokoro-82M v1.0 (hexgrad, Apache-2.0) via kokoro-onnx 0.6.1 (MIT); voice af_heart, speed 1.0, lang en-us; one sentence per call, explicit pauses, -16 LUFS / -1 dBTP / mono 48 kHz; ArtSource/voice/render_voices.py, 2026-10-30
-Segments: 0.990 1.150 2.839
+Source: AI synthesized, Kokoro-82M v1.0 (hexgrad, Apache-2.0) via kokoro-onnx 0.6.1 (MIT); voice af_heart, speed 1.0, lang en-us; one sentence per call, explicit pauses, -16 LUFS / -1 dBTP / mono 48 kHz; ArtSource/voice/render_voices.py, 2026-10-31
+Segments: 1.480 0.880 0.820 1.960 0.820 0.640 1.560 1.570
 
-It isn't sure. It never is. The word we meant, hungry, only got one percent.
+It's rarely sure. Our word, hungry, only got about one percent. But too, so, and scared fit as well. Lots of words can come next.

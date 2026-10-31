@@ -55,7 +55,7 @@ namespace Convergence.Presentation.Ride.Level2
 
             var shapes = new List<Shape>();
             _plate = shapes.Count;
-            shapes.Add(Level2Kit.Square(Centre + new Vector3(0f, 0.2f, 0.2f), new Vector2(11.6f, 5.0f), new Color(0.02f, 0.07f, 0.09f, 0.9f), 0.05f, new Color(1f, 0.85f, 0.45f, 0.9f), 0.04f));
+            shapes.Add(Level2Kit.Square(Centre + new Vector3(0f, 0.2f, 0.2f), new Vector2(11.6f, 5.0f), new Color(0.02f, 0.07f, 0.09f, 0.98f), 0.05f, new Color(1f, 0.85f, 0.45f, 0.9f), 0.04f));
             _barFirst = shapes.Count;
             for (int i = 0; i < Lanes; i++) shapes.Add(Level2Kit.Square(LaneBase(i), new Vector2(1.1f, 0.05f), Fx.A(Cols[i], 0.5f), 0.18f, Cols[i], 0.045f));
             _coldFirst = shapes.Count;

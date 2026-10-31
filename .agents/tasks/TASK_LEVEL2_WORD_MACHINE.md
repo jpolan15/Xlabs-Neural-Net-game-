@@ -5,6 +5,11 @@ and the backprop game (drag the glowing wires onto the 3) not intuitive. Then: d
 as a ride *inside an LLM* where you see the machine working, with the same rhythm as Level 1 (a short explainer, then a mini-game),
 different games, looking great and fun for Ignite. ADR: `Documentation/Architecture/ADRs/ADR-022-level2-word-machine.md`.
 
+Owner brief v2 (2026-10-31): "Level 2 looks the same as Level 1; it can't be the same dark look." The school's VR room has an
+exercise bike: Level 2 becomes a bike ride (the rider sits on the real bike and pedals, or on a chair). And "review it as a master AI
+professor": the logic, long enough pauses, fun games that are not Level 1's. Built as ADR-023
+(`Documentation/Architecture/ADRs/ADR-023-level2-bike-ride-and-review.md`).
+
 ## 1. What exists
 
 Level 1 v7.1 (teacher feedback):
@@ -25,7 +30,14 @@ Level 2 (scene `Assets/Scenes/WordMachine.unity`, built by `Convergence/Build Wo
 | 3 Attention | `AttentionExplainer`: a word only looks back | `SpotlightMoment` hold the laser on the words that explain "it" (softmax shares), then the real head is shown | `attention` (layer 5, head 4) |
 | 4 Prediction | `OddsExplainer`: scores to odds, the loop of learning | `PredictMoment` ten chips over the next word, beat the machine | `predict` (top words and odds) |
 | 5 Writing | `WritingExplainer`: loop, temperature dial | `StoryMoment` shoot the word you want at 3 forks; the story's odds are the product of the lanes | `story`, `temperature` |
-| End | `OutroExplainer`: Pixel says the rider's story; 970 vs 124 million vs hundreds of billions | none | |
+| End | `OutroExplainer`: Pixel says the rider's story; the loop recap; 970 vs 124 million vs hundreds of billions; "likely is not true, always check" | none | |
+
+v2 (ADR-023): a daylight bike ride. `Convergence/DaySky` (sun, clouds, meadow; one look per stop, a day passing), the cargo bike `PodL2`
+(`NeuralRideBuilder.Bike.cs`, `BikeView`: wheels and pedals follow the ride, bars steer at the story forks), one country road
+(`Track/TrackWorld`) and a landmark per stop (`DockWorld` windmill, `TokenWorld` sawmill, `GalaxyWorld` observatory, `HallWorld` theatre,
+`OddsWorld` fair, `RoadWorld` farm, `EndWorld` finish). Outlined text (`Level2Kit.outline`), soft glows, opaque boards. Script v2: four
+new lines (242 bike, 243 the learned table, 244 attention blends meaning, 245 recap, 246 "always check") and corrected ones (why
+tokens, low odds are not wrong, loss as surprise, loaded dice), pauses about twice as long; 47 lines re-voiced (Kokoro, temporary).
 
 Honesty rules (an ML teacher reviews this): every number shown comes from `Assets/_Project/Data/Level2/level2_words.json`, baked by
 `ArtSource/training/bake_level2.py` from the real GPT-2 small (124M); attention is causal; a story's probability is the product of the
@@ -41,17 +53,29 @@ lane odds; kid-unsafe words are blocked on the road (`BLOCKED`, checked by eye o
   `Tools/Editor/Level2Bot.cs`. Voices: `ArtSource/voice/render_voices.py` reads both narration files.
 - Tests: `Tests/EditMode/Ride/Level2Tests.cs` (data, galaxy framing, rules, built scene), `Tests/PlayMode/Gameplay/Level2RideTests.cs`
   (the whole ride, played by a test rider, every game won by the rider).
-- Evidence: `Documentation/Design/captures/level2_v1/` and `level2_v2/` (live shots from a bot run).
+- Evidence: `Documentation/Design/captures/level2_v5/` (v2 live shots from a bot run, ADR-023).
 
 ## 3. How to run
 
 - Desktop: open `Assets/Scenes/WordMachine.unity`, press Play. Mouse is the laser, Space skips a line, Shift+Space hurries a game, R restarts.
 - Rebuild after code or data changes: `Convergence/Build Word Machine (Level 2)` (and `Convergence/Build Neural Ride` for Level 1).
 - Re-bake the data: `uv run --with torch --with transformers --with numpy python -I ArtSource/training/bake_level2.py bake --out Assets/_Project/Data/Level2/level2_words.json`.
-- Voices: edit `Level2NarrationData.cs`, then `render_voices.py render --lines N`, `verify`, `install` (needs Python 3.13 with kokoro-onnx etc.; see
-  `ArtSource/voice/README.md`) and rebuild.
+- Voices: edit `Level2NarrationData.cs`, then `render_voices.py render --lines N`, `verify`, `install` and rebuild. The system Python lacks
+  the packages; run it through uv: `uv run --no-project --python 3.13 --with kokoro-onnx --with soundfile --with pyloudnorm --with scipy
+  --with numpy --with faster-whisper python render_voices.py ...` from `ArtSource/voice/`.
+- Tests live in the local package `com.convergence.tests` (`Tests/`): after editing one, `AssetDatabase.ImportAsset("Packages/com.convergence.tests/...")`
+  or Unity keeps running the old build of it.
 - A bot rider in Play Mode: `Convergence.EditorTools.Level2Bot.Start(0.9f)` and `RideLiveShot.AutoPilot(true, 3f)` (UnityMCP `execute_code`).
 - Level 1 ends with GO lighting for "LEVEL 2"; Level 2 ends with GO for Level 1 again (`FinaleView.nextScene`).
+
+### Playtest v2 (owner, on the Quest over Link)
+
+1. Open `Assets/Scenes/WordMachine.unity`, press Play (or finish Level 1 and pull GO on its end card). About 10 to 12 minutes.
+2. Watch for: does the first look say "new level" at once (sunny road, bike under you); can you read every board without leaning;
+   are the pauses long enough to follow; does each game make sense from its one instruction; does the bike's steering at the story
+   forks feel good or make you queasy; does anything block the road or a board.
+3. Exercise bike: a stationary bike only, a spotter beside it, no standing on the pedals. The seat re-centres the eye height by itself
+   (chair or bike). Hold the controllers; rest them on the bike's bars between games. The virtual pedals turn only while the ride moves.
 
 ## 4. Status
 
@@ -59,6 +83,9 @@ lane odds; kid-unsafe words are blocked on the road (`BLOCKED`, checked by eye o
 - [x] Level 2 built end to end, played start to finish by the bot and by `Level2RideTests`.
 - [x] All 42 Level 2 lines voiced with the temporary Kokoro voice (WER under 10 % by Whisper). The owner dislikes synthetic voices: offer
       a human recording (`ArtSource/voice/RECORDING_SCRIPT.md` style) before Ignite.
-- [ ] Ridden on a Quest 2 (comfort of the galaxy view, laser aim at word sizes, draw-call budget on the headset).
+- [x] v2 (ADR-023): daylight bike ride, reviewed and slower script, re-voiced, story game steers the bike; played end to end by the bot,
+      EditMode tests green (Level2Tests, RideNarrationTests).
+- [ ] Ridden on a Quest 2 (comfort of the galaxy view, laser aim at word sizes, draw-call budget of the countryside on the headset).
+- [ ] Ridden on the school's exercise bike (does the virtual bike sit right under a real one; is the dash readable while pedalling).
 - [ ] A human voice for Level 2.
 - [ ] Ideas not built: a second attention head, a "guess the next word" duel against the machine, sharing the written story (QR) at the booth.

@@ -101,11 +101,18 @@ namespace Convergence.EditorTools
             var pod = new GameObject("Pod");
             Transform seat = Make("SeatAnchor", pod.transform, Vector3.zero).transform;
 
-            Prim(PrimitiveType.Cylinder, "Floor", pod.transform, new Vector3(0, -0.03f, 0), new Vector3(2.6f, 0.02f, 2.6f), "PodDark");
-            Prim(PrimitiveType.Cylinder, "FloorRing", pod.transform, new Vector3(0, -0.045f, 0), new Vector3(2.75f, 0.01f, 2.75f), "CyanDim");
-            Prim(PrimitiveType.Cube, "SeatBack", pod.transform, new Vector3(0, 0.75f, -0.62f), new Vector3(0.62f, 0.9f, 0.1f), "PodMid");
-            Prim(PrimitiveType.Cube, "SeatBase", pod.transform, new Vector3(0, 0.3f, -0.4f), new Vector3(0.62f, 0.12f, 0.5f), "PodMid");
-            BuildTub(pod.transform);
+            if (_level2)
+            {
+                BuildBike(pod); // Level 2 rides a bike (ADR-023): the same dash and table, on the bike's front box
+            }
+            else
+            {
+                Prim(PrimitiveType.Cylinder, "Floor", pod.transform, new Vector3(0, -0.03f, 0), new Vector3(2.6f, 0.02f, 2.6f), "PodDark");
+                Prim(PrimitiveType.Cylinder, "FloorRing", pod.transform, new Vector3(0, -0.045f, 0), new Vector3(2.75f, 0.01f, 2.75f), "CyanDim");
+                Prim(PrimitiveType.Cube, "SeatBack", pod.transform, new Vector3(0, 0.75f, -0.62f), new Vector3(0.62f, 0.9f, 0.1f), "PodMid");
+                Prim(PrimitiveType.Cube, "SeatBase", pod.transform, new Vector3(0, 0.3f, -0.4f), new Vector3(0.62f, 0.12f, 0.5f), "PodMid");
+                BuildTub(pod.transform);
+            }
 
             // Dash: low and tilted 45 degrees toward the seat, so its top edge sits about 14 degrees under a 1.15 m eye and
             // even a short rider sees the pixels below the horizon ahead. Local +Z points away from the player.

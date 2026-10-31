@@ -8,8 +8,8 @@ using Convergence.Presentation.Ride.Explainers;
 namespace Convergence.Presentation.Ride.Level2
 {
     /// <summary>
-    /// Stop 2, explained. A token's number is a name tag ({name}); each word really is 768 numbers, squashed to three so they can be seen
-    /// ({squash}); the three numbers are a place in space, and the real baked picture of GPT-2's forty words appears around the rider,
+    /// Stop 2, explained. A token's number is a name tag ({name}); the machine looks the token up in a table it learned and gets 768 numbers
+    /// ({table}, {learned}) and its place in the sentence ({place}), squashed to three so they can be seen ({squash}); the three numbers are a place in space, and the real baked picture of GPT-2's forty words appears around the rider,
     /// related words clustering ({space}, {close}); and directions mean things: king - man + woman lands on queen ({math}, real
     /// similarity from the bake). {sort} clears the board for the game, whose galaxy is the same picture.
     /// </summary>
@@ -21,7 +21,7 @@ namespace Convergence.Presentation.Ride.Level2
         private ShapeBatch _plate, _grid, _math;
         private GlowField _stars, _links;
         private RibbonField _near;
-        private TextMeshPro _title, _cat, _number, _tag, _label768, _label3, _nearList, _mathLine, _mathResult, _royal, _female, _dogLabel;
+        private TextMeshPro _title, _cat, _number, _tag, _label768, _learned, _place, _label3, _nearList, _mathLine, _mathResult, _royal, _female, _dogLabel;
         private TextMeshPro[] _axis, _words, _mathWords;
         private readonly List<L2GalaxyWord> _all = new List<L2GalaxyWord>();
         private readonly List<int> _labelled = new List<int>();
@@ -47,7 +47,7 @@ namespace Convergence.Presentation.Ride.Level2
             // The name tag.
             var shapes = new List<Shape>();
             _plateIndex = shapes.Count;
-            shapes.Add(Level2Kit.Square(Centre, new Vector2(9.2f, 4.2f), new Color(0.04f, 0.03f, 0.13f, 0.9f), 0.06f, new Color(0.62f, 0.5f, 1f, 0.9f), 0.04f));
+            shapes.Add(Level2Kit.Square(Centre, new Vector2(9.2f, 4.2f), new Color(0.04f, 0.03f, 0.13f, 0.98f), 0.06f, new Color(0.62f, 0.5f, 1f, 0.9f), 0.04f));
             _chipIndex = shapes.Count;
             shapes.Add(Level2Kit.Square(Centre + new Vector3(-2.7f, 0.1f, -0.02f), new Vector2(2.0f, 1.0f), new Color(0.3f, 0.85f, 1f, 0.18f), 0.35f, new Color(0.3f, 0.85f, 1f, 0.95f), 0.04f));
             _arrowIndex = shapes.Count;
@@ -85,6 +85,8 @@ namespace Convergence.Presentation.Ride.Level2
             foreach (Shape s in grid) s.alpha = 0f;
             _grid = _kit.Batch(root, "Squash", grid, 2);
             _label768 = _kit.Text(root, "Label768", "768 NUMBERS", 0.3f, new Color(0.6f, 0.95f, 1f), Centre + new Vector3(-2.1f, -1.35f, -0.06f), 4f);
+            _learned = _kit.Text(root, "Learned", "LEARNED IN TRAINING, NOT TYPED IN", 0.26f, new Color(1f, 0.85f, 0.5f), Centre + new Vector3(-2.1f, -1.8f, -0.06f), 6f);
+            _place = _kit.Text(root, "Place", "+ ITS PLACE IN THE SENTENCE:   dog bites man   /   man bites dog", 0.24f, new Color(0.7f, 1f, 0.8f), Centre + new Vector3(0f, -1.8f, -0.06f), 8.8f);
             _label3 = _kit.Text(root, "Label3", "3 NUMBERS", 0.3f, new Color(1f, 0.85f, 0.5f), Centre + new Vector3(3.2f, -0.75f, -0.06f), 4f);
             _axis = new TextMeshPro[3];
             string[] names = { "x", "y", "z" };
@@ -104,7 +106,7 @@ namespace Convergence.Presentation.Ride.Level2
                 {
                     if (_all[i].category != Level2Data.Neighbourhoods[c]) continue;
                     _labelled.Add(i);
-                    _words[n] = _kit.Text(root, "Word" + n, _all[i].word, 0.34f, Color.white, GalaxyMoment.Map(new Vector3(_all[i].x, _all[i].y, _all[i].z)) + new Vector3(0f, 0.32f, 0f), 3f);
+                    _words[n] = _kit.Text(root, "Word" + n, _all[i].word, 0.38f, Level2Kit.CategoryColor(_all[i].category), GalaxyMoment.Map(new Vector3(_all[i].x, _all[i].y, _all[i].z)) + new Vector3(0f, 0.32f, 0f), 3f);
                     n++;
                     shown++;
                 }
@@ -120,13 +122,13 @@ namespace Convergence.Presentation.Ride.Level2
             if (_dogStar >= 0)
             {
                 L2GalaxyWord dog = _all[_dogStar];
-                _dogLabel = _kit.Text(root, "DogWord", dog.word, 0.34f, Color.white, GalaxyMoment.Map(new Vector3(dog.x, dog.y, dog.z)) + new Vector3(0f, 0.32f, 0f), 3f);
+                _dogLabel = _kit.Text(root, "DogWord", dog.word, 0.38f, Level2Kit.CategoryColor(dog.category), GalaxyMoment.Map(new Vector3(dog.x, dog.y, dog.z)) + new Vector3(0f, 0.32f, 0f), 3f);
             }
 
             L2Neighbours nb = System.Array.Find(data.File.neighbours, x => x.word == "cat");
             string list = "CLOSEST TO CAT (GPT-2)";
             if (nb != null) for (int i = 0; i < Mathf.Min(3, nb.nearest.Length); i++) list += "\n" + nb.nearest[i].word + "   " + nb.nearest[i].similarity.ToString("0.00");
-            _nearList = _kit.Text(root, "NearList", list, 0.26f, new Color(0.85f, 1f, 0.9f), Centre + new Vector3(3.9f, -0.2f, 0f), 4f, TextAlignmentOptions.Left);
+            _nearList = _kit.Text(root, "NearList", list, 0.26f, new Color(0.85f, 1f, 0.9f), new Vector3(4.9f, 4.6f, 9f), 4f, TextAlignmentOptions.Left);
             _nearList.lineSpacing = 8f;
 
             // The directions: king - man + woman.
@@ -134,7 +136,7 @@ namespace Convergence.Presentation.Ride.Level2
             float sim = analogy != null && analogy.answers.Length > 0 ? analogy.answers[0].similarity : 0.71f;
             Vector3 m = new Vector3(0f, 2.7f, 6.4f);
             var diagram = new List<Shape>();
-            diagram.Add(Level2Kit.Square(m, new Vector2(7.4f, 3.9f), new Color(0.04f, 0.03f, 0.13f, 0.92f), 0.06f, new Color(1f, 0.82f, 0.45f, 0.85f), 0.04f));
+            diagram.Add(Level2Kit.Square(m + new Vector3(0.6f, 0f, 0f), new Vector2(8.8f, 3.9f), new Color(0.04f, 0.03f, 0.13f, 0.98f), 0.06f, new Color(1f, 0.82f, 0.45f, 0.85f), 0.04f));
             Vector3 man = m + new Vector3(-2.1f, -0.8f, -0.02f), woman = m + new Vector3(0.5f, -0.6f, -0.02f), king = m + new Vector3(-2.1f, 0.75f, -0.02f), queen = m + new Vector3(0.5f, 0.95f, -0.02f);
             _mp1 = diagram.Count;
             foreach (Vector3 p in new[] { man, woman, king, queen }) diagram.Add(Level2Kit.Square(p, new Vector2(0.34f, 0.34f), new Color(1f, 1f, 1f, 0.95f), 1f));
@@ -187,7 +189,7 @@ namespace Convergence.Presentation.Ride.Level2
 
         private IEnumerable<TextMeshPro> Texts()
         {
-            yield return _title; yield return _cat; yield return _number; yield return _tag; yield return _label768; yield return _label3;
+            yield return _title; yield return _cat; yield return _number; yield return _tag; yield return _label768; yield return _learned; yield return _place; yield return _label3;
             yield return _nearList; yield return _mathLine; yield return _mathResult; yield return _royal; yield return _female;
             if (_dogLabel != null) yield return _dogLabel;
             foreach (TextMeshPro t in _axis) yield return t;
@@ -215,10 +217,10 @@ namespace Convergence.Presentation.Ride.Level2
             {
                 L2Centroid centre = data.Centre(Level2Data.Neighbourhoods[c]);
                 Color col = Level2Kit.CategoryColor(Level2Data.Neighbourhoods[c]);
-                col.a = 0.2f * _galaxy * _dim;
+                col.a = 0.32f * _galaxy * _dim; // soft halos, strong enough to tint a daylight sky
                 Vector3 p = GalaxyMoment.Map(new Vector3(centre.x, centre.y, centre.z));
                 _stars.Set(_all.Count + c * 2, p, 4.2f + 0.3f * Mathf.Sin(Time.time * 0.8f + c), col);
-                col.a = 0.1f * _galaxy * _dim;
+                col.a = 0.16f * _galaxy * _dim;
                 _stars.Set(_all.Count + c * 2 + 1, p, 7.5f, col);
             }
 
@@ -260,22 +262,35 @@ namespace Convergence.Presentation.Ride.Level2
                 Anim.Write(_tag, 1.0f).After(2.4f),
             });
 
-            // "Inside the machine, each word becomes seven hundred and sixty-eight numbers. We squashed them down to three."
-            s.At("squash", () =>
+            // "So the machine looks each token up in a giant table, and gets seven hundred and sixty-eight numbers that describe it."
+            s.At("table", () =>
             {
                 var list = new List<Tween>();
                 foreach (TextMeshPro t in new[] { _cat, _number, _tag }) list.Add(Anim.FadeText(t, 0f, 0.5f));
                 for (int i = _arrowIndex; i <= _arrowIndex + 3; i++) list.Add(Anim.FadeTo(_plate, i, 0f, 0.4f));
                 list.Add(Anim.FadeTo(_plate, _chipIndex, 0f, 0.4f));
-                for (int i = 0; i < Squares; i++) list.Add(Anim.FadeIn(_grid, i, Vector3.zero, 0.3f).After(0.5f + 0.008f * i));
-                list.Add(Anim.Write(_label768, 0.7f).After(0.8f));
+                for (int i = 0; i < Squares; i++) list.Add(Anim.FadeIn(_grid, i, Vector3.zero, 0.3f).After(0.5f + 0.012f * i));
+                list.Add(Anim.Write(_label768, 0.7f).After(1.0f));
+                return list;
+            });
+
+            // "Nobody typed those numbers in. The machine learned them in training, the same way Pixel learned its weights."
+            s.At("learned", () => new List<Tween> { Anim.Write(_learned, 1.0f) });
+
+            // "It also adds where each token sits in the sentence, so dog bites man and man bites dog don't mean the same thing."
+            s.At("place", () => new List<Tween> { Anim.FadeText(_learned, 0f, 0.4f), Anim.Write(_place, 1.4f).After(0.3f) });
+
+            // "Seven hundred and sixty-eight numbers is too many to picture. So we squashed them down to three."
+            s.At("squash", () =>
+            {
+                var list = new List<Tween> { Anim.FadeText(_learned, 0f, 0.5f), Anim.FadeText(_place, 0f, 0.5f) };
                 for (int k = 0; k < 3; k++)
                 {
-                    list.Add(Anim.FadeIn(_grid, Squares + k, Vector3.zero, 0.4f).After(2.4f + 0.15f * k));
-                    list.Add(Anim.Write(_axis[k], 0.4f).After(2.5f + 0.15f * k));
+                    list.Add(Anim.FadeIn(_grid, Squares + k, Vector3.zero, 0.4f).After(0.6f + 0.15f * k));
+                    list.Add(Anim.Write(_axis[k], 0.4f).After(0.7f + 0.15f * k));
                 }
 
-                list.Add(Anim.Write(_label3, 0.6f).After(2.6f));
+                list.Add(Anim.Write(_label3, 0.6f).After(0.8f));
                 for (int i = 0; i < Squares; i++)
                 {
                     int idx = i;
@@ -288,7 +303,7 @@ namespace Convergence.Presentation.Ride.Level2
                         t.size = new Vector2(0.3f, 0.3f);
                         t.alpha = 0f;
                         return t;
-                    }, 1.2f, Rate.RushInto).After(3.0f + 0.01f * i));
+                    }, 1.2f, Rate.RushInto).After(1.4f + 0.01f * i));
                 }
 
                 return list;
@@ -300,7 +315,7 @@ namespace Convergence.Presentation.Ride.Level2
                 var list = new List<Tween>();
                 for (int i = 0; i < _plate.Count; i++) list.Add(Anim.FadeTo(_plate, i, 0f, 0.6f));
                 for (int i = 0; i < _grid.Count; i++) list.Add(Anim.FadeTo(_grid, i, 0f, 0.5f));
-                foreach (TextMeshPro t in new[] { _title, _label768, _label3, _axis[0], _axis[1], _axis[2] }) list.Add(Anim.FadeText(t, 0f, 0.4f));
+                foreach (TextMeshPro t in new[] { _title, _label768, _learned, _place, _label3, _axis[0], _axis[1], _axis[2] }) list.Add(Anim.FadeText(t, 0f, 0.4f));
                 list.Add(Param(2.2f, a => _galaxy = a));
                 for (int i = 0; i < _words.Length; i++) list.Add(Anim.Write(_words[i], 0.5f).After(0.6f + 0.12f * i));
                 return list;
@@ -327,6 +342,9 @@ namespace Convergence.Presentation.Ride.Level2
                     Anim.FadeText(_nearList, 0f, 0.4f),
                     Anim.FadeIn(_math, 0, Vector3.zero, 0.6f).After(0.2f),
                 };
+                // The galaxy's words step back: text sorts before distance, so they would show through the diagram's board.
+                foreach (TextMeshPro w in _words) if (w != null && w.gameObject.activeSelf) list.Add(Anim.FadeText(w, 0f, 0.5f));
+                if (_dogLabel != null && _dogLabel.gameObject.activeSelf) list.Add(Anim.FadeText(_dogLabel, 0f, 0.5f));
                 for (int k = 0; k < 3; k++)
                 {
                     list.Add(Anim.FadeIn(_math, _mp1 + k, Vector3.zero, 0.3f).After(0.7f + 0.2f * k));

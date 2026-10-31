@@ -94,7 +94,7 @@ namespace Convergence.Presentation.Ride.Level2
 
             var shapes = new List<Shape>();
             _plate = shapes.Count;
-            shapes.Add(Level2Kit.Square(centre, new Vector2(9.6f, 3.9f), new Color(0.03f, 0.04f, 0.1f, 0.86f), 0.07f, new Color(1f, 0.7f, 0.3f, 0.8f), 0.04f));
+            shapes.Add(Level2Kit.Square(centre, new Vector2(9.6f, 3.9f), new Color(0.03f, 0.04f, 0.1f, 0.98f), 0.07f, new Color(1f, 0.7f, 0.3f, 0.8f), 0.04f));
             _chipFirst = shapes.Count;
             for (int i = 0; i < _chips; i++)
             {

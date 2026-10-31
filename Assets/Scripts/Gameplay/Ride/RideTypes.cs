@@ -315,7 +315,15 @@ namespace Convergence.Gameplay.Ride
         // The finale.
         OutTalk = 239,
         OutScale = 240,
-        OutEnd = 241
+        OutEnd = 241,
+
+        // Level 2 v2, the bike ride and the professor's review (ADR-023): the lines that fill the story's gaps.
+        L2Bike = 242,
+        EmbTable = 243,
+        AttBlend = 244,
+        OutRecap = 245,
+        OutCareful = 246,
+        EmbPlace = 247
     }
 
     /// <summary>Stable ids for the pod's control channels. Level 1 has one: GO.</summary>

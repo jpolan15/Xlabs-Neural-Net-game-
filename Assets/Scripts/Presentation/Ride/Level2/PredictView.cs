@@ -45,7 +45,7 @@ namespace Convergence.Presentation.Ride.Level2
         private PredictMoment.Offer _offer;
         private static readonly Vector3 Centre = new Vector3(0f, 2.4f, 8f);
         private static readonly Vector3 Eye = new Vector3(0f, 1.3f, 0f);
-        private const float Pitch = 1.42f, Base = 1.35f, Full = 2.7f, ChipStep = 0.255f;
+        private const float Pitch = 1.42f, Base = 1.75f, Full = 2.7f, ChipStep = 0.255f; // Base: clear of the road, which hides anything below it (ADR-023)
 
         private Vector3 ColumnBase(int i) => new Vector3((i - 3) * Pitch, Base, 8f);
 
@@ -59,7 +59,7 @@ namespace Convergence.Presentation.Ride.Level2
 
             var shapes = new List<Shape>();
             _slot = shapes.Count;
-            for (int i = 0; i < Towers; i++) shapes.Add(Level2Kit.Square(ColumnBase(i) + new Vector3(0f, Full * 0.5f, 0.1f), new Vector2(1.12f, Full), new Color(0.1f, 0.04f, 0.16f, 0.5f), 0.12f, Fx.A(Cols[i], 0.4f), 0.03f));
+            for (int i = 0; i < Towers; i++) shapes.Add(Level2Kit.Square(ColumnBase(i) + new Vector3(0f, Full * 0.5f, 0.1f), new Vector2(1.12f, Full), new Color(0.1f, 0.04f, 0.16f, 0.82f), 0.12f, Fx.A(Cols[i], 0.7f), 0.04f)); // dark enough to read against a daylight fair
             _bar = shapes.Count;
             for (int i = 0; i < Towers; i++) shapes.Add(Level2Kit.Square(ColumnBase(i), new Vector2(1.0f, 0.05f), Fx.A(Cols[i], 0.5f), 0.1f, Cols[i], 0.05f));
             _chip = shapes.Count;
@@ -69,9 +69,9 @@ namespace Convergence.Presentation.Ride.Level2
             }
 
             _coin = shapes.Count;
-            for (int k = 0; k < Chips; k++) shapes.Add(Level2Kit.Square(new Vector3(-6.2f, 4.2f - k * 0.36f, 8f), new Vector2(0.3f, 0.3f), new Color(1f, 0.82f, 0.3f, 1f), 1f, new Color(1f, 0.97f, 0.7f, 1f), 0.03f));
+            for (int k = 0; k < Chips; k++) shapes.Add(Level2Kit.Square(new Vector3(-6.2f, 4.6f - k * 0.36f, 8f), new Vector2(0.3f, 0.3f), new Color(1f, 0.82f, 0.3f, 1f), 1f, new Color(1f, 0.97f, 0.7f, 1f), 0.03f));
             _lock = shapes.Count;
-            shapes.Add(Level2Kit.Square(new Vector3(0f, 0.2f, 7.6f), new Vector2(3.2f, 0.62f), new Color(0.3f, 0.85f, 1f, 0.22f), 0.45f, new Color(0.3f, 0.85f, 1f, 0.95f), 0.04f));
+            shapes.Add(Level2Kit.Square(new Vector3(0f, 0.75f, 7.6f), new Vector2(3.2f, 0.62f), new Color(0.3f, 0.85f, 1f, 0.22f), 0.45f, new Color(0.3f, 0.85f, 1f, 0.95f), 0.04f));
             foreach (Shape s in shapes) s.alpha = 0f;
             _batch = _kit.Batch(_props, "Towers", shapes, 2);
 
@@ -101,7 +101,7 @@ namespace Convergence.Presentation.Ride.Level2
 
             var lockGo = new GameObject("Lock");
             lockGo.transform.SetParent(_props, false);
-            lockGo.transform.localPosition = new Vector3(0f, 0.2f, 7.6f);
+            lockGo.transform.localPosition = new Vector3(0f, 0.75f, 7.6f);
             _lockBox = lockGo.AddComponent<BoxCollider>();
             _lockBox.isTrigger = true;
             _lockBox.size = new Vector3(3.4f, 0.8f, 0.8f);
@@ -109,12 +109,12 @@ namespace Convergence.Presentation.Ride.Level2
             lockPick.Owner = moment;
             lockPick.Index = PredictMoment.LockIndex;
 
-            _prompt = _kit.Text(_props, "Prompt", "", 0.5f, Color.white, new Vector3(0f, 5.25f, 8f), 12f);
-            _banner = _kit.Text(_props, "Banner", "SHOOT A WORD TO ADD A CHIP  -  LEFT HAND TAKES ONE BACK", 0.26f, new Color(1f, 0.85f, 0.95f), new Vector3(0f, 4.7f, 8f), 12f);
-            _left = _kit.Text(_props, "Left", "", 0.34f, new Color(1f, 0.92f, 0.5f), new Vector3(-6.2f, 4.6f, 8f), 3f);
-            _result = _kit.Text(_props, "Result", "", 0.42f, new Color(0.5f, 1f, 0.7f), new Vector3(0f, 0.45f, 7.6f), 12f);
-            _sub = _kit.Text(_props, "Sub", "", 0.28f, new Color(0.9f, 0.9f, 1f), new Vector3(0f, -0.05f, 7.6f), 12f);
-            _lockLabel = _kit.Text(_props, "LockLabel", "LOCK IT IN", 0.3f, Color.white, new Vector3(0f, 0.2f, 7.5f), 3f);
+            _prompt = _kit.Text(_props, "Prompt", "", 0.5f, Color.white, new Vector3(0f, 5.7f, 8f), 12f);
+            _banner = _kit.Text(_props, "Banner", "SHOOT A WORD TO ADD A CHIP  -  LEFT HAND TAKES ONE BACK", 0.26f, new Color(1f, 0.85f, 0.95f), new Vector3(0f, 5.15f, 8f), 12f);
+            _left = _kit.Text(_props, "Left", "", 0.34f, new Color(1f, 0.92f, 0.5f), new Vector3(-6.2f, 5.05f, 8f), 3f);
+            _result = _kit.Text(_props, "Result", "", 0.42f, new Color(0.5f, 1f, 0.7f), new Vector3(0f, 1.0f, 7.6f), 12f);
+            _sub = _kit.Text(_props, "Sub", "", 0.3f, Color.white, new Vector3(0f, 0.5f, 7.6f), 12f);
+            _lockLabel = _kit.Text(_props, "LockLabel", "LOCK IT IN", 0.3f, Color.white, new Vector3(0f, 0.75f, 7.5f), 3f);
             _glows = GlowField.Create(_props, "Glows", 40, _kit.Glow, 3);
             _beam = RibbonField.Create(_props, "Beam", 1, _kit.Beam, 1);
 

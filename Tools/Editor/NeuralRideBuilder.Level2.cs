@@ -78,15 +78,20 @@ namespace Convergence.EditorTools
             }
         }
 
+        /// <summary>
+        /// Level 2's skies (Convergence/DaySky, ADR-023): a day passing on the bike path, never Level 1's night. Morning at the dock, bright
+        /// noon at the chopper and the observatory, golden hour at the theatre, late afternoon at the fair, sunset on the story road, dusk at
+        /// the finish. Per stop: zenith, horizon (= fog), sun colour and halo strength, meadow colour and strength, cloud cover, fog density.
+        /// </summary>
         private static RideTheme.RegionLook[] Level2Regions() => new[]
         {
-            Sky("WORD MACHINE", "#0A0620", "#23124F", "#8A5CFF", 0.55f, "#7C4DFF", 0.30f, 1.2f, 0.010f),
-            Sky("TOKENS", "#0B0603", "#33190A", "#FF9A2E", 0.50f, "#FFB347", 0.30f, 0.5f, 0.012f),
-            Sky("MEANING", "#04041A", "#1A1050", "#6C4DFF", 0.60f, "#9B7BFF", 0.25f, 1.6f, 0.008f),
-            Sky("ATTENTION", "#040B18", "#0B2F4F", "#29D3FF", 0.50f, "#36E0FF", 0.30f, 0.8f, 0.010f),
-            Sky("PREDICTION", "#12041F", "#4A1440", "#FF4F9A", 0.60f, "#FF5FA8", 0.35f, 0.6f, 0.010f),
-            Sky("WRITING", "#08141F", "#1B4B55", "#FFD36B", 0.55f, "#6DFFC9", 0.25f, 1.0f, 0.009f),
-            Sky("THE END", "#060818", "#22204D", "#FFE08A", 0.50f, "#A98BFF", 0.30f, 1.4f, 0.009f),
+            Sky("WORD MACHINE", "#3E8EF0", "#CFE6FF", "#FFE2A8", 0.60f, "#78BE5A", 1f, 0.55f, 0.006f),
+            Sky("TOKENS", "#4A95F2", "#DDEFFF", "#FFE9B0", 0.55f, "#86C45A", 1f, 0.45f, 0.006f),
+            Sky("MEANING", "#2F6FDF", "#C2DEFF", "#FFF0C8", 0.50f, "#6CB866", 1f, 0.35f, 0.005f),
+            Sky("ATTENTION", "#5279D6", "#FFE0B0", "#FFB45E", 0.80f, "#9DBE5E", 1f, 0.60f, 0.006f),
+            Sky("PREDICTION", "#6C74D4", "#FFD0BE", "#FF9A70", 0.80f, "#94B860", 1f, 0.60f, 0.006f),
+            Sky("WRITING", "#5A62C2", "#FFBE94", "#FF8A55", 0.90f, "#8CAE5E", 1f, 0.70f, 0.007f),
+            Sky("THE END", "#3F4AA8", "#FFAE8C", "#FFC27A", 0.90f, "#789E5A", 1f, 0.70f, 0.007f),
         };
 
         // ---------- materials ----------
@@ -131,8 +136,10 @@ namespace Convergence.EditorTools
                 float a = Mathf.Pow(Mathf.Clamp01(1f - Mathf.Abs(v * 2f - 1f)), 1.5f);
                 return new Color(1f, 1f, 1f, a);
             });
-            Particles("L2Ring", Color.white, true, ring);
-            Particles("L2Beam", Color.white, true, beam);
+            // Soft, not additive: additive light vanishes against Level 2's bright sky (ADR-023).
+            Particles("L2Ring", Color.white, false, ring);
+            Particles("L2Beam", Color.white, false, beam);
+            MakeBikeMaterials();
         }
 
         // ---------- narration ----------
@@ -231,7 +238,7 @@ namespace Convergence.EditorTools
             RenderSettings.fogMode = FogMode.Exponential;
             RenderSettings.fogDensity = dock.fogDensity;
             RenderSettings.fogColor = dock.fog;
-            RenderSettings.skybox = SkyMaterial();
+            RenderSettings.skybox = DaySkyMaterial();
             RegionAtmosphere.ApplySky(dock, _theme);
             RenderSettings.ambientMode = AmbientMode.Flat;
             RenderSettings.ambientLight = _theme.voidNavy;
@@ -252,14 +259,26 @@ namespace Convergence.EditorTools
             Ref(source, "data", dataAsset);
             var session = host.AddComponent<Level2Session>();
             var kit = host.AddComponent<Level2Kit>();
-            Ref(kit, "glow", Mat("Spark"));
+            Ref(kit, "glow", Mat("L2Soft"));
             Ref(kit, "ring", Mat("L2Ring"));
             Ref(kit, "beam", Mat("L2Beam"));
             Ref(kit, "shapes", Mat("ExplainerFlat"));
-            Ref(kit, "solid", Mat("Tiles"));
+            Ref(kit, "solid", Mat("L2Solid"));
             Ref(kit, "font", _font);
             Ref(kit, "serif", ExplainerFont());
+            Ref(kit, "outline", OutlinedFont(_font, "L2TextOutline"));
+            Ref(kit, "serifOutline", OutlinedFont(ExplainerFont(), "L2SerifOutline"));
             Ref(kit, "theme", _theme);
+
+            // The bike path from the dock to the end, always on (the roadside clears where each stop shows its boards).
+            var track = new GameObject("Track").AddComponent<TrackWorld>();
+            Set(track, "stops", p =>
+            {
+                p.arraySize = StopZ.Length;
+                for (int i = 0; i < StopZ.Length; i++) p.GetArrayElementAtIndex(i).floatValue = StopZ[i];
+            });
+            Set(track, "extent", p => p.vector2Value = new Vector2(StopZ[0] - 40f, StopZ[StopZ.Length - 1] + 90f));
+            Set(track, "longClear", p => p.vector2Value = new Vector2(StopZ[5] - 6f, StopZ[5] + 80f)); // the three forks run 48 m past the stop
 
             var games = new GameObject[0];
             var slice = MakeL2Moment<SliceMoment>(host.transform, "Slice", source, session, regions[1].transform);
@@ -300,7 +319,7 @@ namespace Convergence.EditorTools
             Game(galaxy, "SORT THE GALAXY", "Carry each loose word home", RideLine.EmbDone, 130f);
             Game(spot, "BE THE ATTENTION", "Look at the words that matter", RideLine.AttDone, 120f);
             Game(bet, "PLACE YOUR CHIPS", "Spread ten chips over the next word", RideLine.PredDone, 140f);
-            Game(road, "STEER THE STORY", "Shoot the word you want next", RideLine.GenDone, 120f);
+            Game(road, "STEER THE STORY", "Point at a word, pull the trigger, ride that way", RideLine.GenDone, 120f);
         }
 
         private static void WireDirector2(RideDirector rd, GameObject pod, RideMoment[] moments, GameObject[] regions)
@@ -504,49 +523,58 @@ namespace Convergence.EditorTools
             T Explainer<T>(RideLine[] lines, int explain, int last, int region) where T : Level2Explainer
                 => AddExplainer2<T>(explainers, rd, dash, atmosphere, source, lines, explain, last, regions[region].transform);
 
-            // The dock: the intro's lines and the dock's own.
+            // Each explainer hears the lines of its stop's sequences (Level2NarrationData), so a new line's cues always reach it.
+            RideLine[] Of(params int[] sequences)
+            {
+                var all = new List<RideLine>();
+                foreach (int i in sequences) all.AddRange(Level2NarrationData.Sequences[i].Lines);
+                return all.ToArray();
+            }
+
+            // The dock: the intro's lines.
             regions[0].AddComponent<DockWorld>();
-            Explainer<WordDockExplainer>(new[] { RideLine.L2Hello, RideLine.L2Chatbot, RideLine.L2Stops }, -1, S2Tokens, 0);
+            Explainer<WordDockExplainer>(Level2NarrationData.IntroLines, -1, S2Tokens, 0);
 
             // Stop 1: tokens.
             regions[1].AddComponent<TokenWorld>();
-            Explainer<TokenizeExplainer>(new[] { RideLine.TokChop, RideLine.TokNumbers, RideLine.TokRare, RideLine.TokSliceGo }, S2Tokens, S2Slice, 1);
+            Explainer<TokenizeExplainer>(Of(S2Tokens, S2Slice), S2Tokens, S2Slice, 1);
             var sliceView = Make("SliceView", regions[1].transform, Vector3.zero).AddComponent<SliceView>();
             Ref(sliceView, "moment", slice);
             Ref(sliceView, "stage", regions[1].transform);
 
             // Stop 2: meaning.
             regions[2].AddComponent<GalaxyWorld>();
-            Explainer<MeaningExplainer>(new[] { RideLine.EmbName, RideLine.EmbSquash, RideLine.EmbSpace, RideLine.EmbMath, RideLine.EmbSortGo }, S2Meaning, S2Sort, 2);
+            Explainer<MeaningExplainer>(Of(S2Meaning, S2Sort), S2Meaning, S2Sort, 2);
             var galaxyView = Make("GalaxyView", regions[2].transform, Vector3.zero).AddComponent<GalaxyView>();
             Ref(galaxyView, "moment", galaxy);
             Ref(galaxyView, "stage", regions[2].transform);
 
             // Stop 3: attention.
             regions[3].AddComponent<HallWorld>();
-            Explainer<AttentionExplainer>(new[] { RideLine.AttMeaning, RideLine.AttLookBack, RideLine.AttShares, RideLine.AttReal, RideLine.AttGo }, S2Attention, S2Spot, 3);
+            Explainer<AttentionExplainer>(Of(S2Attention, S2Spot), S2Attention, S2Spot, 3);
             var spotView = Make("SpotlightView", regions[3].transform, Vector3.zero).AddComponent<SpotlightView>();
             Ref(spotView, "moment", spot);
             Ref(spotView, "stage", regions[3].transform);
 
             // Stop 4: prediction.
             regions[4].AddComponent<OddsWorld>();
-            Explainer<OddsExplainer>(new[] { RideLine.PredJob, RideLine.PredOdds, RideLine.PredUnsure, RideLine.PredLearn, RideLine.PredGo }, S2Prediction, S2Bet, 4);
+            Explainer<OddsExplainer>(Of(S2Prediction, S2Bet), S2Prediction, S2Bet, 4);
             var predictView = Make("PredictView", regions[4].transform, Vector3.zero).AddComponent<PredictView>();
             Ref(predictView, "moment", bet);
             Ref(predictView, "stage", regions[4].transform);
 
             // Stop 5: writing.
             regions[5].AddComponent<RoadWorld>();
-            Explainer<WritingExplainer>(new[] { RideLine.GenLoop, RideLine.GenTemp, RideLine.GenGo }, S2Writing, S2Road, 5);
+            Explainer<WritingExplainer>(Of(S2Writing, S2Road), S2Writing, S2Road, 5);
             var storyView = Make("StoryView", regions[5].transform, Vector3.zero).AddComponent<StoryView>();
             Ref(storyView, "moment", road);
             Ref(storyView, "stage", regions[5].transform);
 
             // The finale: Pixel speaks the rider's story.
             regions[6].AddComponent<EndWorld>();
-            var outro = Explainer<OutroExplainer>(new[] { RideLine.OutTalk, RideLine.OutScale, RideLine.OutEnd }, S2Finale, S2Finale, 6);
+            var outro = Explainer<OutroExplainer>(Of(S2Finale), S2Finale, S2Finale, 6);
             Ref(outro, "session", session);
+            Set(outro, "keepContent", p => p.boolValue = true); // the finale stays up behind the end card
         }
     }
 }

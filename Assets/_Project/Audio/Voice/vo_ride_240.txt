@@ -1,4 +1,4 @@
-Source: AI synthesized, Kokoro-82M v1.0 (hexgrad, Apache-2.0) via kokoro-onnx 0.6.1 (MIT); voice af_heart, speed 1.0, lang en-us; one sentence per call, explicit pauses, -16 LUFS / -1 dBTP / mono 48 kHz; ArtSource/voice/render_voices.py, 2026-10-30
-Segments: 3.320 3.460 2.368
+Source: AI synthesized, Kokoro-82M v1.0 (hexgrad, Apache-2.0) via kokoro-onnx 0.6.1 (MIT); voice af_heart, speed 1.0, lang en-us; one sentence per call, explicit pauses, -16 LUFS / -1 dBTP / mono 48 kHz; ArtSource/voice/render_voices.py, 2026-10-31
+Segments: 3.520 3.660 2.899 2.250 1.080 1.130
 
-Pixel's number brain had nine hundred and seventy numbers. GPT-2 has one hundred and twenty-four million. The biggest chatbots have hundreds of billions.
+Pixel's number brain had nine hundred and seventy numbers. GPT-2 has one hundred and twenty-four million. Today's biggest chatbots have hundreds of billions, plus extra training to be helpful. But inside, it's the same trick.

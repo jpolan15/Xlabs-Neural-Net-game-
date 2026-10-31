@@ -7,8 +7,9 @@ namespace Convergence.Presentation.Ride.Level2
 {
     /// <summary>
     /// Stop 5, played: the story road. At each of three forks the road splits into four lanes, each ending in a gate wearing the word it
-    /// stands for and GPT-2's real chance of writing it; a lane is as wide as its chance. The rider shoots a gate; the road bends the
-    /// chosen lane under the pod (the scenery slides sideways while the pod carries on), the gate flares and the word joins the sentence
+    /// stands for and GPT-2's real chance of writing it; a lane is as wide as its chance. The rider points at a gate and pulls the trigger;
+    /// the bike steers into the chosen lane (the scenery slides sideways while the bike carries on and its handlebars turn, ADR-023), the
+    /// gate flares and the word joins the sentence
     /// over the road with its surprise score. At the end the finished story is shown with how often the machine would have written
     /// exactly it. Display and the colliders the laser aims at; the rules are the moment's.
     /// </summary>
@@ -91,7 +92,7 @@ namespace Convergence.Presentation.Ride.Level2
             _glows = GlowField.Create(_props, "Gates", forks * Lanes * 2, _kit.Ring, 1);
             _sparks = GlowField.Create(_props, "Sparks", SparkCount, _kit.Glow, 4);
             _story = _kit.Text(_props, "Story", "", 0.62f, Color.white, new Vector3(0f, 5.6f, 14f), 14f);
-            _banner = _kit.Text(_props, "Banner", "SHOOT THE WORD YOU WANT NEXT  -  SAFE WORDS ARE EASY, WILD WORDS SCORE BIG", 0.28f, new Color(1f, 0.92f, 0.65f), new Vector3(0f, 4.55f, 13f), 14f);
+            _banner = _kit.Text(_props, "Banner", "POINT AT A WORD AND PULL THE TRIGGER TO RIDE THAT WAY  -  SAFE IS EASY, WILD SCORES BIG", 0.28f, new Color(1f, 0.92f, 0.65f), new Vector3(0f, 4.55f, 13f), 14f);
             _popup = _kit.Text(_props, "Popup", "", 0.5f, new Color(1f, 0.9f, 0.5f), new Vector3(0f, 3.2f, 6f), 8f);
             _final = _kit.Text(_props, "Final", "", 0.56f, Color.white, new Vector3(0f, 4.0f, 10f), 13f);
             _odds = _kit.Text(_props, "Odds", "", 0.3f, new Color(1f, 0.85f, 0.5f), new Vector3(0f, 2.9f, 10f), 13f);
@@ -193,7 +194,13 @@ namespace Convergence.Presentation.Ride.Level2
 
                 // The chosen lane slides under the pod: the whole fork drifts sideways until the gate is dead ahead.
                 float slide = 0f;
-                if (v.Chosen >= 0) slide = -LaneX[v.Chosen] * Fx.Smooth(Mathf.Clamp01((Time.time - v.ChosenAt) / 2.4f));
+                if (v.Chosen >= 0)
+                {
+                    float turn = Mathf.Clamp01((Time.time - v.ChosenAt) / 2.4f);
+                    slide = -LaneX[v.Chosen] * Fx.Smooth(turn);
+                    // The handlebars turn toward the lane while the bike swings into it, and straighten as it lines up.
+                    if (turn < 1f && BikeView.Current != null) BikeView.Current.Steer(LaneX[v.Chosen] / LaneX[Lanes - 1] * Mathf.Sin(turn * Mathf.PI));
+                }
                 v.Root.localPosition = new Vector3(slide, 0f, ForkZ(f));
 
                 // The road behind the gates splits into four lanes as wide as their chances.

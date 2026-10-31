@@ -21,6 +21,9 @@ namespace Convergence.Presentation.Ride.Level2
         [SerializeField] private Material solid;
         [SerializeField] private TMP_FontAsset font;
         [SerializeField] private TMP_FontAsset serif;
+        [Tooltip("The font's material with a dark outline (ADR-023): words stay readable on Level 2's bright sky, grass and boards alike.")]
+        [SerializeField] private Material outline;
+        [SerializeField] private Material serifOutline;
         [SerializeField] private RideTheme theme;
 
         public static Level2Kit Current { get; private set; }
@@ -35,7 +38,7 @@ namespace Convergence.Presentation.Ride.Level2
         public Material Solid => solid;
         public RideTheme Theme => theme;
 
-        // Level 2's palette: a dark world lit by a few loud colours, one colour per idea.
+        // Level 2's palette: a few loud colours, one colour per idea, on the daylight world and on the boards' dark plates.
         public static readonly Color Cyan = new Color(0.25f, 0.88f, 1f);
         public static readonly Color Violet = new Color(0.62f, 0.45f, 1f);
         public static readonly Color Pink = new Color(1f, 0.38f, 0.66f);
@@ -73,7 +76,10 @@ namespace Convergence.Presentation.Ride.Level2
             go.transform.SetParent(parent, false);
             go.transform.localPosition = localPosition;
             var t = go.AddComponent<TextMeshPro>();
-            t.font = serifFace && serif != null ? serif : font;
+            bool useSerif = serifFace && serif != null;
+            t.font = useSerif ? serif : font;
+            Material outlined = useSerif ? serifOutline : outline;
+            if (outlined != null) t.fontSharedMaterial = outlined;
             t.fontSize = meters * 10f;
             t.color = color;
             t.alignment = align;

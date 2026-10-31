@@ -116,7 +116,7 @@ namespace Convergence.Presentation.Ride.Level2
             // The bank: a glass tube that fills.
             var tube = new List<Shape>
             {
-                Level2Kit.Square(BankAt, new Vector2(1.0f, 2.8f), new Color(0.05f, 0.07f, 0.16f, 0.7f), 0.3f, new Color(1f, 0.82f, 0.45f, 0.9f), 0.04f),
+                Level2Kit.Square(BankAt, new Vector2(1.0f, 2.8f), new Color(0.05f, 0.07f, 0.16f, 0.98f), 0.3f, new Color(1f, 0.82f, 0.45f, 0.9f), 0.04f),
                 Level2Kit.Square(BankAt + new Vector3(0f, -1.3f, -0.02f), new Vector2(0.78f, 0.05f), new Color(1f, 0.78f, 0.3f, 0.9f), 0.5f),
             };
             _bank = _kit.Batch(_props, "Bank", tube, 3);

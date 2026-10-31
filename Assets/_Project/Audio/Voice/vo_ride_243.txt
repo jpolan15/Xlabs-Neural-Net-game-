@@ -1,0 +1,4 @@
+Source: AI synthesized, Kokoro-82M v1.0 (hexgrad, Apache-2.0) via kokoro-onnx 0.6.1 (MIT); voice af_heart, speed 1.0, lang en-us; one sentence per call, explicit pauses, -16 LUFS / -1 dBTP / mono 48 kHz; ArtSource/voice/render_voices.py, 2026-10-31
+Segments: 3.100 3.690 2.000 1.790 2.030
+
+So the machine looks each token up in a giant table, and gets seven hundred and sixty-eight numbers that describe it. Nobody typed those numbers in. The machine learned them in training, the same way Pixel learned its weights.

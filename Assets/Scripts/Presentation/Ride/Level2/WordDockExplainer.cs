@@ -51,7 +51,7 @@ namespace Convergence.Presentation.Ride.Level2
 
             var shapes = new List<Shape>();
             _panel = shapes.Count;
-            shapes.Add(Level2Kit.Square(c, new Vector2(7.4f, 3.7f), new Color(0.05f, 0.04f, 0.15f, 0.92f), 0.06f, new Color(0.62f, 0.5f, 1f, 0.95f), 0.045f));
+            shapes.Add(Level2Kit.Square(c, new Vector2(7.4f, 3.7f), new Color(0.05f, 0.04f, 0.15f, 0.98f), 0.06f, new Color(0.62f, 0.5f, 1f, 0.95f), 0.045f));
             _headerBar = shapes.Count;
             shapes.Add(Level2Kit.Square(c + new Vector3(0f, 1.6f, -0.02f), new Vector2(7.2f, 0.5f), new Color(0.2f, 0.14f, 0.42f, 0.95f), 0.3f));
             for (int i = 0; i < 3; i++) shapes.Add(Level2Kit.Square(c + new Vector3(-3.3f + i * 0.34f, 1.6f, -0.04f), new Vector2(0.2f, 0.2f), Palette[i], 1f));
@@ -76,11 +76,11 @@ namespace Convergence.Presentation.Ride.Level2
             for (int i = 0; i < Stops.Length; i++)
             {
                 Vector3 at = new Vector3((i - 2) * 2.7f, 1.9f, 8.5f);
-                chips.Add(Level2Kit.Square(at, new Vector2(2.5f, 0.72f), Fx.A(Palette[i], 0.14f), 0.4f, Fx.A(Palette[i], 0.9f), 0.04f));
+                chips.Add(Level2Kit.Square(at, new Vector2(2.5f, 0.72f), new Color(0.04f, 0.05f, 0.12f, 0.94f), 0.4f, Fx.A(Palette[i], 0.95f), 0.05f)); // dark chips read over the daylight road
             }
 
             _badgeBack = chips.Count;
-            chips.Add(Level2Kit.Square(new Vector3(2.9f, 5.0f, 8.55f), new Vector2(2.9f, 0.55f), new Color(1f, 0.82f, 0.4f, 0.16f), 0.4f, new Color(1f, 0.82f, 0.4f, 0.95f), 0.035f));
+            chips.Add(Level2Kit.Square(new Vector3(2.9f, 5.0f, 8.55f), new Vector2(2.9f, 0.55f), new Color(0.04f, 0.05f, 0.12f, 0.94f), 0.4f, new Color(1f, 0.82f, 0.4f, 0.95f), 0.035f));
             foreach (Shape sh in chips) sh.alpha = 0f;
             _chips = _kit.Batch(root, "StopChips", chips, 1);
 

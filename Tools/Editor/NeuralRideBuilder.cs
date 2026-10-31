@@ -115,7 +115,9 @@ namespace Convergence.EditorTools
                 Sky("TRAINING", "#0A0803", "#2E2408", "#C9922A", 0.55f, "#FFD166", 0.30f, 0.8f, 0.010f),
             };
             if (_level2) theme.regions = Level2Regions();
-            theme.blackboardDim = 0.78f;
+            // Level 2's daylight only softens while a board explains (its boards carry their own dark plates); the meadow stays green.
+            theme.blackboardDim = _level2 ? 0.9f : 0.78f;
+            theme.blackboardFloor = _level2 ? 1f : 0.5f;
             theme.floorDepth = 7f;
             theme.floorSpacing = 3f;
 
