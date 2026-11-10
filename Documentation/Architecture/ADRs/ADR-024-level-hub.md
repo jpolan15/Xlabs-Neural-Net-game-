@@ -43,6 +43,11 @@ of level has to be data, not scene wiring. For a booth, a reason to ride again h
    for 1.5 s (`RideHandLasers`; it ticks every half second while held, a tap does nothing). Level 2's GO at the end now loads the hub
    ("PULL GO TO PICK YOUR NEXT LEVEL"); Level 1's still leads into Level 2. When the hub is not in the build nothing happens, and an end
    card whose next scene is missing just stays up.
+4b. **The way home is faded too.** Every scene switch out of a ride (H, the menu hold, an end card's GO) goes through
+   `LevelHubNav.GoTo`, which asks the scene's `RideBoot` (it sets the `LevelHubNav.FadeOut` hook while enabled) to fade the view and
+   the sound to black over 0.6 s; under the black every sound is stopped and the volume put back, so the next scene's boot reads the
+   real level, then the scene switches. A second press while leaving does nothing. The hub opens behind black, waits 0.15 s for its
+   first frames to settle, then fades in with its music (0.7 s). A scene with no `RideBoot` switches at once, as before.
 5. **Build order is one function.** `OrderBuildScenes()` (hub, Level 1, Level 2, then the rest) is called by all three builders, so
    rebuilding a level never pushes the hub out of scene 0.
 

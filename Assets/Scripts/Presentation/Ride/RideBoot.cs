@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR;
+using Convergence.Gameplay.Hub;
 using Convergence.Gameplay.Ride;
 
 namespace Convergence.Presentation.Ride
@@ -31,6 +32,8 @@ namespace Convergence.Presentation.Ride
         [Tooltip("Pause after the memory collection, so frame time settles before the fade starts.")]
         [SerializeField] private float settleSeconds = 0.25f;
         [SerializeField] private float fadeSeconds = 0.5f;
+        [Tooltip("Seconds of fade to black (and silence) when the ride is left for another scene: the hub, or the next level.")]
+        [SerializeField] private float leaveSeconds = 0.6f;
         [Tooltip("Longest the clips get to load before the ride goes on without them.")]
         [SerializeField] private float audioSeconds = 8f;
         [Tooltip("The whole boot gives up after this long and starts the ride anyway.")]
@@ -62,10 +65,58 @@ namespace Convergence.Presentation.Ride
 
         private void Start() => StartCoroutine(Boot());
 
+        private void OnEnable() => LevelHubNav.FadeOut = FadeOutThen;
+
+        private void OnDisable()
+        {
+            if (LevelHubNav.FadeOut == (Func<Action, bool>)FadeOutThen) LevelHubNav.FadeOut = null;
+        }
+
         private void OnDestroy()
         {
             if (_muted) AudioListener.volume = _volume;
             if (_cover != null) Destroy(_cover.gameObject);
+        }
+
+        // ---------- leaving ----------
+
+        /// <summary>Fades the view and the sound to black, then runs <paramref name="then"/> (the scene switch). False if it cannot.</summary>
+        private bool FadeOutThen(Action then)
+        {
+            if (!isActiveAndEnabled || then == null) return false;
+            StopAllCoroutines(); // a boot still running gives way: the black takes over from here
+            StartCoroutine(Leave(then));
+            return true;
+        }
+
+        private IEnumerator Leave(Action then)
+        {
+            if (!_muted) _volume = AudioListener.volume;
+            float from = AudioListener.volume;
+            try
+            {
+                EnsureCover();
+                SetCover(0f); // a new cover starts black; the fade starts from clear
+                for (float t = 0f; t < leaveSeconds; t += Mathf.Min(Time.unscaledDeltaTime, 1f / 30f))
+                {
+                    float k = Mathf.SmoothStep(0f, 1f, t / leaveSeconds);
+                    SetCover(k);
+                    AudioListener.volume = from * (1f - k);
+                    yield return null;
+                }
+
+                SetCover(1f);
+                AudioListener.volume = 0f;
+                yield return null;
+            }
+            finally
+            {
+                // Silence what was playing, then the listener goes back to its level, so the next scene's boot reads the real volume.
+                foreach (AudioSource source in FindObjectsByType<AudioSource>(FindObjectsInactive.Exclude)) source.Stop();
+                AudioListener.volume = _volume;
+                _muted = false;
+                then();
+            }
         }
 
         private IEnumerator Boot()

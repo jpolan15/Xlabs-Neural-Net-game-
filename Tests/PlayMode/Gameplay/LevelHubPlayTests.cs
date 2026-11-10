@@ -77,11 +77,26 @@ namespace Convergence.Tests.PlayMode.Gameplay
             Assert.IsNotNull(UnityEngine.Object.FindAnyObjectByType<RideDirector>(), "Level 2's ride is running");
             Assert.IsNotNull(UnityEngine.Object.FindAnyObjectByType<LevelProgressRecorder>(), "the scoreboard recorder rides along");
 
+            float volume = AudioListener.volume;
             Assert.IsTrue(LevelHubNav.GoToHub(), "a level can go back to the hub");
+            Assert.IsTrue(LevelHubNav.GoToHub(), "a second press while leaving is taken, and does nothing more");
+            yield return null;
+            // Faded, not cut: the level stays on show while its view goes to black.
+            Assert.AreEqual("WordMachine", SceneManager.GetActiveScene().name, "the level fades out before the switch");
+            Assert.IsTrue(LevelHubNav.Leaving);
             yield return WaitFor(() => SceneManager.GetActiveScene().name == LevelHubNav.HubScene, "the hub to load again", 30f);
             yield return null;
             Assert.IsNotNull(UnityEngine.Object.FindAnyObjectByType<LevelHubView>());
+            Assert.IsFalse(LevelHubNav.Leaving, "arrived");
+            Assert.AreEqual(volume, AudioListener.volume, 0.001f, "the sound comes back after the fade out");
             Assert.IsFalse(LevelHubNav.GoToHub(), "already in the hub");
+
+            // The hub opens behind black and fades in.
+            yield return new WaitForSecondsRealtime(1.5f);
+            foreach (Renderer r in Camera.main.GetComponentsInChildren<Renderer>(true))
+            {
+                if (r.name == "HubCover") Assert.IsFalse(r.enabled, "the hub's black has faded out");
+            }
         }
     }
 }

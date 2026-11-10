@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using TMPro;
 using Convergence.Gameplay.Hub;
 using Convergence.Gameplay.Ride;
@@ -10,7 +9,7 @@ namespace Convergence.Presentation.Ride
     /// <summary>
     /// The ending: when the ride completes, a panel with one check mark per stop pops up in front of the pod, then
     /// "to be continued", then the credits (every voice, music and sound source with its license). When a next scene is named, GO lights
-    /// once the credits are up and loads it (Level 1 leads to Level 2 and Level 2 back to Level 1), so a booth never needs a menu.
+    /// once the credits are up and loads it (Level 1 leads to Level 2, Level 2 to the level hub), faded to black on the way out, so a booth never needs a menu.
     /// </summary>
     public sealed class FinaleView : MonoBehaviour
     {
@@ -75,7 +74,8 @@ namespace Convergence.Presentation.Ride
             yield return new WaitForSeconds(creditsDelay + 1f);
             if (goHint != null) goHint.SetActive(true);
             yield return director.WaitForGo(goWaitSeconds);
-            SceneManager.LoadScene(nextScene);
+            // Faded: the ride's boot fades the view and the sound out before the switch (the hub, or Level 1 into Level 2).
+            LevelHubNav.GoTo(nextScene);
         }
 
         private void Update()

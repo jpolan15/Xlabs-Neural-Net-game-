@@ -52,6 +52,10 @@ namespace Convergence.Presentation.Hub
         [Tooltip("Seconds into the glide the fade to black begins.")]
         [SerializeField] private float fadeLead = 0.25f;
         [SerializeField] private float fadeSeconds = 0.6f;
+        [Tooltip("Seconds of black when the hub opens, so its first frames settle, before it fades in.")]
+        [SerializeField] private float settleSeconds = 0.15f;
+        [Tooltip("Seconds of the fade in when the hub opens (at boot, or back from a level).")]
+        [SerializeField] private float arriveSeconds = 0.7f;
 
         private static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
         private static readonly int SkyParams = Shader.PropertyToID("_RideSkyParams");
@@ -115,14 +119,37 @@ namespace Convergence.Presentation.Hub
 
         private void OnDisable() => LevelProgress.Changed -= RefreshStats;
 
-        private void Start()
+        private void Start() => StartCoroutine(Arrive());
+
+        /// <summary>
+        /// The way in: the hub opens behind black (the level the rider came from faded out), lets the first frames settle, then fades in
+        /// with its music, so coming home is as clean as leaving.
+        /// </summary>
+        private IEnumerator Arrive()
         {
-            if (music != null && music.clip != null)
+            SetCover(1f);
+            bool hasMusic = music != null && music.clip != null;
+            if (hasMusic)
             {
                 music.loop = true;
-                music.volume = musicVolume;
+                music.volume = 0f;
                 music.Play();
             }
+
+            yield return null;
+            yield return null;
+            yield return new WaitForSecondsRealtime(settleSeconds);
+            for (float t = 0f; t < arriveSeconds && !_loading; t += Mathf.Min(Time.unscaledDeltaTime, 1f / 30f))
+            {
+                float k = Fx.Smooth(t / arriveSeconds);
+                SetCover(1f - k);
+                if (hasMusic) music.volume = musicVolume * k;
+                yield return null;
+            }
+
+            if (_loading) yield break; // a card was chosen mid-fade: the way out owns the black now
+            SetCover(0f);
+            if (hasMusic) music.volume = musicVolume;
         }
 
         // ---------- building ----------
