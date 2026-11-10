@@ -75,6 +75,13 @@ namespace Convergence.Presentation.Ride
         [SerializeField] private BlameMoment blame;
         [SerializeField] private ValleyRunMoment valley;
 
+        [Header("Level 2: chat locked")]
+        [Tooltip("Level 2's Pixel can see (Level 1 taught it) but cannot talk yet: a padlock on its chat bubble, opened by this cue.")]
+        [SerializeField] private Transform chatLock;
+        [SerializeField] private Renderer chatBubble;
+        [SerializeField] private Material chatOpen;
+        [SerializeField] private string unlockCue = "unlock";
+
         // Face slots in the batch: two eyes of two strokes each, a mouth of four strokes, an open mouth, two cheeks.
         private const int EyeL = 0, EyeR = 2, Mouth = 4, MouthStrokes = 4, Open = 8, CheekL = 9, CheekR = 10, Slots = 11;
 
@@ -137,6 +144,8 @@ namespace Convergence.Presentation.Ride
         private float _pet, _petHoldUntil, _lastPet = -10f;
         private float _petRoll, _petBounce, _petGlow;
         private Coroutine _petRoutine;
+        private float _unlock = -1f;
+        private Vector3 _lockHome;
         private readonly bool[] _rubbing = new bool[2];
         private readonly Vector3[] _rubFrom = new Vector3[2];
         private readonly float[] _rubPath = new float[2];
@@ -392,6 +401,7 @@ namespace Convergence.Presentation.Ride
             _glanceUntil = _clock + glanceSeconds;
             if (NarrationLibrary.HasCue(segment, "pixel")) Meet();
             if (NarrationLibrary.HasCue(segment, "go")) _riding = true;
+            if (chatLock != null && _unlock < 0f && NarrationLibrary.HasCue(segment, unlockCue)) Unlock();
             for (int i = 0; i < lineMoods.Length; i++)
             {
                 LineMood m = lineMoods[i];
@@ -449,6 +459,27 @@ namespace Convergence.Presentation.Ride
         private void OnHop(int hop) => _hop = Mathf.Max(_hop, 0.3f);
 
         private void StopPointing() => _pointing = false;
+
+        /// <summary>Level 2's finale: the padlock flies off the chat bubble, which lights up. Pixel can talk.</summary>
+        public void Unlock()
+        {
+            if (chatLock == null) return;
+            if (!_met) Meet();
+            _unlock = 0f;
+            _lockHome = chatLock.localPosition;
+            if (chatBubble != null && chatOpen != null) chatBubble.sharedMaterial = chatOpen;
+            React(Mood.Celebrate);
+        }
+
+        /// <summary>Paints a Pixel face (made by FaceShapes) in a mood, its mouth opened by talk (0 to 1): for a Pixel the buddy does not drive.</summary>
+        public static void PaintFace(ShapeBatch face, Mood mood, float talk, float blink, Color ink)
+        {
+            if (face == null || face.Count < Slots) return;
+            Face f = FaceFor(mood);
+            f.open = Mathf.Max(f.open, talk);
+            Draw(i => face[i], f, blink, ink);
+            face.MarkDirty();
+        }
 
         /// <summary>Pixel pops into view (the dock's {pixel}, or at once when the ride starts without it).</summary>
         public void Meet()
@@ -558,6 +589,17 @@ namespace Convergence.Presentation.Ride
             }
 
             UpdatePointer(dt);
+
+            if (_unlock >= 0f && chatLock != null && chatLock.gameObject.activeSelf)
+            {
+                // The padlock pops up, spins and shrinks away.
+                _unlock += dt;
+                float t = Mathf.Clamp01(_unlock / 1.1f);
+                chatLock.localPosition = _lockHome + new Vector3(0.04f * t, 0.18f * Mathf.Sin(t * Mathf.PI * 0.6f), 0f);
+                chatLock.localRotation = Quaternion.Euler(0f, 0f, -200f * t);
+                chatLock.localScale = Vector3.one * (1f - t * t);
+                if (t >= 1f) chatLock.gameObject.SetActive(false);
+            }
         }
 
         private void UpdatePointer(float dt)

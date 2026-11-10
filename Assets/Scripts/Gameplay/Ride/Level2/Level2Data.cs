@@ -25,6 +25,11 @@ namespace Convergence.Gameplay.Ride.Level2
     [Serializable] public sealed class L2Temperature { public string prompt; public L2TempSetting[] settings; }
     [Serializable] public sealed class L2StoryNode { public string path; public string text; public L2Choice[] lanes; }
     [Serializable] public sealed class L2Story { public string start; public int forks; public L2StoryNode[] nodes; }
+    /// <summary>One step of GPT-2's tokenizer gluing a word: the pieces after the step, and the glue rule it used (1 = the first of 50,000; 0 = the letters before any glue).</summary>
+    [Serializable] public sealed class L2GlueStep { public string[] pieces; public int rule; }
+    [Serializable] public sealed class L2Merge { public string word; public L2GlueStep[] steps; public int[] ids; }
+    /// <summary>king - man + woman on eight of GPT-2's 768 embedding columns (bake_level2_extras.py), and queen's own numbers there.</summary>
+    [Serializable] public sealed class L2AnalogyNumbers { public int[] columns; public float[] king; public float[] man; public float[] woman; public float[] result; public float[] queen; public float queenSimilarity; }
 
     [Serializable]
     public sealed class Level2File
@@ -39,6 +44,8 @@ namespace Convergence.Gameplay.Ride.Level2
         public L2Prediction[] predict;
         public L2Temperature temperature;
         public L2Story story;
+        public L2Merge[] merges;
+        public L2AnalogyNumbers analogyNumbers;
     }
 
     /// <summary>
@@ -58,6 +65,10 @@ namespace Convergence.Gameplay.Ride.Level2
         };
 
         public const string BossWord = "supercalifragilisticexpialidocious";
+
+        /// <summary>The words the tokens stop glues together piece by piece: a common one (one token) and a rarer one (left in pieces).</summary>
+        public const string CommonGlueWord = "the";
+        public const string RareGlueWord = "chatbot";
 
         /// <summary>The prompts of the odds game, in play order (a sure thing first, a coin flip last).</summary>
         public static readonly string[] PredictPrompts =
@@ -140,6 +151,22 @@ namespace Convergence.Gameplay.Ride.Level2
             foreach (string p in PredictPrompts) CheckPrediction(f, p, Need);
             CheckPrediction(f, ExplainPrompt, Need);
 
+            Need(f.merges != null && f.merges.Length >= 2, "the glue steps are missing (run ArtSource/training/bake_level2_extras.py)");
+            Need(Merge(f, CommonGlueWord) != null && Last(Merge(f, CommonGlueWord)).pieces.Length == 1, "the common glue word is not one token");
+            Need(Merge(f, RareGlueWord) != null && Last(Merge(f, RareGlueWord)).pieces.Length >= 2, "the rare glue word is not several tokens");
+            foreach (L2Merge m in f.merges)
+            {
+                Need(m.steps.Length >= 2 && m.steps[0].rule == 0 && m.ids.Length == Last(m).pieces.Length, "the glue steps of " + m.word + " have the wrong shape");
+                for (int i = 1; i < m.steps.Length; i++) Need(m.steps[i].rule > m.steps[i - 1].rule && m.steps[i].rule <= 50000, m.word + ": glue rules must climb, 1 to 50,000");
+            }
+
+            L2AnalogyNumbers an = f.analogyNumbers;
+            Need(an != null && an.columns != null && an.columns.Length >= 4, "the king - man + woman numbers are missing (run bake_level2_extras.py)");
+            int cols = an.columns.Length;
+            Need(an.king.Length == cols && an.man.Length == cols && an.woman.Length == cols && an.result.Length == cols && an.queen.Length == cols, "the analogy rows differ in length");
+            for (int i = 0; i < cols; i++) Need(Mathf.Abs(an.king[i] - an.man[i] + an.woman[i] - an.result[i]) < 0.005f, "the analogy sum is off in column " + i);
+            Need(an.queenSimilarity > 0f && an.queenSimilarity <= 1f, "queen's similarity is outside 0 to 1");
+
             Need(f.temperature.settings.Length >= 3, "too few temperatures");
             Need(f.story.forks >= 2, "the story has too few forks");
             var paths = new HashSet<string>();
@@ -157,6 +184,13 @@ namespace Convergence.Gameplay.Ride.Level2
                 for (int k = 0; k < 4; k++) Need(paths.Contains(n.path + k), "the story fork '" + n.path + "' has no node for lane " + k);
             }
         }
+
+        private static L2Merge Merge(Level2File f, string word) => Array.Find(f.merges, m => m.word == word);
+
+        private static L2GlueStep Last(L2Merge m) => m.steps[m.steps.Length - 1];
+
+        /// <summary>The glue steps baked for a word (the tokens stop shows two).</summary>
+        public L2Merge Merge(string word) => Merge(File, word);
 
         private static void CheckAttention(Level2File f, int r, Action<bool, string> need)
         {

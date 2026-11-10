@@ -177,7 +177,7 @@ namespace Convergence.Gameplay.Ride.Level2
                 RoundPoints = 0;
                 Stage = Phase.Betting;
                 RoundStarted?.Invoke(Round);
-                SetGoal("Spread 10 chips on the next word  (" + (Round + 1) + " of " + RoundCount + ")");
+                SetGoal("Guess the next word: more chips on the words you think are likely  (" + (Round + 1) + " of " + RoundCount + ")");
 
                 while (Stage == Phase.Betting)
                 {

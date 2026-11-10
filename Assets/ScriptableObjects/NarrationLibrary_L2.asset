@@ -18,7 +18,7 @@ MonoBehaviour:
     tag: GUIDE
     clip: {fileID: 8300000, guid: 768630c3b1ff2724894dffdbabafaa71, type: 3}
     pauseAfter: 0.88000005
-    readSeconds: 7.0259256
+    readSeconds: 11.929629
     segments:
     - text: Welcome back!
       weight: 1.32
@@ -30,8 +30,21 @@ MonoBehaviour:
     - text: you taught Pixel to read handwritten numbers.
       weight: 2.891
       cues: []
-    - text: Now Pixel wants to talk.
-      weight: 1.47
+    - text: 'Look:'
+      weight: 0.73
+      cues:
+      - pixel
+    - text: Pixel can see now!
+      weight: 1.57
+      cues: []
+    - text: But its chat is still locked.
+      weight: 1.79
+      cues: []
+    - text: Today,
+      weight: 0.78
+      cues: []
+    - text: we unlock it.
+      weight: 0.94
       cues: []
   - line: 201
     speaker: 0
@@ -160,20 +173,98 @@ MonoBehaviour:
     - text: These are its real numbers.
       weight: 1.49
       cues: []
+  - line: 248
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: 0652721e67c333542a111e5f28452da4, type: 3}
+    pauseAfter: 1.1
+    readSeconds: 33.65926
+    segments:
+    - text: So where does it chop?
+      weight: 1.54
+      cues:
+      - glue
+    - text: Before GPT-2 learned anything,
+      weight: 2.14
+      cues: []
+    - text: a program read a mountain of text,
+      weight: 2.18
+      cues: []
+    - text: 'and wrote a glue list:'
+      weight: 1.49
+      cues: []
+    - text: first glue the two pieces seen side by side most often,
+      weight: 3.41
+      cues: []
+    - text: then the next pair,
+      weight: 1.24
+      cues: []
+    - text: fifty thousand times.
+      weight: 1.82
+      cues: []
+    - text: Take the word the.
+      weight: 1.28
+      cues:
+      - the
+    - text: H and E are glue number three.
+      weight: 2.15
+      cues: []
+    - text: Then T joins them.
+      weight: 1.54
+      cues: []
+    - text: One token.
+      weight: 1.36
+      cues: []
+    - text: Chatbot was rare back then.
+      weight: 1.85
+      cues:
+      - chatbot
+    - text: It gets glued into chat and bot,
+      weight: 2.09
+      cues: []
+    - text: but no rule glues those two.
+      weight: 1.89
+      cues: []
+    - text: So it stays two tokens.
+      weight: 1.46
+      cues: []
+  - line: 249
+    speaker: 0
+    tag: GUIDE
+    clip: {fileID: 8300000, guid: b0e35ca50c33c104b867f73ff1709270, type: 3}
+    pauseAfter: 1.1
+    readSeconds: 13.992593
+    segments:
+    - text: When you type,
+      weight: 1
+      cues:
+      - same
+    - text: the chopper follows the same glue list,
+      weight: 2.27
+      cues: []
+    - text: in the same order.
+      weight: 1.42
+      cues: []
+    - text: So a word is always chopped the same way.
+      weight: 2.41
+      cues: []
+    - text: Common words end up whole.
+      weight: 1.63
+      cues: []
+    - text: Rare words end up in pieces.
+      weight: 1.65
+      cues: []
   - line: 205
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: c96152716b1b9e140a298ebd10a6b94a, type: 3}
     pauseAfter: 1.1
-    readSeconds: 7.0962963
+    readSeconds: 7.1666665
     segments:
-    - text: Common words stay whole.
-      weight: 1.64
+    - text: A word the glue list has rarely seen gets chopped a lot.
+      weight: 3.56
       cues:
       - rare
-    - text: Rare words get chopped into smaller pieces.
-      weight: 2.83
-      cues: []
     - text: This long one becomes eleven tokens!
       weight: 2.251
       cues:
@@ -265,7 +356,7 @@ MonoBehaviour:
     tag: GUIDE
     clip: {fileID: 8300000, guid: d13db3207508f2d45ae1471eca0fc68c, type: 3}
     pauseAfter: 1.1
-    readSeconds: 15.744444
+    readSeconds: 16.855555
     segments:
     - text: So the machine looks each token up in a giant table,
       weight: 3.1
@@ -281,8 +372,8 @@ MonoBehaviour:
     - text: The machine learned them in training,
       weight: 1.79
       cues: []
-    - text: the same way Pixel learned its weights.
-      weight: 2.03
+    - text: the same way Pixel learned its weights in Level 1.
+      weight: 2.84
       cues: []
   - line: 247
     speaker: 0
@@ -344,25 +435,43 @@ MonoBehaviour:
     tag: GUIDE
     clip: {fileID: 8300000, guid: a89be1514b160dc4abf451e3d6ad8f22, type: 3}
     pauseAfter: 1.1
-    readSeconds: 8.166667
+    readSeconds: 23.87037
     segments:
-    - text: Even directions mean something.
-      weight: 2.07
+    - text: Now watch the machine do math with meaning.
+      weight: 2.63
       cues:
       - math
-    - text: Start at king,
-      weight: 1.14
+    - text: Here are eight of king's seven hundred and sixty-eight numbers.
+      weight: 3.829
       cues: []
-    - text: take away man,
-      weight: 1.26
+    - text: Take away man's numbers,
+      weight: 1.88
+      cues:
+      - minus
+    - text: and add woman's numbers,
+      weight: 1.71
+      cues:
+      - plus
+    - text: one column at a time.
+      weight: 1.81
       cues: []
-    - text: add woman.
-      weight: 1.26
+    - text: 'Then it checks every token it knows:'
+      weight: 2.22
+      cues:
+      - search
+    - text: whose numbers are closest to the answer?
+      weight: 2.49
       cues: []
-    - text: You land right next to queen.
-      weight: 1.5
+    - text: Queen!
+      weight: 0.98
       cues:
       - queen
+    - text: Nobody taught it that.
+      weight: 1.42
+      cues: []
+    - text: It learned it from reading.
+      weight: 1.22
+      cues: []
   - line: 214
     speaker: 0
     tag: GUIDE
@@ -434,14 +543,17 @@ MonoBehaviour:
     tag: GUIDE
     clip: {fileID: 8300000, guid: b299a83c7ddcbe141a0e1c0100446a1b, type: 3}
     pauseAfter: 1.1
-    readSeconds: 10.159259
+    readSeconds: 12.411111
     segments:
-    - text: So each word looks back at the words before it,
-      weight: 2.63
+    - text: 'So each word asks a question:'
+      weight: 2.01
       cues:
       - look
-    - text: and decides which ones matter most.
-      weight: 2.14
+    - text: which words before me help explain me?
+      weight: 2.33
+      cues: []
+    - text: Creature looks back at every word before it.
+      weight: 2.69
       cues: []
     - text: 'It can''t look ahead:'
       weight: 1.24
@@ -454,37 +566,43 @@ MonoBehaviour:
     tag: GUIDE
     clip: {fileID: 8300000, guid: 5f2009e2cbd8ee846a713d5fc7655ec4, type: 3}
     pauseAfter: 1.1
-    readSeconds: 7.366667
+    readSeconds: 12.681481
     segments:
-    - text: That's called attention.
-      weight: 1.61
+    - text: It splits its attention between them,
+      weight: 2.03
       cues:
       - shares
-    - text: Each earlier word gets a share,
-      weight: 1.9
+    - text: like slicing a pie.
+      weight: 1.64
       cues: []
-    - text: and the shares add up to one hundred percent.
-      weight: 2.2
+    - text: The slices always add up to one hundred percent.
+      weight: 3.01
+      cues: []
+    - text: Fluffy and blue get the big slices,
+      weight: 2.22
+      cues: []
+    - text: because they describe the creature.
+      weight: 1.69
       cues: []
   - line: 244
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 3617c05516374164b896cc57f965eac4, type: 3}
     pauseAfter: 1.1
-    readSeconds: 8.877778
+    readSeconds: 11.099999
     segments:
-    - text: Then the word mixes in a little meaning from each one,
-      weight: 2.91
+    - text: Then creature mixes in meaning from each word,
+      weight: 2.86
       cues:
       - blend
-    - text: by its share.
-      weight: 1.33
+    - text: by the size of its slice.
+      weight: 1.85
       cues: []
-    - text: 'Now creature means:'
-      weight: 1.45
+    - text: Now it doesn't mean just any creature.
+      weight: 2.27
       cues: []
-    - text: a fluffy,
-      weight: 0.85
+    - text: It means a fluffy,
+      weight: 1.15
       cues: []
     - text: blue creature.
       weight: 0.9
@@ -494,27 +612,40 @@ MonoBehaviour:
     tag: GUIDE
     clip: {fileID: 8300000, guid: b18a7f6080d4f7f4fb159571cd6ab1f0, type: 3}
     pauseAfter: 1.1
-    readSeconds: 12.851851
+    readSeconds: 16.174074
     segments:
-    - text: These are real numbers from GPT-2.
-      weight: 2.7
+    - text: Every word does this at once,
+      weight: 1.79
       cues:
       - real
-    - text: It has a hundred and forty-four attention heads,
-      weight: 2.79
+    - text: in twelve layers,
+      weight: 1.25
       cues: []
-    - text: and each one learned its own job.
-      weight: 2.27
+    - text: with heads that each look for different things.
+      weight: 2.55
       cues: []
-    - text: We picked the one that links words the way you would.
-      weight: 2.44
+    - text: These are real numbers from one of GPT-2's hundred and forty-four heads.
+      weight: 5.141
+      cues: []
+    - text: 'So:'
+      weight: 0.73
+      cues:
+      - recap
+    - text: look back,
+      weight: 1.04
+      cues: []
+    - text: share out attention,
+      weight: 1.38
+      cues: []
+    - text: mix in meaning.
+      weight: 0.97
       cues: []
   - line: 221
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 108aa77f829c05548b72221c16e5f754, type: 3}
     pauseAfter: 0.66
-    readSeconds: 11.02963
+    readSeconds: 14.5222225
     segments:
     - text: 'Your turn:'
       weight: 0.94
@@ -523,8 +654,17 @@ MonoBehaviour:
     - text: you are the attention.
       weight: 1.53
       cues: []
-    - text: Point your laser at the words that matter,
-      weight: 2.18
+    - text: One word glows.
+      weight: 1.41
+      cues: []
+    - text: 'Ask:'
+      weight: 0.74
+      cues: []
+    - text: which earlier words explain it?
+      weight: 2.07
+      cues: []
+    - text: Point your laser at those words,
+      weight: 1.8
       cues: []
     - text: and hold it there.
       weight: 1.36
@@ -532,8 +672,8 @@ MonoBehaviour:
     - text: The longer you look,
       weight: 1.21
       cues: []
-    - text: the bigger the share.
-      weight: 0.96
+    - text: the bigger their slice.
+      weight: 1.17
       cues: []
   - line: 222
     speaker: 0
@@ -652,7 +792,7 @@ MonoBehaviour:
     tag: GUIDE
     clip: {fileID: 8300000, guid: 9c963ebebfdc58443bc738ddfbf73eba, type: 3}
     pauseAfter: 1.1
-    readSeconds: 17.385185
+    readSeconds: 20.818518
     segments:
     - text: That's how it learned.
       weight: 1.4
@@ -673,40 +813,50 @@ MonoBehaviour:
     - text: and that surprise was its loss.
       weight: 2.175
       cues: []
-    - text: Then backpropagation and gradient descent nudged its weights,
-      weight: 3.711
-      cues: []
-    - text: just like Pixel's.
-      weight: 1.15
+    - text: 'Then backpropagation and gradient descent nudged its weights:'
+      weight: 3.875
+      cues:
+      - level1
+    - text: the same two tricks you used to train Pixel in Level 1.
+      weight: 3.23
       cues: []
   - line: 229
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 6e31b885758b05f438b634f574e3817f, type: 3}
     pauseAfter: 0.66
-    readSeconds: 11.97037
+    readSeconds: 23.07037
     segments:
     - text: 'Your turn:'
       weight: 0.94
       cues:
       - bet
-    - text: place your chips.
-      weight: 1.41
-      cues: []
-    - text: Shoot a word to add a chip.
-      weight: 1.56
-      cues: []
-    - text: Right hand adds,
+    - text: be the machine.
       weight: 1.25
       cues: []
-    - text: left hand takes one back.
-      weight: 1.86
+    - text: Guess the next word,
+      weight: 1.28
       cues: []
-    - text: Ten chips,
-      weight: 1.03
+    - text: with odds.
+      weight: 1.15
       cues: []
-    - text: then see what the machine thinks.
-      weight: 1.44
+    - text: You have ten chips.
+      weight: 1.45
+      cues: []
+    - text: Put more chips on the words you think are likely.
+      weight: 2.89
+      cues: []
+    - text: Shoot a word to add a chip,
+      weight: 1.56
+      cues: []
+    - text: and your left hand takes one back.
+      weight: 2.1
+      cues: []
+    - text: Then you'll see GPT-2's real odds next to yours,
+      weight: 3.285
+      cues: []
+    - text: and the word that really came next.
+      weight: 1.72
       cues: []
   - line: 230
     speaker: 0
@@ -810,7 +960,7 @@ MonoBehaviour:
     tag: GUIDE
     clip: {fileID: 8300000, guid: 206c81056862abc43be0e56b0dccd7b2, type: 3}
     pauseAfter: 0.66
-    readSeconds: 12.711111
+    readSeconds: 20.007408
     segments:
     - text: 'Your turn:'
       weight: 0.94
@@ -822,17 +972,26 @@ MonoBehaviour:
     - text: At every fork,
       weight: 1.21
       cues: []
-    - text: point at the word you want,
-      weight: 1.51
+    - text: the four gates are words GPT-2 could write next,
+      weight: 3.44
       cues: []
-    - text: and pull the trigger to ride that way.
-      weight: 2.29
+    - text: with its real odds.
+      weight: 1.58
       cues: []
-    - text: Safe words are easy.
-      weight: 1.5
+    - text: Normally the machine rolls the dice.
+      weight: 2.28
       cues: []
-    - text: Wild words are rare.
-      weight: 1.26
+    - text: This time,
+      weight: 0.92
+      cues: []
+    - text: you choose.
+      weight: 1.16
+      cues: []
+    - text: Point at a gate and pull the trigger,
+      weight: 2.09
+      cues: []
+    - text: then see which word the machine liked best.
+      weight: 2.03
       cues: []
   - line: 236
     speaker: 0
@@ -862,28 +1021,38 @@ MonoBehaviour:
     tag: GUIDE
     clip: {fileID: 8300000, guid: e78883589aeb0e34dab8911c477b65c6, type: 3}
     pauseAfter: 0.66
-    readSeconds: 5.3148146
+    readSeconds: 8.677777
     segments:
     - text: That's your story.
       weight: 1.26
       cues: []
-    - text: You did the steering,
-      weight: 1.2
+    - text: The machine offered the words,
+      weight: 1.673
       cues: []
-    - text: and the machine did the guessing.
-      weight: 1.47
+    - text: and you did the choosing.
+      weight: 1.59
+      cues: []
+    - text: Its own favourite story is up there too.
+      weight: 2.13
       cues: []
   - line: 239
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: be40611540c0417449aa6cc5ccfdde28, type: 3}
     pauseAfter: 1.1
-    readSeconds: 8.307407
+    readSeconds: 9.648148
     segments:
     - text: And that's how Pixel learns to talk.
       weight: 2.27
       cues:
       - talk
+    - text: 'Chat:'
+      weight: 0.79
+      cues:
+      - unlock
+    - text: unlocked!
+      weight: 1.09
+      cues: []
     - text: Not from grammar rules,
       weight: 1.61
       cues: []

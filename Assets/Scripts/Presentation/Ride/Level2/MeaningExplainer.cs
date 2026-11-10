@@ -10,8 +10,8 @@ namespace Convergence.Presentation.Ride.Level2
     /// <summary>
     /// Stop 2, explained. A token's number is a name tag ({name}); the machine looks the token up in a table it learned and gets 768 numbers
     /// ({table}, {learned}) and its place in the sentence ({place}), squashed to three so they can be seen ({squash}); the three numbers are a place in space, and the real baked picture of GPT-2's forty words appears around the rider,
-    /// related words clustering ({space}, {close}); and directions mean things: king - man + woman lands on queen ({math}, real
-    /// similarity from the bake). {sort} clears the board for the game, whose galaxy is the same picture.
+    /// related words clustering ({space}, {close}); and the numbers do math: king - man + woman, column by column on eight of GPT-2's
+    /// real 768 numbers ({math}, {minus}, {plus}), then the closest token's numbers: queen ({search}, {queen}; bake_level2_extras.py). {sort} clears the board for the game, whose galaxy is the same picture.
     /// </summary>
     public sealed class MeaningExplainer : Level2Explainer
     {
@@ -131,33 +131,94 @@ namespace Convergence.Presentation.Ride.Level2
             _nearList = _kit.Text(root, "NearList", list, 0.26f, new Color(0.85f, 1f, 0.9f), new Vector3(4.9f, 4.6f, 9f), 4f, TextAlignmentOptions.Left);
             _nearList.lineSpacing = 8f;
 
-            // The directions: king - man + woman.
+            // king - man + woman, done the way the machine does it: on the numbers (owner playtest 2026-11-10: the old rhombus did not
+            // show how it thinks). Eight of the 768 columns, real (bake_level2_extras.py): king's row, man's taken away, woman's added,
+            // the answer worked column by column, then the closest of every token's numbers: queen, whose own row is shown under it.
             L2Analogy analogy = System.Array.Find(data.File.analogies, a => a.a == "king");
-            float sim = analogy != null && analogy.answers.Length > 0 ? analogy.answers[0].similarity : 0.71f;
+            L2AnalogyNumbers an = data.File.analogyNumbers;
             Vector3 m = new Vector3(0f, 2.7f, 6.4f);
+            int cols = an.columns.Length;
             var diagram = new List<Shape>();
-            diagram.Add(Level2Kit.Square(m + new Vector3(0.6f, 0f, 0f), new Vector2(8.8f, 3.9f), new Color(0.04f, 0.03f, 0.13f, 0.98f), 0.06f, new Color(1f, 0.82f, 0.45f, 0.85f), 0.04f));
-            Vector3 man = m + new Vector3(-2.1f, -0.8f, -0.02f), woman = m + new Vector3(0.5f, -0.6f, -0.02f), king = m + new Vector3(-2.1f, 0.75f, -0.02f), queen = m + new Vector3(0.5f, 0.95f, -0.02f);
+            diagram.Add(Level2Kit.Square(m + new Vector3(0.55f, -0.25f, 0f), new Vector2(10.6f, 4.7f), new Color(0.04f, 0.03f, 0.13f, 0.98f), 0.06f, new Color(1f, 0.82f, 0.45f, 0.85f), 0.04f));
+            float[][] rows = { an.king, an.man, an.woman, an.result, an.queen };
+            string[] labels = { "king", "- man", "+ woman", "= answer", "queen" };
             _mp1 = diagram.Count;
-            foreach (Vector3 p in new[] { man, woman, king, queen }) diagram.Add(Level2Kit.Square(p, new Vector2(0.34f, 0.34f), new Color(1f, 1f, 1f, 0.95f), 1f));
+            _rowY = new[] { 1.05f, 0.4f, -0.25f, -0.95f, -1.6f };
+            for (int r = 0; r < rows.Length; r++)
+            {
+                for (int c = 0; c < cols; c++) diagram.Add(Level2Kit.Square(CellAt(m, r, c), new Vector2(0.6f, 0.5f), CellColor(rows[r][c]), 0.25f, r == 3 ? new Color(1f, 0.85f, 0.45f, 0.9f) : r == 4 ? new Color(1f, 0.85f, 0.45f, 0.9f) : (Color?)null, r >= 3 ? 0.03f : 0f));
+            }
+
             _mLines = diagram.Count;
-            Color green = new Color(0.5f, 1f, 0.65f, 0.95f), yellow = new Color(1f, 0.82f, 0.45f, 0.95f);
-            diagram.Add(Level2Kit.Line(man + new Vector3(0f, 0.2f, 0f), king + new Vector3(0f, -0.2f, 0f), 0.06f, green));           // man -> king: royalty
-            diagram.Add(Level2Kit.Line(man + new Vector3(0.2f, 0f, 0f), woman + new Vector3(-0.2f, 0f, 0f), 0.06f, yellow));         // man -> woman: female
-            diagram.Add(Level2Kit.Line(woman + new Vector3(0f, 0.2f, 0f), queen + new Vector3(0f, -0.2f, 0f), 0.06f, green));        // woman -> queen: the same royalty
-            diagram.Add(Level2Kit.Line(king + new Vector3(0.2f, 0f, 0f), queen + new Vector3(-0.2f, 0f, 0f), 0.06f, yellow));        // king -> queen: the same female
+            diagram.Add(Level2Kit.Line(m + new Vector3(-3.95f, -0.62f, -0.02f), CellAt(m, 3, cols - 1) + new Vector3(0.32f, 0.33f, 0f), 0.035f, new Color(1f, 1f, 1f, 0.8f)));
+            _barFirst = diagram.Count;
+            int answers = analogy != null ? Mathf.Min(4, analogy.answers.Length) : 0;
+            for (int i = 0; i < answers; i++)
+            {
+                float w = 1.6f * analogy.answers[i].similarity;
+                diagram.Add(Level2Kit.Square(m + new Vector3(3.55f + w * 0.5f, 0.45f - 0.5f * i, -0.02f), new Vector2(w, 0.3f), i == 0 ? new Color(1f, 0.82f, 0.4f, 0.9f) : new Color(0.6f, 0.75f, 1f, 0.7f), 0.4f));
+            }
+
             foreach (Shape s in diagram) s.alpha = 0f;
             _math = _kit.Batch(root, "Directions", diagram, 4);
-            _mathWords = new TextMeshPro[4];
-            string[] mw = { "man", "woman", "king", "queen" };
-            Vector3[] at = { man, woman, king, queen };
-            for (int k = 0; k < 4; k++) _mathWords[k] = _kit.Text(root, "Math" + mw[k], mw[k], 0.34f, k == 3 ? new Color(1f, 0.85f, 0.45f) : Color.white, at[k] + new Vector3(k % 2 == 0 ? -0.75f : 0.8f, 0f, -0.05f), 1.6f);
-            _royal = _kit.Text(root, "Royal", "ROYAL", 0.22f, green, (man + king) * 0.5f + new Vector3(-0.65f, 0f, -0.05f), 1.4f);
-            _female = _kit.Text(root, "Female", "FEMALE", 0.22f, yellow, (man + woman) * 0.5f + new Vector3(0f, -0.35f, -0.05f), 1.6f);
-            _mathLine = _kit.Text(root, "MathLine", "king - man + woman", 0.4f, Color.white, m + new Vector3(2.9f, 0.5f, -0.05f), 3.4f);
-            _mathResult = _kit.Text(root, "MathResult", "= queen", 0.5f, new Color(1f, 0.85f, 0.45f), m + new Vector3(2.9f, -0.15f, -0.05f), 3.4f);
-            TextMeshPro sub = _kit.Text(root, "MathSim", "GPT-2 says " + sim.ToString("0.00") + " alike", 0.22f, new Color(0.8f, 0.85f, 1f), m + new Vector3(2.9f, -0.8f, -0.05f), 3.4f);
-            _mathWords = AppendText(_mathWords, sub);
+
+            var texts = new List<TextMeshPro>();
+            _rowLabel = new TextMeshPro[rows.Length];
+            for (int r = 0; r < rows.Length; r++)
+            {
+                _rowLabel[r] = _kit.Text(root, "Row" + r, labels[r], 0.3f, r >= 3 ? new Color(1f, 0.85f, 0.45f) : Color.white, m + new Vector3(-3.65f, _rowY[r], -0.05f), 1.6f);
+                texts.Add(_rowLabel[r]);
+            }
+
+            _cell = new TextMeshPro[rows.Length * cols];
+            for (int r = 0; r < rows.Length; r++)
+            {
+                for (int c = 0; c < cols; c++)
+                {
+                    _cell[r * cols + c] = _kit.Text(root, "Cell" + r + "_" + c, rows[r][c].ToString("+0.00;-0.00", System.Globalization.CultureInfo.InvariantCulture), 0.17f, Color.white, CellAt(m, r, c) + new Vector3(0f, 0f, -0.05f), 0.6f);
+                    texts.Add(_cell[r * cols + c]);
+                }
+            }
+
+            _mathLine = _kit.Text(root, "MathLine", "8 OF KING'S 768 NUMBERS  (REAL, FROM GPT-2)", 0.24f, new Color(0.85f, 0.9f, 1f), m + new Vector3(-0.35f, 1.62f, -0.05f), 6f);
+            _royal = _kit.Text(root, "SearchTitle", "CLOSEST TOKEN\nTO THE ANSWER", 0.24f, new Color(0.85f, 0.9f, 1f), m + new Vector3(4.35f, 1.3f, -0.05f), 2.6f);
+            _searchWords = new TextMeshPro[answers];
+            for (int i = 0; i < answers; i++)
+            {
+                _searchWords[i] = _kit.Text(root, "Search" + i, analogy.answers[i].word + "  " + analogy.answers[i].similarity.ToString("0.00"), 0.24f, i == 0 ? new Color(1f, 0.88f, 0.5f) : Color.white, m + new Vector3(4.35f, 0.45f - 0.5f * i, -0.07f), 2.4f);
+                texts.Add(_searchWords[i]);
+            }
+
+            _female = _kit.Text(root, "Checked", "CHECKED ALL 50,257", 0.18f, new Color(0.7f, 0.8f, 1f), m + new Vector3(4.35f, -1.55f, -0.05f), 2.6f);
+            _mathResult = _kit.Text(root, "MathResult", "king - man + woman  =  queen", 0.3f, new Color(1f, 0.85f, 0.45f), m + new Vector3(0.55f, -2.25f, -0.05f), 8f);
+            _mathWords = texts.ToArray();
+        }
+
+        private float[] _rowY;
+        private int _barFirst;
+        private TextMeshPro[] _rowLabel, _cell, _searchWords;
+
+        private Vector3 CellAt(Vector3 m, int row, int col) => m + new Vector3(-2.35f + col * 0.68f, _rowY[row], -0.02f);
+
+        /// <summary>Warm for a positive number, cool for a negative one, brighter the bigger it is.</summary>
+        private static Color CellColor(float v)
+        {
+            float k = Mathf.Clamp01(Mathf.Abs(v) / 0.6f);
+            Color hue = v >= 0f ? new Color(1f, 0.55f, 0.2f) : new Color(0.25f, 0.6f, 1f);
+            return Color.Lerp(new Color(0.12f, 0.12f, 0.2f, 0.95f), Fx.A(hue, 0.95f), 0.25f + 0.75f * k);
+        }
+
+        private List<Tween> ShowRow(int row, float delay, float each)
+        {
+            int cols = source.Data.File.analogyNumbers.columns.Length;
+            var list = new List<Tween> { Anim.Write(_rowLabel[row], 0.4f).After(delay) };
+            for (int c = 0; c < cols; c++)
+            {
+                list.Add(Anim.FadeIn(_math, _mp1 + row * cols + c, Vector3.zero, 0.3f).After(delay + each * c));
+                list.Add(Anim.Write(_cell[row * cols + c], 0.3f).After(delay + each * c + 0.05f));
+            }
+
+            return list;
         }
 
         private static TextMeshPro[] AppendText(TextMeshPro[] list, TextMeshPro add)
@@ -333,7 +394,7 @@ namespace Convergence.Presentation.Ride.Level2
                 return list;
             });
 
-            // "Even directions mean something. king, subtract man, add woman... you land on queen."
+            // "Now watch the machine do math with meaning." The galaxy dims behind a board of numbers.
             s.At("math", () =>
             {
                 var list = new List<Tween>
@@ -342,37 +403,56 @@ namespace Convergence.Presentation.Ride.Level2
                     Anim.FadeText(_nearList, 0f, 0.4f),
                     Anim.FadeIn(_math, 0, Vector3.zero, 0.6f).After(0.2f),
                 };
-                // The galaxy's words step back: text sorts before distance, so they would show through the diagram's board.
+                // The galaxy's words step back: text sorts before distance, so they would show through the board.
                 foreach (TextMeshPro w in _words) if (w != null && w.gameObject.activeSelf) list.Add(Anim.FadeText(w, 0f, 0.5f));
                 if (_dogLabel != null && _dogLabel.gameObject.activeSelf) list.Add(Anim.FadeText(_dogLabel, 0f, 0.5f));
-                for (int k = 0; k < 3; k++)
-                {
-                    list.Add(Anim.FadeIn(_math, _mp1 + k, Vector3.zero, 0.3f).After(0.7f + 0.2f * k));
-                    list.Add(Anim.Write(_mathWords[k], 0.4f).After(0.8f + 0.2f * k));
-                }
-
-                list.Add(Anim.FadeIn(_math, _mLines, Vector3.zero, 0.2f).After(1.6f));
-                list.Add(Anim.Create(_math, _mLines, 0.7f).After(1.6f));
-                list.Add(Anim.Write(_royal, 0.4f).After(1.9f));
-                list.Add(Anim.FadeIn(_math, _mLines + 1, Vector3.zero, 0.2f).After(2.6f));
-                list.Add(Anim.Create(_math, _mLines + 1, 0.7f).After(2.6f));
-                list.Add(Anim.Write(_female, 0.4f).After(2.9f));
-                list.Add(Anim.Write(_mathLine, 1.2f).After(3.2f));
                 return list;
             });
 
-            // "You land on queen."
-            s.At("queen", () => new List<Tween>
+            // "Here are eight of king's seven hundred and sixty-eight numbers."
+            s.AtClause(RideLine.EmbMath, 1, () =>
             {
-                Anim.FadeIn(_math, _mp1 + 3, Vector3.zero, 0.3f),
-                Anim.Write(_mathWords[3], 0.5f),
-                Anim.FadeIn(_math, _mLines + 2, Vector3.zero, 0.2f),
-                Anim.Create(_math, _mLines + 2, 0.7f),
-                Anim.FadeIn(_math, _mLines + 3, Vector3.zero, 0.2f).After(0.5f),
-                Anim.Create(_math, _mLines + 3, 0.7f).After(0.5f),
-                Anim.Write(_mathResult, 0.8f).After(0.9f),
-                Anim.Write(_mathWords[4], 0.8f).After(1.5f),
-                Anim.Indicate(_math, _mp1 + 3, gold, 1.2f, 1.6f).After(1.2f),
+                var list = ShowRow(0, 0.2f, 0.12f);
+                list.Add(Anim.Write(_mathLine, 1.0f));
+                return list;
+            });
+
+            // "Take away man's numbers, and add woman's numbers, one column at a time." The answer row is worked out column by column.
+            s.At("minus", () => ShowRow(1, 0f, 0.1f));
+            s.At("plus", () => ShowRow(2, 0f, 0.1f));
+            s.AtClause(RideLine.EmbMath, 4, () =>
+            {
+                int cols = source.Data.File.analogyNumbers.columns.Length;
+                var list = new List<Tween> { Anim.FadeIn(_math, _mLines, Vector3.zero, 0.2f), Anim.Create(_math, _mLines, 0.5f) };
+                list.AddRange(ShowRow(3, 0.3f, 0.28f));
+                for (int c = 0; c < cols; c++)
+                {
+                    for (int r = 0; r < 3; r++) list.Add(Anim.Indicate(_math, _mp1 + r * cols + c, gold, 0.4f, 1.1f).After(0.3f + 0.28f * c - 0.1f));
+                }
+
+                return list;
+            });
+
+            // "Then it checks every token it knows: whose numbers are closest to the answer?" The closest words, with GPT-2's real scores.
+            s.At("search", () =>
+            {
+                var list = new List<Tween> { Anim.Write(_royal, 0.8f), Anim.Write(_female, 0.8f).After(0.4f) };
+                for (int i = 0; i < _searchWords.Length; i++)
+                {
+                    list.Add(Anim.FadeIn(_math, _barFirst + i, Vector3.left * 0.2f, 0.4f).After(1.0f + 0.5f * (_searchWords.Length - 1 - i)));
+                    list.Add(Anim.Write(_searchWords[i], 0.4f).After(1.05f + 0.5f * (_searchWords.Length - 1 - i)));
+                }
+
+                return list;
+            });
+
+            // "Queen!" Queen's own numbers appear under the answer: close, not identical.
+            s.At("queen", () =>
+            {
+                var list = ShowRow(4, 0f, 0.06f);
+                if (_searchWords.Length > 0) list.Add(Anim.Indicate(_math, _barFirst, gold, 1.2f, 1.25f));
+                list.Add(Anim.Write(_mathResult, 0.9f).After(0.5f));
+                return list;
             });
 
             // "Your turn: sort the loose words."

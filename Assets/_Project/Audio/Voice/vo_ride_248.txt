@@ -1,0 +1,4 @@
+Source: AI synthesized, Kokoro-82M v1.0 (hexgrad, Apache-2.0) via kokoro-onnx 0.6.1 (MIT); voice af_heart, speed 1.0, lang en-us; one sentence per call, explicit pauses, -16 LUFS / -1 dBTP / mono 48 kHz; ArtSource/voice/render_voices.py, 2026-11-10
+Segments: 1.540 2.140 2.180 1.490 3.410 1.240 1.820 1.280 2.150 1.540 1.360 1.850 2.090 1.890 1.460
+
+So where does it chop? Before GPT-2 learned anything, a program read a mountain of text, and wrote a glue list: first glue the two pieces seen side by side most often, then the next pair, fifty thousand times. Take the word the. H and E are glue number three. Then T joins them. One token. Chatbot was rare back then. It gets glued into chat and bot, but no rule glues those two. So it stays two tokens.

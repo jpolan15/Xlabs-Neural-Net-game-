@@ -273,8 +273,10 @@ namespace Convergence.Tests.EditMode.Ride
             Assert.IsFalse(script.intro.IsEmpty);
             float all = 0f;
             foreach (NarrationLibrary.Entry e in library.entries) all += e.TotalSeconds;
-            Assert.LessOrEqual(all, 420f, "all the narration of Level 2, with the reactions (v2, ADR-023: pauses about twice as long, as the owner asked)");
-            foreach (RideScript.Sequence s in script.sequences) Assert.LessOrEqual(s.TotalSeconds, 60f, s.name + " runs long");
+            // v3 (owner playtest 2026-11-10) asked for more explaining: how tokens are chosen (the glue list) and king - man + woman on
+            // the real numbers. Those two stops grew to about 70 s, the whole script to about 480 s; the caps follow, with a little room.
+            Assert.LessOrEqual(all, 500f, "all the narration of Level 2, with the reactions (v2, ADR-023: pauses about twice as long; v3: the owner's clearer explanations)");
+            foreach (RideScript.Sequence s in script.sequences) Assert.LessOrEqual(s.TotalSeconds, 75f, s.name + " runs long");
         }
 
         [Test]

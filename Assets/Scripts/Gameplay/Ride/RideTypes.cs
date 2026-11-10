@@ -323,7 +323,11 @@ namespace Convergence.Gameplay.Ride
         AttBlend = 244,
         OutRecap = 245,
         OutCareful = 246,
-        EmbPlace = 247
+        EmbPlace = 247,
+
+        // Level 2 v3, the owner's playtest (2026-11-10): how GPT-2 decides where to chop a word (its glue list).
+        TokGlue = 248,
+        TokSame = 249
     }
 
     /// <summary>Stable ids for the pod's control channels. Level 1 has one: GO.</summary>

@@ -294,6 +294,7 @@ namespace Convergence.EditorTools
             WireDirector2(rd, pod, new RideMoment[] { slice, galaxy, spot, bet, road }, regions);
             WirePod2(pod, rd);
             BuildStopViews(host, rd, dash, regions, slice, galaxy, spot, bet, road, source, session);
+            BuildPixel2(pod, rd, dash, regions[6]);
             WireTable2(pod, rd);
             WireLasers(rig);
             BuildBoot(pod, rd, regions);
@@ -303,6 +304,27 @@ namespace Convergence.EditorTools
             AssertRideSfxLevels(pod);
             EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene(), Scene2Path);
             SetBuildScenes2();
+        }
+
+        /// <summary>
+        /// Pixel rides Level 2 too, upgraded (BuildPixel with _level2), and a big copy of it stands on the finish line's screen for the
+        /// finale (owner playtest 2026-11-10: the end should show Pixel itself, not a flat face). OutroExplainer drives the copy.
+        /// </summary>
+        private static void BuildPixel2(GameObject pod, RideDirector rd, DashScreenView dash, GameObject finish)
+        {
+            PixelBuddyView pixel = BuildPixel(pod, rd, dash, null);
+            GameObject portrait = Object.Instantiate(pixel.transform.Find("Body").gameObject, finish.transform);
+            portrait.name = "PixelPortrait";
+            Object.DestroyImmediate(portrait.GetComponent<AudioSource>());
+            portrait.transform.localPosition = new Vector3(-3.4f, 2.3f, 7.6f);
+            portrait.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
+            portrait.transform.localScale = Vector3.one * 4.2f;
+            var outro = rd.GetComponentInChildren<OutroExplainer>(true);
+            Ref(outro, "portrait", portrait.transform);
+            Ref(outro, "portraitFace", portrait.transform.Find("Face").GetComponent<Convergence.Presentation.Ride.Explainers.ShapeBatch>());
+            Ref(outro, "portraitLock", portrait.transform.Find("Chat/Lock"));
+            Ref(outro, "portraitBubble", portrait.transform.Find("Chat/Bubble").GetComponent<Renderer>());
+            Ref(outro, "bubbleOpen", Mat("PixelBubbleOpen"));
         }
 
         private static void ConfigureGames2(SliceMoment slice, GalaxyMoment galaxy, SpotlightMoment spot, PredictMoment bet, StoryMoment road)
@@ -317,9 +339,9 @@ namespace Convergence.EditorTools
 
             Game(slice, "CHOP THE WORDS", "Swipe through the glowing seams", RideLine.TokDone, 120f);
             Game(galaxy, "SORT THE GALAXY", "Carry each loose word home", RideLine.EmbDone, 130f);
-            Game(spot, "BE THE ATTENTION", "Look at the words that matter", RideLine.AttDone, 120f);
-            Game(bet, "PLACE YOUR CHIPS", "Spread ten chips over the next word", RideLine.PredDone, 140f);
-            Game(road, "STEER THE STORY", "Point at a word, pull the trigger, ride that way", RideLine.GenDone, 120f);
+            Game(spot, "BE THE ATTENTION", "Hold your laser on the words that explain the glowing word", RideLine.AttDone, 120f);
+            Game(bet, "GUESS LIKE THE MACHINE", "Which word comes next? More chips = more likely", RideLine.PredDone, 140f);
+            Game(road, "STEER THE STORY", "Guess the machine's favourite next word", RideLine.GenDone, 120f);
         }
 
         private static void WireDirector2(RideDirector rd, GameObject pod, RideMoment[] moments, GameObject[] regions)

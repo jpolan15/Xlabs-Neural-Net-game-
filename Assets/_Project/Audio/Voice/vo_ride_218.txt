@@ -1,4 +1,4 @@
-Source: AI synthesized, Kokoro-82M v1.0 (hexgrad, Apache-2.0) via kokoro-onnx 0.6.1 (MIT); voice af_heart, speed 1.0, lang en-us; one sentence per call, explicit pauses, -16 LUFS / -1 dBTP / mono 48 kHz; ArtSource/voice/render_voices.py, 2026-10-31
-Segments: 2.630 2.140 1.240 1.550
+Source: AI synthesized, Kokoro-82M v1.0 (hexgrad, Apache-2.0) via kokoro-onnx 0.6.1 (MIT); voice af_heart, speed 1.0, lang en-us; one sentence per call, explicit pauses, -16 LUFS / -1 dBTP / mono 48 kHz; ArtSource/voice/render_voices.py, 2026-11-10
+Segments: 2.010 2.330 2.690 1.240 1.550
 
-So each word looks back at the words before it, and decides which ones matter most. It can't look ahead: those words aren't written yet.
+So each word asks a question: which words before me help explain me? Creature looks back at every word before it. It can't look ahead: those words aren't written yet.

@@ -12,18 +12,22 @@ namespace Convergence.Gameplay.Ride.Level2
     /// surprising it was (minus log2 of its probability, times ten): the safe word is easy and worth little, a wild word is a long shot
     /// and worth a lot. At the end the rider is told how often the machine would have written exactly that story on its own, which is
     /// the product of the odds they steered through. Gameplay only: the pod travels on the director's leg, and the view slides the
-    /// scenery sideways to steer.
+    /// scenery sideways to steer. v3 (owner playtest 2026-11-10: "super short", and unclear that the rider stands in for the dice):
+    /// after each pick the ride holds for compareSeconds while the view shows the machine's own favourite at that fork and where the
+    /// other lanes would have led, and the end shows the machine's favourite story and two others it could have written.
     /// </summary>
     public sealed class StoryMoment : Level2Game
     {
-        public enum Phase { Waiting, Fork, Travelling, Reveal }
+        public enum Phase { Waiting, Fork, Compare, Travelling, Reveal }
 
         [SerializeField] private Level2DataSource source;
         [SerializeField] private Level2Session session;
         [SerializeField] private float forkSeconds = 28f;
         [SerializeField] private float forkSpacing = 16f;
         [SerializeField] private float travelSeconds = 3.2f;
-        [SerializeField] private float revealSeconds = 6f;
+        [SerializeField] private float revealSeconds = 12f;
+        [Tooltip("After a pick: how long the fork stays to compare the rider's word with the machine's favourite (lane 0).")]
+        [SerializeField] private float compareSeconds = 3f;
         [SerializeField] private float surprisePoints = 10f;
 
         private int _chosen = -1;
@@ -57,6 +61,35 @@ namespace Convergence.Gameplay.Ride.Level2
         };
 
         public static bool EndsOpen(string word) => OpenEnds.Contains(word.ToLowerInvariant());
+
+        /// <summary>The fork reached along a path of lanes, or null past the last fork.</summary>
+        public L2StoryNode NodeAt(string path) => source.Data.StoryNode(path);
+
+        /// <summary>The machine's favourite lane at every fork: lane 0 holds the word it gave the best odds.</summary>
+        public string FavouritePath => new string('0', ForkCount);
+
+        /// <summary>The story told along a path of lanes (a digit per fork), ended the way FinishedText ends one; null if the path leaves the road.</summary>
+        public string Tell(string path)
+        {
+            var words = new List<string>();
+            for (int i = 0; i < path.Length; i++)
+            {
+                L2StoryNode node = source.Data.StoryNode(path.Substring(0, i));
+                int lane = path[i] - '0';
+                if (node == null || lane < 0 || lane >= node.lanes.Length) return null;
+                words.Add(Level2Data.Clean(node.lanes[lane].word));
+            }
+
+            return Start + (words.Count > 0 ? " " + string.Join(" ", words) : "") + (EndsOpen(words.Count > 0 ? words[words.Count - 1] : "") ? " ..." : ".");
+        }
+
+        /// <summary>The chance the machine gives to writing exactly the story along a path (the product of its lanes' odds).</summary>
+        public double ChanceOf(string path)
+        {
+            double p = 1.0;
+            for (int i = 0; i < path.Length; i++) p *= source.Data.StoryNode(path.Substring(0, i)).lanes[path[i] - '0'].p;
+            return p;
+        }
         public double Bits => _bits;
         public double Probability => _probability;
         public int LastLane { get; private set; } = -1;
@@ -110,7 +143,7 @@ namespace Convergence.Gameplay.Ride.Level2
                 _forkStarted = Time.time;
                 Stage = Phase.Fork;
                 ForkOpened?.Invoke(Fork, Node);
-                SetGoal("Ride down the word you want  (" + (Fork + 1) + " of " + forks + ")");
+                SetGoal("Guess the machine's favourite next word  (" + (Fork + 1) + " of " + forks + ")");
                 Progress = Fork / (float)forks;
                 while (_chosen < 0)
                 {
@@ -147,6 +180,9 @@ namespace Convergence.Gameplay.Ride.Level2
                 }
 
                 Path += _chosen;
+                // Hold at the fork: the view compares the pick with the machine's favourite and shows where the other lanes led.
+                Stage = Phase.Compare;
+                if (!_hurry) yield return new WaitForSeconds(compareSeconds);
                 Stage = Phase.Travelling;
                 yield return Director.TravelTo(Director.Distance + forkSpacing, _hurry ? 1.2f : travelSeconds);
             }

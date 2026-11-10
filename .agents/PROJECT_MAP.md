@@ -43,7 +43,7 @@ Last updated: 2026-10-30 (Level 2, the Word Machine, ADR-022; Level 1 pacing and
 |---|---|
 | `Assets/_Project/` | First-party assets: Audio, Materials, Prefabs, Scenes, ScriptableObjects |
 | `Assets/_Project/Data/Level1/` | `level1_digits.json`: the baked Level 1 network (both weight sets), hero digit, puzzle, Valley ribbon, finale digits, the training game's digits (`live`) and the travel game's targets (`targets`), written by `ArtSource/training/bake_level1.py` |
-| `Assets/_Project/Data/Level2/` | `level2_words.json`: everything Level 2 shows as a number, baked from the real GPT-2 small by `ArtSource/training/bake_level2.py` (tokens and ids, the 3-d embedding picture of 40 words, attention head, next-word odds, temperature odds, the story road) |
+| `Assets/_Project/Data/Level2/` | `level2_words.json`: everything Level 2 shows as a number, baked from the real GPT-2 small by `ArtSource/training/bake_level2.py` (tokens and ids, the 3-d embedding picture of 40 words, attention head, next-word odds, temperature odds, the story road), plus the glue steps and king - man + woman numbers from `bake_level2_extras.py` |
 | `Assets/_Project/Audio/` | **Canonical** audio assets location — see `Assets/_Project/Audio/AGENTS.md`. Ride: `Voice/vo_ride_NN.wav` (+ `.txt` sidecars), `Sfx/` (derived loops and buzzer), `Kenney/` (CC0 effects), `Music/` |
 | `Assets/AudioAssets/` | **Deprecated** — redirect to `Assets/_Project/Audio/` (no files; only AGENTS.md) |
 | `Assets/Materials/` | Shared materials. `NeuralRide/` holds the ride's materials (HoloLit solids, unlit icons and lines, additive glows, the two network materials) |

@@ -12,7 +12,9 @@ namespace Convergence.Presentation.Ride.Level2
     /// "creature" looks back, and a ribbon of light runs to each earlier word ({look}); each word gets a share and the shares are
     /// written on the ribbons and add up to a hundred percent ({shares}); "creature" mixes in each word's meaning by its share, and turns
     /// the colours of the words it looked at ({blend}); the numbers are from a real attention head of GPT-2 ({real}). {spot} clears
-    /// the board for the game.
+    /// the board for the game. v3 (owner playtest 2026-11-10: clear for someone who has never heard of attention): the query word asks
+    /// its question out loud ({look}), the shares are slices of one bar that fills to 100% ({shares}), and a three-step recap ends the
+    /// stop ({recap}).
     /// </summary>
     public sealed class AttentionExplainer : Level2Explainer
     {
@@ -20,7 +22,10 @@ namespace Convergence.Presentation.Ride.Level2
         private ShapeBatch _plate;
         private RibbonField _arcs;
         private GlowField _glows;
-        private TextMeshPro _title, _badge, _sum, _note, _blendNote;
+        private TextMeshPro _title, _badge, _sum, _note, _blendNote, _question, _recap;
+        private TextMeshPro[] _sliceText;
+        private int _sliceFirst;
+        private static readonly Color[] SliceColor = { new Color(0.55f, 0.65f, 0.9f), new Color(1f, 0.6f, 0.85f), new Color(0.35f, 0.75f, 1f), new Color(0.6f, 1f, 0.7f), new Color(1f, 0.8f, 0.4f) };
         private TextMeshPro[] _words, _percent;
         private Vector3[] _at;
         private float[] _width;
@@ -42,7 +47,22 @@ namespace Convergence.Presentation.Ride.Level2
             Transform root = MakeContent("AttentionExplain");
 
             var shapes = new List<Shape> { Level2Kit.Square(Centre + new Vector3(0f, 0.05f, 0.2f), new Vector2(11.6f, 4.9f), new Color(0.02f, 0.05f, 0.12f, 0.98f), 0.05f, new Color(0.25f, 0.85f, 1f, 0.9f), 0.04f) };
-            shapes[0].alpha = 0f;
+
+            // The shares as slices of one bar: together they are the whole bar, 100%.
+            _sliceFirst = shapes.Count;
+            _sliceText = new TextMeshPro[_round.query];
+            const float barWidth = 7.2f;
+            float sx = -barWidth * 0.5f;
+            for (int i = 0; i < _round.query; i++)
+            {
+                float w = barWidth * _round.weights[i];
+                Vector3 at = Centre + new Vector3(sx + w * 0.5f, -1.15f, 0.05f);
+                shapes.Add(Level2Kit.Square(at, new Vector2(Mathf.Max(0.05f, w - 0.04f), 0.48f), Fx.A(SliceColor[i % SliceColor.Length], 0.9f), 0.2f));
+                _sliceText[i] = _kit.Text(root, "Slice" + i, _round.words[i].ToUpperInvariant() + (w < 1.4f ? "" : " " + Mathf.RoundToInt(_round.weights[i] * 100f) + "%"), 0.2f, new Color(0.05f, 0.05f, 0.12f), at + new Vector3(0f, 0f, -0.1f), Mathf.Max(0.6f, w));
+                sx += w;
+            }
+
+            foreach (Shape sh in shapes) sh.alpha = 0f;
             _plate = _kit.Batch(root, "Plate", shapes, 1);
             _title = _kit.Text(root, "Title", "ATTENTION", 0.42f, new Color(0.6f, 0.95f, 1f), Centre + new Vector3(0f, 2.55f, 0f), 6f, TextAlignmentOptions.Center, false, true);
             _title.characterSpacing = 8f;
@@ -83,10 +103,12 @@ namespace Convergence.Presentation.Ride.Level2
 
             _arcs = RibbonField.Create(root, "Arcs", n, _kit.Beam, 2);
             _glows = GlowField.Create(root, "Glows", n + 2, _kit.Glow, 3);
-            _sum = _kit.Text(root, "Sum", "ADD UP TO 100%", 0.36f, new Color(1f, 0.85f, 0.5f), Centre + new Vector3(0f, -1.5f, -0.1f), 8f);
+            _sum = _kit.Text(root, "Sum", "ADD UP TO 100%", 0.32f, new Color(1f, 0.85f, 0.5f), Centre + new Vector3(0f, -1.75f, -0.1f), 8f);
             _badge = _kit.Text(root, "Badge", "REAL NUMBERS FROM GPT-2:  LAYER " + (_round.layer + 1) + ", HEAD " + (_round.head + 1) + "  (ONE OF ITS 144 HEADS)", 0.26f, new Color(1f, 0.85f, 0.5f), Centre + new Vector3(0f, -1.95f, -0.1f), 10f);
             _blendNote = _kit.Text(root, "Blend", BlendSentence(), 0.26f, new Color(1f, 0.9f, 0.6f), Centre + new Vector3(0f, -1.5f, -0.1f), 10.8f);
             _note = _kit.Text(root, "Note", "A WORD CAN ONLY LOOK BACK", 0.26f, new Color(0.8f, 0.9f, 1f), Centre + new Vector3(0f, -1.0f, -0.1f), 8f);
+            _question = _kit.Text(root, "Question", "\"" + _round.words[_round.query].ToUpperInvariant() + "\" ASKS:  WHICH WORDS BEFORE ME EXPLAIN ME?", 0.3f, new Color(1f, 0.88f, 0.55f), Centre + new Vector3(0f, 1.95f, -0.1f), 10.6f);
+            _recap = _kit.Text(root, "Recap", "ATTENTION =  1  LOOK BACK   >   2  SHARE OUT 100%   >   3  MIX IN MEANING", 0.24f, Color.white, Centre + new Vector3(0f, -1.55f, -0.12f), 10.8f);
         }
 
         /// <summary>"CREATURE NOW CARRIES  45% FLUFFY + 43% BLUE + 12% THE": the real shares, biggest first.</summary>
@@ -103,7 +125,7 @@ namespace Convergence.Presentation.Ride.Level2
 
         protected override void ResetPieces()
         {
-            _plate[0].alpha = 0f;
+            for (int i = 0; i < _plate.Count; i++) _plate[i].alpha = 0f;
             _plate.MarkDirty();
             foreach (TextMeshPro t in Texts())
             {
@@ -120,7 +142,8 @@ namespace Convergence.Presentation.Ride.Level2
 
         private IEnumerable<TextMeshPro> Texts()
         {
-            yield return _title; yield return _badge; yield return _sum; yield return _note; yield return _blendNote;
+            yield return _title; yield return _badge; yield return _sum; yield return _note; yield return _blendNote; yield return _question; yield return _recap;
+            foreach (TextMeshPro t in _sliceText) yield return t;
             foreach (TextMeshPro t in _words) yield return t;
             foreach (TextMeshPro t in _percent) yield return t;
         }
@@ -191,8 +214,9 @@ namespace Convergence.Presentation.Ride.Level2
             // "So each word looks back at the words before it, and decides which ones matter." Ribbons of light run back from "creature".
             s.At("look", () => new List<Tween>
             {
-                Param(1.8f, a => _draw = a),
-                Anim.Write(_note, 1.0f).After(0.6f),
+                Anim.Write(_question, 1.2f),
+                Param(1.8f, a => _draw = a).After(1.0f),
+                Anim.Write(_note, 1.0f).After(1.6f),
             });
 
             // "That's attention. Every word gets a share, and the shares add up to one hundred percent."
@@ -201,25 +225,45 @@ namespace Convergence.Presentation.Ride.Level2
                 var list = new List<Tween> { Param(1.2f, a => _numbers = a) };
                 for (int i = 0; i < q; i++) list.Add(Anim.Write(_percent[i], 0.5f).After(0.15f * i));
                 list.Add(Anim.FadeText(_note, 0f, 0.4f));
-                list.Add(Anim.Write(_sum, 1.0f).After(0.9f));
+                for (int i = 0; i < q; i++)
+                {
+                    list.Add(Anim.FadeIn(_plate, _sliceFirst + i, Vector3.left * 0.3f, 0.5f).After(1.0f + 0.35f * i));
+                    list.Add(Anim.Write(_sliceText[i], 0.4f).After(1.1f + 0.35f * i));
+                }
+
+                list.Add(Anim.Write(_sum, 1.0f).After(1.2f + 0.35f * q));
                 return list;
             });
 
             // "Then the word mixes in a little meaning from each one, by its share. Now creature means: a fluffy, blue creature."
-            s.At("blend", () => new List<Tween>
+            s.At("blend", () =>
             {
-                Param(1.0f, a => _blend = a),
-                Anim.FadeText(_sum, 0f, 0.4f),
-                Anim.Write(_blendNote, 1.6f).After(0.5f),
+                var list = new List<Tween>
+                {
+                    Param(1.0f, a => _blend = a),
+                    Anim.FadeText(_sum, 0f, 0.4f),
+                    Anim.Write(_blendNote, 1.6f).After(0.5f),
+                };
+                for (int i = 0; i < q; i++)
+                {
+                    list.Add(Anim.FadeTo(_plate, _sliceFirst + i, 0f, 0.4f));
+                    list.Add(Anim.FadeText(_sliceText[i], 0f, 0.4f));
+                }
+
+                return list;
             });
 
             // "These are real numbers from GPT-2. It has a hundred and forty-four attention heads... We picked the one that links words."
             s.At("real", () => new List<Tween> { Anim.Write(_badge, 1.4f) });
 
+            // "So: look back, share out attention, mix in meaning."
+            s.At("recap", () => new List<Tween> { Anim.FadeText(_blendNote, 0f, 0.4f), Anim.FadeText(_question, 0f, 0.4f), Anim.Write(_recap, 2.4f).After(0.3f) });
+
             // "Your turn: you are the attention."
             s.At("spot", () =>
             {
                 var list = new List<Tween> { Anim.FadeTo(_plate, 0, 0f, 0.7f), Param(0.7f, a => { _draw = 1f - a; _light = 1f - a; _blend = 1f - a; }) };
+                for (int i = 1; i < _plate.Count; i++) list.Add(Anim.FadeTo(_plate, i, 0f, 0.5f));
                 foreach (TextMeshPro t in Texts()) if (t.gameObject.activeSelf) list.Add(Anim.FadeText(t, 0f, 0.6f));
                 return list;
             });

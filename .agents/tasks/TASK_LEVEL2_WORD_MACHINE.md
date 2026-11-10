@@ -103,9 +103,19 @@ lane odds; kid-unsafe words are blocked on the road (`BLOCKED`, checked by eye o
       a human recording (`ArtSource/voice/RECORDING_SCRIPT.md` style) before Ignite.
 - [x] v2 (ADR-023): daylight bike ride, reviewed and slower script, re-voiced, story game steers the bike; played end to end by the bot,
       EditMode tests green (Level2Tests, RideNarrationTests).
+- [x] v3 (owner playtest 2026-11-10): Pixel rides Level 2,
+      upgraded (gold rings, camera goggles = it can see; a padlocked chat bubble that opens at the finale's "Chat: unlocked!"); tokens
+      explain the glue list (GPT-2's real merges: "the" glued whole, "chatbot" left as chat + bot); king - man + woman shown on 8 of
+      the 768 real numbers, column by column, then the closest token; attention asks its question, shares as slices of 100%, a recap;
+      the chip game says its goal; backprop and gradient descent point back to Level 1; the story game compares each pick with the
+      machine's favourite, shows the roads not taken and ends with the machine's own favourite story; the finale shows Pixel itself and
+      a GPT-2 chip next to a wall of chips (our own emblem, not a company logo). 16 lines re-voiced (Kokoro, worst WER 4.8 %).
+      EditMode 168/168, `Level2RideTests` green, live shots in `Documentation/Design/captures/level2_v6/`. Not yet ridden on the Quest.
 - [ ] Ridden on a Quest 2 (comfort of the galaxy view, laser aim at word sizes, draw-call budget of the countryside on the headset).
 - [ ] Ridden on the school's exercise bike (does the virtual bike sit right under a real one; is the dash readable while pedalling).
 - [ ] A human voice for Level 2.
 - [x] Level hub (ADR-024): build scene 0, catalog-driven cards, scoreboard, way home; EditMode + PlayMode tests green; hub to Level 2
       and back played on desktop. Not yet seen in the headset (card size at 2.8 m, laser hover, menu-button hold).
+- [ ] Level 2's own song: a synthesized one was tried (2026-11-10) and the owner found it bland; Level 2 plays Telstar until a
+      real track (CC0 or commissioned) is picked.
 - [ ] Ideas not built: a second attention head, a "guess the next word" duel against the machine, sharing the written story (QR) at the booth.

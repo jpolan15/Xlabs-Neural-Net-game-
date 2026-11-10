@@ -1,4 +1,4 @@
-Source: AI synthesized, Kokoro-82M v1.0 (hexgrad, Apache-2.0) via kokoro-onnx 0.6.1 (MIT); voice af_heart, speed 1.0, lang en-us; one sentence per call, explicit pauses, -16 LUFS / -1 dBTP / mono 48 kHz; ArtSource/voice/render_voices.py, 2026-10-31
-Segments: 0.940 1.350 1.210 1.510 2.290 1.500 1.260
+Source: AI synthesized, Kokoro-82M v1.0 (hexgrad, Apache-2.0) via kokoro-onnx 0.6.1 (MIT); voice af_heart, speed 1.0, lang en-us; one sentence per call, explicit pauses, -16 LUFS / -1 dBTP / mono 48 kHz; ArtSource/voice/render_voices.py, 2026-11-10
+Segments: 0.940 1.350 1.210 3.440 1.580 2.280 0.920 1.160 2.090 2.030
 
-Your turn: steer the story. At every fork, point at the word you want, and pull the trigger to ride that way. Safe words are easy. Wild words are rare.
+Your turn: steer the story. At every fork, the four gates are words GPT-2 could write next, with its real odds. Normally the machine rolls the dice. This time, you choose. Point at a gate and pull the trigger, then see which word the machine liked best.

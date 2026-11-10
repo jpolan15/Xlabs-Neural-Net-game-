@@ -1,4 +1,4 @@
-Source: AI synthesized, Kokoro-82M v1.0 (hexgrad, Apache-2.0) via kokoro-onnx 0.6.1 (MIT); voice af_heart, speed 1.0, lang en-us; one sentence per call, explicit pauses, -16 LUFS / -1 dBTP / mono 48 kHz; ArtSource/voice/render_voices.py, 2026-10-31
-Segments: 0.940 1.410 1.560 1.250 1.860 1.030 1.440
+Source: AI synthesized, Kokoro-82M v1.0 (hexgrad, Apache-2.0) via kokoro-onnx 0.6.1 (MIT); voice af_heart, speed 1.0, lang en-us; one sentence per call, explicit pauses, -16 LUFS / -1 dBTP / mono 48 kHz; ArtSource/voice/render_voices.py, 2026-11-10
+Segments: 0.940 1.250 1.280 1.150 1.450 2.890 1.560 2.100 3.285 1.720
 
-Your turn: place your chips. Shoot a word to add a chip. Right hand adds, left hand takes one back. Ten chips, then see what the machine thinks.
+Your turn: be the machine. Guess the next word, with odds. You have ten chips. Put more chips on the words you think are likely. Shoot a word to add a chip, and your left hand takes one back. Then you'll see GPT-2's real odds next to yours, and the word that really came next.

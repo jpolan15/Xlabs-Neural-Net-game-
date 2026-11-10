@@ -10,7 +10,9 @@ namespace Convergence.Presentation.Ride.Level2
     /// <summary>
     /// Stop 1, explained: a sentence is typed, then chopped into GPT-2's real tokens (a chip each), each token gets its real number,
     /// and a very long word is chopped into eleven. Cues: {sentence}, {chop}, {ids}, {rare}, {boss}, and {slice} (the next line,
-    /// the rider's turn) which clears the board.
+    /// the rider's turn) which clears the board. v3 (owner playtest 2026-11-10: "what makes a token?"): {glue}, {the}, {chatbot} and
+    /// {same} show how GPT-2 decides where to chop: its glue list, replayed letter by letter on "the" (glued whole) and "chatbot" (no
+    /// rule glues chat + bot, so it stays two), each glue labelled with its real rule number from GPT-2's merges.
     /// </summary>
     public sealed class TokenizeExplainer : Level2Explainer
     {
@@ -29,6 +31,21 @@ namespace Convergence.Presentation.Ride.Level2
         private Vector3[] _chipAt, _pieceAt;
         private Vector2[] _chipSize, _pieceSize;
 
+        // The glue demo: two words, one tile per letter, re-laid out at each glue step.
+        private static readonly Color[] GlueColor = { new Color(0.42f, 1f, 0.72f), new Color(1f, 0.5f, 0.72f) };
+        private static readonly float[] GlueX = { -2.75f, 1.75f };
+        private L2Merge[] _glue;
+        private int[] _glueFirst;
+        private TextMeshPro[][] _glueText;
+        private TextMeshPro[] _glueRule, _glueCount;
+        private TextMeshPro _glueTitle, _glueList, _same, _noRule;
+        private readonly float[] _glueT = new float[2];
+        private readonly bool[] _glueOn = new bool[2];
+        private readonly int[] _glueShown = { -1, -1 };
+        private readonly float[] _glueFlash = new float[2];
+        private readonly int[] _glueNew = { -1, -1 };
+        private Vector3 _centre;
+
         protected override void Awake()
         {
             Construct();
@@ -41,6 +58,7 @@ namespace Convergence.Presentation.Ride.Level2
             Level2Data data = source.Data;
             Transform root = MakeContent("TokenizeExplain");
             Vector3 centre = new Vector3(0f, 2.55f, 8f);
+            _centre = centre;
 
             L2Token[] tokens = data.File.thread.tokens;
             _chips = tokens.Length;
@@ -116,6 +134,15 @@ namespace Convergence.Presentation.Ride.Level2
                 shapes.Add(Level2Kit.Square(_pieceAt[i], _pieceSize[i], Fx.A(c, 0.2f), 0.35f, Fx.A(c, 0.95f), 0.035f));
             }
 
+            _glue = new[] { data.Merge(Level2Data.CommonGlueWord), data.Merge(Level2Data.RareGlueWord) };
+            _glueFirst = new int[2];
+            for (int w = 0; w < 2; w++)
+            {
+                _glueFirst[w] = shapes.Count;
+                Color c = GlueColor[w];
+                for (int i = 0; i < _glue[w].steps[0].pieces.Length; i++) shapes.Add(Level2Kit.Square(centre, new Vector2(0.5f, 0.66f), Fx.A(c, 0.2f), 0.35f, Fx.A(c, 0.95f), 0.035f));
+            }
+
             foreach (Shape s in shapes) s.alpha = 0f;
             _batch = _kit.Batch(root, "Chips", shapes, 1);
 
@@ -135,6 +162,132 @@ namespace Convergence.Presentation.Ride.Level2
             for (int i = 0; i < _pieces; i++) _pieceText[i] = _kit.Text(root, "Piece" + i, Fx.Clean(boss.tokens[i]), 0.28f, Color.white, _pieceAt[i] + new Vector3(0f, 0f, -0.05f), _pieceSize[i].x);
             _counter = _kit.Text(root, "Counter", _pieces + " TOKENS", 0.5f, new Color(1f, 0.82f, 0.45f), centre + new Vector3(0f, -1.6f, -0.05f), 6f);
             _sparks = GlowField.Create(root, "Sparks", 90, _kit.Glow, 3);
+
+            _glueText = new TextMeshPro[2][];
+            _glueRule = new TextMeshPro[2];
+            _glueCount = new TextMeshPro[2];
+            for (int w = 0; w < 2; w++)
+            {
+                int n = _glue[w].steps[0].pieces.Length;
+                _glueText[w] = new TextMeshPro[n];
+                for (int i = 0; i < n; i++) _glueText[w][i] = _kit.Text(root, "Glue" + w + "_" + i, "", 0.34f, Color.white, centre, 2f);
+                _glueRule[w] = _kit.Text(root, "GlueRule" + w, "", 0.24f, new Color(1f, 0.85f, 0.45f), centre + new Vector3(GlueX[w], 0.7f, -0.05f), 4.2f);
+                _glueCount[w] = _kit.Text(root, "GlueCount" + w, "", 0.34f, GlueColor[w], centre + new Vector3(GlueX[w], -0.9f, -0.05f), 4.2f);
+            }
+
+            _glueTitle = _kit.Text(root, "GlueTitle", "WHERE TO CHOP?  GPT-2'S GLUE LIST", 0.3f, new Color(1f, 0.85f, 0.45f), centre + new Vector3(0f, 1.6f, -0.05f), 9f);
+            _glueList = _kit.Text(root, "GlueList", "MADE BEFORE TRAINING:  MOST COMMON PAIR GLUED FIRST  -  50,000 RULES", 0.19f, new Color(0.85f, 0.9f, 1f), centre + new Vector3(0f, 1.2f, -0.05f), 9.2f);
+            _noRule = _kit.Text(root, "NoRule", "NO RULE GLUES  CHAT + BOT", 0.24f, new Color(1f, 0.55f, 0.5f), centre + new Vector3(GlueX[1], 0.7f, -0.05f), 4.2f);
+            _same = _kit.Text(root, "Same", "SAME LIST, SAME ORDER  =  SAME CHOPS, EVERY TIME", 0.26f, Color.white, centre + new Vector3(0f, -1.5f, -0.05f), 9f);
+        }
+
+        /// <summary>Lays one glue word out at the glue step it has reached: a tile per piece, centred under its rule label.</summary>
+        private void LayGlue(int w)
+        {
+            L2Merge m = _glue[w];
+            int step = Mathf.Clamp(Mathf.FloorToInt(_glueT[w] + 1e-3f), 0, m.steps.Length - 1);
+            if (step != _glueShown[w])
+            {
+                // A new glue: find the piece it made, flash it, and name the rule.
+                _glueNew[w] = -1;
+                if (step > 0)
+                {
+                    string[] before = m.steps[step - 1].pieces, after = m.steps[step].pieces;
+                    for (int i = 0; i < after.Length && _glueNew[w] < 0; i++)
+                    {
+                        if (i >= before.Length || after[i] != before[i]) _glueNew[w] = i;
+                    }
+
+                    int k = Mathf.Max(0, _glueNew[w]);
+                    string a = k < before.Length ? before[k] : "", b = k + 1 < before.Length ? before[k + 1] : "";
+                    _glueRule[w].text = "GLUE RULE #" + m.steps[step].rule.ToString("N0", System.Globalization.CultureInfo.InvariantCulture) + ":   " + a + " + " + b;
+                    _glueRule[w].gameObject.SetActive(true);
+                    _glueRule[w].alpha = 1f;
+                    _glueFlash[w] = 1f;
+                }
+
+                _glueShown[w] = step;
+            }
+
+            string[] pieces = m.steps[step].pieces;
+            const float gap = 0.12f;
+            float total = gap * (pieces.Length - 1);
+            foreach (string p in pieces) total += 0.19f * p.Length + 0.3f;
+            float x = GlueX[w] - total * 0.5f;
+            for (int i = 0; i < _glueText[w].Length; i++)
+            {
+                Shape tile = _batch[_glueFirst[w] + i];
+                TextMeshPro t = _glueText[w][i];
+                if (i < pieces.Length)
+                {
+                    float width = 0.19f * pieces[i].Length + 0.3f;
+                    Vector3 at = _centre + new Vector3(x + width * 0.5f, -0.05f, 0f);
+                    bool fresh = i == _glueNew[w];
+                    tile.position = at;
+                    tile.size = new Vector2(width, 0.66f);
+                    tile.alpha = 1f;
+                    tile.scale = 1f + (fresh ? 0.18f * _glueFlash[w] : 0f);
+                    tile.color = Color.Lerp(Fx.A(GlueColor[w], 0.2f), new Color(1f, 0.85f, 0.4f, 0.85f), fresh ? _glueFlash[w] : 0f);
+                    t.gameObject.SetActive(true);
+                    t.text = pieces[i];
+                    t.transform.localPosition = at + new Vector3(0f, 0f, -0.05f);
+                    x += width + gap;
+                }
+                else
+                {
+                    tile.alpha = 0f;
+                    t.gameObject.SetActive(false);
+                }
+            }
+        }
+
+        protected override void Animate(float deltaTime)
+        {
+            bool any = false;
+            for (int w = 0; w < 2; w++)
+            {
+                if (!_glueOn[w]) continue;
+                _glueFlash[w] = Mathf.MoveTowards(_glueFlash[w], 0f, deltaTime * 1.4f);
+                LayGlue(w);
+                any = true;
+            }
+
+            if (any) _batch.MarkDirty();
+        }
+
+        private void HideGlue()
+        {
+            for (int w = 0; w < 2; w++)
+            {
+                _glueOn[w] = false;
+                _glueShown[w] = -1;
+                _glueT[w] = 0f;
+                for (int i = 0; i < _glueText[w].Length; i++)
+                {
+                    _batch[_glueFirst[w] + i].alpha = 0f;
+                    _glueText[w][i].gameObject.SetActive(false);
+                }
+            }
+
+            _batch.MarkDirty();
+        }
+
+        private List<Tween> ShowGlue(int w)
+        {
+            _glueOn[w] = true;
+            _glueT[w] = 0f;
+            _glueShown[w] = -1;
+            LayGlue(w);
+            _batch.MarkDirty();
+            var list = new List<Tween>();
+            foreach (TextMeshPro t in _glueText[w]) list.Add(Anim.Write(t, 0.4f));
+            return list;
+        }
+
+        private Tween GlueTo(int w, int step, float seconds)
+        {
+            float from = 0f;
+            return new Tween(seconds, a => _glueT[w] = Mathf.Lerp(from, step, a), Rate.Smooth, begin: () => from = _glueT[w]);
         }
 
         protected override void ResetPieces()
@@ -153,10 +306,17 @@ namespace Convergence.Presentation.Ride.Level2
             }
 
             _sparks.HideAll();
+            if (_glueText != null) HideGlue();
         }
 
         private IEnumerable<TextMeshPro> Texts()
         {
+            yield return _glueTitle;
+            yield return _glueList;
+            yield return _same;
+            yield return _noRule;
+            foreach (TextMeshPro t in _glueRule) yield return t;
+            foreach (TextMeshPro t in _glueCount) yield return t;
             yield return _sentence;
             yield return _rare;
             yield return _counter;
@@ -225,8 +385,8 @@ namespace Convergence.Presentation.Ride.Level2
                 return list;
             });
 
-            // "Common words stay whole. Rare words get chopped smaller." The sentence clears; one very long word is typed.
-            s.At("rare", () =>
+            // "So where does it chop? ... a glue list." The sentence's chips clear; the glue list is named.
+            s.At("glue", () =>
             {
                 var list = new List<Tween>();
                 for (int i = 0; i < _chips; i++)
@@ -235,6 +395,57 @@ namespace Convergence.Presentation.Ride.Level2
                     list.Add(Anim.FadeTo(_batch, _lineFirst + i, 0f, 0.4f));
                     list.Add(Anim.FadeText(_chipText[i], 0f, 0.45f));
                     list.Add(Anim.FadeText(_idText[i], 0f, 0.4f));
+                }
+
+                list.Add(Anim.FadeText(_title, 0f, 0.4f));
+                list.Add(Anim.Write(_glueTitle, 0.9f).After(0.5f));
+                list.Add(Anim.Write(_glueList, 1.6f).After(3.0f));
+                return list;
+            });
+
+            // "Take the word the. H and E are glue number three. Then T joins them. One token." Clauses 7 to 10 of TokGlue.
+            int theSteps = _glue[0].steps.Length - 1;
+            s.At("the", () => ShowGlue(0));
+            for (int k = 1; k <= theSteps; k++)
+            {
+                int step = k;
+                s.AtClause(RideLine.TokGlue, 7 + k, () => new List<Tween> { GlueTo(0, step, 0.3f) });
+            }
+
+            s.AtClause(RideLine.TokGlue, 8 + theSteps, () => new List<Tween>
+            {
+                Tween.Call(0f, () => _glueCount[0].text = "1 TOKEN"),
+                Anim.Write(_glueCount[0], 0.6f),
+            });
+
+            // "Chatbot was rare back then. It gets glued into chat and bot, but no rule glues those two. So it stays two tokens."
+            int chat = 9 + theSteps; // the {chatbot} clause
+            s.At("chatbot", () => ShowGlue(1));
+            s.AtClause(RideLine.TokGlue, chat + 1, () => new List<Tween> { GlueTo(1, _glue[1].steps.Length - 1, 2.6f) });
+            s.AtClause(RideLine.TokGlue, chat + 2, () => new List<Tween> { Anim.FadeText(_glueRule[1], 0f, 0.3f), Anim.Write(_noRule, 0.7f).After(0.2f) });
+            s.AtClause(RideLine.TokGlue, chat + 3, () => new List<Tween>
+            {
+                Tween.Call(0f, () => _glueCount[1].text = _glue[1].steps[_glue[1].steps.Length - 1].pieces.Length + " TOKENS"),
+                Anim.Write(_glueCount[1], 0.6f),
+            });
+
+            // "When you type, the chopper follows the same glue list, in the same order."
+            s.At("same", () => new List<Tween> { Anim.Write(_same, 1.2f) });
+
+            // "A word the glue list has rarely seen gets chopped a lot." The glue demo clears; one very long word is typed.
+            s.At("rare", () =>
+            {
+                var list = new List<Tween>
+                {
+                    Tween.Call(0.6f, HideGlue),
+                    Anim.FadeText(_glueTitle, 0f, 0.4f), Anim.FadeText(_glueList, 0f, 0.4f), Anim.FadeText(_same, 0f, 0.4f), Anim.FadeText(_noRule, 0f, 0.4f),
+                    Anim.Write(_title, 0.5f),
+                };
+                for (int w = 0; w < 2; w++)
+                {
+                    list.Add(Anim.FadeText(_glueRule[w], 0f, 0.4f));
+                    list.Add(Anim.FadeText(_glueCount[w], 0f, 0.4f));
+                    foreach (TextMeshPro t in _glueText[w]) list.Add(Anim.FadeText(t, 0f, 0.4f));
                 }
 
                 list.Add(Anim.Write(_rare, 2.0f).After(0.7f));

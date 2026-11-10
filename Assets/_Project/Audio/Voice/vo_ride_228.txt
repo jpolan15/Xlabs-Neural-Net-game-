@@ -1,4 +1,4 @@
-Source: AI synthesized, Kokoro-82M v1.0 (hexgrad, Apache-2.0) via kokoro-onnx 0.6.1 (MIT); voice af_heart, speed 1.0, lang en-us; one sentence per call, explicit pauses, -16 LUFS / -1 dBTP / mono 48 kHz; ArtSource/voice/render_voices.py, 2026-10-31
-Segments: 1.400 3.165 1.940 1.952 1.220 2.175 3.711 1.150
+Source: AI synthesized, Kokoro-82M v1.0 (hexgrad, Apache-2.0) via kokoro-onnx 0.6.1 (MIT); voice af_heart, speed 1.0, lang en-us; one sentence per call, explicit pauses, -16 LUFS / -1 dBTP / mono 48 kHz; ArtSource/voice/render_voices.py, 2026-11-10
+Segments: 1.400 3.165 1.940 1.952 1.220 2.175 3.875 3.230
 
-That's how it learned. GPT-2 read millions of web pages, guessing every next word. When the real word got low odds, it was surprised, and that surprise was its loss. Then backpropagation and gradient descent nudged its weights, just like Pixel's.
+That's how it learned. GPT-2 read millions of web pages, guessing every next word. When the real word got low odds, it was surprised, and that surprise was its loss. Then backpropagation and gradient descent nudged its weights: the same two tricks you used to train Pixel in Level 1.

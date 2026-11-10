@@ -20,7 +20,7 @@ namespace Convergence.Presentation.Ride.Level2
 
         private Level2Kit _kit;
         private ShapeBatch _batch;
-        private TextMeshPro _title, _prompt, _rest, _hungry, _unsure, _loopTitle, _web;
+        private TextMeshPro _title, _prompt, _rest, _hungry, _unsure, _loopTitle, _web, _level1;
         private TextMeshPro[] _names, _percent, _loop;
         private L2Prediction _p;
         private int _plate, _barFirst, _hungryBar, _loopFirst;
@@ -101,6 +101,8 @@ namespace Convergence.Presentation.Ride.Level2
             string[] steps = { "GUESS THE\nNEXT WORD", "HOW SURPRISED\nWAS IT?", "NUDGE THE\nWEIGHTS" };
             for (int k = 0; k < 3; k++) _loop[k] = _kit.Text(root, "Loop" + k, steps[k], 0.3f, Color.white, Centre + new Vector3(-3.4f + k * 3.4f, -0.1f, -0.1f), 2.8f);
             _loopTitle = _kit.Text(root, "LoopTitle", "AGAIN AND AGAIN", 0.34f, new Color(1f, 0.85f, 0.45f), Centre + new Vector3(0f, 1.15f, -0.1f), 7f);
+            // The two tricks were taught in Level 1: say so on the board (owner playtest 2026-11-10).
+            _level1 = _kit.Text(root, "Level1", "YOU LEARNED THESE TWO IN LEVEL 1, TRAINING PIXEL", 0.26f, new Color(0.45f, 1f, 0.75f), Centre + new Vector3(0f, -1.95f, -0.1f), 12f);
             _web = _kit.Text(root, "Web", "MILLIONS OF WEB PAGES   -   BACKPROPAGATION   -   GRADIENT DESCENT", 0.24f, new Color(0.85f, 0.9f, 1f), Centre + new Vector3(0f, -1.45f, -0.1f), 12f);
             _grow = new float[Shown];
         }
@@ -121,7 +123,7 @@ namespace Convergence.Presentation.Ride.Level2
 
         private IEnumerable<TextMeshPro> Texts()
         {
-            yield return _title; yield return _prompt; yield return _rest; yield return _hungry; yield return _unsure; yield return _loopTitle; yield return _web;
+            yield return _title; yield return _prompt; yield return _rest; yield return _hungry; yield return _unsure; yield return _loopTitle; yield return _web; yield return _level1;
             foreach (TextMeshPro t in _names) yield return t;
             foreach (TextMeshPro t in _percent) yield return t;
             foreach (TextMeshPro t in _loop) yield return t;
@@ -226,6 +228,9 @@ namespace Convergence.Presentation.Ride.Level2
                 list.Add(Anim.Write(_web, 1.6f).After(3.4f));
                 return list;
             });
+
+            // "Then backpropagation and gradient descent nudged its weights: the same two tricks you used to train Pixel in Level 1."
+            s.At("level1", () => new List<Tween> { Anim.Write(_level1, 1.2f), Anim.Indicate(_batch, _loopFirst + 2, new Color(0.45f, 1f, 0.75f), 1.2f, 1.12f) });
 
             // "Your turn: place your chips."
             s.At("bet", () =>

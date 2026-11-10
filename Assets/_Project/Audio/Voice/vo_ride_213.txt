@@ -1,4 +1,4 @@
-Source: AI synthesized, Kokoro-82M v1.0 (hexgrad, Apache-2.0) via kokoro-onnx 0.6.1 (MIT); voice af_heart, speed 1.0, lang en-us; one sentence per call, explicit pauses, -16 LUFS / -1 dBTP / mono 48 kHz; ArtSource/voice/render_voices.py, 2026-10-31
-Segments: 2.070 1.140 1.260 1.260 1.500
+Source: AI synthesized, Kokoro-82M v1.0 (hexgrad, Apache-2.0) via kokoro-onnx 0.6.1 (MIT); voice af_heart, speed 1.0, lang en-us; one sentence per call, explicit pauses, -16 LUFS / -1 dBTP / mono 48 kHz; ArtSource/voice/render_voices.py, 2026-11-10
+Segments: 2.630 3.829 1.880 1.710 1.810 2.220 2.490 0.980 1.420 1.220
 
-Even directions mean something. Start at king, take away man, add woman. You land right next to queen.
+Now watch the machine do math with meaning. Here are eight of king's seven hundred and sixty-eight numbers. Take away man's numbers, and add woman's numbers, one column at a time. Then it checks every token it knows: whose numbers are closest to the answer? Queen! Nobody taught it that. It learned it from reading.

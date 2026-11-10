@@ -52,7 +52,7 @@ namespace Convergence.Presentation.Ride.Level2
         private Transform _props;
         private SlotView[] _slots;
         private GlowField _seams, _sparks, _coach;
-        private ShapeBatch _chipBack, _bank;
+        private ShapeBatch _chipBack, _bank, _cuts;
         private Chip[] _chips;
         private TextMeshPro _bankCount, _bankLabel, _banner, _measure;
         private readonly List<(Vector3 pos, Vector3 vel, float born, Color color)> _spark = new List<(Vector3, Vector3, float, Color)>();
@@ -98,6 +98,13 @@ namespace Convergence.Presentation.Ride.Level2
             }
 
             _seams = GlowField.Create(_props, "Seams", SeamQuads, _kit.Glow, 2);
+
+            // The cut lines themselves: solid, hot pink with a dark edge, so a seam reads against the bright sky (owner playtest
+            // 2026-11-10: the soft glow alone was "like an invisible line"). Two lines per seam: the dark edge, then the colour.
+            var cuts = new List<Shape>();
+            for (int i = 0; i < SeamQuads * 2; i++) cuts.Add(Level2Kit.Line(Vector3.zero, Vector3.up, 0.05f, Color.white));
+            foreach (Shape s in cuts) s.alpha = 0f;
+            _cuts = _kit.Batch(_props, "Cuts", cuts, 9);
             _sparks = GlowField.Create(_props, "Sparks", SparkCount, _kit.Glow, 4);
             _coach = GlowField.Create(_props, "Coach", 8, _kit.Glow, 5);
 
@@ -238,6 +245,7 @@ namespace Convergence.Presentation.Ride.Level2
         private void UpdateSlots()
         {
             _seams.HideAll();
+            for (int c = 0; c < _cuts.Count; c++) _cuts[c].alpha = 0f;
             float pulse = 0.75f + 0.25f * Mathf.Sin(Time.time * 7f);
             for (int i = 0; i < _slots.Length; i++)
             {
@@ -295,11 +303,20 @@ namespace Convergence.Presentation.Ride.Level2
                     {
                         if (s.Cut[k]) continue;
                         Vector3 at = centre + face * new Vector3(moment.SeamOffset(i, k), 0f, -0.05f);
-                        _seams.Set(i * PerSlot + k, at, new Vector2(0.09f + 0.035f * pulse, s.Size * 2.15f), new Color(1f, 0.88f, 0.45f, 0.95f * pulse));
-                        _seams.Set(i * PerSlot + 12 - (k % 2), at, new Vector2(0.5f, s.Size * 2.6f), new Color(1f, 0.6f, 0.2f, 0.16f * pulse));
+                        _seams.Set(i * PerSlot + k, at, new Vector2(0.25f + 0.06f * pulse, s.Size * 2.3f), new Color(1f, 0.4f, 0.7f, 0.6f * pulse));
+                        _seams.Set(i * PerSlot + 12 - (k % 2), at, new Vector2(0.7f, s.Size * 2.6f), new Color(1f, 0.25f, 0.6f, 0.35f * pulse));
+                        Vector3 top = at + face * new Vector3(0f, s.Size * 1.05f, -0.02f), bottom = at - face * new Vector3(0f, s.Size * 1.05f, 0.02f);
+                        Shape edge = _cuts[(i * PerSlot + k) * 2], line = _cuts[(i * PerSlot + k) * 2 + 1];
+                        edge.position = top; edge.end = bottom; edge.size = new Vector2(0.14f, 0.14f); edge.color = new Color(0.08f, 0.02f, 0.1f); edge.alpha = 0.85f;
+                        line.position = top; line.end = bottom; line.size = new Vector2(0.075f + 0.02f * pulse, 0.075f + 0.02f * pulse); line.color = new Color(1f, 0.2f, 0.62f); line.alpha = 1f;
                     }
                 }
             }
+        }
+
+        private void LateUpdate()
+        {
+            if (_cuts != null) _cuts.MarkDirty();
         }
 
         // ---------- events ----------

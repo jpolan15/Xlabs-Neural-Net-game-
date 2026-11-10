@@ -16,7 +16,7 @@ MonoBehaviour:
     name: Intro
     beats:
     - line: 200
-      seconds: 7.59
+      seconds: 11.930667
     - line: 201
       seconds: 10.7
     - line: 242
@@ -31,8 +31,12 @@ MonoBehaviour:
       seconds: 12.35
     - line: 204
       seconds: 9.435333
+    - line: 248
+      seconds: 28.53
+    - line: 249
+      seconds: 11.47
     - line: 205
-      seconds: 7.811333
+      seconds: 6.9013333
   - name: 'T1 tokens: your turn'
     beats:
     - line: 206
@@ -42,7 +46,7 @@ MonoBehaviour:
     - line: 210
       seconds: 6.52
     - line: 243
-      seconds: 13.700001
+      seconds: 14.51
     - line: 247
       seconds: 8.29
     - line: 212
@@ -50,7 +54,7 @@ MonoBehaviour:
     - line: 211
       seconds: 6.7599998
     - line: 213
-      seconds: 8.32
+      seconds: 21.27
   - name: 'T2 meaning: your turn'
     beats:
     - line: 214
@@ -60,17 +64,17 @@ MonoBehaviour:
     - line: 217
       seconds: 6.7799997
     - line: 218
-      seconds: 8.650001
+      seconds: 10.910001
     - line: 219
-      seconds: 6.7999997
+      seconds: 11.68
     - line: 244
-      seconds: 8.53
+      seconds: 10.120001
     - line: 220
-      seconds: 11.29
+      seconds: 15.940667
   - name: 'T3 attention: your turn'
     beats:
     - line: 221
-      seconds: 8.83
+      seconds: 12.88
   - name: 'T4 prediction: explain'
     beats:
     - line: 225
@@ -80,11 +84,11 @@ MonoBehaviour:
     - line: 227
       seconds: 10.820001
     - line: 228
-      seconds: 17.804
+      seconds: 20.048
   - name: 'T4 prediction: your turn'
     beats:
     - line: 229
-      seconds: 10.139999
+      seconds: 18.274666
   - name: 'T5 writing: explain'
     beats:
     - line: 233
@@ -94,11 +98,11 @@ MonoBehaviour:
   - name: 'T5 writing: your turn'
     beats:
     - line: 235
-      seconds: 10.71
+      seconds: 17.65
   - name: Finale
     beats:
     - line: 239
-      seconds: 7.83
+      seconds: 9.71
     - line: 245
       seconds: 12.860001
     - line: 240
@@ -109,7 +113,7 @@ MonoBehaviour:
       seconds: 7.54
   lines:
   - line: 200
-    seconds: 7.59
+    seconds: 11.930667
   - line: 201
     seconds: 10.7
   - line: 242
@@ -120,8 +124,12 @@ MonoBehaviour:
     seconds: 12.35
   - line: 204
     seconds: 9.435333
+  - line: 248
+    seconds: 28.53
+  - line: 249
+    seconds: 11.47
   - line: 205
-    seconds: 7.811333
+    seconds: 6.9013333
   - line: 206
     seconds: 7.8799996
   - line: 207
@@ -133,7 +141,7 @@ MonoBehaviour:
   - line: 210
     seconds: 6.52
   - line: 243
-    seconds: 13.700001
+    seconds: 14.51
   - line: 247
     seconds: 8.29
   - line: 212
@@ -141,7 +149,7 @@ MonoBehaviour:
   - line: 211
     seconds: 6.7599998
   - line: 213
-    seconds: 8.32
+    seconds: 21.27
   - line: 214
     seconds: 7.33
   - line: 215
@@ -151,15 +159,15 @@ MonoBehaviour:
   - line: 217
     seconds: 6.7799997
   - line: 218
-    seconds: 8.650001
+    seconds: 10.910001
   - line: 219
-    seconds: 6.7999997
+    seconds: 11.68
   - line: 244
-    seconds: 8.53
+    seconds: 10.120001
   - line: 220
-    seconds: 11.29
+    seconds: 15.940667
   - line: 221
-    seconds: 8.83
+    seconds: 12.88
   - line: 222
     seconds: 2.52
   - line: 223
@@ -173,9 +181,9 @@ MonoBehaviour:
   - line: 227
     seconds: 10.820001
   - line: 228
-    seconds: 17.804
+    seconds: 20.048
   - line: 229
-    seconds: 10.139999
+    seconds: 18.274666
   - line: 230
     seconds: 1.75
   - line: 231
@@ -187,15 +195,15 @@ MonoBehaviour:
   - line: 234
     seconds: 10.819334
   - line: 235
-    seconds: 10.71
+    seconds: 17.65
   - line: 236
     seconds: 2.08
   - line: 237
     seconds: 1.34
   - line: 238
-    seconds: 4.57
+    seconds: 7.3033333
   - line: 239
-    seconds: 7.83
+    seconds: 9.71
   - line: 245
     seconds: 12.860001
   - line: 240
