@@ -119,7 +119,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &33253276
+--- !u!1 &153853165
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -127,713 +127,14 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 33253277}
-  - component: {fileID: 33253278}
-  m_Layer: 0
-  m_Name: StoryView
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &33253277
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 33253276}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1757093730}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &33253278
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 33253276}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e83a1cfe9ffb13b41b7ba4150f0fc841, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.Level2.StoryView
-  moment: {fileID: 768215285}
-  stage: {fileID: 1757093730}
---- !u!1001 &81744023
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 4088962292045641216, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      propertyPath: director
-      value: 
-      objectReference: {fileID: 1172727708}
-    - target: {fileID: 4719295210774565660, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      propertyPath: director
-      value: 
-      objectReference: {fileID: 1172727708}
-    - target: {fileID: 5464775797475430190, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      propertyPath: rig
-      value: 
-      objectReference: {fileID: 828056547}
-    - target: {fileID: 5610244513174571838, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      propertyPath: m_Name
-      value: Pod
-      objectReference: {fileID: 0}
-    - target: {fileID: 5713836834629473067, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      propertyPath: director
-      value: 
-      objectReference: {fileID: 1172727708}
-    - target: {fileID: 5902155694704055896, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      propertyPath: director
-      value: 
-      objectReference: {fileID: 1172727708}
-    - target: {fileID: 7616898775107759946, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      propertyPath: director
-      value: 
-      objectReference: {fileID: 1172727708}
-    - target: {fileID: 8437328667955863574, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8437328667955863574, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8437328667955863574, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8437328667955863574, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8437328667955863574, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8437328667955863574, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8437328667955863574, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8437328667955863574, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8437328667955863574, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8437328667955863574, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9043868140711703454, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      propertyPath: director
-      value: 
-      objectReference: {fileID: 1172727708}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 6109917705842483620, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 828056547}
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 5610244513174571838, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 81744054}
-    - targetCorrespondingSourceObject: {fileID: 5610244513174571838, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 81744053}
-    - targetCorrespondingSourceObject: {fileID: 5610244513174571838, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 81744052}
-    - targetCorrespondingSourceObject: {fileID: 5610244513174571838, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 81744051}
-    - targetCorrespondingSourceObject: {fileID: 8799967751406059943, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
-    - targetCorrespondingSourceObject: {fileID: 332169792884758941, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
-    - targetCorrespondingSourceObject: {fileID: 7858676598494854028, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
-    - targetCorrespondingSourceObject: {fileID: 7928235623614545665, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
-    - targetCorrespondingSourceObject: {fileID: 4308421194695920205, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
-    - targetCorrespondingSourceObject: {fileID: 4309338304980984393, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
-    - targetCorrespondingSourceObject: {fileID: 4797730428259760816, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
-    - targetCorrespondingSourceObject: {fileID: 5596421807111869890, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
-    - targetCorrespondingSourceObject: {fileID: 1141080358684800598, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
-    - targetCorrespondingSourceObject: {fileID: 8191517470359085410, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
-    - targetCorrespondingSourceObject: {fileID: 9181208477253588139, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
-    - targetCorrespondingSourceObject: {fileID: 541206733222463528, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
-    - targetCorrespondingSourceObject: {fileID: 462512080646245463, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
-    - targetCorrespondingSourceObject: {fileID: 3163783278612950018, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
-  m_SourcePrefab: {fileID: 100100000, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
---- !u!23 &81744024 stripped
-MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 4181906047242623209, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-  m_PrefabInstance: {fileID: 81744023}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &81744025 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8437328667955863574, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-  m_PrefabInstance: {fileID: 81744023}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &81744026 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1672839589400892229, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-  m_PrefabInstance: {fileID: 81744023}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &81744027 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1419439224948018352, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-  m_PrefabInstance: {fileID: 81744023}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &81744028 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7286043140806345748, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-  m_PrefabInstance: {fileID: 81744023}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 81744027}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshPro
---- !u!198 &81744029 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 6661631416416502790, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-  m_PrefabInstance: {fileID: 81744023}
-  m_PrefabAsset: {fileID: 0}
---- !u!23 &81744030 stripped
-MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 1319732277938238833, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-  m_PrefabInstance: {fileID: 81744023}
-  m_PrefabAsset: {fileID: 0}
---- !u!23 &81744031 stripped
-MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 8601169351717254651, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-  m_PrefabInstance: {fileID: 81744023}
-  m_PrefabAsset: {fileID: 0}
---- !u!23 &81744032 stripped
-MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 4313508649851643865, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-  m_PrefabInstance: {fileID: 81744023}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &81744033 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4147484550807920076, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-  m_PrefabInstance: {fileID: 81744023}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshPro
---- !u!1 &81744034 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6532259570318865174, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-  m_PrefabInstance: {fileID: 81744023}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &81744035 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8098548088802816308, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-  m_PrefabInstance: {fileID: 81744023}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &81744036 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 7115011341900775030, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-  m_PrefabInstance: {fileID: 81744023}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &81744037 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 7364894997052800906, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-  m_PrefabInstance: {fileID: 81744023}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &81744038 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8182895722731168153, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-  m_PrefabInstance: {fileID: 81744023}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshPro
---- !u!114 &81744039 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6427610974540370562, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-  m_PrefabInstance: {fileID: 81744023}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshPro
---- !u!114 &81744040 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5712235497031558334, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-  m_PrefabInstance: {fileID: 81744023}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshPro
---- !u!114 &81744041 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4557007061513386356, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-  m_PrefabInstance: {fileID: 81744023}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshPro
---- !u!114 &81744042 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8824930694076597277, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-  m_PrefabInstance: {fileID: 81744023}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshPro
---- !u!23 &81744043 stripped
-MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 7667672538557010363, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-  m_PrefabInstance: {fileID: 81744023}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &81744044 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8075153576658867516, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-  m_PrefabInstance: {fileID: 81744023}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &81744045 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7042285474158708226, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-  m_PrefabInstance: {fileID: 81744023}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshPro
---- !u!4 &81744046 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 6109917705842483620, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-  m_PrefabInstance: {fileID: 81744023}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &81744047 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7616898775107759946, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-  m_PrefabInstance: {fileID: 81744023}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 81744050}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a2e989ed4c039e94fb79f0c3f4da4246, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.RideSfxView
---- !u!114 &81744048 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4088962292045641216, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-  m_PrefabInstance: {fileID: 81744023}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 81744050}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0de3d6a76741ef54ba8dc76775adf49e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.DashScreenView
---- !u!114 &81744049 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7731860561601147739, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-  m_PrefabInstance: {fileID: 81744023}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 81744050}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c4e889bd6723ef4419862fa0356df368, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Convergence.Gameplay::Convergence.Gameplay.Ride.RideControlSet
---- !u!1 &81744050 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5610244513174571838, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
-  m_PrefabInstance: {fileID: 81744023}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &81744051
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 81744050}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 018511d403ca8254d915503cfd7164b0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.RideBoot
-  director: {fileID: 1172727708}
-  library: {fileID: 11400000, guid: e92f0feaafbcc0e468186f77d2ed8b61, type: 2}
-  sfx: {fileID: 81744047}
-  coverMaterial: {fileID: 2100000, guid: 4003958afb24aa34faa2dc17e2c5d8b7, type: 2}
-  warmRoots:
-  - {fileID: 901620411}
-  - {fileID: 1451904693}
-  - {fileID: 1719272716}
-  - {fileID: 1721065289}
-  - {fileID: 1569184365}
-  - {fileID: 1757093729}
-  - {fileID: 841374014}
-  - {fileID: 81744044}
-  - {fileID: 81744034}
-  - {fileID: 81744026}
-  - {fileID: 81744027}
-  warmFrames: 2
-  settleSeconds: 0.25
-  fadeSeconds: 0.5
-  audioSeconds: 8
-  maxBootSeconds: 25
---- !u!114 &81744052
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 81744050}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2fb41cecfbe0e9d45966bf56c024a9b0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.GameHudView
-  director: {fileID: 1172727708}
-  panel: {fileID: 0}
-  title: {fileID: 81744041}
-  goal: {fileID: 81744039}
-  timer: {fileID: 81744038}
-  score: {fileID: 81744040}
-  progressFill: {fileID: 81744037}
-  stamp: {fileID: 81744034}
-  stampText: {fileID: 81744033}
-  stars:
-  - {fileID: 81744032}
-  - {fileID: 81744031}
-  - {fileID: 81744030}
-  starLit: {fileID: 2100000, guid: 929025f2e1a207649a2a89c1202f0be0, type: 2}
-  starDim: {fileID: 2100000, guid: 777281e95d44ad543b50cb10001cfc72, type: 2}
-  confetti: {fileID: 81744029}
-  popup: {fileID: 81744028}
-  popupAnchor: {fileID: 81744036}
-  zap: {fileID: 0}
-  stampSeconds: 4.5
-  blastSeconds: 2.4
---- !u!114 &81744053
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 81744050}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d012c37fc19c7fd4db43e3669a30bf90, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.GameTableView
-  director: {fileID: 1172727708}
-  table: {fileID: 81744035}
-  frame: {fileID: 81744043}
-  frameLive: {fileID: 2100000, guid: aff00f090498fd14c97ab6d5459de9b7, type: 2}
-  frameIdle: {fileID: 2100000, guid: 73d90ecda2a722e49b5f22e981434ff3, type: 2}
-  stowedOffset: {x: 0, y: -0.32, z: 0.08}
-  riseSeconds: 0.55
-  alsoUpAt: 
-  nominalEyeHeight: 1.3
-  followEyeHeights: {x: 1.1, y: 1.5}
---- !u!114 &81744054
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 81744050}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26090ed4487cb4141b9d02f49cac618e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.SubtitleMirror
-  source: {fileID: 81744045}
-  target: {fileID: 81744042}
---- !u!1 &226955738
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 226955739}
-  - component: {fileID: 226955740}
-  m_Layer: 0
-  m_Name: PredictView
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &226955739
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 226955738}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1569184366}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &226955740
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 226955738}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1e7e9051c59d656409214e8c1059dd53, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.Level2.PredictView
-  moment: {fileID: 1408216627}
-  stage: {fileID: 1569184366}
---- !u!1 &384500730
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 384500732}
-  - component: {fileID: 384500731}
-  m_Layer: 0
-  m_Name: Spotlight
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &384500731
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 384500730}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0f7261bdeae788478761525feb233fd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Convergence.Gameplay::Convergence.Gameplay.Ride.Level2.SpotlightMoment
-  title: BE THE ATTENTION
-  goal: Look at the words that matter
-  giveUpAfter: 120
-  goWait: 12
-  winLine: 224
-  source: {fileID: 1172727711}
-  winShare: 0.8
-  eachShare: 0.25
-  holdSeconds: 0.8
-  roundSeconds: 24
-  revealSeconds: 5
-  pourRate: 3.2
-  drainRate: 0.5
-  maxLogit: 4.5
-  roundPoints: 40
-  wrongPoints: -5
---- !u!4 &384500732
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 384500730}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1172727712}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &498552149
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 498552151}
-  - component: {fileID: 498552150}
-  m_Layer: 0
-  m_Name: Galaxy
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &498552150
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 498552149}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d1bb86ff3aa2941499bba0f6a8cdebb7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Convergence.Gameplay::Convergence.Gameplay.Ride.Level2.GalaxyMoment
-  title: SORT THE GALAXY
-  goal: Carry each loose word home
-  giveUpAfter: 130
-  goWait: 12
-  winLine: 216
-  source: {fileID: 1172727711}
-  stage: {fileID: 1719272717}
-  carryDistance: 7
-  coneDegrees: 11
-  placePoints: 20
-  wrongPoints: -5
-  hintAfter: 7
---- !u!4 &498552151
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 498552149}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1172727712}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &508870579
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 508870580}
-  - component: {fileID: 508870581}
-  m_Layer: 0
-  m_Name: SpotlightView
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &508870580
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 508870579}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1721065290}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &508870581
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 508870579}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c5cf12078cf488e438bc6cef1b8c1a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.Level2.SpotlightView
-  moment: {fileID: 384500731}
-  stage: {fileID: 1721065290}
---- !u!1 &646011900
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 646011901}
-  - component: {fileID: 646011908}
-  - component: {fileID: 646011907}
-  - component: {fileID: 646011906}
-  - component: {fileID: 646011905}
-  - component: {fileID: 646011904}
-  - component: {fileID: 646011903}
-  - component: {fileID: 646011902}
+  - component: {fileID: 153853166}
+  - component: {fileID: 153853173}
+  - component: {fileID: 153853172}
+  - component: {fileID: 153853171}
+  - component: {fileID: 153853170}
+  - component: {fileID: 153853169}
+  - component: {fileID: 153853168}
+  - component: {fileID: 153853167}
   m_Layer: 0
   m_Name: Explainers
   m_TagString: Untagged
@@ -841,36 +142,36 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &646011901
+--- !u!4 &153853166
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 646011900}
+  m_GameObject: {fileID: 153853165}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1172727712}
+  m_Father: {fileID: 2089381007}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &646011902
+--- !u!114 &153853167
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 646011900}
+  m_GameObject: {fileID: 153853165}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a3a9608f2e9708143a54a9d2e4c5dc40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.Level2.OutroExplainer
-  director: {fileID: 1172727708}
-  dash: {fileID: 81744048}
-  atmosphere: {fileID: 1172727706}
+  director: {fileID: 2089381003}
+  dash: {fileID: 1927604740}
+  atmosphere: {fileID: 2089381001}
   theme: {fileID: 11400000, guid: a35ba03cc0be8e449980242532a2026a, type: 2}
   lines: ef000000f5000000f0000000f6000000f1000000i
   explainSegment: 10
@@ -880,24 +181,24 @@ MonoBehaviour:
   keepContent: 1
   hidden: []
   unfolds: []
-  anchor: {fileID: 841374015}
-  source: {fileID: 1172727711}
-  session: {fileID: 1172727710}
---- !u!114 &646011903
+  anchor: {fileID: 1913727084}
+  source: {fileID: 2089381006}
+  session: {fileID: 2089381005}
+--- !u!114 &153853168
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 646011900}
+  m_GameObject: {fileID: 153853165}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c4a1d905f9ff28f4b998105937b85499, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.Level2.WritingExplainer
-  director: {fileID: 1172727708}
-  dash: {fileID: 81744048}
-  atmosphere: {fileID: 1172727706}
+  director: {fileID: 2089381003}
+  dash: {fileID: 1927604740}
+  atmosphere: {fileID: 2089381001}
   theme: {fileID: 11400000, guid: a35ba03cc0be8e449980242532a2026a, type: 2}
   lines: e9000000ea000000eb000000i
   explainSegment: 8
@@ -907,23 +208,23 @@ MonoBehaviour:
   keepContent: 0
   hidden: []
   unfolds: []
-  anchor: {fileID: 1757093730}
-  source: {fileID: 1172727711}
---- !u!114 &646011904
+  anchor: {fileID: 1020846506}
+  source: {fileID: 2089381006}
+--- !u!114 &153853169
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 646011900}
+  m_GameObject: {fileID: 153853165}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6ffc6152e96a37d4d90c0f04431dbcf0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.Level2.OddsExplainer
-  director: {fileID: 1172727708}
-  dash: {fileID: 81744048}
-  atmosphere: {fileID: 1172727706}
+  director: {fileID: 2089381003}
+  dash: {fileID: 1927604740}
+  atmosphere: {fileID: 2089381001}
   theme: {fileID: 11400000, guid: a35ba03cc0be8e449980242532a2026a, type: 2}
   lines: e1000000e2000000e3000000e4000000e5000000i
   explainSegment: 6
@@ -933,23 +234,23 @@ MonoBehaviour:
   keepContent: 0
   hidden: []
   unfolds: []
-  anchor: {fileID: 1569184366}
-  source: {fileID: 1172727711}
---- !u!114 &646011905
+  anchor: {fileID: 1800718251}
+  source: {fileID: 2089381006}
+--- !u!114 &153853170
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 646011900}
+  m_GameObject: {fileID: 153853165}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5fc6ae2e9c08e9b4c966c45cf5295802, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.Level2.AttentionExplainer
-  director: {fileID: 1172727708}
-  dash: {fileID: 81744048}
-  atmosphere: {fileID: 1172727706}
+  director: {fileID: 2089381003}
+  dash: {fileID: 1927604740}
+  atmosphere: {fileID: 2089381001}
   theme: {fileID: 11400000, guid: a35ba03cc0be8e449980242532a2026a, type: 2}
   lines: d9000000da000000db000000f4000000dc000000dd000000i
   explainSegment: 4
@@ -959,23 +260,23 @@ MonoBehaviour:
   keepContent: 0
   hidden: []
   unfolds: []
-  anchor: {fileID: 1721065290}
-  source: {fileID: 1172727711}
---- !u!114 &646011906
+  anchor: {fileID: 211811040}
+  source: {fileID: 2089381006}
+--- !u!114 &153853171
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 646011900}
+  m_GameObject: {fileID: 153853165}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b39d7d8cf6bd8bf43a9b58bc3fd500ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.Level2.MeaningExplainer
-  director: {fileID: 1172727708}
-  dash: {fileID: 81744048}
-  atmosphere: {fileID: 1172727706}
+  director: {fileID: 2089381003}
+  dash: {fileID: 1927604740}
+  atmosphere: {fileID: 2089381001}
   theme: {fileID: 11400000, guid: a35ba03cc0be8e449980242532a2026a, type: 2}
   lines: d2000000f3000000f7000000d4000000d3000000d5000000d6000000i
   explainSegment: 2
@@ -985,23 +286,23 @@ MonoBehaviour:
   keepContent: 0
   hidden: []
   unfolds: []
-  anchor: {fileID: 1719272717}
-  source: {fileID: 1172727711}
---- !u!114 &646011907
+  anchor: {fileID: 2008467800}
+  source: {fileID: 2089381006}
+--- !u!114 &153853172
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 646011900}
+  m_GameObject: {fileID: 153853165}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f0c2aa4753885264eba379b56a384444, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.Level2.TokenizeExplainer
-  director: {fileID: 1172727708}
-  dash: {fileID: 81744048}
-  atmosphere: {fileID: 1172727706}
+  director: {fileID: 2089381003}
+  dash: {fileID: 1927604740}
+  atmosphere: {fileID: 2089381001}
   theme: {fileID: 11400000, guid: a35ba03cc0be8e449980242532a2026a, type: 2}
   lines: cb000000cc000000cd000000ce000000i
   explainSegment: 0
@@ -1011,23 +312,23 @@ MonoBehaviour:
   keepContent: 0
   hidden: []
   unfolds: []
-  anchor: {fileID: 1451904694}
-  source: {fileID: 1172727711}
---- !u!114 &646011908
+  anchor: {fileID: 211332002}
+  source: {fileID: 2089381006}
+--- !u!114 &153853173
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 646011900}
+  m_GameObject: {fileID: 153853165}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d4ea98a968bec0541971d1d46e64a535, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.Level2.WordDockExplainer
-  director: {fileID: 1172727708}
-  dash: {fileID: 81744048}
-  atmosphere: {fileID: 1172727706}
+  director: {fileID: 2089381003}
+  dash: {fileID: 1927604740}
+  atmosphere: {fileID: 2089381001}
   theme: {fileID: 11400000, guid: a35ba03cc0be8e449980242532a2026a, type: 2}
   lines: c8000000c9000000f2000000ca000000i
   explainSegment: -1
@@ -1037,9 +338,9 @@ MonoBehaviour:
   keepContent: 0
   hidden: []
   unfolds: []
-  anchor: {fileID: 901620412}
-  source: {fileID: 1172727711}
---- !u!1 &768215284
+  anchor: {fileID: 1102861328}
+  source: {fileID: 2089381006}
+--- !u!1 &211332001
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1047,61 +348,378 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 768215286}
-  - component: {fileID: 768215285}
+  - component: {fileID: 211332002}
+  - component: {fileID: 211332003}
   m_Layer: 0
-  m_Name: Story
+  m_Name: Region_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &768215285
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 768215284}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b986b64ddc0edf418bf2d9fcca072a8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Convergence.Gameplay::Convergence.Gameplay.Ride.Level2.StoryMoment
-  title: STEER THE STORY
-  goal: Point at a word, pull the trigger, ride that way
-  giveUpAfter: 120
-  goWait: 12
-  winLine: 238
-  source: {fileID: 1172727711}
-  session: {fileID: 1172727710}
-  forkSeconds: 28
-  forkSpacing: 16
-  travelSeconds: 3.2
-  revealSeconds: 6
-  surprisePoints: 10
---- !u!4 &768215286
+--- !u!4 &211332002
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 768215284}
+  m_GameObject: {fileID: 211332001}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 62}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1751586782}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &211332003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 211332001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26c09f15b18056c45b860f136f854d21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.Level2.TokenWorld
+--- !u!1 &211811039
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 211811040}
+  - component: {fileID: 211811041}
+  m_Layer: 0
+  m_Name: Region_3
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &211811040
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 211811039}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 202}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 654840980}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &211811041
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 211811039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2df6c79093adbd14fb863315fd98b50e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.Level2.HallWorld
+--- !u!1 &654840979
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 654840980}
+  - component: {fileID: 654840981}
+  m_Layer: 0
+  m_Name: SpotlightView
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &654840980
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 654840979}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1172727712}
+  m_Father: {fileID: 211811040}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &828056546
+--- !u!114 &654840981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 654840979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5cf12078cf488e438bc6cef1b8c1a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.Level2.SpotlightView
+  moment: {fileID: 2061480461}
+  stage: {fileID: 211811040}
+--- !u!1 &847648741
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 847648743}
+  - component: {fileID: 847648742}
+  m_Layer: 0
+  m_Name: XR Interaction Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &847648742
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 847648741}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83e4e6cca11330d4088d729ab4fc9d9f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.XR.Interaction.Toolkit::UnityEngine.XR.Interaction.Toolkit.XRInteractionManager
+  m_StartingHoverFilters: []
+  m_StartingSelectFilters: []
+--- !u!4 &847648743
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 847648741}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &873229026
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 873229027}
+  - component: {fileID: 873229028}
+  m_Layer: 0
+  m_Name: PredictView
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &873229027
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 873229026}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1800718251}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &873229028
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 873229026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e7e9051c59d656409214e8c1059dd53, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.Level2.PredictView
+  moment: {fileID: 1049649027}
+  stage: {fileID: 1800718251}
+--- !u!1 &1020846505
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1020846506}
+  - component: {fileID: 1020846507}
+  m_Layer: 0
+  m_Name: Region_5
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1020846506
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1020846505}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 342}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1686458449}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1020846507
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1020846505}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ca7c06af99396a4fb97c6de165e391a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.Level2.RoadWorld
+--- !u!1 &1049649026
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1049649028}
+  - component: {fileID: 1049649027}
+  m_Layer: 0
+  m_Name: Predict
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1049649027
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1049649026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc9b42534ebd7f14d86882ea78f41f64, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Convergence.Gameplay::Convergence.Gameplay.Ride.Level2.PredictMoment
+  title: PLACE YOUR CHIPS
+  goal: Spread ten chips over the next word
+  giveUpAfter: 140
+  goWait: 12
+  winLine: 232
+  source: {fileID: 2089381006}
+  betSeconds: 26
+  revealSeconds: 7
+  settleSeconds: 1.4
+  words: 6
+  chipPoints: 10
+  beatBonus: 40
+--- !u!4 &1049649028
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1049649026}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2089381007}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1102861327
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1102861328}
+  - component: {fileID: 1102861329}
+  m_Layer: 0
+  m_Name: Region_0
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1102861328
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1102861327}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1102861329
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1102861327}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eddde7f49670392419399a228eb0bb01, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.Level2.DockWorld
+--- !u!1001 &1282110327
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 81744046}
+    m_TransformParent: {fileID: 1927604738}
     m_Modifications:
     - target: {fileID: 1319746312, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
       propertyPath: m_MaxRaycastDistance
@@ -1201,59 +819,59 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1717954561962503725, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 828056557}
+      addedObject: {fileID: 1282110338}
     - targetCorrespondingSourceObject: {fileID: 1767192433, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 828056556}
+      addedObject: {fileID: 1282110337}
     - targetCorrespondingSourceObject: {fileID: 202364687, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 828056555}
+      addedObject: {fileID: 1282110336}
     - targetCorrespondingSourceObject: {fileID: 1670256624, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 828056554}
+      addedObject: {fileID: 1282110335}
   m_SourcePrefab: {fileID: 100100000, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
---- !u!4 &828056547 stripped
+--- !u!4 &1282110328 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1717954561962503726, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
-  m_PrefabInstance: {fileID: 828056546}
+  m_PrefabInstance: {fileID: 1282110327}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &828056548 stripped
+--- !u!4 &1282110329 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1670256625, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
-  m_PrefabInstance: {fileID: 828056546}
+  m_PrefabInstance: {fileID: 1282110327}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &828056549 stripped
+--- !u!1 &1282110330 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1670256624, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
-  m_PrefabInstance: {fileID: 828056546}
+  m_PrefabInstance: {fileID: 1282110327}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &828056550 stripped
+--- !u!4 &1282110331 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 202364688, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
-  m_PrefabInstance: {fileID: 828056546}
+  m_PrefabInstance: {fileID: 1282110327}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &828056551 stripped
+--- !u!1 &1282110332 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 202364687, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
-  m_PrefabInstance: {fileID: 828056546}
+  m_PrefabInstance: {fileID: 1282110327}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &828056552 stripped
+--- !u!1 &1282110333 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1767192433, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
-  m_PrefabInstance: {fileID: 828056546}
+  m_PrefabInstance: {fileID: 1282110327}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &828056553 stripped
+--- !u!1 &1282110334 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1717954561962503725, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
-  m_PrefabInstance: {fileID: 828056546}
+  m_PrefabInstance: {fileID: 1282110327}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &828056554
+--- !u!114 &1282110335
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 828056549}
+  m_GameObject: {fileID: 1282110330}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e5ce03669fd2aca4388e239b24ec2195, type: 3}
@@ -1265,13 +883,13 @@ MonoBehaviour:
   tipRadius: 0.012
   orbSize: 0.024
   touchHaptic: 0.35
---- !u!114 &828056555
+--- !u!114 &1282110336
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 828056551}
+  m_GameObject: {fileID: 1282110332}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e5ce03669fd2aca4388e239b24ec2195, type: 3}
@@ -1283,13 +901,13 @@ MonoBehaviour:
   tipRadius: 0.012
   orbSize: 0.024
   touchHaptic: 0.35
---- !u!114 &828056556
+--- !u!114 &1282110337
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 828056552}
+  m_GameObject: {fileID: 1282110333}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
@@ -1327,20 +945,20 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
---- !u!114 &828056557
+--- !u!114 &1282110338
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 828056553}
+  m_GameObject: {fileID: 1282110334}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6651f8d55457f344fae50cb9f022a468, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Convergence.XR::Convergence.XR.Ride.RideHandLasers
-  leftHand: {fileID: 828056550}
-  rightHand: {fileID: 828056548}
+  leftHand: {fileID: 1282110331}
+  rightHand: {fileID: 1282110329}
   laserMaterial: {fileID: 2100000, guid: d0050fea4d5f6c94699d2b29699cb1ec, type: 2}
   leftColor: {r: 0.906, g: 0.298, b: 0.235, a: 0.9}
   rightColor: {r: 0.18, g: 0.8, b: 0.443, a: 0.9}
@@ -1352,7 +970,8 @@ MonoBehaviour:
   strokeHaptic: 0.08
   assistDegrees: 5
   assistRadius: 1.2
---- !u!1 &841374014
+  hubHoldSeconds: 1.5
+--- !u!1 &1292205299
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1360,8 +979,367 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 841374015}
-  - component: {fileID: 841374016}
+  - component: {fileID: 1292205300}
+  - component: {fileID: 1292205301}
+  m_Layer: 0
+  m_Name: GalaxyView
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1292205300
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1292205299}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2008467800}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1292205301
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1292205299}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d07e430d932b9f4e87caae9f20f13e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.Level2.GalaxyView
+  moment: {fileID: 1421291143}
+  stage: {fileID: 2008467800}
+--- !u!1 &1421291142
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1421291144}
+  - component: {fileID: 1421291143}
+  m_Layer: 0
+  m_Name: Galaxy
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1421291143
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1421291142}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1bb86ff3aa2941499bba0f6a8cdebb7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Convergence.Gameplay::Convergence.Gameplay.Ride.Level2.GalaxyMoment
+  title: SORT THE GALAXY
+  goal: Carry each loose word home
+  giveUpAfter: 130
+  goWait: 12
+  winLine: 216
+  source: {fileID: 2089381006}
+  stage: {fileID: 2008467800}
+  carryDistance: 7
+  coneDegrees: 11
+  placePoints: 20
+  wrongPoints: -5
+  hintAfter: 7
+--- !u!4 &1421291144
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1421291142}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2089381007}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1686458448
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1686458449}
+  - component: {fileID: 1686458450}
+  m_Layer: 0
+  m_Name: StoryView
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1686458449
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1686458448}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1020846506}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1686458450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1686458448}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e83a1cfe9ffb13b41b7ba4150f0fc841, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.Level2.StoryView
+  moment: {fileID: 1810782374}
+  stage: {fileID: 1020846506}
+--- !u!1 &1751586781
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1751586782}
+  - component: {fileID: 1751586783}
+  m_Layer: 0
+  m_Name: SliceView
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1751586782
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1751586781}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 211332002}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1751586783
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1751586781}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de459c4ea458e6340a3ddebd1c8bb587, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.Level2.SliceView
+  moment: {fileID: 1873774352}
+  stage: {fileID: 211332002}
+--- !u!1 &1800718250
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1800718251}
+  - component: {fileID: 1800718252}
+  m_Layer: 0
+  m_Name: Region_4
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1800718251
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1800718250}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 272}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 873229027}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1800718252
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1800718250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1cff0d95f1b3c674188afea889977f12, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.Level2.OddsWorld
+--- !u!1 &1810782373
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1810782375}
+  - component: {fileID: 1810782374}
+  m_Layer: 0
+  m_Name: Story
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1810782374
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1810782373}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b986b64ddc0edf418bf2d9fcca072a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Convergence.Gameplay::Convergence.Gameplay.Ride.Level2.StoryMoment
+  title: STEER THE STORY
+  goal: Point at a word, pull the trigger, ride that way
+  giveUpAfter: 120
+  goWait: 12
+  winLine: 238
+  source: {fileID: 2089381006}
+  session: {fileID: 2089381005}
+  forkSeconds: 28
+  forkSpacing: 16
+  travelSeconds: 3.2
+  revealSeconds: 6
+  surprisePoints: 10
+--- !u!4 &1810782375
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1810782373}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2089381007}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1873774351
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1873774353}
+  - component: {fileID: 1873774352}
+  m_Layer: 0
+  m_Name: Slice
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1873774352
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1873774351}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef12a64afe1a01441933c5897b710ad5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Convergence.Gameplay::Convergence.Gameplay.Ride.Level2.SliceMoment
+  title: CHOP THE WORDS
+  goal: Swipe through the glowing seams
+  giveUpAfter: 120
+  goWait: 12
+  winLine: 209
+  source: {fileID: 2089381006}
+  session: {fileID: 2089381005}
+  stage: {fileID: 211332002}
+  spawnEvery: 2.7
+  lifeSeconds: 7.5
+  bossLifeSeconds: 15
+  farNear: {x: 11, y: 4.4}
+  wordSize: 0.55
+  maxWidth: 4.3
+  bossMaxWidth: 5.2
+  seamPoints: 10
+  wordBonus: 20
+  wholeBonus: 5
+  brokenPoints: -15
+  shotReach: 0.55
+--- !u!4 &1873774353
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1873774351}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2089381007}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1913727083
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1913727084}
+  - component: {fileID: 1913727085}
   m_Layer: 0
   m_Name: Region_6
   m_TagString: Untagged
@@ -1369,13 +1347,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &841374015
+--- !u!4 &1913727084
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 841374014}
+  m_GameObject: {fileID: 1913727083}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 440}
@@ -1384,65 +1362,467 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &841374016
+--- !u!114 &1913727085
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 841374014}
+  m_GameObject: {fileID: 1913727083}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5cc1f51557ab36d4788622eba16850fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.Level2.EndWorld
---- !u!1 &864546543
-GameObject:
+--- !u!1001 &1927604715
+PrefabInstance:
   m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 864546544}
-  - component: {fileID: 864546545}
-  m_Layer: 0
-  m_Name: SliceView
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &864546544
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 864546543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1451904694}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &864546545
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4088962292045641216, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      propertyPath: director
+      value: 
+      objectReference: {fileID: 2089381003}
+    - target: {fileID: 4719295210774565660, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      propertyPath: director
+      value: 
+      objectReference: {fileID: 2089381003}
+    - target: {fileID: 5464775797475430190, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      propertyPath: rig
+      value: 
+      objectReference: {fileID: 1282110328}
+    - target: {fileID: 5610244513174571838, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      propertyPath: m_Name
+      value: Pod
+      objectReference: {fileID: 0}
+    - target: {fileID: 5713836834629473067, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      propertyPath: director
+      value: 
+      objectReference: {fileID: 2089381003}
+    - target: {fileID: 5902155694704055896, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      propertyPath: director
+      value: 
+      objectReference: {fileID: 2089381003}
+    - target: {fileID: 7616898775107759946, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      propertyPath: director
+      value: 
+      objectReference: {fileID: 2089381003}
+    - target: {fileID: 8437328667955863574, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8437328667955863574, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8437328667955863574, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8437328667955863574, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8437328667955863574, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8437328667955863574, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8437328667955863574, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8437328667955863574, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8437328667955863574, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8437328667955863574, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9043868140711703454, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      propertyPath: director
+      value: 
+      objectReference: {fileID: 2089381003}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 6109917705842483620, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1282110328}
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5610244513174571838, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1927604746}
+    - targetCorrespondingSourceObject: {fileID: 5610244513174571838, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1927604745}
+    - targetCorrespondingSourceObject: {fileID: 5610244513174571838, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1927604744}
+    - targetCorrespondingSourceObject: {fileID: 5610244513174571838, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1927604743}
+    - targetCorrespondingSourceObject: {fileID: 8799967751406059943, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 332169792884758941, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 7858676598494854028, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 7928235623614545665, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 4308421194695920205, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 6952882106477631823, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 4797730428259760816, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 5596421807111869890, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 1141080358684800598, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 8191517470359085410, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 2838255902051594910, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 541206733222463528, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 462512080646245463, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 4384060696910038472, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 1009750957632150136, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+  m_SourcePrefab: {fileID: 100100000, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+--- !u!23 &1927604716 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 4181906047242623209, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+  m_PrefabInstance: {fileID: 1927604715}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1927604717 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8437328667955863574, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+  m_PrefabInstance: {fileID: 1927604715}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1927604718 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1672839589400892229, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+  m_PrefabInstance: {fileID: 1927604715}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1927604719 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1419439224948018352, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+  m_PrefabInstance: {fileID: 1927604715}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1927604720 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7286043140806345748, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+  m_PrefabInstance: {fileID: 1927604715}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1927604719}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshPro
+--- !u!198 &1927604721 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 6661631416416502790, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+  m_PrefabInstance: {fileID: 1927604715}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &1927604722 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 1319732277938238833, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+  m_PrefabInstance: {fileID: 1927604715}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &1927604723 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 8601169351717254651, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+  m_PrefabInstance: {fileID: 1927604715}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &1927604724 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 4313508649851643865, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+  m_PrefabInstance: {fileID: 1927604715}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1927604725 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4282180864563977182, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+  m_PrefabInstance: {fileID: 1927604715}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshPro
+--- !u!1 &1927604726 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6532259570318865174, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+  m_PrefabInstance: {fileID: 1927604715}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1927604727 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8098548088802816308, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+  m_PrefabInstance: {fileID: 1927604715}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1927604728 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7115011341900775030, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+  m_PrefabInstance: {fileID: 1927604715}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1927604729 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7364894997052800906, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+  m_PrefabInstance: {fileID: 1927604715}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1927604730 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8182895722731168153, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+  m_PrefabInstance: {fileID: 1927604715}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshPro
+--- !u!114 &1927604731 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6427610974540370562, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+  m_PrefabInstance: {fileID: 1927604715}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshPro
+--- !u!114 &1927604732 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5712235497031558334, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+  m_PrefabInstance: {fileID: 1927604715}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshPro
+--- !u!114 &1927604733 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4557007061513386356, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+  m_PrefabInstance: {fileID: 1927604715}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshPro
+--- !u!114 &1927604734 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9121492595999892533, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+  m_PrefabInstance: {fileID: 1927604715}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshPro
+--- !u!23 &1927604735 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 9098119300665334970, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+  m_PrefabInstance: {fileID: 1927604715}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1927604736 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8075153576658867516, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+  m_PrefabInstance: {fileID: 1927604715}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1927604737 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7042285474158708226, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+  m_PrefabInstance: {fileID: 1927604715}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshPro
+--- !u!4 &1927604738 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6109917705842483620, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+  m_PrefabInstance: {fileID: 1927604715}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1927604739 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7616898775107759946, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+  m_PrefabInstance: {fileID: 1927604715}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1927604742}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2e989ed4c039e94fb79f0c3f4da4246, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.RideSfxView
+--- !u!114 &1927604740 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4088962292045641216, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+  m_PrefabInstance: {fileID: 1927604715}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1927604742}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de3d6a76741ef54ba8dc76775adf49e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.DashScreenView
+--- !u!114 &1927604741 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7731860561601147739, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+  m_PrefabInstance: {fileID: 1927604715}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1927604742}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4e889bd6723ef4419862fa0356df368, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Convergence.Gameplay::Convergence.Gameplay.Ride.RideControlSet
+--- !u!1 &1927604742 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5610244513174571838, guid: 8ee479c5667a27d438e5638b3caf36c7, type: 3}
+  m_PrefabInstance: {fileID: 1927604715}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1927604743
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 864546543}
+  m_GameObject: {fileID: 1927604742}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: de459c4ea458e6340a3ddebd1c8bb587, type: 3}
+  m_Script: {fileID: 11500000, guid: 018511d403ca8254d915503cfd7164b0, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.Level2.SliceView
-  moment: {fileID: 2101206967}
-  stage: {fileID: 1451904694}
---- !u!1 &901620411
+  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.RideBoot
+  director: {fileID: 2089381003}
+  library: {fileID: 11400000, guid: e92f0feaafbcc0e468186f77d2ed8b61, type: 2}
+  sfx: {fileID: 1927604739}
+  coverMaterial: {fileID: 2100000, guid: 4003958afb24aa34faa2dc17e2c5d8b7, type: 2}
+  warmRoots:
+  - {fileID: 1102861327}
+  - {fileID: 211332001}
+  - {fileID: 2008467799}
+  - {fileID: 211811039}
+  - {fileID: 1800718250}
+  - {fileID: 1020846505}
+  - {fileID: 1913727083}
+  - {fileID: 1927604736}
+  - {fileID: 1927604726}
+  - {fileID: 1927604718}
+  - {fileID: 1927604719}
+  warmFrames: 2
+  settleSeconds: 0.25
+  fadeSeconds: 0.5
+  audioSeconds: 8
+  maxBootSeconds: 25
+--- !u!114 &1927604744
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1927604742}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fb41cecfbe0e9d45966bf56c024a9b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.GameHudView
+  director: {fileID: 2089381003}
+  panel: {fileID: 0}
+  title: {fileID: 1927604733}
+  goal: {fileID: 1927604731}
+  timer: {fileID: 1927604730}
+  score: {fileID: 1927604732}
+  progressFill: {fileID: 1927604729}
+  stamp: {fileID: 1927604726}
+  stampText: {fileID: 1927604725}
+  stars:
+  - {fileID: 1927604724}
+  - {fileID: 1927604723}
+  - {fileID: 1927604722}
+  starLit: {fileID: 2100000, guid: 929025f2e1a207649a2a89c1202f0be0, type: 2}
+  starDim: {fileID: 2100000, guid: 777281e95d44ad543b50cb10001cfc72, type: 2}
+  confetti: {fileID: 1927604721}
+  popup: {fileID: 1927604720}
+  popupAnchor: {fileID: 1927604728}
+  zap: {fileID: 0}
+  stampSeconds: 4.5
+  blastSeconds: 2.4
+--- !u!114 &1927604745
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1927604742}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d012c37fc19c7fd4db43e3669a30bf90, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.GameTableView
+  director: {fileID: 2089381003}
+  table: {fileID: 1927604727}
+  frame: {fileID: 1927604735}
+  frameLive: {fileID: 2100000, guid: aff00f090498fd14c97ab6d5459de9b7, type: 2}
+  frameIdle: {fileID: 2100000, guid: 73d90ecda2a722e49b5f22e981434ff3, type: 2}
+  stowedOffset: {x: 0, y: -0.32, z: 0.08}
+  riseSeconds: 0.55
+  alsoUpAt: 
+  nominalEyeHeight: 1.3
+  followEyeHeights: {x: 1.1, y: 1.5}
+--- !u!114 &1927604746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1927604742}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26090ed4487cb4141b9d02f49cac618e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.SubtitleMirror
+  source: {fileID: 1927604737}
+  target: {fileID: 1927604734}
+--- !u!1 &1950747069
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1450,22 +1830,44 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 901620412}
-  - component: {fileID: 901620413}
+  - component: {fileID: 1950747071}
+  - component: {fileID: 1950747070}
   m_Layer: 0
-  m_Name: Region_0
+  m_Name: Track
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &901620412
+--- !u!114 &1950747070
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1950747069}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a3030992dec0484da219336a278ee02, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.Level2.TrackWorld
+  stops:
+  - 0
+  - 62
+  - 132
+  - 202
+  - 272
+  - 342
+  - 440
+  longClear: {x: 336, y: 422}
+  extent: {x: -40, y: 530}
+--- !u!4 &1950747071
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 901620411}
+  m_GameObject: {fileID: 1950747069}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -1474,19 +1876,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &901620413
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 901620411}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eddde7f49670392419399a228eb0bb01, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.Level2.DockWorld
---- !u!1 &1172727705
+--- !u!1 &2008467799
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1494,13 +1884,118 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1172727712}
-  - component: {fileID: 1172727711}
-  - component: {fileID: 1172727710}
-  - component: {fileID: 1172727709}
-  - component: {fileID: 1172727708}
-  - component: {fileID: 1172727707}
-  - component: {fileID: 1172727706}
+  - component: {fileID: 2008467800}
+  - component: {fileID: 2008467801}
+  m_Layer: 0
+  m_Name: Region_2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2008467800
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2008467799}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 132}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1292205300}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2008467801
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2008467799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98b8c7adce2f8224d90d0dcb578ac4c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.Level2.GalaxyWorld
+--- !u!1 &2061480460
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2061480462}
+  - component: {fileID: 2061480461}
+  m_Layer: 0
+  m_Name: Spotlight
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2061480461
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2061480460}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0f7261bdeae788478761525feb233fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Convergence.Gameplay::Convergence.Gameplay.Ride.Level2.SpotlightMoment
+  title: BE THE ATTENTION
+  goal: Look at the words that matter
+  giveUpAfter: 120
+  goWait: 12
+  winLine: 224
+  source: {fileID: 2089381006}
+  winShare: 0.8
+  eachShare: 0.25
+  holdSeconds: 0.8
+  roundSeconds: 24
+  revealSeconds: 5
+  pourRate: 3.2
+  drainRate: 0.5
+  maxLogit: 4.5
+  roundPoints: 40
+  wrongPoints: -5
+--- !u!4 &2061480462
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2061480460}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2089381007}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2089381000
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2089381007}
+  - component: {fileID: 2089381006}
+  - component: {fileID: 2089381005}
+  - component: {fileID: 2089381004}
+  - component: {fileID: 2089381003}
+  - component: {fileID: 2089381002}
+  - component: {fileID: 2089381001}
   m_Layer: 0
   m_Name: RideDirector
   m_TagString: Untagged
@@ -1508,60 +2003,60 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1172727706
+--- !u!114 &2089381001
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1172727705}
+  m_GameObject: {fileID: 2089381000}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bd24bc5406a891c4988afb85ebd3f06f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.RegionAtmosphere
-  director: {fileID: 1172727708}
+  director: {fileID: 2089381003}
   theme: {fileID: 11400000, guid: a35ba03cc0be8e449980242532a2026a, type: 2}
   blendSeconds: 3
   blackboardBlendSeconds: 1.2
-  grid: {fileID: 81744024}
---- !u!114 &1172727707
+  grid: {fileID: 1927604716}
+--- !u!114 &2089381002
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1172727705}
+  m_GameObject: {fileID: 2089381000}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d199aa04905b892438d865928d028be9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.RegionStreamer
-  director: {fileID: 1172727708}
+  director: {fileID: 2089381003}
   roots:
-  - {fileID: 901620411}
-  - {fileID: 1451904693}
-  - {fileID: 1719272716}
-  - {fileID: 1721065289}
-  - {fileID: 1569184365}
-  - {fileID: 1757093729}
-  - {fileID: 841374014}
+  - {fileID: 1102861327}
+  - {fileID: 211332001}
+  - {fileID: 2008467799}
+  - {fileID: 211811039}
+  - {fileID: 1800718250}
+  - {fileID: 1020846505}
+  - {fileID: 1913727083}
   dockMask: 3
   segmentMasks: 030000000200000006000000040000000c000000080000001800000010000000300000006000000060000000i
---- !u!114 &1172727708
+--- !u!114 &2089381003
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1172727705}
+  m_GameObject: {fileID: 2089381000}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 25d2e9f02986ac34ca8db4d62db17286, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Convergence.Gameplay::Convergence.Gameplay.Ride.RideDirector
-  pod: {fileID: 81744025}
-  controls: {fileID: 81744049}
+  pod: {fileID: 1927604717}
+  controls: {fileID: 1927604741}
   legs:
   - name: 'A: the machine, dock to end'
     points:
@@ -1666,7 +2161,7 @@ MonoBehaviour:
     minSeconds: 0
     travel: -1
     arrival: 1
-    moment: {fileID: 2101206967}
+    moment: {fileID: 1873774352}
     arrivalWithMoment: 1
     hold: 0
   - name: 'T2 meaning: explain'
@@ -1688,7 +2183,7 @@ MonoBehaviour:
     minSeconds: 0
     travel: -1
     arrival: 3
-    moment: {fileID: 498552150}
+    moment: {fileID: 1421291143}
     arrivalWithMoment: 1
     hold: 0
   - name: 'T3 attention: explain'
@@ -1710,7 +2205,7 @@ MonoBehaviour:
     minSeconds: 0
     travel: -1
     arrival: 5
-    moment: {fileID: 384500731}
+    moment: {fileID: 2061480461}
     arrivalWithMoment: 1
     hold: 0
   - name: 'T4 prediction: explain'
@@ -1732,7 +2227,7 @@ MonoBehaviour:
     minSeconds: 0
     travel: -1
     arrival: 7
-    moment: {fileID: 1408216627}
+    moment: {fileID: 1049649027}
     arrivalWithMoment: 1
     hold: 0
   - name: 'T5 writing: explain'
@@ -1754,7 +2249,7 @@ MonoBehaviour:
     minSeconds: 0
     travel: -1
     arrival: 9
-    moment: {fileID: 768215285}
+    moment: {fileID: 1810782374}
     arrivalWithMoment: 1
     hold: 0
   - name: Finale
@@ -1775,13 +2270,13 @@ MonoBehaviour:
   speechPadSeconds: 1
   maxSpeechHoldSeconds: 15
   gentleScale: 0.5
---- !u!114 &1172727709
+--- !u!114 &2089381004
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1172727705}
+  m_GameObject: {fileID: 2089381000}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3ad632f2d97e3084eab3e30313ee947b, type: 3}
@@ -1797,555 +2292,64 @@ MonoBehaviour:
   outline: {fileID: 2100000, guid: 4a7a6a2a71e5f8a4a8e223f5708dc615, type: 2}
   serifOutline: {fileID: 2100000, guid: f39f9c7532691e94786299c22da36dee, type: 2}
   theme: {fileID: 11400000, guid: a35ba03cc0be8e449980242532a2026a, type: 2}
---- !u!114 &1172727710
+--- !u!114 &2089381005
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1172727705}
+  m_GameObject: {fileID: 2089381000}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: beae12af280e4de44ac705e457c1a52b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Convergence.Gameplay::Convergence.Gameplay.Ride.Level2.Level2Session
---- !u!114 &1172727711
+--- !u!114 &2089381006
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1172727705}
+  m_GameObject: {fileID: 2089381000}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 68d0a9f1f2761a541878e8a1163f4924, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Convergence.Gameplay::Convergence.Gameplay.Ride.Level2.Level2DataSource
   data: {fileID: 4900000, guid: c1011dea55960b4448ddd1c18ea7b7d8, type: 3}
---- !u!4 &1172727712
+--- !u!4 &2089381007
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1172727705}
+  m_GameObject: {fileID: 2089381000}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2101206968}
-  - {fileID: 498552151}
-  - {fileID: 384500732}
-  - {fileID: 1408216628}
-  - {fileID: 768215286}
-  - {fileID: 646011901}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1408216626
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1408216628}
-  - component: {fileID: 1408216627}
-  m_Layer: 0
-  m_Name: Predict
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1408216627
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1408216626}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cc9b42534ebd7f14d86882ea78f41f64, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Convergence.Gameplay::Convergence.Gameplay.Ride.Level2.PredictMoment
-  title: PLACE YOUR CHIPS
-  goal: Spread ten chips over the next word
-  giveUpAfter: 140
-  goWait: 12
-  winLine: 232
-  source: {fileID: 1172727711}
-  betSeconds: 26
-  revealSeconds: 7
-  settleSeconds: 1.4
-  words: 6
-  chipPoints: 10
-  beatBonus: 40
---- !u!4 &1408216628
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1408216626}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1172727712}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1451904693
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1451904694}
-  - component: {fileID: 1451904695}
-  m_Layer: 0
-  m_Name: Region_1
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1451904694
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1451904693}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 62}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 864546544}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1451904695
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1451904693}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26c09f15b18056c45b860f136f854d21, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.Level2.TokenWorld
---- !u!1 &1569184365
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1569184366}
-  - component: {fileID: 1569184367}
-  m_Layer: 0
-  m_Name: Region_4
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1569184366
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1569184365}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 272}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 226955739}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1569184367
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1569184365}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1cff0d95f1b3c674188afea889977f12, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.Level2.OddsWorld
---- !u!1 &1623684113
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1623684114}
-  - component: {fileID: 1623684115}
-  m_Layer: 0
-  m_Name: GalaxyView
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1623684114
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1623684113}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1719272717}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1623684115
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1623684113}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8d07e430d932b9f4e87caae9f20f13e9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.Level2.GalaxyView
-  moment: {fileID: 498552150}
-  stage: {fileID: 1719272717}
---- !u!1 &1719272716
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1719272717}
-  - component: {fileID: 1719272718}
-  m_Layer: 0
-  m_Name: Region_2
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1719272717
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1719272716}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 132}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1623684114}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1719272718
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1719272716}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 98b8c7adce2f8224d90d0dcb578ac4c7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.Level2.GalaxyWorld
---- !u!1 &1721065289
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1721065290}
-  - component: {fileID: 1721065291}
-  m_Layer: 0
-  m_Name: Region_3
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1721065290
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1721065289}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 202}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 508870580}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1721065291
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1721065289}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2df6c79093adbd14fb863315fd98b50e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.Level2.HallWorld
---- !u!1 &1757093729
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1757093730}
-  - component: {fileID: 1757093731}
-  m_Layer: 0
-  m_Name: Region_5
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1757093730
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1757093729}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 342}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 33253277}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1757093731
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1757093729}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8ca7c06af99396a4fb97c6de165e391a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.Level2.RoadWorld
---- !u!1 &2040454226
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2040454228}
-  - component: {fileID: 2040454227}
-  m_Layer: 0
-  m_Name: XR Interaction Manager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &2040454227
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2040454226}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 83e4e6cca11330d4088d729ab4fc9d9f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.XR.Interaction.Toolkit::UnityEngine.XR.Interaction.Toolkit.XRInteractionManager
-  m_StartingHoverFilters: []
-  m_StartingSelectFilters: []
---- !u!4 &2040454228
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2040454226}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &2101206966
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2101206968}
-  - component: {fileID: 2101206967}
-  m_Layer: 0
-  m_Name: Slice
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &2101206967
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2101206966}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef12a64afe1a01441933c5897b710ad5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Convergence.Gameplay::Convergence.Gameplay.Ride.Level2.SliceMoment
-  title: CHOP THE WORDS
-  goal: Swipe through the glowing seams
-  giveUpAfter: 120
-  goWait: 12
-  winLine: 209
-  source: {fileID: 1172727711}
-  session: {fileID: 1172727710}
-  stage: {fileID: 1451904694}
-  spawnEvery: 2.7
-  lifeSeconds: 7.5
-  bossLifeSeconds: 15
-  farNear: {x: 11, y: 4.4}
-  wordSize: 0.55
-  maxWidth: 4.3
-  bossMaxWidth: 5.2
-  seamPoints: 10
-  wordBonus: 20
-  wholeBonus: 5
-  brokenPoints: -15
-  shotReach: 0.55
---- !u!4 &2101206968
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2101206966}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1172727712}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &2125950659
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2125950661}
-  - component: {fileID: 2125950660}
-  m_Layer: 0
-  m_Name: Track
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &2125950660
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2125950659}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2a3030992dec0484da219336a278ee02, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Convergence.Presentation::Convergence.Presentation.Ride.Level2.TrackWorld
-  stops:
-  - 0
-  - 62
-  - 132
-  - 202
-  - 272
-  - 342
-  - 440
-  longClear: {x: 336, y: 422}
-  extent: {x: -40, y: 530}
---- !u!4 &2125950661
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2125950659}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
+  - {fileID: 1873774353}
+  - {fileID: 1421291144}
+  - {fileID: 2061480462}
+  - {fileID: 1049649028}
+  - {fileID: 1810782375}
+  - {fileID: 153853166}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 81744023}
-  - {fileID: 2040454228}
-  - {fileID: 901620412}
-  - {fileID: 1451904694}
-  - {fileID: 1719272717}
-  - {fileID: 1721065290}
-  - {fileID: 1569184366}
-  - {fileID: 1757093730}
-  - {fileID: 841374015}
-  - {fileID: 1172727712}
-  - {fileID: 2125950661}
+  - {fileID: 1927604715}
+  - {fileID: 847648743}
+  - {fileID: 1102861328}
+  - {fileID: 211332002}
+  - {fileID: 2008467800}
+  - {fileID: 211811040}
+  - {fileID: 1800718251}
+  - {fileID: 1020846506}
+  - {fileID: 1913727084}
+  - {fileID: 2089381007}
+  - {fileID: 1950747071}

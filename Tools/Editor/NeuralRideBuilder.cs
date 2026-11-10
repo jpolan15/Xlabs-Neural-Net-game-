@@ -669,15 +669,6 @@ namespace Convergence.EditorTools
             if (bad.Count > 0) throw new System.InvalidOperationException("Ride music is too loud: " + string.Join("; ", bad) + ". Keep RideMusic volume at or below 0.2 and duckedVolume at or below volume (set in BuildPod).");
         }
 
-        private static void SetBuildScenes()
-        {
-            var scenes = new List<EditorBuildSettingsScene> { new EditorBuildSettingsScene(ScenePath, true) };
-            foreach (EditorBuildSettingsScene s in EditorBuildSettings.scenes)
-            {
-                if (s.path != ScenePath) scenes.Add(s);
-            }
-
-            EditorBuildSettings.scenes = scenes.ToArray();
-        }
+        private static void SetBuildScenes() => OrderBuildScenes();
     }
 }

@@ -10,6 +10,13 @@ exercise bike: Level 2 becomes a bike ride (the rider sits on the real bike and 
 professor": the logic, long enough pauses, fun games that are not Level 1's. Built as ADR-023
 (`Documentation/Architecture/ADRs/ADR-023-level2-bike-ride-and-review.md`).
 
+Owner brief v3 (2026-11-10, presenting the same day, Level 2 demo the next): "make sure Level 2 is fully good and add a hub where I can
+choose the levels I end up adding; retentive, fun, demo-ready; do not break existing features." Built as ADR-024
+(`Documentation/Architecture/ADRs/ADR-024-level-hub.md`): `Assets/Scenes/LevelHub.unity` is build scene 0 (`Convergence/Build Level Hub`),
+one card per entry of `Assets/ScriptableObjects/LevelCatalog.asset` (add a level: an entry plus its scene in the build), a per-device
+scoreboard (best stars, high score, NEW RECORD) on the cards and on Level 2's end card, H (desk) or holding the left menu button 1.5 s
+(headset) goes back to the hub from any level, and Level 2's final GO leads to the hub.
+
 ## 1. What exists
 
 Level 1 v7.1 (teacher feedback):
@@ -66,7 +73,10 @@ lane odds; kid-unsafe words are blocked on the road (`BLOCKED`, checked by eye o
 - Tests live in the local package `com.convergence.tests` (`Tests/`): after editing one, `AssetDatabase.ImportAsset("Packages/com.convergence.tests/...")`
   or Unity keeps running the old build of it.
 - A bot rider in Play Mode: `Convergence.EditorTools.Level2Bot.Start(0.9f)` and `RideLiveShot.AutoPilot(true, 3f)` (UnityMCP `execute_code`).
-- Level 1 ends with GO lighting for "LEVEL 2"; Level 2 ends with GO for Level 1 again (`FinaleView.nextScene`).
+- Level 1 ends with GO lighting for "LEVEL 2"; Level 2 ends with GO for the level hub (`FinaleView.nextScene`, ADR-024).
+- The hub: open `Assets/Scenes/LevelHub.unity`, press Play, click (or laser) a card. H goes back to the hub from any level; in the hub,
+  Shift+Backspace wipes the scoreboard. Rebuild after hub code changes that touch the scene: `Convergence/Build Level Hub` (the cards
+  themselves are built at load from the catalog, no rebuild needed).
 
 ### Playtest v2 (owner, on the Quest over Link)
 
@@ -76,6 +86,14 @@ lane odds; kid-unsafe words are blocked on the road (`BLOCKED`, checked by eye o
    forks feel good or make you queasy; does anything block the road or a board.
 3. Exercise bike: a stationary bike only, a spotter beside it, no standing on the pedals. The seat re-centres the eye height by itself
    (chair or bike). Hold the controllers; rest them on the bike's bars between games. The virtual pedals turn only while the ride moves.
+
+### Playtest v3 (owner, hub + Level 2 demo)
+
+1. Before the group: open `Assets/Scenes/LevelHub.unity`, press Play, Shift+Backspace to wipe the scoreboard (test rides write it).
+2. In the headset: point at LEVEL 2, pull the trigger. Desk: click the card. The hub fades out and Level 2 boots.
+3. Space skips a line, Shift+Space solves a game, H (desk) or holding the left menu button 1.5 s (headset) goes back to the hub.
+4. At the end: the card shows the ride's points and stars; GO goes back to the hub, whose Level 2 card now says NEW RECORD.
+5. Watch for: card text readable at 2.8 m, the laser hover tick, the menu-button hold not firing by accident.
 
 ## 4. Status
 
@@ -88,4 +106,6 @@ lane odds; kid-unsafe words are blocked on the road (`BLOCKED`, checked by eye o
 - [ ] Ridden on a Quest 2 (comfort of the galaxy view, laser aim at word sizes, draw-call budget of the countryside on the headset).
 - [ ] Ridden on the school's exercise bike (does the virtual bike sit right under a real one; is the dash readable while pedalling).
 - [ ] A human voice for Level 2.
+- [x] Level hub (ADR-024): build scene 0, catalog-driven cards, scoreboard, way home; EditMode + PlayMode tests green; hub to Level 2
+      and back played on desktop. Not yet seen in the headset (card size at 2.8 m, laser hover, menu-button hold).
 - [ ] Ideas not built: a second attention head, a "guess the next word" duel against the machine, sharing the written story (QR) at the booth.

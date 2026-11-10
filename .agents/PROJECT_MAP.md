@@ -50,7 +50,7 @@ Last updated: 2026-10-30 (Level 2, the Word Machine, ADR-022; Level 1 pacing and
 | `Assets/Shaders/` | Hand-written URP shaders for the Neural Ride: `HoloLit`, `NeuralLinks`, `NeuralNodes` (ADR-013), `ExplainerFlat`, and `RideSky` (every region's lit sky and grid floor, ADR-021) |
 | `Assets/Prefabs/` | Shared prefabs. `NeuralRide/` holds Pod, Station, and Track (built by `Tools/Editor/NeuralRideBuilder*.cs`); `NeuralRide/Meshes/` holds the generated tub and network meshes |
 | `Assets/Puzzles/` | Per-chamber puzzle data: test cases, rules, configuration |
-| `Assets/Scenes/` | Unity scene files. `NeuralRide.unity` is build scene 0 (ADR-011); `WordMachine.unity` is Level 2 (build scene 1, ADR-022); `Level01_AwakeningGate.unity` is kept |
+| `Assets/Scenes/` | Unity scene files. `LevelHub.unity` is build scene 0, the level select (ADR-024, cards from `ScriptableObjects/LevelCatalog.asset`); `NeuralRide.unity` is Level 1 (scene 1, ADR-011); `WordMachine.unity` is Level 2 (scene 2, ADR-022); `Level01_AwakeningGate.unity` is kept |
 | `Assets/ScriptableObjects/` | Shared ScriptableObject data. `RideTheme`, `RideScript` (narration pacing) and `NarrationLibrary` (subtitles, clips, chapter cards) are written by the ride builder |
 | `Assets/Samples/` | SDK sample imports (third-party; do not modify) |
 | `Assets/ThirdParty/` | Third-party plugin assets (do not modify) |

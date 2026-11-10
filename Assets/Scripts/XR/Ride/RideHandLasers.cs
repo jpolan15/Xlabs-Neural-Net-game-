@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.XR;
+using Convergence.Gameplay.Hub;
 using Convergence.Gameplay.Ride;
 
 namespace Convergence.XR.Ride
@@ -13,7 +14,8 @@ namespace Convergence.XR.Ride
     /// sprays the weight grid cell by cell as it sweeps. Letting go of the trigger drops a carried wire. The beam passes
     /// through both controllers' own colliders, and a press that just misses a flying digit, a button or a hot wire still
     /// fires it (aim help). It turns input into commands and decides nothing (ADR-007); grip and finger pokes still work
-    /// through XRI as before.
+    /// through XRI as before. Holding the left controller's menu button for <see cref="hubHoldSeconds"/> goes back to the level hub
+    /// (ADR-024); a tap does nothing, so a stray press never ends a ride.
     /// </summary>
     public sealed class RideHandLasers : MonoBehaviour
     {
@@ -32,6 +34,8 @@ namespace Convergence.XR.Ride
         [SerializeField] private float assistDegrees = 5f;
         [Tooltip("How wide the aim help looks around the beam, metres (caps the degrees far away).")]
         [SerializeField] private float assistRadius = 1.2f;
+        [Tooltip("Seconds the left menu button is held before the ride goes back to the level hub.")]
+        [SerializeField] private float hubHoldSeconds = 1.5f;
 
         private readonly RaycastHit[] _rayHits = new RaycastHit[32];
         private readonly RaycastHit[] _assistHits = new RaycastHit[64];
@@ -55,6 +59,8 @@ namespace Convergence.XR.Ride
         }
 
         private Hand[] _hands;
+        private InputAction _menu;
+        private float _menuHeld;
         private PodLeverInteractable _go;
         private RideDirector _director;
 
@@ -65,6 +71,10 @@ namespace Convergence.XR.Ride
                 MakeHand(RideHand.Left, leftHand, "LeftHand", leftColor),
                 MakeHand(RideHand.Right, rightHand, "RightHand", rightColor),
             };
+            _menu = new InputAction("MenuLeftHand", InputActionType.Button);
+            _menu.AddBinding("<XRController>{LeftHand}/{MenuButton}");
+            _menu.AddBinding("<XRController>{LeftHand}/menu");
+            _menu.AddBinding("<XRController>{LeftHand}/menuButton");
         }
 
         private Hand MakeHand(int index, Transform pose, string usage, Color color)
@@ -111,6 +121,8 @@ namespace Convergence.XR.Ride
         {
             if (_hands == null) return;
             RideAim.Buzzed += OnBuzzed;
+            _menu.Enable();
+            _menuHeld = 0f;
             foreach (Hand h in _hands)
             {
                 h.Trigger.Enable();
@@ -122,6 +134,7 @@ namespace Convergence.XR.Ride
         {
             if (_hands == null) return;
             RideAim.Buzzed -= OnBuzzed;
+            _menu.Disable();
             foreach (Hand h in _hands)
             {
                 h.Trigger.Disable();
@@ -137,6 +150,7 @@ namespace Convergence.XR.Ride
         private void OnDestroy()
         {
             if (_hands == null) return;
+            _menu?.Dispose();
             foreach (Hand h in _hands)
             {
                 h.Trigger.Dispose();
@@ -147,6 +161,25 @@ namespace Convergence.XR.Ride
         private void Update()
         {
             foreach (Hand h in _hands) UpdateHand(h);
+            HoldMenuForHub();
+        }
+
+        private void HoldMenuForHub()
+        {
+            if (_menu == null || !_menu.IsPressed() || LevelHubNav.InHub)
+            {
+                _menuHeld = 0f;
+                return;
+            }
+
+            float before = _menuHeld;
+            _menuHeld += Time.unscaledDeltaTime;
+            // A tick each half second while held, so the rider feels it counting.
+            if (Mathf.Floor(before * 2f) != Mathf.Floor(_menuHeld * 2f)) Haptic(RideHand.Left, 0.25f, 0.04f);
+            if (_menuHeld < hubHoldSeconds) return;
+            _menuHeld = float.NegativeInfinity;
+            Haptic(RideHand.Left, 0.7f, 0.15f);
+            LevelHubNav.GoToHub();
         }
 
         private void UpdateHand(Hand h)

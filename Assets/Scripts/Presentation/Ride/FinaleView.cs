@@ -1,6 +1,8 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
+using Convergence.Gameplay.Hub;
 using Convergence.Gameplay.Ride;
 
 namespace Convergence.Presentation.Ride
@@ -25,11 +27,14 @@ namespace Convergence.Presentation.Ride
         [SerializeField] private float goWaitSeconds = 900f;
         [Tooltip("Signs behind the end card that would peek out around it (the accuracy sign); off when it pops up.")]
         [SerializeField] private GameObject[] hideWhenDone = new GameObject[0];
+        [Tooltip("Optional: a banner over the card with this ride's points and stars, and NEW RECORD when it beat the hub's scoreboard (ADR-024).")]
+        [SerializeField] private TextMeshPro scoreBanner;
 
         private float _age = -1f;
 
         private void OnEnable()
         {
+            if (scoreBanner != null) scoreBanner.gameObject.SetActive(false);
             if (panel != null) panel.SetActive(false);
             if (toBeContinued != null) toBeContinued.SetActive(false);
             if (credits != null) credits.SetActive(false);
@@ -52,7 +57,17 @@ namespace Convergence.Presentation.Ride
                 if (sign != null) sign.SetActive(false);
             }
 
-            if (!string.IsNullOrEmpty(nextScene)) StartCoroutine(GoToNext());
+            // A next scene missing from the build (a level built on its own) ends the ride on the card instead of failing to load.
+            if (!string.IsNullOrEmpty(nextScene) && Application.CanStreamedLevelBeLoaded(nextScene)) StartCoroutine(GoToNext());
+        }
+
+        /// <summary>The ride's result, from the scoreboard the ride just wrote (it is written when the ride completes, before this shows).</summary>
+        private void ShowScore()
+        {
+            if (scoreBanner == null || LevelProgressRecorder.LastLevel != gameObject.scene.name) return;
+            string stars = LevelProgressRecorder.LastMaxStars > 0 ? LevelProgressRecorder.LastStars + " / " + LevelProgressRecorder.LastMaxStars : LevelProgressRecorder.LastStars.ToString();
+            scoreBanner.text = LevelProgressRecorder.LastScore + " POINTS   " + stars + " STARS" + (LevelProgressRecorder.LastWasBest ? "   NEW RECORD!" : "");
+            scoreBanner.gameObject.SetActive(true);
         }
 
         private IEnumerator GoToNext()
@@ -67,7 +82,12 @@ namespace Convergence.Presentation.Ride
         {
             if (_age < 0f) return;
             _age += Time.deltaTime;
-            if (toBeContinued != null && !toBeContinued.activeSelf && _age >= continuedDelay) toBeContinued.SetActive(true);
+            if (toBeContinued != null && !toBeContinued.activeSelf && _age >= continuedDelay)
+            {
+                toBeContinued.SetActive(true);
+                ShowScore();
+            }
+
             if (credits != null && !credits.activeSelf && _age >= creditsDelay) credits.SetActive(true);
             if (_age > popSeconds) return;
             float t = Mathf.Clamp01(_age / popSeconds);

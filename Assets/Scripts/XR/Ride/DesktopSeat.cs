@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.XR;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR;
+using Convergence.Gameplay.Hub;
 using Convergence.Gameplay.Ride;
 
 namespace Convergence.XR.Ride
@@ -15,7 +16,8 @@ namespace Convergence.XR.Ride
     /// hand's; the A key is the A button (pulls GO when it is live). The moment a
     /// headset or XR display is running it gives the camera back to tracking. The mouse uses the same APIs a hand does.
     /// Operator keys work with or without a headset: Space skips the lines, Shift+Space hurries (solves) the running puzzle, R restarts, G toggles
-    /// gentle mode (half the drop, slower travel).
+    /// gentle mode (half the drop, slower travel), H goes back to the level hub (ADR-024), and in the hub Shift+Backspace wipes the
+    /// scoreboard for a new group.
     /// </summary>
     public sealed class DesktopSeat : MonoBehaviour
     {
@@ -23,6 +25,8 @@ namespace Convergence.XR.Ride
         [SerializeField] private float lookSpeed = 0.15f;
         [SerializeField] private float maxYaw = 100f;
         [SerializeField] private float maxPitch = 55f;
+        [Tooltip("Degrees the desk camera starts looking down (the pod's dash sits low; the hub's cards are at eye height).")]
+        [SerializeField] private float startPitch = 16f;
         [SerializeField] private float reach = 6f;
         [Tooltip("How far a click reaches for the rewind's wires, which hang far out in the network.")]
         [SerializeField] private float wireReach = 80f;
@@ -89,6 +93,8 @@ namespace Convergence.XR.Ride
             }
 
             if (keyboard.rKey.wasPressedThisFrame) SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            if (keyboard.hKey.wasPressedThisFrame) LevelHubNav.GoToHub();
+            if (keyboard.backspaceKey.wasPressedThisFrame && keyboard.shiftKey.isPressed && LevelHubNav.InHub) LevelProgress.ClearAll();
 
             if (keyboard.gKey.wasPressedThisFrame)
             {
@@ -104,7 +110,7 @@ namespace Convergence.XR.Ride
             if (_poseDriver != null) _poseDriver.enabled = false;
             _camera.transform.position = transform.position + Vector3.up * seatedEyeHeight;
             _yaw = 0f;
-            _pitch = 16f;
+            _pitch = startPitch;
             _camera.fieldOfView = 85f;
             _camera.transform.localRotation = Quaternion.Euler(_pitch, 0f, 0f);
         }

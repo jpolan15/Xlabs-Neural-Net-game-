@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9502f7276c148b43a691a37eb83e1b6, type: 3}
+  m_Name: LevelCatalog
+  m_EditorClassIdentifier: Convergence.Gameplay::Convergence.Gameplay.Hub.LevelCatalog
+  levels:
+  - badge: LEVEL 1
+    title: 'HOW A MACHINE
+
+      LEARNS TO SEE'
+    tagline: Ride a pod through a real neural network. Paint a 3, blast the 3s, then train it yourself.
+    stops:
+    - PIXELS
+    - NEURON
+    - NETWORK
+    - BACKPROP
+    - TRAINING
+    scene: NeuralRide
+    minutes: 12
+    accent: {r: 0.31, g: 0.76, b: 1, a: 1}
+  - badge: LEVEL 2
+    title: 'INSIDE THE
+
+      WORD MACHINE'
+    tagline: Bike through a real GPT-2. Chop words, sort a galaxy of meaning, bet on the next word, steer a story.
+    stops:
+    - TOKENS
+    - MEANING
+    - ATTENTION
+    - PREDICTION
+    - WRITING
+    scene: WordMachine
+    minutes: 12
+    accent: {r: 1, g: 0.82, b: 0.38, a: 1}
+  - badge: LEVEL 3
+    title: 'COMING
+
+      SOON'
+    tagline: A new ride is being built. Ask what you would like to see inside an AI next!
+    stops: []
+    scene: 
+    minutes: 0
+    accent: {r: 0.62, g: 0.45, b: 1, a: 1}

@@ -134,6 +134,8 @@ namespace Convergence.Presentation.Ride
             _cover.sharedMaterial = coverMaterial;
             _cover.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             _cover.receiveShadows = false;
+            // Over everything: sorting order outranks the render queue, and the boards and words sort above 0.
+            _cover.sortingOrder = short.MaxValue;
             SetCover(1f);
             return true;
         }

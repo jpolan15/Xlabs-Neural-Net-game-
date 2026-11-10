@@ -165,7 +165,7 @@ namespace Convergence.EditorTools
             TextMeshPro recap = Text("Recap", end.transform, new Vector3(0, 0.17f, -0.01f), _level2 ? "1 TOKENS    2 MEANING    3 ATTENTION\n4 PREDICTION    5 WRITING" : "1 PIXELS    2 NEURON    3 NETWORK\n4 BACKPROP    5 TRAINING", 0.11f, Color.white, 3.4f, bold: true);
             recap.rectTransform.sizeDelta = new Vector2(3.4f, 0.28f);
             TextMeshPro next = Text("Next", end.transform, new Vector3(0, -0.07f, -0.01f), _level2 ? "LEVEL 2 COMPLETE" : "NEXT: LEVEL 2 - WORDS", 0.13f, _theme.cyan, 2.8f, bold: true);
-            TextMeshPro goHint = Text("GoHint", end.transform, new Vector3(0, -0.245f, -0.01f), _level2 ? "PULL GO TO RIDE LEVEL 1 AGAIN" : "PULL GO TO RIDE LEVEL 2", 0.085f, _theme.gold, 2.8f, bold: true);
+            TextMeshPro goHint = Text("GoHint", end.transform, new Vector3(0, -0.245f, -0.01f), _level2 ? "PULL GO TO PICK YOUR NEXT LEVEL" : "PULL GO TO RIDE LEVEL 2", 0.085f, _theme.gold, 2.8f, bold: true);
             goHint.gameObject.SetActive(false);
             var credits = Make("Credits", end.transform, new Vector3(0, -0.62f, -0.01f));
             TextMeshPro creditText = Text("Text", credits.transform, Vector3.zero, _level2 ? Level2NarrationData.Credits : RideNarrationData.Credits, 0.1f, _theme.offWhite, 3.4f);
@@ -176,7 +176,11 @@ namespace Convergence.EditorTools
             Ref(finale, "toBeContinued", next.gameObject);
             Ref(finale, "credits", credits);
             Ref(finale, "goHint", goHint.gameObject);
-            Set(finale, "nextScene", p => p.stringValue = _level2 ? "NeuralRide" : "WordMachine");
+            // The ride's result over the card (ADR-024): points, stars, NEW RECORD. A solid strip behind it, so it reads on any sky.
+            TextMeshPro score = Text("Score", end.transform, new Vector3(0, 0.76f, -0.01f), "", 0.11f, _theme.gold, 3.4f, bold: true);
+            Board("Backing", score.transform, new Vector3(0f, 0f, 0.012f), new Vector2(3.0f, 0.22f), "PlateSolid", 0.02f);
+            Ref(finale, "scoreBanner", score);
+            Set(finale, "nextScene", p => p.stringValue = _level2 ? "LevelHub" : "WordMachine"); // Level 2 ends in the level hub (ADR-024)
 
             var hints = pod.AddComponent<HintArrowView>();
             Set(hints, "arrows", p =>

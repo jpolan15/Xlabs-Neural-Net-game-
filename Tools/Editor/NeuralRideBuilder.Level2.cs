@@ -481,16 +481,7 @@ namespace Convergence.EditorTools
             }
         }
 
-        private static void SetBuildScenes2()
-        {
-            var scenes = new List<EditorBuildSettingsScene> { new EditorBuildSettingsScene(ScenePath, true), new EditorBuildSettingsScene(Scene2Path, true) };
-            foreach (EditorBuildSettingsScene s in EditorBuildSettings.scenes)
-            {
-                if (s.path != ScenePath && s.path != Scene2Path) scenes.Add(s);
-            }
-
-            EditorBuildSettings.scenes = scenes.ToArray();
-        }
+        private static void SetBuildScenes2() => OrderBuildScenes();
 
         // ---------- the places ----------
 

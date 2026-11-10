@@ -43,6 +43,8 @@ namespace Convergence.Presentation.Ride.Level2
         private RibbonField _arcs, _real, _beams;
         private GlowField _glows;
         private TextMeshPro _banner, _result, _legend;
+        private GameObject _theatreSign;
+        private bool _signLooked;
         private bool _shown;
         private float _roundAt;
         private string _lastLayout = "";
@@ -171,6 +173,16 @@ namespace Convergence.Presentation.Ride.Level2
             if (_props == null) return;
             bool running = moment.IsRunning;
             if (_props.gameObject.activeSelf != running) _props.gameObject.SetActive(running);
+            if (!_signLooked)
+            {
+                // The theatre's name (HallWorld, built in its own Awake) hangs where the game's instruction reads from the bike: it
+                // steps aside while the game runs.
+                _signLooked = true;
+                Transform sign = stage != null ? stage.Find("Theatre") : null;
+                if (sign != null) _theatreSign = sign.gameObject;
+            }
+
+            if (_theatreSign != null && _theatreSign.activeSelf == running) _theatreSign.SetActive(!running);
             if (!running || moment.Current == null || _lastLayout != moment.Current.sentence) return;
 
             L2Attention a = moment.Current;
