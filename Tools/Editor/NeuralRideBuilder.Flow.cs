@@ -90,7 +90,7 @@ namespace Convergence.EditorTools
             Ref(rd, "pod", pod.transform);
             Ref(rd, "controls", pod.GetComponent<RideControlSet>());
             Ref(rd, "script", _script);
-            Float(rd, "speechPadSeconds", 1.0f);
+            Float(rd, "speechPadSeconds", 0.6f); // 2026-11-17: shorter gaps between a moment's lines
             Set(rd, "legs", p =>
             {
                 p.arraySize = legs.Length;

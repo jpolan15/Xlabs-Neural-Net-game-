@@ -258,7 +258,7 @@ namespace Convergence.Gameplay.Ride
         PixelsWhy49 = 184, // retired 2026-11-17 (ADR-025): not in the script; the id stays reserved
         NeuronJudge = 185,
         WeightPlain = 186, // retired 2026-11-17 (ADR-025): not in the script; the id stays reserved
-        BackPlain = 187,
+        BackPlain = 187, // retired 2026-11-17 (ADR-025)
         DescentFog = 188,
 
         // Level 2, "Inside the Word Machine" (TASK_LEVEL2_WORD_MACHINE, ADR-022): lines 200 and up. The dock.

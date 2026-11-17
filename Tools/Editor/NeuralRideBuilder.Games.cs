@@ -197,8 +197,8 @@ namespace Convergence.EditorTools
             // that the rider's digit is a 3 (BlameView fills it from the real softmax after every shot).
             var shoot = Make("HuntBoard", table, BoardCentre).transform;
             Color hot = new Color(1f, 0.55f, 0.15f);
-            Text("Shoot", shoot, new Vector3(0, 0.1f, -0.006f), "SHOOT THE HOT WIRES!", 0.042f, hot, 0.62f, bold: true).rectTransform.sizeDelta = new Vector2(0.62f, 0.06f);
-            TextMeshPro steps = Text("Steps", shoot, new Vector3(0, 0.05f, -0.006f), "AIM at a glowing orb up ahead.  PULL the trigger.", 0.026f, Color.white, 0.62f, TextAlignmentOptions.Center, true);
+            Text("Shoot", shoot, new Vector3(0, 0.1f, -0.006f), "SHOOT THE GLOWING BALLS!", 0.042f, hot, 0.62f, bold: true).rectTransform.sizeDelta = new Vector2(0.62f, 0.06f);
+            TextMeshPro steps = Text("Steps", shoot, new Vector3(0, 0.05f, -0.006f), "Look UP. Point at a ball. Pull the trigger.", 0.026f, Color.white, 0.62f, TextAlignmentOptions.Center, true);
             steps.rectTransform.sizeDelta = new Vector2(0.62f, 0.04f);
             TextMeshPro sureLabel = Text("SureLabel", shoot, new Vector3(-0.07f, -0.005f, -0.006f), "PIXEL THINKS IT'S A 3:", 0.03f, _theme.cyan, 0.46f, TextAlignmentOptions.Left, true);
             sureLabel.textWrappingMode = TextWrappingModes.NoWrap;

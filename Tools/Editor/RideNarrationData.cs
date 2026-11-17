@@ -94,8 +94,7 @@ namespace Convergence.EditorTools
             // E5, backpropagation, then the hot-wire hunt on the rider's own 3.
             new Line(RideLine.BackWish, "{nudges}So which weights should change, [p0.1] and which way? [p0.15] {wish}The three's output wants to go up. [p0.1] {dim}Every other output wants to go down.", 0.2f),
             new Line(RideLine.BackFlows, "{back}Those wishes flow backwards through the network, [p0.1] layer by layer. [p0.15] That's backpropagation. [p0.1] It gives every weight a nudge: [p0.1] which way to move, [p0.1] and how much. [p0.1] That nudge is called its gradient.", 0.3f),
-            new Line(RideLine.BackPlain, "In plain words: [p0.15] it works out how much each wire is to blame for the mistake.", 0.2f),
-            new Line(RideLine.BackGrab, "{grab}Look up. [p0.15] The hot, glowing wires are the most to blame. [p0.2] Shoot one, [p0.1] and it gets one small fix: [p0.1] a real gradient step. [p0.2] Watch your table: [p0.1] Pixel gets surer it's a three.", 0.1f),
+            new Line(RideLine.BackGrab, "{grab}Look up! [p0.15] See the big glowing balls? [p0.15] They sit on the wires most to blame. [p0.2] Shoot them! [p0.15] Each shot is one small fix, [p0.1] a real gradient step. [p0.15] Watch Pixel get surer it's a three.", 0.1f),
             new Line(RideLine.BackHurry, "Quick, [p0.1] shoot the hot wires!", 0.1f),
             new Line(RideLine.BackDone, "Each wire you shot was one real gradient step. [p0.15] Now imagine fixing every weight, [p0.1] over thousands of digits.", 0.1f),
             new Line(RideLine.StopClear, "Stage clear. [p0.1] Pull GO.", 0.1f),
@@ -112,14 +111,14 @@ namespace Convergence.EditorTools
             new Line(RideLine.TrainDone, "Pixel is trained. [p0.15] You just ran gradient descent on a real neural network.", 0.1f),
 
             // E7, what training learned (v7), then Pixel reads the rider's own 3 with the weights the rider trained.
-            new Line(RideLine.LearnedPainted, "{learned}Remember the neuron you painted by hand? [p0.25] {sixteen}Training just painted all sixteen hidden neurons, [p0.1] from real digits.", 0.2f),
-            new Line(RideLine.LearnedHonest, "{blobs}Nobody told them what to look for. [p0.15] They're not neat strokes, [p0.1] but together, [p0.1] they read handwriting.", 0.2f),
+            new Line(RideLine.LearnedPainted, "{learned}Remember the neuron you painted by hand? [p0.25] {sixteen}Training just painted all sixteen hidden neurons, [p0.1] from real digits.", 0.02f), // tight: no dead air at the end (2026-11-17 ride)
+            new Line(RideLine.LearnedHonest, "{blobs}Nobody told them what to look for. [p0.15] They're not neat strokes, [p0.1] but together, [p0.1] they read handwriting.", 0.02f), // tight: no dead air at the end (2026-11-17 ride)
             new Line(RideLine.RightYours, "{right}Now, [p0.1] the real test: [p0.15] the three you drew. [p0.2] Pixel says...", 0.2f),
-            new Line(RideLine.RightYes, "Three! [p0.15] It can read your handwriting.", 0.3f),
+            new Line(RideLine.RightYes, "Three! [p0.15] It can read your handwriting.", 0.02f), // tight: no dead air at the end (2026-11-17 ride)
             new Line(RideLine.RightStudy, "Not quite. [p0.1] Your three is unusual. [p0.15] So Pixel studies it, [p0.1] a few more steps...", 0.1f),
-            new Line(RideLine.RightNowYes, "And now it's a three.", 0.3f),
-            new Line(RideLine.RightAccuracy, "{accuracy}On five hundred digits it has never seen, [p0.1] Pixel gets almost nine out of ten right.", 0.3f),
-            new Line(RideLine.RightLoop, "{practice}That's how every neural network learns. [p0.15] Guess. [p0.1] Measure the loss. [p0.1] Backpropagate. [p0.1] Step. [p0.15] Repeat.", 0.3f),
+            new Line(RideLine.RightNowYes, "And now it's a three.", 0.02f), // tight: no dead air at the end (2026-11-17 ride)
+            new Line(RideLine.RightAccuracy, "{accuracy}On five hundred digits it has never seen, [p0.1] Pixel gets almost nine out of ten right.", 0.02f), // tight: no dead air at the end (2026-11-17 ride)
+            new Line(RideLine.RightLoop, "{practice}That's how every neural network learns. [p0.15] Guess. [p0.1] Measure the loss. [p0.1] Backpropagate. [p0.1] Step. [p0.15] Repeat.", 0.02f), // tight: no dead air at the end (2026-11-17 ride)
 
             // Bonus: stump Pixel.
             new Line(RideLine.StumpYourTurn, "Bonus round. [p0.1] Draw the digit on the screen, [p0.1] and shoot DONE. [p0.1] Can Pixel read it?", 0.1f),
@@ -128,17 +127,17 @@ namespace Convergence.EditorTools
             new Line(RideLine.StumpDone, "Not bad, [p0.1] for nine hundred and seventy numbers.", 0.1f),
 
             // The recap (owner, 2026-10-27): the five stops again, numbered, the way the intro promised them, before the teaser.
-            new Line(RideLine.RecapIntro, "{recap}Quick recap. [p0.1] Five stops.", 0.1f),
-            new Line(RideLine.RecapPixels, "{r1}One, [p0.1] pixels: [p0.1] your three became forty-nine numbers.", 0.1f),
-            new Line(RideLine.RecapNeuron, "{r2}Two, [p0.1] a neuron: [p0.1] weigh the pixels, [p0.1] add them up, [p0.1] squish.", 0.1f),
-            new Line(RideLine.RecapNetwork, "{r3}Three, [p0.1] the network: [p0.1] layers of neurons, [p0.1] all wired together.", 0.1f),
-            new Line(RideLine.RecapBackprop, "{r4}Four, [p0.1] backpropagation: [p0.1] measure the loss, [p0.1] send the blame backwards.", 0.1f),
-            new Line(RideLine.RecapTraining, "{r5}And five, [p0.15] training: [p0.1] step downhill, [p0.1] again and again.", 0.3f),
+            new Line(RideLine.RecapIntro, "{recap}Quick recap. [p0.1] Five stops.", 0.02f), // tight: no dead air at the end (2026-11-17 ride)
+            new Line(RideLine.RecapPixels, "{r1}One, [p0.1] pixels: [p0.1] your three became forty-nine numbers.", 0.02f), // tight: no dead air at the end (2026-11-17 ride)
+            new Line(RideLine.RecapNeuron, "{r2}Two, [p0.1] a neuron: [p0.1] weigh the pixels, [p0.1] add them up, [p0.1] squish.", 0.02f), // tight: no dead air at the end (2026-11-17 ride)
+            new Line(RideLine.RecapNetwork, "{r3}Three, [p0.1] the network: [p0.1] layers of neurons, [p0.1] all wired together.", 0.02f), // tight: no dead air at the end (2026-11-17 ride)
+            new Line(RideLine.RecapBackprop, "{r4}Four, [p0.1] backpropagation: [p0.1] measure the loss, [p0.1] send the blame backwards.", 0.02f), // tight: no dead air at the end (2026-11-17 ride)
+            new Line(RideLine.RecapTraining, "{r5}And five, [p0.15] training: [p0.1] step downhill, [p0.1] again and again.", 0.02f), // tight: no dead air at the end (2026-11-17 ride)
 
             // E8, tokens: the same idea, for words.
-            new Line(RideLine.TokensWords, "{sentence}Language works the same way. [p0.15] {tokens}Text gets chopped into pieces called tokens.", 0.2f),
-            new Line(RideLine.TokensNumbers, "{vectors}Each token becomes a list of numbers, [p0.1] just like your pixels.", 0.2f),
-            new Line(RideLine.TokensPredict, "{predict}A far bigger network, [p0.1] trained the same way, [p0.1] predicts the next token. [p0.15] {mat}That's how a chatbot writes.", 0.3f),
+            new Line(RideLine.TokensWords, "{sentence}Language works the same way. [p0.15] {tokens}Text gets chopped into pieces called tokens.", 0.02f), // tight: no dead air at the end (2026-11-17 ride)
+            new Line(RideLine.TokensNumbers, "{vectors}Each token becomes a list of numbers, [p0.1] just like your pixels.", 0.02f), // tight: no dead air at the end (2026-11-17 ride)
+            new Line(RideLine.TokensPredict, "{predict}A far bigger network, [p0.1] trained the same way, [p0.1] predicts the next token. [p0.15] {mat}That's how a chatbot writes.", 0.02f), // tight: no dead air at the end (2026-11-17 ride)
             new Line(RideLine.TokensNext, "{next}Next time, [p0.1] Pixel learns to read words.", 0.5f),
         };
 
@@ -159,7 +158,7 @@ namespace Convergence.EditorTools
             ("E3 network: explain", new[] { RideLine.NetworkTeam, RideLine.NetworkAnswers, RideLine.NetworkWire }),                                         // 3
             ("E3 network: send your 3", new[] { RideLine.NetworkSend }),                                                                                     // 4
             ("E4 the guess and the loss", new[] { RideLine.WrongSays, RideLine.WrongWanted, RideLine.WrongLoss }),                                          // 5
-            ("E5 backprop: explain", new[] { RideLine.BackWish, RideLine.BackFlows, RideLine.BackPlain }),                                                                      // 6
+            ("E5 backprop: explain", new[] { RideLine.BackWish, RideLine.BackFlows }),                                                                      // 6
             ("E5 backprop: grab", new[] { RideLine.BackGrab }),                                                                                              // 7
             ("E6 descent: explain, then train", new[] { RideLine.DescentHill, RideLine.DescentStep, RideLine.DescentFog, RideLine.DescentTooBig, RideLine.TrainYourTurn }),     // 8
             ("E8 recap, then tokens", new[] { RideLine.RecapIntro, RideLine.RecapPixels, RideLine.RecapNeuron, RideLine.RecapNetwork, RideLine.RecapBackprop, RideLine.RecapTraining, RideLine.TokensWords, RideLine.TokensNumbers, RideLine.TokensPredict, RideLine.TokensNext }),                     // 9

@@ -647,47 +647,34 @@ MonoBehaviour:
     - text: That nudge is called its gradient.
       weight: 1.79
       cues: []
-  - line: 187
-    speaker: 0
-    tag: GUIDE
-    clip: {fileID: 8300000, guid: b0f33498378073c49baad1d7453a6313, type: 3}
-    pauseAfter: 0.44000003
-    readSeconds: 6.075926
-    segments:
-    - text: 'In plain words:'
-      weight: 1.16
-      cues: []
-    - text: it works out how much each wire is to blame for the mistake.
-      weight: 3.25
-      cues: []
   - line: 148
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 147ab369b57c9f8498a9191fdaff7ff0, type: 3}
     pauseAfter: 0.22000001
-    readSeconds: 12.701852
+    readSeconds: 13.492593
     segments:
-    - text: Look up.
+    - text: Look up!
       weight: 0.82
       cues:
       - grab
-    - text: The hot, glowing wires are the most to blame.
-      weight: 2.81
+    - text: See the big glowing balls?
+      weight: 1.63
       cues: []
-    - text: Shoot one,
-      weight: 0.83
+    - text: They sit on the wires most to blame.
+      weight: 2.07
       cues: []
-    - text: 'and it gets one small fix:'
-      weight: 1.64
+    - text: Shoot them!
+      weight: 0.86
+      cues: []
+    - text: Each shot is one small fix,
+      weight: 1.86
       cues: []
     - text: a real gradient step.
-      weight: 1.57
+      weight: 1.52
       cues: []
-    - text: 'Watch your table:'
-      weight: 1.08
-      cues: []
-    - text: Pixel gets surer it's a three.
-      weight: 1.66
+    - text: Watch Pixel get surer it's a three.
+      weight: 1.97
       cues: []
   - line: 149
     speaker: 0
@@ -897,7 +884,7 @@ MonoBehaviour:
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 9856cc5e6149e4a469b498427bdf4465, type: 3}
-    pauseAfter: 0.44000003
+    pauseAfter: 0.044
     readSeconds: 6.646296
     segments:
     - text: Remember the neuron you painted by hand?
@@ -915,7 +902,7 @@ MonoBehaviour:
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 69919e1c6a09c4d46aa8e26d5cba2511, type: 3}
-    pauseAfter: 0.44000003
+    pauseAfter: 0.044
     readSeconds: 6.2759256
     segments:
     - text: Nobody told them what to look for.
@@ -955,7 +942,7 @@ MonoBehaviour:
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 552bc6e3b35a6594a95695e4f6642d30, type: 3}
-    pauseAfter: 0.66
+    pauseAfter: 0.044
     readSeconds: 2.3722222
     segments:
     - text: Three!
@@ -987,7 +974,7 @@ MonoBehaviour:
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 227a7fda6bdae5c47ba516b46cd3c8d4, type: 3}
-    pauseAfter: 0.66
+    pauseAfter: 0.044
     readSeconds: 1.8518518
     segments:
     - text: And now it's a three.
@@ -997,7 +984,7 @@ MonoBehaviour:
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 8cc2b2f25fdb4c64b8717f65fe04b049, type: 3}
-    pauseAfter: 0.66
+    pauseAfter: 0.044
     readSeconds: 6.0259256
     segments:
     - text: On five hundred digits it has never seen,
@@ -1011,7 +998,7 @@ MonoBehaviour:
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: f88c8db61b985a94d8cf109b16fdac6e, type: 3}
-    pauseAfter: 0.66
+    pauseAfter: 0.044
     readSeconds: 5.414815
     segments:
     - text: That's how every neural network learns.
@@ -1092,7 +1079,7 @@ MonoBehaviour:
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 3ced51136a11c81409e6bdc7b687dd42, type: 3}
-    pauseAfter: 0.22000001
+    pauseAfter: 0.044
     readSeconds: 1.5814815
     segments:
     - text: Quick recap.
@@ -1106,7 +1093,7 @@ MonoBehaviour:
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: db0396cc14db79d47b14d8e2d998d348, type: 3}
-    pauseAfter: 0.22000001
+    pauseAfter: 0.044
     readSeconds: 2.7925925
     segments:
     - text: One,
@@ -1123,7 +1110,7 @@ MonoBehaviour:
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: b1bd03643678aa046a8ff73111f7b346, type: 3}
-    pauseAfter: 0.22000001
+    pauseAfter: 0.044
     readSeconds: 4.1037035
     segments:
     - text: Two,
@@ -1146,7 +1133,7 @@ MonoBehaviour:
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: fdec1622dce5c474e8595ed92f307fdd, type: 3}
-    pauseAfter: 0.22000001
+    pauseAfter: 0.044
     readSeconds: 3.6333332
     segments:
     - text: Three,
@@ -1166,7 +1153,7 @@ MonoBehaviour:
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: 442fd371967c5b74783c2a22f2b183c7, type: 3}
-    pauseAfter: 0.22000001
+    pauseAfter: 0.044
     readSeconds: 3.6333332
     segments:
     - text: Four,
@@ -1186,7 +1173,7 @@ MonoBehaviour:
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: ed6ae1c5cbcd34c4181de46cfa0e382f, type: 3}
-    pauseAfter: 0.66
+    pauseAfter: 0.044
     readSeconds: 3.312963
     segments:
     - text: And five,
@@ -1206,7 +1193,7 @@ MonoBehaviour:
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: c9f3affc1d879234ba26e47d973e8e28, type: 3}
-    pauseAfter: 0.44000003
+    pauseAfter: 0.044
     readSeconds: 4.5944443
     segments:
     - text: Language works the same way.
@@ -1221,7 +1208,7 @@ MonoBehaviour:
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: d02f841d97df1ea45b06245bb2994772, type: 3}
-    pauseAfter: 0.44000003
+    pauseAfter: 0.044
     readSeconds: 4.174074
     segments:
     - text: Each token becomes a list of numbers,
@@ -1235,7 +1222,7 @@ MonoBehaviour:
     speaker: 0
     tag: GUIDE
     clip: {fileID: 8300000, guid: bca68ec40b361fc40ac52700784c7a18, type: 3}
-    pauseAfter: 0.66
+    pauseAfter: 0.044
     readSeconds: 6.646296
     segments:
     - text: A far bigger network,

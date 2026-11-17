@@ -251,7 +251,7 @@ namespace Convergence.Gameplay.Ride.Level1
             while (Count() < _nudged.Length)
             {
                 Progress = (float)Count() / _nudged.Length;
-                SetGoal("Shoot the hot wires to fix them:  " + Count() + " of " + _nudged.Length);
+                SetGoal("Shoot the glowing balls:  " + Count() + " of " + _nudged.Length);
                 if (!_saidHurry && Time.time - opened > timeout * 0.6f && Count() * 2 < _nudged.Length)
                 {
                     _saidHurry = true;

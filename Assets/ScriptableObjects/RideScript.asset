@@ -77,12 +77,10 @@ MonoBehaviour:
       seconds: 6.8
     - line: 147
       seconds: 11.309999
-    - line: 187
-      seconds: 4.84
   - name: 'E5 backprop: grab'
     beats:
     - line: 148
-      seconds: 10.62
+      seconds: 10.940001
   - name: 'E6 descent: explain, then train'
     beats:
     - line: 152
@@ -98,23 +96,23 @@ MonoBehaviour:
   - name: E8 recap, then tokens
     beats:
     - line: 178
-      seconds: 2.09
+      seconds: 1.914
     - line: 179
-      seconds: 3.7333333
+      seconds: 3.5573332
     - line: 180
-      seconds: 4.2599998
+      seconds: 4.084
     - line: 181
-      seconds: 4.17
+      seconds: 3.994
     - line: 182
-      seconds: 4.4399996
+      seconds: 4.264
     - line: 183
-      seconds: 4.29
+      seconds: 3.674
     - line: 170
-      seconds: 4.63
+      seconds: 4.234
     - line: 171
-      seconds: 3.89
+      seconds: 3.494
     - line: 172
-      seconds: 6.29
+      seconds: 5.6740003
     - line: 173
       seconds: 3.5900002
   lines:
@@ -182,10 +180,8 @@ MonoBehaviour:
     seconds: 6.8
   - line: 147
     seconds: 11.309999
-  - line: 187
-    seconds: 4.84
   - line: 148
-    seconds: 10.62
+    seconds: 10.940001
   - line: 149
     seconds: 2.07
   - line: 150
@@ -211,21 +207,21 @@ MonoBehaviour:
   - line: 159
     seconds: 4.7066665
   - line: 176
-    seconds: 6.7646666
+    seconds: 6.3686666
   - line: 177
-    seconds: 5.76
+    seconds: 5.3640003
   - line: 160
     seconds: 4.29
   - line: 161
-    seconds: 2.8200002
+    seconds: 2.204
   - line: 162
     seconds: 5.16
   - line: 163
-    seconds: 1.8199999
+    seconds: 1.204
   - line: 164
-    seconds: 5.23
+    seconds: 4.6140003
   - line: 165
-    seconds: 7.1246667
+    seconds: 6.508667
   - line: 166
     seconds: 4.9399996
   - line: 167
@@ -235,22 +231,22 @@ MonoBehaviour:
   - line: 169
     seconds: 2.93
   - line: 178
-    seconds: 2.09
+    seconds: 1.914
   - line: 179
-    seconds: 3.7333333
+    seconds: 3.5573332
   - line: 180
-    seconds: 4.2599998
+    seconds: 4.084
   - line: 181
-    seconds: 4.17
+    seconds: 3.994
   - line: 182
-    seconds: 4.4399996
+    seconds: 4.264
   - line: 183
-    seconds: 4.29
+    seconds: 3.674
   - line: 170
-    seconds: 4.63
+    seconds: 4.234
   - line: 171
-    seconds: 3.89
+    seconds: 3.494
   - line: 172
-    seconds: 6.29
+    seconds: 5.6740003
   - line: 173
     seconds: 3.5900002

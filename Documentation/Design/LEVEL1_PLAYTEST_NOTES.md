@@ -21,5 +21,13 @@ We ran 6 test reviewers (a kid who knows nothing about AI, an ML teacher, a game
 - Kid: "Hooked and clear." Teacher: "Accurate and well sequenced."
 - Art: "No longer a black void," close to Level 2 in mood, with its own identity.
 
+## Owner ride (headset), then fixed
+- Cards were in the way and couldn't be closed → cards now pop up small on the console's left side, close when you shoot them or pull GO, and live as a neat row of 5 card buttons on the console.
+- No card for stop 3 → fixed (sending your 3 through the network now earns the Network card).
+- Backprop too long, and the chart covered the network → one line cut, and the chart moved off to the side so the network is fully visible.
+- Backprop targets not obvious → the wires to fix now carry big glowing balls with a bouncing "SHOOT!" over each one, and the voice says "See the big glowing balls? Shoot them!"
+- Ending felt slow → tighter pauses, a drum roll while Pixel guesses your 3, and fireworks plus a cymbal crash when it gets it right.
+- Some surfaces flickered (z-fighting) → fixed.
+
 ## Not tested yet
 - Riding it in the actual headset (frame rate with all the lanterns, how easy the hot wires are to hit at 30 m).

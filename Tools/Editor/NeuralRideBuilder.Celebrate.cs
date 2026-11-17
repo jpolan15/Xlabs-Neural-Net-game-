@@ -44,7 +44,9 @@ namespace Convergence.EditorTools
             var view = rd.gameObject.AddComponent<WinCelebrationView>();
             Ref(view, "director", rd);
             Ref(view, "pixel", pixel);
-            Refs(view, "cardGames", new List<Object> { m.Draw, m.Paint, m.Forward, m.Blame, m.Train });
+            // Card 3 (the network) comes from "send your 3", a moment that is not a scored game: its Finished earns it.
+            Refs(view, "cardGames", new List<Object> { m.Draw, m.Paint, null, m.Blame, m.Train });
+            Ref(view, "sendMoment", m.Forward);
             Set(view, "titles", p => Strings(p, CardTitles));
             Set(view, "ideas", p => Strings(p, CardIdeas));
             Set(view, "facts", p => Strings(p, CardFacts));
@@ -55,10 +57,11 @@ namespace Convergence.EditorTools
             });
 
             // ----- the big card, up and to the left of the table, facing the eye
-            Vector3 home = new Vector3(-0.34f, 1.29f, 0.76f);
+            // Low on the console's left wing, beside the table (2026-11-17 ride: the card blocked the view): a console screen.
+            Vector3 home = new Vector3(-0.6f, 1.06f, 0.62f);
             var card = Make("TopicCard", pod.transform, home).transform;
             card.localRotation = Quaternion.LookRotation(home - EyePoint, Vector3.up);
-            card.localScale = Vector3.one * 0.88f; // above the table, never over its words (round-2 review)
+            card.localScale = Vector3.one * 0.8f;
             var tiles = new TileMesh();
             tiles.Face(new Vector3(0f, 0f, 0.004f), 0.58f, 0.46f, Color.white);
             GameObject frame = TileObject("Frame", card, tiles, "PlateSolid");
@@ -82,6 +85,13 @@ namespace Convergence.EditorTools
             Ref(view, "idea", idea);
             Ref(view, "body", body);
             Ref(view, "border", frame.GetComponent<Renderer>());
+            // Shoot the card to close it (it also closes on GO).
+            card.gameObject.AddComponent<BoxCollider>().size = new Vector3(0.58f, 0.46f, 0.03f);
+            var closer = card.gameObject.AddComponent<TopicCardSlot>();
+            Int(closer, "index", -1);
+            Ref(view, "closer", closer);
+            TextMeshPro x = Text("Close", card, new Vector3(0.235f, 0.19f, -0.002f), "X", 0.04f, new Color(1f, 0.5f, 0.45f), 0.06f, TextAlignmentOptions.Center, true);
+            x.textWrappingMode = TextWrappingModes.NoWrap;
             card.gameObject.SetActive(false); // shown only on a win (and the sightline check must not see it)
 
             // ----- the card rail: five slots along the tub's left rim, low and to the side, out of the view
@@ -90,26 +100,26 @@ namespace Convergence.EditorTools
             var faces = new List<Object>();
             for (int i = 0; i < 5; i++)
             {
-                float deg = 288f + i * 10f;
-                Vector3 at = new Vector3(Mathf.Sin(deg * Mathf.Deg2Rad) * 1.12f, 0.78f, Mathf.Cos(deg * Mathf.Deg2Rad) * 1.12f);
+                // One neat row of card slots on the console's left wing, like buttons on the dash.
+                Vector3 at = new Vector3(-0.84f + i * 0.1f, 0.86f, 0.5f);
                 var slot = Make("Slot" + i, rail, at).transform;
                 slot.localRotation = Quaternion.LookRotation(at - EyePoint, Vector3.up);
                 var empty = new TileMesh();
-                empty.Face(new Vector3(0f, 0f, 0.003f), 0.15f, 0.11f, new Color(0.18f, 0.2f, 0.26f, 0f));
+                empty.Face(new Vector3(0f, 0f, 0.003f), 0.09f, 0.07f, new Color(0.18f, 0.2f, 0.26f, 0f));
                 TileObject("Empty", slot, empty, "Tiles");
                 var face = Make("Face", slot, Vector3.zero);
                 var faceTiles = new TileMesh();
                 Color c = TopicLantern(CardRegions[i]);
-                faceTiles.Face(new Vector3(0f, 0f, 0.002f), 0.15f, 0.11f, new Color(c.r, c.g, c.b, 1f));
-                faceTiles.Face(new Vector3(0f, 0f, 0.001f), 0.138f, 0.098f, new Color(0.02f, 0.03f, 0.06f, 0f));
+                faceTiles.Face(new Vector3(0f, 0f, 0.002f), 0.09f, 0.07f, new Color(c.r, c.g, c.b, 1f));
+                faceTiles.Face(new Vector3(0f, 0f, 0.001f), 0.08f, 0.06f, new Color(0.02f, 0.03f, 0.06f, 0f));
                 TileObject("Card" + i, face.transform, faceTiles, "Tiles");
                 TextMeshPro label = Text("Label", face.transform, new Vector3(0f, 0f, 0f), CardTitles[i].Replace("  ", "\n"), 0.024f, c, 0.14f, TextAlignmentOptions.Center, true);
-                label.rectTransform.sizeDelta = new Vector2(0.14f, 0.1f);
+                label.rectTransform.sizeDelta = new Vector2(0.084f, 0.064f);
                 label.textWrappingMode = TextWrappingModes.NoWrap;
                 label.enableAutoSizing = true;
                 label.fontSizeMin = 0.12f;
                 label.fontSizeMax = 0.24f;
-                slot.gameObject.AddComponent<BoxCollider>().size = new Vector3(0.17f, 0.13f, 0.03f);
+                slot.gameObject.AddComponent<BoxCollider>().size = new Vector3(0.1f, 0.08f, 0.03f);
                 var s = slot.gameObject.AddComponent<TopicCardSlot>();
                 Int(s, "index", i);
                 slots.Add(s);

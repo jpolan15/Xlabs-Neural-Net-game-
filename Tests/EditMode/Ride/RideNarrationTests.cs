@@ -55,7 +55,7 @@ namespace Convergence.Tests.EditMode.Ride
         }
 
         /// <summary>Lines cut from the script (2026-11-17, plain-words pass, ADR-025); their ids stay reserved.</summary>
-        private static readonly RideLine[] Retired = { RideLine.PixelsWhy49, RideLine.WeightPlain };
+        private static readonly RideLine[] Retired = { RideLine.PixelsWhy49, RideLine.WeightPlain, RideLine.BackPlain };
 
         private static IEnumerable<RideLine> Level1Lines()
         {

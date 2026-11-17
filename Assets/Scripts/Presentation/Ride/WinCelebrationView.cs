@@ -46,6 +46,13 @@ namespace Convergence.Presentation.Ride
         [SerializeField] private ParticleSystem fireworks;
         [SerializeField] private AudioSource boomSource;
         [SerializeField] private int sparksPerBurst = 110;
+
+        [Header("More (2026-11-17 ride)")]
+        [Tooltip("\"Send your 3\" is not a scored game; its end earns card 3.")]
+        [SerializeField] private RideMoment sendMoment;
+        [SerializeField] private int sendCard = 2;
+        [Tooltip("The big card's own target: shooting it closes it.")]
+        [SerializeField] private TopicCardSlot closer;
         [SerializeField] private float cardHoldSeconds = 16f;
 
         private static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
@@ -83,12 +90,22 @@ namespace Convergence.Presentation.Ride
         {
             foreach (TopicCardSlot s in slots) if (s != null) s.Opened += OnOpened;
             if (director != null) director.SegmentStarted += OnSegmentStarted;
+            if (director != null) director.Narrated += OnNarrated;
+            if (sendMoment != null) sendMoment.Finished += OnSent;
+            if (closer != null)
+            {
+                closer.Earned = true;
+                closer.Opened += OnClose;
+            }
         }
 
         private void OnDisable()
         {
             foreach (TopicCardSlot s in slots) if (s != null) s.Opened -= OnOpened;
             if (director != null) director.SegmentStarted -= OnSegmentStarted;
+            if (director != null) director.Narrated -= OnNarrated;
+            if (sendMoment != null) sendMoment.Finished -= OnSent;
+            if (closer != null) closer.Opened -= OnClose;
             Watch(null);
         }
 
@@ -121,6 +138,90 @@ namespace Convergence.Presentation.Ride
             _showing = StartCoroutine(Earn(index));
         }
 
+        private void OnSent()
+        {
+            StartCoroutine(Fireworks(sendCard < colors.Length ? colors[sendCard] : Gold, 3));
+            if (sendCard >= slots.Length || slots[sendCard] == null || slots[sendCard].Earned) return;
+            if (_showing != null) StopCoroutine(_showing);
+            _showing = StartCoroutine(Earn(sendCard));
+        }
+
+        private bool _closeRequested;
+
+        private void OnClose(int _) => _closeRequested = true;
+
+        // ---------- the big reveal: Pixel reads the rider's own 3 ----------
+
+        private AudioClip _drum, _crash;
+
+        private void OnNarrated(RideLine line)
+        {
+            if (boomSource == null) return;
+            if (line == RideLine.RightYours)
+            {
+                if (_drum == null) _drum = MakeDrumRoll();
+                boomSource.Stop();
+                boomSource.clip = _drum;
+                boomSource.volume = 0.6f;
+                boomSource.PlayDelayed(1.2f);
+            }
+            else if (line == RideLine.RightYes || line == RideLine.RightNowYes)
+            {
+                boomSource.Stop();
+                if (_crash == null) _crash = MakeCrash();
+                boomSource.PlayOneShot(_crash, 0.8f);
+                StartCoroutine(Fireworks(Gold, 6));
+                if (pixel != null) pixel.Learn();
+            }
+            else if (line == RideLine.RightStudy) boomSource.Stop();
+        }
+
+        /// <summary>A snare roll that swells for about three seconds (made once, no asset).</summary>
+        private static AudioClip MakeDrumRoll()
+        {
+            const int rate = 44100;
+            int n = (int)(rate * 3.4f);
+            var data = new float[n];
+            var rnd = new System.Random(3);
+            float hit = 0f;
+            for (int i = 0; i < n; i++)
+            {
+                float t = i / (float)rate;
+                float period = Mathf.Lerp(0.075f, 0.04f, t / 3.4f);
+                if (Mathf.Repeat(t, period) < 1f / rate * 1.5f) hit = 1f;
+                hit *= 0.9993f;
+                float noise = (float)(rnd.NextDouble() * 2.0 - 1.0);
+                float swell = Mathf.Lerp(0.25f, 1f, t / 3.4f);
+                data[i] = noise * hit * swell * 0.55f + Mathf.Sin(2f * Mathf.PI * 180f * t) * hit * swell * 0.15f;
+            }
+
+            AudioClip clip = AudioClip.Create("DrumRoll", n, 1, rate, false);
+            clip.SetData(data, 0);
+            return clip;
+        }
+
+        /// <summary>A cymbal crash for the reveal.</summary>
+        private static AudioClip MakeCrash()
+        {
+            const int rate = 44100;
+            int n = (int)(rate * 1.8f);
+            var data = new float[n];
+            var rnd = new System.Random(11);
+            float prev = 0f;
+            for (int i = 0; i < n; i++)
+            {
+                float t = i / (float)rate;
+                float noise = (float)(rnd.NextDouble() * 2.0 - 1.0);
+                float bright = noise - prev * 0.6f;
+                prev = noise;
+                data[i] = bright * Mathf.Exp(-t * 2.2f) * 0.45f;
+            }
+
+            AudioClip clip = AudioClip.Create("Crash", n, 1, rate, false);
+            clip.SetData(data, 0);
+            return clip;
+        }
+
         private void OnOpened(int index)
         {
             if (_showing != null) StopCoroutine(_showing);
@@ -139,7 +240,8 @@ namespace Convergence.Presentation.Ride
         {
             yield return new WaitForSeconds(1.0f);
             LightBrain(index);
-            ShowCard(index, "NEW CARD!  " + (index + 1) + " OF 5");
+            _closeRequested = false;
+            ShowCard(index, "NEW CARD!  " + (index + 1) + " OF 5   (shoot to close)");
             yield return Pop(bigCard, _cardHomeScale);
 
             // The "read me" moment: the card stays up until the rider pulls GO (or the ride moves on by itself), at least a few
@@ -150,7 +252,7 @@ namespace Convergence.Presentation.Ride
             while (held < cardHoldSeconds)
             {
                 if (director.WaitingForGo) sawGo = true;
-                if (held > 3.5f && ((sawGo && !director.WaitingForGo) || director.SegmentIndex != segment)) break;
+                if (_closeRequested || (held > 3.5f && ((sawGo && !director.WaitingForGo) || director.SegmentIndex != segment))) break;
                 held += Time.deltaTime;
                 yield return null;
             }
@@ -185,7 +287,8 @@ namespace Convergence.Presentation.Ride
         {
             ShowCard(index, "CARD " + (index + 1) + " OF 5");
             yield return Pop(bigCard, _cardHomeScale);
-            yield return new WaitForSeconds(9f);
+            _closeRequested = false;
+            for (float t = 0f; t < 12f && !_closeRequested; t += Time.deltaTime) yield return null;
             HideCard();
             _showing = null;
         }

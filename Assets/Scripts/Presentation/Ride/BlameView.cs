@@ -38,7 +38,9 @@ namespace Convergence.Presentation.Ride
         [SerializeField] private MeshFilter glows;
         [SerializeField] private ParticleSystem sparks;
         [Tooltip("Metres across of a hot wire's orb glow: seen from the stop 30 m away it is a big, easy target.")]
-        [SerializeField] private float orbSize = 3.6f;
+        [SerializeField] private float orbSize = 5f;
+        [Tooltip("A bouncing \"SHOOT!\" over each hot ball (2026-11-17: so even a small child knows what to aim at).")]
+        [SerializeField] private TMPro.TextMeshPro[] shootLabels = new TMPro.TextMeshPro[0];
         [SerializeField] private Color hotColor = new Color(1f, 0.5f, 0.12f, 1f);
         [SerializeField] private Color whiteHot = new Color(1f, 0.95f, 0.85f, 1f);
         [SerializeField] private Color coolColor = new Color(0.35f, 0.65f, 1f, 0.6f);
@@ -51,7 +53,7 @@ namespace Convergence.Presentation.Ride
         [Tooltip("The coach's ring (a closed line renderer of unit radius in its XY plane) that pulses on the hottest orb when the rider stalls. Named for the old drop ring: NeuralRideBuilder.Network sets it by this name.")]
         [SerializeField] private Transform dropRing;
         [Tooltip("Seconds without a cooled wire before the ring shows the hottest one.")]
-        [SerializeField] private float showAfterIdle = 4f;
+        [SerializeField] private float showAfterIdle = 1.5f;
         [SerializeField] private Color coachColor = new Color(1f, 0.82f, 0.3f, 0.9f);
 
         [Header("How sure Pixel is (the hunt board)")]
@@ -339,6 +341,16 @@ namespace Convergence.Presentation.Ride
             for (int i = 0; i < _glowCount; i++) Glow(i, Vector3.zero, 0f, Color.clear);
 
             int wires = WireCount;
+            for (int k = 0; k < shootLabels.Length; k++)
+            {
+                TMPro.TextMeshPro label = shootLabels[k];
+                if (label == null) continue;
+                // One target at a time: only the hottest ball still glowing wears "SHOOT!" (the balls cluster near the answers).
+                bool hot = live && k < wires && _cooledAt[k] < 0f && k == moment.HottestLeft;
+                if (label.gameObject.activeSelf != hot) label.gameObject.SetActive(hot);
+                if (hot) label.transform.position = OrbPosition(k) + Vector3.up * (orbSize * 0.75f + 0.5f + 0.35f * Mathf.Abs(Mathf.Sin(Time.time * 3f + k)));
+            }
+
             for (int k = 0; k < wires; k++)
             {
                 Vector3 at = OrbPosition(k);

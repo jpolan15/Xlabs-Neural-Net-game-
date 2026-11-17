@@ -842,8 +842,10 @@ namespace Convergence.EditorTools
             // A chart on a dark card, left of the answers so the giant network's own answers and the guess sign stay clear.
             Vector3 eye = _layout.WrongStop.position + Vector3.up * EyePoint.y;
             Transform stage = Make("Stage", content, Vector3.zero).transform;
-            stage.position = eye + new Vector3(-1.5f, 0.1f, 5.5f);
+            // Out to the left of the network (2026-11-17: the chart sat on the diagram; the net must stay fully visible).
+            stage.position = eye + new Vector3(-4.6f, 0.0f, 4.2f);
             stage.rotation = Quaternion.LookRotation(stage.position - eye, Vector3.up);
+            stage.localScale = Vector3.one * 0.85f;
 
             const float rowPitch = 0.27f, barH = 0.17f, length = 2.2f, x0 = -1.5f;
             float RowY(int k) => (4.5f - k) * rowPitch;
@@ -923,8 +925,10 @@ namespace Convergence.EditorTools
             // Pixel's answers come back as E4's chart (same place, same scale); each bar gets an arrow for its wish.
             Vector3 eye = _layout.NetViewStop.position + Vector3.up * EyePoint.y;
             Transform stage = Make("Stage", content, Vector3.zero).transform;
-            stage.position = eye + new Vector3(-1.5f, 0.1f, 5.5f);
+            // Out to the left of the network (2026-11-17: the chart sat on the diagram; the net must stay fully visible).
+            stage.position = eye + new Vector3(-4.6f, 0.0f, 4.2f);
             stage.rotation = Quaternion.LookRotation(stage.position - eye, Vector3.up);
+            stage.localScale = Vector3.one * 0.85f;
             const float rowPitch = 0.27f, barH = 0.17f, length = 2.2f, x0 = -1.5f;
             float RowY(int k) => (4.5f - k) * rowPitch;
             var card = new List<Shape> { new Shape { kind = Shape.Kind.Quad, position = new Vector3(0.05f, 0f, 0.05f), size = new Vector2(4.3f, 3.25f), round = 0.06f, color = new Color(0.04f, 0.05f, 0.08f, 0.97f) } };

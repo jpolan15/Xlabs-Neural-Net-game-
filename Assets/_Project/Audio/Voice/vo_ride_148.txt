@@ -1,4 +1,4 @@
 Source: AI synthesized, Kokoro-82M v1.0 (hexgrad, Apache-2.0) via kokoro-onnx 0.6.1 (MIT); voice af_heart, speed 1.0, lang en-us; one sentence per call, explicit pauses, -16 LUFS / -1 dBTP / mono 48 kHz; ArtSource/voice/render_voices.py, 2026-11-17
-Segments: 0.820 2.810 0.830 1.640 1.570 1.080 1.660
+Segments: 0.820 1.630 2.070 0.860 1.860 1.520 1.970
 
-Look up. The hot, glowing wires are the most to blame. Shoot one, and it gets one small fix: a real gradient step. Watch your table: Pixel gets surer it's a three.
+Look up! See the big glowing balls? They sit on the wires most to blame. Shoot them! Each shot is one small fix, a real gradient step. Watch Pixel get surer it's a three.

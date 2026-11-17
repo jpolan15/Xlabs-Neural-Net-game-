@@ -450,6 +450,18 @@ namespace Convergence.EditorTools
             Ref(view, "sparks", sparks);
             Ref(view, "dropRing", ring);
             Refs(view, "targets", targetList);
+            var shootLabels = new List<Object>();
+            for (int k = 0; k < top; k++)
+            {
+                TextMeshPro label = Text("Shoot" + k, steer, Vector3.zero, "SHOOT!\nv", 1.3f, new Color(1f, 0.85f, 0.35f), 6f, TextAlignmentOptions.Center, true);
+                label.textWrappingMode = TextWrappingModes.NoWrap;
+                label.lineSpacing = -30f;
+                label.gameObject.AddComponent<FaceCamera>();
+                label.gameObject.SetActive(false);
+                shootLabels.Add(label);
+            }
+
+            Refs(view, "shootLabels", shootLabels);
             Set(view, "inputPositions", p => Positions(p, 49, InputPosition));
             Set(view, "hiddenPositions", p => Positions(p, 16, HiddenPosition));
             Set(view, "outputPositions", p => Positions(p, 10, OutputPosition));

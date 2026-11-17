@@ -497,7 +497,7 @@ namespace Convergence.EditorTools
                 FestivalRegion part = Part(1);
                 float deck = field.y - 0.05f;
                 part.Solid.Box(new Vector3(field.x, (StreetY + deck) * 0.5f, field.z), new Vector3(23f, deck - StreetY, 23f), Quaternion.identity, new Color(0.11f, 0.07f, 0.06f));
-                part.Solid.Box(new Vector3(field.x, deck - 0.25f, field.z), new Vector3(23.6f, 0.5f, 23.6f), Quaternion.identity, Vermilion);
+                part.Solid.Box(new Vector3(field.x, deck - 0.4f, field.z), new Vector3(23.6f, 0.5f, 23.6f), Quaternion.identity, Vermilion); // its top 15 cm under the deck: no z-fighting
                 foreach (Vector2 c in new[] { new Vector2(-1, -1), new Vector2(-1, 1), new Vector2(1, -1), new Vector2(1, 1) })
                 {
                     Vector3 at = new Vector3(field.x + c.x * 11.4f, deck + 1.2f, field.z + c.y * 11.4f);
@@ -727,7 +727,7 @@ namespace Convergence.EditorTools
                 float w = 7.5f - tier * 1.1f, h = tier == 0 ? 4.2f : 3.1f;
                 part.Solid.Box(at + Vector3.up * (y + h * 0.5f), new Vector3(w, h, w), rot, new Color(0.12f, 0.07f, 0.06f));
                 // A lit band of paper screens round each storey.
-                part.Solid.Box(at + Vector3.up * (y + h * 0.55f), new Vector3(w + 0.04f, 0.9f, w + 0.04f), rot, new Color(1f, 0.7f, 0.36f, 0.85f));
+                part.Solid.Box(at + Vector3.up * (y + h * 0.55f), new Vector3(w + 0.3f, 0.9f, w + 0.3f), rot, new Color(1f, 0.7f, 0.36f, 0.85f));
                 y += h;
                 float roof = w + 3.2f;
                 part.Solid.Box(at + Vector3.up * (y + 0.2f), new Vector3(roof, 0.45f, roof), rot, RoofTile);
@@ -765,7 +765,7 @@ namespace Convergence.EditorTools
             part.Solid.Tri(e0 - r * (width * 0.5f) + facing * (depth * 0.5f), ridgeC + facing * (depth * 0.5f), e0 + r * (width * 0.5f) + facing * (depth * 0.5f), wall);
             // Windows: a grid on the front, some lit warm, a few in the topic colour (paper screens).
             int cols = Mathf.Max(2, Mathf.FloorToInt(width / 1.8f)), floors = Mathf.Max(1, Mathf.FloorToInt((height - 1f) / 2.6f));
-            Vector3 face = at + facing * (depth * 0.5f + 0.02f);
+            Vector3 face = at + facing * (depth * 0.5f + 0.1f); // windows stand off the wall: no z-fighting from afar
             for (int fl = 0; fl < floors; fl++)
             {
                 for (int c = 0; c < cols; c++)
