@@ -23,6 +23,8 @@ namespace Convergence.Presentation.Ride
         [SerializeField] private float riseSeconds = 0.55f;
         [Tooltip("The table also comes up for these segments even without a game (the hot-wire hunt shows its timer).")]
         [SerializeField] private int[] alsoUpAt = new int[0];
+        [Tooltip("The table is also up while the ride waits at the dock (the chapter picker's board is on it).")]
+        [SerializeField] private bool upAtDock;
         [Tooltip("The eye height above the pod floor the raised pose was built for (PodSeat's target).")]
         [SerializeField] private float nominalEyeHeight = 1.30f;
         [Tooltip("The eye heights the table follows; outside them it stops.")]
@@ -56,6 +58,7 @@ namespace Convergence.Presentation.Ride
         {
             if (director == null) return false;
             if (director.ActiveMoment is RideGame || director.WaitingForGo) return true;
+            if (upAtDock && director.State == RideState.Dock && director.CanChooseStart) return true;
             return System.Array.IndexOf(alsoUpAt, director.SegmentIndex) >= 0 && director.State == RideState.AtStop;
         }
 

@@ -7,7 +7,7 @@
 //   _RideSkyHorizon  horizon colour (the fog matches it, so far things sink into the horizon)
 //   _RideSkyGlow     rgb: horizon glow colour, a: its strength
 //   _RideSkyFloor    rgb: grid colour, a: grid strength (0 = no floor)
-//   _RideSkyParams   x: star brightness, y: floor depth below the eye (m), z: grid spacing (m)
+//   _RideSkyParams   x: star brightness, y: floor depth below the eye (m), z: grid spacing (m), w: moon (0 = none)
 Shader "Convergence/RideSky"
 {
     Properties
@@ -88,6 +88,14 @@ Shader "Convergence/RideSky"
                 float3 centre = normalize((cell + 0.5 + jitter * 0.6) / 90.0);
                 float star = (1.0 - smoothstep(0.0008, 0.0030, distance(d, centre))) * step(0.986, pick);
                 color += star * _RideSkyParams.x * saturate(y * 5.0) * (0.45 + 0.55 * Hash(cell + 9.2));
+
+                // The moon (Level 1's festival night): a soft disc with a halo, low in the sky ahead-left of the first leg.
+                float3 moonDir = normalize(float3(-0.52, 0.40, 0.75));
+                float m = dot(d, moonDir);
+                half disc = smoothstep(0.99915, 0.99935, m);
+                half halo = pow(saturate((m - 0.97) / 0.03), 3.0) * 0.35 + pow(saturate((m - 0.8) / 0.2), 4.0) * 0.12;
+                color = lerp(color, half3(1.0, 0.95, 0.82) * 1.05, disc * _RideSkyParams.w);
+                color += half3(1.0, 0.86, 0.62) * halo * _RideSkyParams.w;
 
                 // The floor: where this pixel's ray meets a plane depth metres below the eye, a grid of lines.
                 // Derivatives are taken for every pixel (outside any branch), then masked to below the horizon.

@@ -41,7 +41,7 @@ Material:
     - _Reveal: 1
     - _Width: 0.18
     m_Colors:
-    - _NegColor: {r: 1, g: 0.43529412, b: 0.5686275, a: 1}
-    - _PosColor: {r: 1, g: 0.7176471, b: 0.78431374, a: 1}
+    - _NegColor: {r: 1, g: 0.81960785, b: 0.4, a: 1}
+    - _PosColor: {r: 1, g: 0.86, b: 0.55, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

@@ -177,8 +177,7 @@ namespace Convergence.Presentation.Ride.Level2
             {
                 if (l == lane) continue;
                 L2StoryNode next = moment.NodeAt(v.Path + l);
-                if (next != null) v.Percent[l].text = FormatPercent(v.P[l]) + "
-then: " + Level2Data.Clean(next.lanes[0].word) + " ...";
+                if (next != null) v.Percent[l].text = FormatPercent(v.P[l]) + "\nthen: " + Level2Data.Clean(next.lanes[0].word) + " ...";
             }
             Vector3 at = v.Root.localPosition + new Vector3(v.X[lane], 1.7f, 0f);
             for (int k = 0; k < 26; k++)

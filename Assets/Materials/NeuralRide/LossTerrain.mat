@@ -33,9 +33,9 @@ Material:
     - _RimStrength: 0.35
     - _Shade: 0.8
     m_Colors:
-    - _ContourColor: {r: 1, g: 0.86, b: 0.95, a: 1}
-    - _HighColor: {r: 1, g: 0.43529412, b: 0.5686275, a: 1}
-    - _LowColor: {r: 0.2727451, g: 0.11470588, b: 0.35686275, a: 1}
-    - _RimColor: {r: 1, g: 0.6, b: 0.85, a: 1}
+    - _ContourColor: {r: 1, g: 0.78, b: 0.42, a: 1}
+    - _HighColor: {r: 0.62, g: 0.22, b: 0.24, a: 1}
+    - _LowColor: {r: 0.05, g: 0.08, b: 0.16, a: 1}
+    - _RimColor: {r: 1, g: 0.55, b: 0.6, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

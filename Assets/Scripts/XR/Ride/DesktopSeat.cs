@@ -16,8 +16,8 @@ namespace Convergence.XR.Ride
     /// hand's; the A key is the A button (pulls GO when it is live). The moment a
     /// headset or XR display is running it gives the camera back to tracking. The mouse uses the same APIs a hand does.
     /// Operator keys work with or without a headset: Space skips the lines, Shift+Space hurries (solves) the running puzzle, R restarts, G toggles
-    /// gentle mode (half the drop, slower travel), H goes back to the level hub (ADR-024), and in the hub Shift+Backspace wipes the
-    /// scoreboard for a new group.
+    /// gentle mode (half the drop, slower travel), H goes back to the level hub (ADR-024), in the hub Shift+Backspace wipes the
+    /// scoreboard for a new group, and at the dock 1 to 6 pick where GO starts the ride (the chapter picker).
     /// </summary>
     public sealed class DesktopSeat : MonoBehaviour
     {
@@ -101,7 +101,18 @@ namespace Convergence.XR.Ride
                 if (_director == null) _director = FindAnyObjectByType<RideDirector>();
                 if (_director != null) _director.GentleMode = !_director.GentleMode;
             }
+
+            // 1 to 6 pick the chapter at the dock (1: the full ride, 2 to 6: stops 1 to 5), like shooting its tile.
+            for (int k = 0; k < ChapterKeys.Length; k++)
+            {
+                if (!keyboard[ChapterKeys[k]].wasPressedThisFrame) continue;
+                if (_chapters == null) _chapters = FindAnyObjectByType<ChapterPicker>();
+                if (_chapters != null) _chapters.Select(k);
+            }
         }
+
+        private static readonly Key[] ChapterKeys = { Key.Digit1, Key.Digit2, Key.Digit3, Key.Digit4, Key.Digit5, Key.Digit6 };
+        private ChapterPicker _chapters;
 
         private void Take()
         {

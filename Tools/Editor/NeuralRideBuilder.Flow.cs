@@ -62,7 +62,7 @@ namespace Convergence.EditorTools
                 new SegmentSpec { Name = "E4 the guess and the loss", Region = 4, Leg = A, To = L.WrongStop, Cruise = 4f, MinSeconds = 0f, Travel = -1, Arrival = 5, Hold = ExplainHold + 1.5f, Mask = R(3, 4) },
                 // E5: backpropagation, then the rewind with the hot-wire hunt on the rider's 3.
                 new SegmentSpec { Name = "E5 backprop: explain", Region = 5, Leg = B, To = L.NetViewStop, Cruise = 1.2f, MinSeconds = 0f, Travel = -1, Arrival = 6, Hold = ExplainHold, Mask = R(3, 5) },
-                new SegmentSpec { Name = "E5 backprop: rewind, hot-wire hunt", Region = 5, Leg = B, To = L.BlameStop, Cruise = 1.2f, MinSeconds = 6f, Travel = -1, Arrival = 7, Moment = m.Blame, Mask = R(3, 5) },
+                new SegmentSpec { Name = "E5 backprop: cool the hot wires", Region = 5, Leg = B, To = L.BlameStop, Cruise = 1.2f, MinSeconds = 0f, Travel = -1, Arrival = 7, Moment = m.Blame, Mask = R(3, 5) },
                 new SegmentSpec { Name = "Back to the switch", Region = 5, Leg = B, To = L.SpurEnd, Cruise = 5f, MinSeconds = 5f, Travel = -1, Arrival = -1, Mask = R(3, 5) },
                 // E6: gradient descent at the rim, then the training game (real training, live), then the plunge.
                 new SegmentSpec { Name = "E6 descent: explain, then train", Region = 6, Leg = C, To = L.Rim, Cruise = 6f, MinSeconds = 8f, Travel = -1, Arrival = 8, Moment = m.Train, Mask = R(3, 6) },

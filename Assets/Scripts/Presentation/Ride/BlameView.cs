@@ -8,17 +8,18 @@ namespace Convergence.Presentation.Ride
     /// <summary>
     /// Region 5: every wire of the untrained network burns by its real blame |∂loss/∂w| (one mesh, baked by the
     /// builder from the same Core backward pass the moment runs), with the light flowing backward from the answers to
-    /// the pixels as the Guide says "backwards". The few brightest wires each wear a pulsing handle on their loose end.
-    /// A wire a hand has grabbed dims in place and a bright cable runs from its fixed end to wherever the laser points,
-    /// with a pulse of blame flowing back along it; a gold glow marks the 3 it is to be dragged to, and swells as the
-    /// end comes near. When the wire snaps on, the cable locks onto the 3, the 3 flashes, sparks fly, the hand buzzes, and
-    /// the wire cools. The dash shows the real step: the weight before and after, and the loss of the hero 3.
-    /// Every glow (the handles, the pulses, the 3's glow and flash) is a camera-facing quad in one mesh, so the whole
-    /// hunt costs one draw call plus the cables. Display only: the moment decides when a wire has reached the 3.
+    /// the pixels as the Guide says "backwards". "Cool the hot wires" (2026-11-17): the few hottest wires glow hot orange,
+    /// each wearing a big pulsing orb (orange to white) that the laser can hit from the stop. When the moment says a wire
+    /// was shot, its orb flashes white and settles as a small calm blue dot, the wire itself cools from orange to blue,
+    /// sparks fly and the hand buzzes. When nobody has cooled a wire for a few seconds, a gold ring pulses on the hottest
+    /// orb with a stream of gold lights falling onto it. The hunt board on the table shows, big and near, how sure Pixel
+    /// is that the rider's digit is a 3 (the moment's real softmax output, counting up after each shot) and a loss bar
+    /// going down. Every glow is a camera-facing quad in one mesh, so the hunt costs one draw call plus the ring.
+    /// Display only: the moment decides what a shot does.
     /// </summary>
     public sealed class BlameView : MonoBehaviour
     {
-        private const int CablePoints = 24;
+        private const int CoachDots = 3;
 
         [SerializeField] private RideDirector director;
         [SerializeField] private DashScreenView dash;
@@ -28,63 +29,65 @@ namespace Convergence.Presentation.Ride
         [SerializeField] private int vertsPerWire = 16;
         [SerializeField] private float flowSeconds = 4f;
 
-        [Header("Dragging wires to the 3")]
-        [Tooltip("Where each top wire is fixed (the pixel or hidden neuron end).")]
-        [SerializeField] private Transform[] origins = new Transform[0];
-        [Tooltip("Where each top wire's loose end hangs until a hand takes it; its handle waits there.")]
-        [SerializeField] private Transform[] ends = new Transform[0];
-        [Tooltip("The cable drawn from each wire's fixed end to its handle (or to the 3 once connected).")]
-        [SerializeField] private LineRenderer[] cables = new LineRenderer[0];
+        [Header("The hot wires")]
+        [Tooltip("Each top wire's laser target: a capsule along the wire; its first child is the orb's sphere.")]
+        [SerializeField] private Transform[] targets = new Transform[0];
+        [Tooltip("Where each orb sits along its wire, 0 at the fixed (pixel or hidden) end: off the middle, so the orbs do not overlap where the wires crowd toward the 3.")]
+        [SerializeField] private float orbAlong = 0.3f;
         [Tooltip("Holds the one mesh of glows (an additive glow material with vertex colour); the view fills it each frame.")]
         [SerializeField] private MeshFilter glows;
         [SerializeField] private ParticleSystem sparks;
-        [Tooltip("Metres across: the network is big, so its handles and pulses are too.")]
-        [SerializeField] private float handleSize = 2.2f;
-        [SerializeField] private float pulseSize = 1.4f;
-        [SerializeField] private Color heldColor = new Color(1f, 0.85f, 0.3f, 1f);
-        [SerializeField] private Color connectedColor = new Color(0.4f, 1f, 0.7f, 1f);
-        [SerializeField] private Color socketColor = new Color(1f, 0.82f, 0.3f, 0.55f);
-        [SerializeField] private float snapBuzz = 0.75f;
-        [SerializeField] private float snapBuzzSeconds = 0.12f;
+        [Tooltip("Metres across of a hot wire's orb glow: seen from the stop 30 m away it is a big, easy target.")]
+        [SerializeField] private float orbSize = 3.6f;
+        [SerializeField] private Color hotColor = new Color(1f, 0.5f, 0.12f, 1f);
+        [SerializeField] private Color whiteHot = new Color(1f, 0.95f, 0.85f, 1f);
+        [SerializeField] private Color coolColor = new Color(0.35f, 0.65f, 1f, 0.6f);
+        [Tooltip("Seconds a shot wire takes to cool from hot to calm blue.")]
+        [SerializeField] private float coolSeconds = 0.9f;
+        [SerializeField] private float hitBuzz = 0.75f;
+        [SerializeField] private float hitBuzzSeconds = 0.12f;
 
-        [Header("Showing how (owner, 2026-10-30: the teacher could not tell the glowing wires are dragged to the 3)")]
-        [Tooltip("A ring around the 3, the place to let go (a closed line renderer of unit radius; the view sizes it).")]
+        [Header("Showing how")]
+        [Tooltip("The coach's ring (a closed line renderer of unit radius in its XY plane) that pulses on the hottest orb when the rider stalls. Named for the old drop ring: NeuralRideBuilder.Network sets it by this name.")]
         [SerializeField] private Transform dropRing;
-        [Tooltip("The words beside the 3, all the time the wires are live.")]
-        [SerializeField] private TextMeshPro dropLabel;
-        [Tooltip("The words that ride with the ghost hand: 1 GRAB IT, 2 DRAG IT, 3 LET GO.")]
-        [SerializeField] private TextMeshPro stepLabel;
-        [Tooltip("Seconds without a grab before a ghost hand shows how, and again after every lap.")]
+        [Tooltip("Seconds without a cooled wire before the ring shows the hottest one.")]
         [SerializeField] private float showAfterIdle = 4f;
-        [SerializeField] private float demoSeconds = 7f;
+        [SerializeField] private Color coachColor = new Color(1f, 0.82f, 0.3f, 0.9f);
+
+        [Header("How sure Pixel is (the hunt board)")]
+        [SerializeField] private TextMeshPro sureText;
+        [SerializeField] private TextMeshPro startText;
+        [Tooltip("A pivot at the bar's left end; its x scale is the probability of a 3.")]
+        [SerializeField] private Transform sureFill;
+        [Tooltip("A pivot at the loss bar's left end; its x scale is the loss now over the loss before any shot.")]
+        [SerializeField] private Transform lossFill;
 
         [Header("Re-aiming at the rider's digit (v6)")]
         [Tooltip("Where the 49 pixels, 16 hidden neurons and 10 answers sit, in the blame meshes' frame.")]
         [SerializeField] private Vector3[] inputPositions = new Vector3[0];
         [SerializeField] private Vector3[] hiddenPositions = new Vector3[0];
         [SerializeField] private Vector3[] outputPositions = new Vector3[0];
-        [Tooltip("Each top wire's laser target (its capsule along the wire, and its grip at the loose end).")]
-        [SerializeField] private Transform[] targets = new Transform[0];
 
         private static readonly int LitUpTo = Shader.PropertyToID("_LitUpTo");
-        private readonly Vector3[] _points = new Vector3[CablePoints];
+        private static string[] _percent;
         private MaterialPropertyBlock _block;
         private Mesh _mesh;
         private Color[] _colors;
         private Color[] _heat;
         private float _flowStarted = -1f;
-        private float _flash;
         private Camera _camera;
 
-        // The glows: per wire a handle and a pulse, then the ghost hand (a cursor, its trail, the dotted guide), then the 3's glow,
-        // then its flash. Four vertices each.
-        private const int TrailCount = 6;
-        private const int GuideCount = 8;
-        private const int GhostSlots = 1 + TrailCount + GuideCount;
+        // Per top wire: when it was cooled (-1: still hot).
+        private float[] _cooledAt = new float[0];
         private float _lastActivity = -100f;
-        private float _demoStarted = -1f;
-        private bool _demoFlashed;
-        private static readonly Color GhostColor = new Color(1f, 1f, 1f, 0.9f);
+        private float _animateUntil = -1f;
+
+        // The meter.
+        private float _shownSure;
+        private float _shownLoss = 1f;
+        private int _shownPercent = -1;
+
+        // The glows: per wire its orb and its cooling burst, then the coach's falling lights. Four vertices each.
         private Mesh _glowMesh;
         private Vector3[] _glowVerts;
         private Color[] _glowColors;
@@ -95,6 +98,12 @@ namespace Convergence.Presentation.Ride
 
         private void Awake()
         {
+            if (_percent == null)
+            {
+                _percent = new string[101];
+                for (int i = 0; i <= 100; i++) _percent[i] = i + "%";
+            }
+
             _block = new MaterialPropertyBlock();
             _mesh = Instantiate(topWires.sharedMesh);
             topWires.sharedMesh = _mesh;
@@ -107,6 +116,8 @@ namespace Convergence.Presentation.Ride
                 _allColors = _all.colors;
             }
 
+            _cooledAt = new float[targets.Length];
+            for (int k = 0; k < _cooledAt.Length; k++) _cooledAt[k] = -1f;
             SetLit(-0.1f);
             BuildGlowMesh();
         }
@@ -114,7 +125,7 @@ namespace Convergence.Presentation.Ride
         private void BuildGlowMesh()
         {
             if (glows == null) return;
-            _glowCount = origins.Length * 2 + GhostSlots + 2;
+            _glowCount = targets.Length * 2 + CoachDots;
             _glowVerts = new Vector3[_glowCount * 4];
             _glowColors = new Color[_glowCount * 4];
             var uv = new Vector2[_glowCount * 4];
@@ -152,8 +163,6 @@ namespace Convergence.Presentation.Ride
             if (moment == null) return;
             moment.BlameChanged += Reaim;
             moment.Nudged += OnNudged;
-            moment.Grabbed += OnGrabbed;
-            moment.Dropped += OnDropped;
             moment.Connected += OnConnected;
             moment.LiveChanged += OnLive;
         }
@@ -164,27 +173,27 @@ namespace Convergence.Presentation.Ride
             if (moment == null) return;
             moment.BlameChanged -= Reaim;
             moment.Nudged -= OnNudged;
-            moment.Grabbed -= OnGrabbed;
-            moment.Dropped -= OnDropped;
             moment.Connected -= OnConnected;
             moment.LiveChanged -= OnLive;
         }
 
         private void Start()
         {
-            foreach (LineRenderer cable in cables) if (cable != null) cable.enabled = false;
             if (glows != null) glows.gameObject.SetActive(false);
-            ShowCoach(false, false);
+            if (dropRing != null) dropRing.gameObject.SetActive(false);
             Reaim();
         }
 
         /// <summary>
-        /// The blame is the rider's own digit's (v6): every wire burns by its new |∂loss/∂w|, and the hunt's top wires,
-        /// their handles, cables and laser targets move onto the new hottest wires. The builder lays the full blame mesh in
-        /// the network's own order (hidden neuron j's 49 wires, then answer k's 16), 16 vertices per wire.
+        /// The blame is the rider's own digit's (v6): every wire burns by its new |∂loss/∂w|, and the hunt's hot wires,
+        /// their orbs and laser targets move onto the new hottest wires, all hot again. The builder lays the full blame mesh
+        /// in the network's own order (hidden neuron j's 49 wires, then answer k's 16), 16 vertices per wire. The board's
+        /// meter starts from this digit's real "how sure".
         /// </summary>
         private void Reaim()
         {
+            for (int k = 0; k < _cooledAt.Length; k++) _cooledAt[k] = -1f;
+            ResetMeter();
             if (moment == null || moment.Wires == null || moment.Wires.Count == 0 || inputPositions.Length < 49) return;
             var wires = moment.Wires;
             double biggest = System.Math.Max(1e-12, System.Math.Abs(wires[0].Gradient));
@@ -200,7 +209,7 @@ namespace Convergence.Presentation.Ride
                 _all.colors = _allColors;
             }
 
-            int top = Mathf.Min(moment.TopCount, Mathf.Min(origins.Length, ends.Length));
+            int top = Mathf.Min(moment.TopCount, targets.Length);
             Vector3[] vertices = _mesh.vertices;
             Vector3[] normals = _mesh.normals;
             var uv = new System.Collections.Generic.List<Vector2>();
@@ -227,15 +236,13 @@ namespace Convergence.Presentation.Ride
                     }
                 }
 
-                origins[k].localPosition = a;
-                ends[k].localPosition = b;
-                if (k < targets.Length && targets[k] != null)
+                if (targets[k] != null)
                 {
                     Transform target = targets[k];
                     target.localPosition = (a + b) * 0.5f;
                     target.localRotation = Quaternion.LookRotation(tangent, Vector3.up);
                     if (target.TryGetComponent(out CapsuleCollider capsule)) capsule.height = Vector3.Distance(a, b);
-                    if (target.childCount > 0) target.GetChild(0).position = target.parent.TransformPoint(b);
+                    if (target.childCount > 0) target.GetChild(0).position = target.parent.TransformPoint(Vector3.Lerp(a, b, orbAlong));
                 }
             }
 
@@ -246,6 +253,7 @@ namespace Convergence.Presentation.Ride
             Bounds bounds = _mesh.bounds;
             bounds.Expand(4f);
             _mesh.bounds = bounds;
+            PaintWires();
         }
 
         private void OnCue(RideLine line, int index, NarrationLibrary.Segment segment)
@@ -262,7 +270,11 @@ namespace Convergence.Presentation.Ride
                 if (t >= 1f) _flowStarted = -2f;
             }
 
-            UpdateWires();
+            if (moment == null) return;
+            bool live = moment.IsLive;
+            if (live || Time.time < _animateUntil) PaintWires();
+            UpdateGlows(live);
+            UpdateMeter();
         }
 
         private void SetLit(float value)
@@ -273,207 +285,171 @@ namespace Convergence.Presentation.Ride
             blameLinks.SetPropertyBlock(_block);
         }
 
-        // ---------- the dragged wires ----------
+        // ---------- the hot wires ----------
 
-        private int HandCarrying(int wire)
+        private int WireCount => moment != null ? Mathf.Min(targets.Length, moment.TopCount) : 0;
+
+        private Vector3 OrbPosition(int k)
         {
-            if (moment.Carrying(RideHand.Left) == wire) return RideHand.Left;
-            return moment.Carrying(RideHand.Right) == wire ? RideHand.Right : -1;
+            Transform target = targets[k];
+            if (target == null) return Vector3.zero;
+            return target.childCount > 0 ? target.GetChild(0).position : target.position;
         }
 
-        private void UpdateWires()
+        /// <summary>
+        /// The wires' colour in the top-wires mesh: red is the width and brightness, green the hue (1: the material's hot
+        /// colour, 0: its calm blue). A hot wire pulses while the hunt is live; a shot one cools from hot to blue.
+        /// </summary>
+        private void PaintWires()
         {
-            if (moment == null || moment.Socket == null || _glowMesh == null) return;
-            bool live = moment.IsLive;
-            if (_camera == null) _camera = Camera.main;
-            Vector3 eye = _camera != null ? _camera.transform.position : moment.Socket.position - Vector3.forward * 30f;
-            Vector3 socket = moment.Socket.position;
-            float radius = moment.SnapRadiusFrom(eye);
-            bool near = false;
-            bool any = live;
-
-            for (int i = 0; i < _glowCount; i++) Glow(i, Vector3.zero, 0f, Color.clear);
-
-            int wires = Mathf.Min(origins.Length, Mathf.Min(ends.Length, cables.Length));
+            if (_colors == null) return;
+            bool live = moment != null && moment.IsLive;
+            int wires = WireCount;
             for (int k = 0; k < wires; k++)
             {
-                bool connected = moment.IsNudged(k);
-                int hand = HandCarrying(k);
-                Vector3 from = origins[k].position;
-                Vector3 end = default;
-                bool held = hand >= 0 && moment.TryGetCursor(hand, out end);
-                if (held) near |= Vector3.Distance(end, socket) <= radius * 1.8f;
-                else if (connected) end = socket;
-
-                LineRenderer line = cables[k];
-                line.enabled = held || connected;
-                any |= line.enabled;
-
-                // The handle: pulsing at the loose end, bigger and following the laser once grabbed.
-                if (live && !connected)
+                float r, g;
+                if (_cooledAt[k] >= 0f)
                 {
-                    float beat = 1f + 0.18f * Mathf.Sin(Time.time * 6f + k);
-                    Glow(k * 2, held ? end : ends[k].position, handleSize * (held ? 1.35f : 1f) * beat, heldColor);
+                    float u = Mathf.Clamp01((Time.time - _cooledAt[k]) / coolSeconds);
+                    r = Mathf.Lerp(1f, 0.4f, u);
+                    g = 1f - u;
+                }
+                else
+                {
+                    r = live ? 0.8f + 0.2f * Mathf.Sin(Time.time * 5f + k * 1.3f) : -1f;
+                    g = 1f;
                 }
 
-                if (!line.enabled) continue;
-                DrawCable(line, from, end, connected ? connectedColor : heldColor);
-                // Blame flows back: a pulse runs from the 3 (or the hand) toward the wire's fixed end.
-                float u = Mathf.Repeat(Time.time * 0.9f + k * 0.23f, 1f);
-                Glow(k * 2 + 1, Cable(from, end, 1f - u), pulseSize * (0.7f + 0.5f * Mathf.Sin(u * Mathf.PI)), Color.white);
+                int at = k * vertsPerWire;
+                for (int i = at; i < at + vertsPerWire && i < _colors.Length; i++)
+                {
+                    _colors[i].r = r < 0f ? _heat[i].r : r;
+                    _colors[i].g = g;
+                }
             }
 
-            UpdateCoach(live, socket, radius);
+            _mesh.colors = _colors;
+        }
 
-            // The 3: a gold glow the size of the snap zone, swelling as a wire's end comes near, and a flash when one snaps on.
-            if (live)
+        private void UpdateGlows(bool live)
+        {
+            if (_glowMesh == null) return;
+            if (_camera == null) _camera = Camera.main;
+            bool any = live;
+            for (int i = 0; i < _glowCount; i++) Glow(i, Vector3.zero, 0f, Color.clear);
+
+            int wires = WireCount;
+            for (int k = 0; k < wires; k++)
             {
-                float swell = near ? 1.25f : 1f;
-                float pulse = 1f + 0.08f * Mathf.Sin(Time.time * 5f);
-                Glow(_glowCount - 2, socket, radius * 3.2f * swell * pulse, socketColor);
+                Vector3 at = OrbPosition(k);
+                if (_cooledAt[k] < 0f)
+                {
+                    if (!live) continue;
+                    // Hot: a big orb pulsing from orange to white.
+                    float beat = 0.5f + 0.5f * Mathf.Sin(Time.time * 5f + k * 1.3f);
+                    Glow(k * 2, at, orbSize * (1f + 0.15f * beat), Color.Lerp(hotColor, whiteHot, beat));
+                    // A wide warm halo, so a hot wire reads as a target from the stop 30 m away (2026-11-17 live check: the
+                    // orb alone was a speck).
+                    Glow(k * 2 + 1, at, orbSize * (2.4f + 0.3f * beat), new Color(hotColor.r, hotColor.g, hotColor.b, 0.5f));
+                    continue;
+                }
+
+                // Cooled: the orb flashes white and settles as a small calm blue dot; a burst rings out from it.
+                float u = Mathf.Clamp01((Time.time - _cooledAt[k]) / coolSeconds);
+                if (!live && u >= 1f) continue;
+                Glow(k * 2, at, orbSize * Mathf.Lerp(1.6f, 0.45f, u), Color.Lerp(whiteHot, coolColor, u));
+                if (u < 1f)
+                {
+                    any = true;
+                    float fade = (1f - u) * (1f - u);
+                    Glow(k * 2 + 1, at, orbSize * (1.2f + 3.5f * u), new Color(1f, 1f, 1f, fade));
+                }
             }
 
-            _flash = Mathf.MoveTowards(_flash, 0f, Time.deltaTime / 0.45f);
-            if (_flash > 0f) Glow(_glowCount - 1, socket, radius * (1.5f + 3f * (1f - _flash)), new Color(1f, 1f, 1f, _flash));
-
-            glows.gameObject.SetActive(any || _flash > 0f);
-            if (!glows.gameObject.activeSelf) return;
+            UpdateCoach(live);
+            glows.gameObject.SetActive(any);
+            if (!any) return;
             _glowMesh.vertices = _glowVerts;
             _glowMesh.colors = _glowColors;
         }
-
 
         // ---------- showing how ----------
 
         private void OnLive(bool live)
         {
-            _demoStarted = -1f;
-            // The first lap starts soon after the hunt opens: a rider who has never seen it should not wait to be shown.
-            _lastActivity = live ? Time.time - showAfterIdle + 1.5f : -100f;
-        }
-
-        private int FirstLoose()
-        {
-            int wires = Mathf.Min(origins.Length, Mathf.Min(ends.Length, cables.Length));
-            for (int k = 0; k < wires; k++) if (!moment.IsNudged(k)) return k;
-            return -1;
-        }
-
-        private void ShowCoach(bool ring, bool step)
-        {
-            if (dropRing != null && dropRing.gameObject.activeSelf != ring) dropRing.gameObject.SetActive(ring);
-            if (dropLabel != null && dropLabel.gameObject.activeSelf != ring) dropLabel.gameObject.SetActive(ring);
-            if (stepLabel != null && stepLabel.gameObject.activeSelf != step) stepLabel.gameObject.SetActive(step);
+            // The first hint comes soon after the hunt opens: a rider who has never seen it should not wait long to be shown.
+            _lastActivity = live ? Time.time - showAfterIdle + 2f : -100f;
+            _animateUntil = Time.time + coolSeconds + 0.1f;
+            if (!live) PaintWires();
         }
 
         /// <summary>
-        /// While the hunt is live the 3 wears a ring and "DROP ON THE 3". While a wire is carried, a dotted trail of lights runs from
-        /// its end to the 3. When nobody has grabbed anything for a few seconds, a ghost hand shows the whole move: it presses on
-        /// the loose end of the hottest wire (1 GRAB IT), drags it along the path (2 DRAG IT) and lets go on the 3 (3 LET GO).
+        /// When nobody has cooled a wire for a few seconds, a gold ring pulses on the hottest orb still hot, facing the rider,
+        /// with a stream of gold lights falling onto it from above: "this one".
         /// </summary>
-        private void UpdateCoach(bool live, Vector3 socket, float radius)
+        private void UpdateCoach(bool live)
         {
-            int carried = moment.Carrying(RideHand.Left) >= 0 ? RideHand.Left : moment.Carrying(RideHand.Right) >= 0 ? RideHand.Right : -1;
-            if (carried >= 0) _lastActivity = Time.time;
-            int k = live ? FirstLoose() : -1;
-            bool demo = live && carried < 0 && k >= 0 && Time.time - _lastActivity >= showAfterIdle;
-            ShowCoach(live, demo);
-            if (!live)
-            {
-                _demoStarted = -1f;
-                return;
-            }
+            int k = live ? moment.HottestLeft : -1;
+            bool show = k >= 0 && k < WireCount && Time.time - _lastActivity >= showAfterIdle;
+            if (dropRing != null && dropRing.gameObject.activeSelf != show) dropRing.gameObject.SetActive(show);
+            if (!show) return;
 
+            Vector3 at = OrbPosition(k);
+            Vector3 eye = _camera != null ? _camera.transform.position : at - Vector3.forward * 30f;
+            Vector3 up = _camera != null ? _camera.transform.up : Vector3.up;
+            float pulse = 1f + 0.12f * Mathf.Sin(Time.time * 6f);
+            float radius = orbSize * 0.75f;
             if (dropRing != null)
             {
-                float pulse = 1f + 0.07f * Mathf.Sin(Time.time * 4.5f);
-                dropRing.position = socket;
-                dropRing.localScale = Vector3.one * radius * 1.05f * pulse;
+                dropRing.position = at;
+                Vector3 look = at - eye;
+                if (look.sqrMagnitude > 1e-6f) dropRing.rotation = Quaternion.LookRotation(look, up);
+                dropRing.localScale = Vector3.one * radius * pulse;
             }
 
-            int ghost = origins.Length * 2;
-            if (carried >= 0)
+            int first = targets.Length * 2;
+            for (int i = 0; i < CoachDots; i++)
             {
-                if (moment.TryGetCursor(carried, out Vector3 hand)) Guide(ghost + 1 + TrailCount, hand, socket, new Color(1f, 0.9f, 0.45f, 0.9f));
-                _demoStarted = -1f;
-                return;
-            }
-
-            if (!demo)
-            {
-                _demoStarted = -1f;
-                return;
-            }
-
-            if (_demoStarted < 0f)
-            {
-                _demoStarted = Time.time;
-                _demoFlashed = false;
-            }
-
-            float t = Time.time - _demoStarted;
-            if (t >= demoSeconds)
-            {
-                // A lap is over: rest a moment, then show it again.
-                _lastActivity = Time.time - showAfterIdle + 1.2f;
-                _demoStarted = -1f;
-                if (stepLabel != null) stepLabel.gameObject.SetActive(false);
-                return;
-            }
-
-            Vector3 from = ends[k].position;
-            const float press = 1.1f, travel = 2.6f;
-            float along = Mathf.Clamp01((t - press) / travel);
-            float eased = along * along * (3f - 2f * along);
-            Vector3 at = Vector3.Lerp(from, socket, eased) + Vector3.up * (Mathf.Sin(eased * Mathf.PI) * 0.9f);
-            string words = t < press ? "1  GRAB THE GLOWING END" : t < press + travel ? "2  DRAG IT" : "3  LET GO ON THE 3";
-
-            float scale = handleSize * 1.5f;
-            if (t < press) scale *= 1f + 0.5f * Mathf.Abs(Mathf.Sin(t / press * Mathf.PI * 2f));   // the press: the cursor pulses on the end
-            float fade = Mathf.Clamp01((demoSeconds - t) / 0.6f);
-            Glow(ghost, at, scale, new Color(GhostColor.r, GhostColor.g, GhostColor.b, GhostColor.a * fade));
-            for (int i = 0; i < TrailCount; i++)
-            {
-                float back = Mathf.Clamp01(along - (i + 1) * 0.055f);
-                float be = back * back * (3f - 2f * back);
-                Vector3 p = Vector3.Lerp(from, socket, be) + Vector3.up * (Mathf.Sin(be * Mathf.PI) * 0.9f);
-                float visible = along > 0f && along < 1f ? 1f : 0f;
-                Glow(ghost + 1 + i, p, handleSize * (0.95f - 0.12f * i), new Color(1f, 0.85f, 0.4f, 0.55f * (1f - i / (float)TrailCount) * visible * fade));
-            }
-
-            if (t >= press && t < press + travel) Guide(ghost + 1 + TrailCount, at, socket, new Color(1f, 0.9f, 0.45f, 0.7f));
-            if (!_demoFlashed && t >= press + travel)
-            {
-                _demoFlashed = true;
-                _flash = 0.7f;
-            }
-
-            // The ghost cable, so the rider sees the wire come along with the hand.
-            LineRenderer line = cables[k];
-            line.enabled = true;
-            DrawCable(line, origins[k].position, at, new Color(1f, 1f, 1f, 0.75f * fade));
-
-            if (stepLabel != null)
-            {
-                stepLabel.text = words;
-                stepLabel.transform.position = at + new Vector3(0f, handleSize * 1.6f, -0.2f);
-                Color c = stepLabel.color;
-                c.a = fade;
-                stepLabel.color = c;
+                float u = Mathf.Repeat(Time.time * 0.8f + i / (float)CoachDots, 1f);
+                Vector3 p = at + up * (radius * 1.2f + 0.4f + (1f - u) * 2.6f);
+                Color c = coachColor;
+                c.a *= Mathf.Sin(u * Mathf.PI);
+                Glow(first + i, p, orbSize * (0.55f - 0.15f * u), c);
             }
         }
 
-        /// <summary>A line of lights marching from a point to the 3, so the way is plain.</summary>
-        private void Guide(int first, Vector3 from, Vector3 to, Color color)
+        // ---------- the meter on the hunt board ----------
+
+        private void ResetMeter()
         {
-            float phase = Mathf.Repeat(Time.time * 1.1f, 1f);
-            for (int i = 0; i < GuideCount; i++)
+            if (moment == null) return;
+            _shownSure = (float)moment.StartProbability;
+            _shownLoss = 1f;
+            _shownPercent = -1;
+            if (startText != null) startText.text = "STARTED AT " + Percent(moment.StartProbability);
+        }
+
+        private static string Percent(double p) => _percent[Mathf.Clamp(Mathf.RoundToInt((float)p * 100f), 0, 100)];
+
+        /// <summary>The real "how sure it's a 3" counts up toward the moment's value after each shot; the loss bar shrinks.</summary>
+        private void UpdateMeter()
+        {
+            float sure = (float)moment.HeroProbability;
+            float gap = Mathf.Abs(sure - _shownSure);
+            _shownSure = Mathf.MoveTowards(_shownSure, sure, Mathf.Max(0.03f, gap * 2.5f) * Time.deltaTime);
+            int percent = Mathf.Clamp(Mathf.RoundToInt(_shownSure * 100f), 0, 100);
+            if (sureText != null && percent != _shownPercent)
             {
-                float u = (i + phase) / GuideCount;
-                Color c = color;
-                c.a *= Mathf.Sin(u * Mathf.PI);
-                Glow(first + i, Vector3.Lerp(from, to, u), pulseSize * (0.55f + 0.35f * Mathf.Sin(u * Mathf.PI)), c);
+                _shownPercent = percent;
+                sureText.text = _percent[percent];
             }
+
+            if (sureFill != null) sureFill.localScale = new Vector3(Mathf.Max(0.001f, _shownSure), 1f, 1f);
+
+            double start = moment.StartLoss;
+            float loss = start > 1e-9 ? Mathf.Clamp01((float)(moment.HeroLoss / start)) : 1f;
+            _shownLoss = Mathf.MoveTowards(_shownLoss, loss, Mathf.Max(0.05f, Mathf.Abs(loss - _shownLoss) * 2.5f) * Time.deltaTime);
+            if (lossFill != null) lossFill.localScale = new Vector3(Mathf.Max(0.001f, _shownLoss), 1f, 1f);
         }
 
         /// <summary>Writes glow i as a camera-facing square (size 0 hides it).</summary>
@@ -495,69 +471,29 @@ namespace Convergence.Presentation.Ride
             for (int c = 0; c < 4; c++) _glowColors[v + c] = color;
         }
 
-        /// <summary>A cable hanging a little between two points, drawn with the line renderer. No allocation.</summary>
-        private void DrawCable(LineRenderer line, Vector3 from, Vector3 to, Color tint)
-        {
-            if (line.positionCount != CablePoints) line.positionCount = CablePoints;
-            for (int i = 0; i < CablePoints; i++) _points[i] = Cable(from, to, i / (float)(CablePoints - 1));
-            line.SetPositions(_points);
-            line.startColor = new Color(tint.r, tint.g, tint.b, 0.35f);
-            line.endColor = tint;
-        }
-
-        private static Vector3 Cable(Vector3 from, Vector3 to, float t)
-        {
-            Vector3 control = (from + to) * 0.5f + Vector3.down * (Vector3.Distance(from, to) * 0.12f);
-            float u = 1f - t;
-            return u * u * from + 2f * u * t * control + t * t * to;
-        }
-
-        private void SetWireHeat(int wire, float scale, bool cool)
-        {
-            int at = wire * vertsPerWire;
-            for (int i = at; i < at + vertsPerWire && i < _colors.Length; i++)
-            {
-                _colors[i].r = cool ? 0.05f : _heat[i].r * scale;
-            }
-
-            _mesh.colors = _colors;
-        }
-
         // ---------- what the moment says ----------
-
-        private void OnGrabbed(int wire, int hand)
-        {
-            _lastActivity = Time.time;
-            SetWireHeat(wire, 0.35f, false); // the fixed wire dims while its cable is dragged
-        }
-
-        private void OnDropped(int wire, int hand)
-        {
-            _lastActivity = Time.time;
-            SetWireHeat(wire, 1f, false);
-        }
-
-        private void OnConnected(int wire, int hand, int order)
-        {
-            _lastActivity = Time.time;
-            _flash = 1f;
-            if (sparks != null)
-            {
-                sparks.transform.position = moment.Socket.position;
-                sparks.Emit(32);
-            }
-
-            RideAim.Buzz(hand, snapBuzz, snapBuzzSeconds);
-        }
 
         private void OnNudged(int k, double before, double after)
         {
-            SetWireHeat(k, 1f, true);
+            if (k >= 0 && k < _cooledAt.Length && _cooledAt[k] < 0f) _cooledAt[k] = Time.time;
+            _animateUntil = Time.time + coolSeconds + 0.1f;
             if (dash != null)
             {
-                dash.ShowReadout("WIRE NUDGED  " + before.ToString("0.00") + " > " + after.ToString("0.00")
-                    + "   LOSS FOR YOUR 3: " + moment.StartLoss.ToString("0.00") + " > " + moment.HeroLoss.ToString("0.00"));
+                dash.ShowReadout("WIRE COOLED  " + before.ToString("0.00") + " > " + after.ToString("0.00")
+                    + "   SURE IT'S A 3: " + Percent(moment.StartProbability) + " > " + Percent(moment.HeroProbability));
             }
+        }
+
+        private void OnConnected(int k, int hand, int order)
+        {
+            _lastActivity = Time.time;
+            if (sparks != null && k >= 0 && k < targets.Length)
+            {
+                sparks.transform.position = OrbPosition(k);
+                sparks.Emit(32);
+            }
+
+            RideAim.Buzz(hand, hitBuzz, hitBuzzSeconds);
         }
     }
 }

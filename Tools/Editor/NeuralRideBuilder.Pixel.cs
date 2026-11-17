@@ -64,7 +64,9 @@ namespace Convergence.EditorTools
             bool upgraded = _level2;
             MakePixelMaterials();
             var root = Make("Pixel", pod.transform, Vector3.zero);
-            var body = Make("Body", root.transform, new Vector3(0.98f, 0.95f, 1.02f));
+            // Level 1 (2026-11-17 playtest): Pixel rides farther out to the right (about 55 degrees) so it never sits on a board
+            // or the network's answers; it still turns to the rider and is one glance away.
+            var body = Make("Body", root.transform, upgraded ? new Vector3(0.98f, 0.95f, 1.02f) : new Vector3(1.12f, 0.92f, 0.8f));
 
             body.transform.localRotation = Quaternion.LookRotation(EyePoint - body.transform.localPosition);
 

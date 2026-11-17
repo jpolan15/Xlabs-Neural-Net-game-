@@ -378,16 +378,13 @@ namespace Convergence.EditorTools
 
             GameObject links = AddMeshObject("BlameLinks", blame, SaveMesh(ToLinkMesh(all), "L1_BlameLinks"), "BlameLinks");
 
-            // The brightest few: thick, pulsing, and grabbable by a laser. The rider drags each one's loose end to the 3; the wire
-            // dims where it hangs and a cable follows the hand (BlameView). A connected wire cools.
-            int top = Mathf.Min(4, wires.Count);
+            // The brightest six: thick, pulsing, each with a big glowing orb the laser shoots (2026-11-17, "cool the hot wires"):
+            // a shot is one real gradient step on that weight, and the wire cools (BlameView).
+            int top = Mathf.Min(6, wires.Count);
             var targets = new Ribbons();
             Transform pointables = Make("Targets", blame, Vector3.zero).transform;
             Transform steer = Make("Steer", blame, Vector3.zero).transform;
             Vector3 socketAt = OutputPosition(Level1Data.HeroDigit);
-            var origins = new List<Object>();
-            var ends = new List<Object>();
-            var cables = new List<Object>();
             var targetList = new List<Object>();
             for (int k = 0; k < top; k++)
             {
@@ -405,31 +402,15 @@ namespace Convergence.EditorTools
                 interactable.SetWire(k);
                 Ref(interactable, "moment", moment);
 
-                // A generous grip on the loose end: seen from the stop it is a few degrees wide, so a hand's wobble still grabs it.
-                var grip = Make("Grip", target.transform, Vector3.zero);
-                grip.transform.position = pointables.TransformPoint(b);
-                grip.AddComponent<SphereCollider>().radius = 1.3f;
-
-                origins.Add(Make("Origin" + k, steer, a).transform);
-                ends.Add(Make("End" + k, steer, b).transform);
-                LineRenderer cable = Make("Cable" + k, steer, Vector3.zero).AddComponent<LineRenderer>();
-                cable.useWorldSpace = true;
-                cable.positionCount = 24;
-                cable.widthMultiplier = 0.16f;
-                cable.numCapVertices = 3;
-                cable.sharedMaterial = Mat("Laser");
-                cable.shadowCastingMode = ShadowCastingMode.Off;
-                cable.receiveShadows = false;
-                cable.enabled = false;
-                cables.Add(cable);
+                // The orb the laser shoots: its first child (BlameView slides it along the wire), big enough to hit from 30 m.
+                var orb = Make("Orb", target.transform, Vector3.zero);
+                orb.AddComponent<SphereCollider>().radius = 1.3f;
             }
 
             GameObject topWires = AddMeshObject("TopWires", blame, SaveMesh(ToLinkMesh(targets), "L1_BlameTop"), "BlameTop");
             Int(moment, "topCount", top);
 
-            // The 3 the wires are dragged to, and every glow of the hunt (the wire handles, the pulses along the cables, the 3's
-            // glow and flash): one mesh the view fills with camera-facing squares, so the hunt costs one draw call.
-            Transform socket = Make("Socket3", blame, socketAt).transform;
+            // Every glow of the hunt (the orbs, the cooling flashes): one mesh the view fills with camera-facing squares, one draw call.
             GameObject glows = Make("Glows", steer, Vector3.zero);
             glows.AddComponent<MeshFilter>();
             var glowRenderer = glows.AddComponent<MeshRenderer>();
@@ -437,11 +418,8 @@ namespace Convergence.EditorTools
             glowRenderer.shadowCastingMode = ShadowCastingMode.Off;
             glowRenderer.receiveShadows = false;
             ParticleSystem sparks = BuildSparks(steer, socketAt);
-            Ref(moment, "socket", socket);
-            Float(moment, "snapDegrees", 3f);
 
-            // Where to let go (owner, 2026-10-30: the teacher could not tell the glowing wires are dragged onto the 3): a ring
-            // on the 3, "DROP ON THE 3" beside its digit, and the words that ride with the ghost hand's demonstration.
+            // The coach's ring: it pulses on the hottest orb when the rider has not shot for a few seconds.
             Transform ring = Make("DropRing", steer, socketAt).transform;
             LineRenderer ringLine = ring.gameObject.AddComponent<LineRenderer>();
             ringLine.useWorldSpace = false;
@@ -459,13 +437,7 @@ namespace Convergence.EditorTools
             ringLine.startColor = ringLine.endColor = new Color(1f, 0.85f, 0.35f, 0.95f);
             ringLine.shadowCastingMode = ShadowCastingMode.Off;
             ringLine.receiveShadows = false;
-            TextMeshPro dropLabel = Text("DropLabel", steer, socketAt + new Vector3(2.5f, 0f, -0.3f), "< DROP ON THE 3", 1.0f, _theme.gold, 9f, TextAlignmentOptions.Left, true);
-            dropLabel.textWrappingMode = TextWrappingModes.NoWrap;
-            TextMeshPro stepLabel = Text("StepLabel", steer, socketAt, "1  GRAB THE GLOWING END", 1.1f, Color.white, 14f, TextAlignmentOptions.Center, true);
-            stepLabel.textWrappingMode = TextWrappingModes.NoWrap;
             ring.gameObject.SetActive(false);
-            dropLabel.gameObject.SetActive(false);
-            stepLabel.gameObject.SetActive(false);
 
             var view = root.AddComponent<BlameView>();
             Ref(view, "director", director);
@@ -474,14 +446,9 @@ namespace Convergence.EditorTools
             Ref(view, "blameLinks", links.GetComponent<Renderer>());
             Ref(view, "topWires", topWires.GetComponent<MeshFilter>());
             Int(view, "vertsPerWire", 16);
-            Refs(view, "origins", origins);
-            Refs(view, "ends", ends);
-            Refs(view, "cables", cables);
             Ref(view, "glows", glows.GetComponent<MeshFilter>());
             Ref(view, "sparks", sparks);
             Ref(view, "dropRing", ring);
-            Ref(view, "dropLabel", dropLabel);
-            Ref(view, "stepLabel", stepLabel);
             Refs(view, "targets", targetList);
             Set(view, "inputPositions", p => Positions(p, 49, InputPosition));
             Set(view, "hiddenPositions", p => Positions(p, 16, HiddenPosition));

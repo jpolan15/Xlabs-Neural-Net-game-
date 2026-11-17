@@ -190,7 +190,7 @@ namespace Convergence.Presentation.Ride
             Shader.SetGlobalColor(SkyHorizon, horizon);
             Shader.SetGlobalColor(SkyGlow, glow);
             Shader.SetGlobalColor(SkyFloor, floor);
-            Shader.SetGlobalVector(SkyParams, new Vector4(stars, theme != null ? theme.floorDepth : 7f, theme != null ? theme.floorSpacing : 3f, 0f));
+            Shader.SetGlobalVector(SkyParams, new Vector4(stars, theme != null ? theme.floorDepth : 7f, theme != null ? theme.floorSpacing : 3f, theme != null ? theme.moon : 0f));
         }
 
         private void ApplyGrid(float alpha)

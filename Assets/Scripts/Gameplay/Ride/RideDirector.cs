@@ -97,8 +97,36 @@ namespace Convergence.Gameplay.Ride
         private float _holdSeconds;
         private RideMoment _moment;
         private bool _gentle;
+        private int _startSegment;
+        private bool _launched;
+        private bool _begun; // the boot has let the ride start (before that the state is only the default Dock)
 
         public RideState State => _state;
+
+        /// <summary>
+        /// The segment GO starts the ride at (0: the whole ride). The chapter picker at the dock sets it; the ride then
+        /// runs on from there to the end as usual.
+        /// </summary>
+        public int StartSegment => _startSegment;
+
+        /// <summary>True until GO launches the ride (the intro and the dock): the start segment can still be chosen.</summary>
+        public bool CanChooseStart => _begun && !_launched && (_state == RideState.Intro || _state == RideState.Dock);
+
+        /// <summary>The start segment changed (the chapter picker's choice).</summary>
+        public event Action<int> StartSegmentChanged;
+
+        /// <summary>
+        /// Chooses the segment GO starts the ride at. Only before GO (the intro or the dock); returns false then, or for a
+        /// segment the ride does not have.
+        /// </summary>
+        public bool SetStartSegment(int segment)
+        {
+            if (!CanChooseStart || segment < 0 || segment >= segments.Length) return false;
+            if (segment == _startSegment) return true;
+            _startSegment = segment;
+            StartSegmentChanged?.Invoke(segment);
+            return true;
+        }
 
         /// <summary>The segment running now, or -1 at the intro and the dock.</summary>
         public int SegmentIndex => _segment;
@@ -222,6 +250,7 @@ namespace Convergence.Gameplay.Ride
 
         private void BeginRide()
         {
+            _begun = true;
             if (script != null && !script.intro.IsEmpty) _routine = StartCoroutine(IntroThenDock());
             else EnterDock(true);
         }
@@ -386,6 +415,7 @@ namespace Convergence.Gameplay.Ride
         private void OnDockAction(RideControlChannel channel, bool byUser)
         {
             if (!byUser || _state != RideState.Dock || channel.Value < 0.5f) return;
+            _launched = true;
             _action.Changed -= OnDockAction;
             HintChanged?.Invoke(null, 0);
             _action.Configure(0f, 1f, 1f, 1f, true, true);
@@ -395,9 +425,31 @@ namespace Convergence.Gameplay.Ride
 
         private IEnumerator RunSegments()
         {
-            for (int i = 0; i < segments.Length; i++) yield return RunSegment(i);
+            int start = Mathf.Clamp(_startSegment, 0, segments.Length - 1);
+            if (start > 0) JumpTo(start);
+            for (int i = start; i < segments.Length; i++) yield return RunSegment(i);
             SetState(RideState.Complete);
             RideCompleted?.Invoke();
+        }
+
+        /// <summary>
+        /// A chapter start: the pod is put where the segment before ended (that segment's leg and distance, facing the
+        /// track), and the ride enters the start segment's region, so the streamer and the sky switch before it begins.
+        /// The start segment itself then runs as usual (SegmentStarted, its travel, its stop and its moment).
+        /// </summary>
+        private void JumpTo(int start)
+        {
+            Segment before = segments[start - 1];
+            _leg = Mathf.Clamp(before.leg, 0, _paths.Length - 1);
+            _distance = before.to;
+            _speed = 0f;
+            Place(_distance, true);
+            int region = segments[start].region;
+            if (region != _region)
+            {
+                _region = region;
+                RegionChanged?.Invoke(_region);
+            }
         }
 
         private IEnumerator RunSegment(int index)

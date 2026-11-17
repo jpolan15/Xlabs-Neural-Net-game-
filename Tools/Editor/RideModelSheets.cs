@@ -151,9 +151,11 @@ namespace Convergence.EditorTools
                 MaterialFloats = new Dictionary<string, float> { { "_LitUpTo", 2f } }
             },
             new Model("valley_terrain", "Region 6: the ground of real loss along the training path, with contours, the trail and the hop posts.", "Viewpoints/rim", "Region_6/Ground"),
-            new Model("valley_set", "Region 6: the deck at the rim, the sign, and the pink sun.", "Viewpoints/rim", "Region_6/Deck", "Region_6/Sign", "Region_6/Sun"),
+            new Model("valley_set", "Region 6: the deck at the rim, the sign, and the festival's great lantern over the far end.", "Viewpoints/rim", "Region_6/Deck", "Region_6/Sign", "Region_6/Sun"),
             new Model("network_trained", "Region 7: the same network with its trained weights, in gold.", "Viewpoints/right", "Region_7/Network"),
             new Model("finale_digits", "Region 7: 60 real test digits with the trained network's real answers (wrong ones red).", "Viewpoints/right", "Region_7/DigitWall"),
+            new Model("festival_town", "Level 1's night festival (2026-11-17): the lamp posts and lantern strings, overhead lantern canopies, the vermilion gate before each stop with its name, the pixel stage, stalls and lit houses on the street 7 m below, all lanterns in the stop's colour.", "Viewpoints/dock",
+                "Region_0/Festival", "Region_1/Festival", "Region_2/Festival", "Region_3/Festival", "Region_6/Festival", "Region_7/Festival"),
             new Model("accuracy_sign", "Region 7: the real accuracy and training count.", "Viewpoints/right", "Region_7/AccuracySign"),
         };
 

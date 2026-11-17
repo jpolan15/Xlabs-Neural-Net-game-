@@ -193,12 +193,27 @@ namespace Convergence.EditorTools
 
             BuildCoachArrow(table);
 
+            // The backprop hunt's board (2026-11-17, "cool the hot wires"): what to do, and a big live meter of how sure Pixel is
+            // that the rider's digit is a 3 (BlameView fills it from the real softmax after every shot).
             var shoot = Make("HuntBoard", table, BoardCentre).transform;
-            Text("Shoot", shoot, new Vector3(0, 0.085f, -0.006f), "DRAG THE GLOWING WIRES\nONTO THE 3!", 0.04f, _theme.rewindMagenta, 0.62f, bold: true).rectTransform.sizeDelta = new Vector2(0.62f, 0.1f);
-            TextMeshPro steps = Text("Steps", shoot, new Vector3(0, -0.035f, -0.006f), "1  POINT at a glowing wire end\n2  HOLD the trigger and DRAG\n3  LET GO on the 3", 0.03f, Color.white, 0.62f, TextAlignmentOptions.Left, true);
-            steps.rectTransform.sizeDelta = new Vector2(0.62f, 0.12f);
-            steps.lineSpacing = 6f;
-            Text("Up", shoot, new Vector3(0, -0.125f, -0.006f), "look up: the network is ahead of you", 0.026f, _theme.cyan, 0.62f);
+            Color hot = new Color(1f, 0.55f, 0.15f);
+            Text("Shoot", shoot, new Vector3(0, 0.1f, -0.006f), "SHOOT THE HOT WIRES!", 0.042f, hot, 0.62f, bold: true).rectTransform.sizeDelta = new Vector2(0.62f, 0.06f);
+            TextMeshPro steps = Text("Steps", shoot, new Vector3(0, 0.05f, -0.006f), "AIM at a glowing orb up ahead.  PULL the trigger.", 0.026f, Color.white, 0.62f, TextAlignmentOptions.Center, true);
+            steps.rectTransform.sizeDelta = new Vector2(0.62f, 0.04f);
+            TextMeshPro sureLabel = Text("SureLabel", shoot, new Vector3(-0.07f, -0.005f, -0.006f), "PIXEL THINKS IT'S A 3:", 0.03f, _theme.cyan, 0.46f, TextAlignmentOptions.Left, true);
+            sureLabel.textWrappingMode = TextWrappingModes.NoWrap;
+            TextMeshPro sure = Text("Sure", shoot, new Vector3(0.235f, -0.005f, -0.006f), "0%", 0.055f, _theme.gold, 0.16f, TextAlignmentOptions.Right, true);
+            sure.textWrappingMode = TextWrappingModes.NoWrap;
+            var barTiles = new TileMesh();
+            barTiles.Face(new Vector3(0f, -0.06f, -0.003f), 0.58f, 0.036f, new Color(0.08f, 0.1f, 0.14f, 0f));
+            TileObject("SureTrack", shoot, barTiles, "Tiles");
+            Transform fill = Make("SureFill", shoot, new Vector3(-0.29f, -0.06f, -0.005f)).transform;
+            var fillTiles = new TileMesh();
+            fillTiles.Face(new Vector3(0.29f, 0f, 0f), 0.58f, 0.03f, new Color(_theme.gold.r, _theme.gold.g, _theme.gold.b, 1f));
+            TileObject("Bar", fill, fillTiles, "Tiles");
+            fill.localScale = new Vector3(0.05f, 1f, 1f);
+            TextMeshPro start = Text("Start", shoot, new Vector3(0, -0.11f, -0.006f), "STARTED AT 0%", 0.024f, new Color(0.7f, 0.75f, 0.82f), 0.62f);
+            start.textWrappingMode = TextWrappingModes.NoWrap;
             shoot.gameObject.SetActive(false);
             return table;
         }
@@ -742,6 +757,10 @@ namespace Convergence.EditorTools
             Ref(huntShow, "director", rd);
             Ref(huntShow, "target", hunt);
             Int(huntShow, "segment", SegRewind);
+            var blameView = Object.FindFirstObjectByType<BlameView>(FindObjectsInactive.Include);
+            Ref(blameView, "sureText", hunt.transform.Find("Sure").GetComponent<TextMeshPro>());
+            Ref(blameView, "startText", hunt.transform.Find("Start").GetComponent<TextMeshPro>());
+            Ref(blameView, "sureFill", hunt.transform.Find("SureFill"));
 
             // The zapper between the stops.
             var zap = rd.gameObject.AddComponent<ZapGame>();
@@ -812,6 +831,8 @@ namespace Convergence.EditorTools
                     if (b.GetType().Name == "CurveVisualController") b.enabled = false;
                 }
             }
+
+            WireChapters(pod, rd, m); // the chapter picker at the dock (NeuralRideBuilder.Chapters)
         }
 
         /// <summary>The game titles, goals, win lines and how long each waits before it helps itself.</summary>

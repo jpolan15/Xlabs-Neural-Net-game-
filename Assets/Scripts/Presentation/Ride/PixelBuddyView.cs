@@ -450,6 +450,15 @@ namespace Convergence.Presentation.Ride
 
         private void OnSolved(bool byRider) => React(Mood.Celebrate);
 
+        /// <summary>A game was won and Pixel learned its topic (WinCelebrationView): the big happy hop, a spin and a grow.</summary>
+        public void Learn()
+        {
+            React(Mood.Celebrate);
+            _hop = 1f;
+            _spin = Mathf.Max(_spin, 1f);
+            _grow = Mathf.Max(_grow, 1f);
+        }
+
         private void OnNudged(int wire, double before, double after)
         {
             Beep(_blip);
@@ -525,8 +534,10 @@ namespace Convergence.Presentation.Ride
             if (_pointing && hintRing != null && hintRing.gameObject.activeInHierarchy)
             {
                 _pointAt = hintRing.position;
+                // Pixel stays in its seat and only its pointer beam reaches the hint (2026-11-17: flying to the grid put Pixel
+                // in front of the neuron's "why" panel). A small lean toward the board is all it moves.
                 Vector3 local = transform.InverseTransformPoint(_pointAt);
-                target = Vector3.Lerp(target, new Vector3(local.x + 0.35f, Mathf.Max(local.y + 0.45f, 1.05f), Mathf.Max(local.z + 0.55f, 1.2f)), 0.55f);
+                target = Vector3.Lerp(target, new Vector3(local.x, target.y, target.z), 0.08f);
             }
 
             _hop = Mathf.MoveTowards(_hop, 0f, dt * 1.6f);

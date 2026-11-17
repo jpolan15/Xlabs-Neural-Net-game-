@@ -25,7 +25,8 @@ namespace Convergence.Tests.PlayMode.Gameplay
     public class RideDirectorTests
     {
         // NeuralRideBuilder.Explainers' Seg* constants: the puzzle, the explain stop after it, the rewind, the drop.
-        private const int PixelsSegment = 0, NeuronSegment = 3, NetworkSegment = 4, RewindSegment = 8, ValleySegment = 11;
+        private const int PixelsSegment = 0, NeuronSegment = 3, NetworkSegment = 4, RewindSegment = 9, // ADR-025: the hunt is played at the network view; the rewind is the roll back to the switch after it
+            ValleySegment = 11;
 
         private readonly List<string> _errors = new List<string>();
 

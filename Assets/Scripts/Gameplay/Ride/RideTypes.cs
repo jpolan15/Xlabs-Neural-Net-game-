@@ -255,9 +255,9 @@ namespace Convergence.Gameplay.Ride
 
         // Level 1 pacing pass (owner, 2026-10-30: the teacher loved it but "moved a bit too fast for anyone not knowing the
         // space"): a plain-words sentence at the hardest ideas (the 49 pixels, a neuron, a weight, blame, a hill in the fog).
-        PixelsWhy49 = 184,
+        PixelsWhy49 = 184, // retired 2026-11-17 (ADR-025): not in the script; the id stays reserved
         NeuronJudge = 185,
-        WeightPlain = 186,
+        WeightPlain = 186, // retired 2026-11-17 (ADR-025): not in the script; the id stays reserved
         BackPlain = 187,
         DescentFog = 188,
 

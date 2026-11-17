@@ -77,6 +77,9 @@ namespace Convergence.Presentation.Ride
         public float floorDepth = 7f;
         public float floorSpacing = 3f;
 
+        [Tooltip("The moon in the sky shader, 0 (none) to 1 (Level 1's festival night).")]
+        [Range(0f, 1f)] public float moon;
+
         [Header("Network")]
         [Range(0f, 1f)] public float networkDim = 0.3f;
         public float pulseSpacing = 5f;

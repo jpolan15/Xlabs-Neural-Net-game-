@@ -47,7 +47,7 @@ Last updated: 2026-10-30 (Level 2, the Word Machine, ADR-022; Level 1 pacing and
 | `Assets/_Project/Audio/` | **Canonical** audio assets location — see `Assets/_Project/Audio/AGENTS.md`. Ride: `Voice/vo_ride_NN.wav` (+ `.txt` sidecars), `Sfx/` (derived loops and buzzer), `Kenney/` (CC0 effects), `Music/` |
 | `Assets/AudioAssets/` | **Deprecated** — redirect to `Assets/_Project/Audio/` (no files; only AGENTS.md) |
 | `Assets/Materials/` | Shared materials. `NeuralRide/` holds the ride's materials (HoloLit solids, unlit icons and lines, additive glows, the two network materials) |
-| `Assets/Shaders/` | Hand-written URP shaders for the Neural Ride: `HoloLit`, `NeuralLinks`, `NeuralNodes` (ADR-013), `ExplainerFlat`, and `RideSky` (every region's lit sky and grid floor, ADR-021) |
+| `Assets/Shaders/` | Hand-written URP shaders for the Neural Ride: `HoloLit`, `NeuralLinks`, `NeuralNodes` (ADR-013), `ExplainerFlat`, `RideSky` (every region's lit sky and grid floor, ADR-021; the moon, ADR-025), `Festival`/`FestivalGlow` (Level 1's night festival town) and `Spark` (fireworks) |
 | `Assets/Prefabs/` | Shared prefabs. `NeuralRide/` holds Pod, Station, and Track (built by `Tools/Editor/NeuralRideBuilder*.cs`); `NeuralRide/Meshes/` holds the generated tub and network meshes |
 | `Assets/Puzzles/` | Per-chamber puzzle data: test cases, rules, configuration |
 | `Assets/Scenes/` | Unity scene files. `LevelHub.unity` is build scene 0, the level select (ADR-024, cards from `ScriptableObjects/LevelCatalog.asset`); `NeuralRide.unity` is Level 1 (scene 1, ADR-011); `WordMachine.unity` is Level 2 (scene 2, ADR-022); `Level01_AwakeningGate.unity` is kept |
@@ -103,7 +103,7 @@ Last updated: 2026-10-30 (Level 2, the Word Machine, ADR-022; Level 1 pacing and
 
 | Path | Purpose |
 |---|---|
-| `Tools/Editor/` | Unity Editor tooling: validation, build scripts, project map generation. The ride builder is split into partial files: `NeuralRideBuilder.cs` (pod, station, scene), `.Pod.cs` (tub, layout helpers), `.Narration.cs`, `.Network.cs`, `.Explainers.cs` (E0–E8), `.Pixel.cs` (the buddy); plus `RideNarrationData.cs` (the script), `RideSightlines.cs` (sightline, cone and text check, and the draw-call report), `RideSeatCaptures.cs` and `RideLiveShot.cs` (screenshots), `RideModelSheets.cs` (every model from every side; the builder checks each model has a sheet) |
+| `Tools/Editor/` | Unity Editor tooling: validation, build scripts, project map generation. The ride builder is split into partial files: `NeuralRideBuilder.cs` (pod, station, scene), `.Pod.cs` (tub, layout helpers), `.Narration.cs`, `.Network.cs`, `.Explainers.cs` (E0–E8), `.Pixel.cs` (the buddy), `.Festival.cs` (the night festival town, ADR-025), `.Chapters.cs` (the chapter picker), `.Celebrate.cs` (the win beat: fireworks, topic cards, Pixel's brain lanterns); plus `RideNarrationData.cs` (the script), `RideSightlines.cs` (sightline, cone and text check, and the draw-call report), `RideSeatCaptures.cs` and `RideLiveShot.cs` (screenshots), `RideModelSheets.cs` (every model from every side; the builder checks each model has a sheet) |
 | `Tools/Validation/` | PowerShell validators for boundaries and repository layout |
 | `Tools/AgentBridge/` | MCP / XR Operator integration; NOT a runtime dependency |
 

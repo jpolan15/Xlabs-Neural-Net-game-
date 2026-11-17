@@ -11,11 +11,12 @@ namespace Convergence.Gameplay.Ride.Level1
     /// Region 5: backpropagation. Core runs the rider's untrained network forward on the rider's own digit (v6; the hero 3
     /// if they never drew), measures the cross-entropy against the answer 3, and runs <see cref="NetworkModel.Backward"/>;
     /// every wire's blame is its real ∂loss/∂w, and every nudge is kept in the rider's network for the training game.
-    /// A mini-game, the hot-wire hunt: the rider grabs the hottest wires with a laser (trigger or A) and drags each one's
-    /// loose end to the answer "3" before they cool down. The wire snaps onto the 3 once its end comes within a few
-    /// degrees of it, and that is one real gradient step on that weight (w ← w − η ∂loss/∂w); a hotter wire scores more.
-    /// Letting go anywhere else drops the wire back where it was. When the hunt's time runs out the ride connects the
-    /// rest itself, one at a time, so nobody gets stuck. Stars come from speed.
+    /// A mini-game, "cool the hot wires" (2026-11-17 redesign: playtesters could not tell what the old drag-to-the-3 hunt
+    /// wanted): the hottest wires glow, each with a big target on it, and a laser shot at one (trigger or A, as in the
+    /// blaster) is one real gradient step on that weight (w ← w − η ∂loss/∂w). The wire cools, a hotter wire scores more,
+    /// and the board shows how sure Pixel now is that the digit is a 3 (the real softmax output of the rider's network).
+    /// When the hunt's time runs out the ride shoots the rest itself, one at a time, so nobody gets stuck. Stars come from
+    /// speed.
     /// </summary>
     public sealed class BlameMoment : RideGame
     {
@@ -42,17 +43,11 @@ namespace Convergence.Gameplay.Ride.Level1
         [SerializeField] private Level1DataSource source;
         [Tooltip("v6: the blame is the rider's own digit's, on the rider's own network, and every nudge stays in it.")]
         [SerializeField] private Level1Session session;
-        [Tooltip("How many of the brightest wires the rider is asked to connect.")]
-        [SerializeField] private int topCount = 4;
-        [Tooltip("Seconds of the hunt: the wires cool down over this time.")]
+        [Tooltip("How many of the hottest wires the rider is asked to cool.")]
+        [SerializeField] private int topCount = 6;
+        [Tooltip("Seconds of the hunt: after this the ride starts cooling the wires itself.")]
         [SerializeField] private float timeout = 75f;
         [SerializeField] private float autoStepSeconds = 1.2f;
-        [Tooltip("The answer node the wires are dragged to (the 3). Set by the scene builder.")]
-        [SerializeField] private Transform socket;
-        [Tooltip("A dragged wire's end snaps onto the node when it comes within this many degrees of it, seen from the hand.")]
-        [SerializeField] private float snapDegrees = 4f;
-        [Tooltip("...but never closer than this many metres, so a near view is as forgiving as a far one.")]
-        [SerializeField] private float snapMinRadius = 0.8f;
 
         private List<Wire> _wires;
         private bool[] _nudged;
@@ -63,8 +58,7 @@ namespace Convergence.Gameplay.Ride.Level1
         private float _opened;
         private float _lastHit;
         private bool _saidHurry;
-        private int _connections;
-        private readonly int[] _carrying = { -1, -1 };
+        private int _cooled;
 
         /// <summary>Every wire, the most to blame first.</summary>
         public IReadOnlyList<Wire> Wires => _wires;
@@ -81,34 +75,32 @@ namespace Convergence.Gameplay.Ride.Level1
         /// <summary>The loss before any nudge.</summary>
         public double StartLoss { get; private set; }
 
+        /// <summary>How sure the rider's network, as nudged so far, is that the rider's digit is a 3: its softmax output for 3.</summary>
+        public double HeroProbability { get; private set; }
+
+        /// <summary>How sure it was before any nudge.</summary>
+        public double StartProbability { get; private set; }
+
         /// <summary>Top wire k was nudged: its weight before and after.</summary>
         public event Action<int, double, double> Nudged;
 
         public event Action<bool> LiveChanged;
 
-        /// <summary>A hand picked up top wire k (wire, hand).</summary>
-        public event Action<int, int> Grabbed;
-
-        /// <summary>A hand let go of top wire k without connecting it (wire, hand).</summary>
-        public event Action<int, int> Dropped;
-
-        /// <summary>Top wire k snapped onto the 3: the wire, the hand (-1: the ride did it), and how many came before it.</summary>
+        /// <summary>Top wire k was shot and cooled: the wire, the hand (-1: the ride did it), and how many cooled before it.</summary>
         public event Action<int, int, int> Connected;
 
-        /// <summary>The 3 the wires are dragged to.</summary>
-        public Transform Socket => socket;
+        /// <summary>How many top wires are cooled so far.</summary>
+        public int CooledCount => Count();
 
-        /// <summary>The top wire a hand is carrying, or -1.</summary>
-        public int Carrying(int hand) => hand == RideHand.Left || hand == RideHand.Right ? _carrying[hand] : -1;
-
-        /// <summary>How many top wires are connected to the 3 so far.</summary>
-        public int ConnectedCount => Count();
-
-        /// <summary>How close to the 3 a dragged wire's end must come to snap, seen from the eye: a few degrees, at least a minimum.</summary>
-        public float SnapRadiusFrom(Vector3 eye)
+        /// <summary>The hottest top wire that is still hot, or -1.</summary>
+        public int HottestLeft
         {
-            float distance = socket != null ? Vector3.Distance(eye, socket.position) : 0f;
-            return Mathf.Max(snapMinRadius, distance * Mathf.Tan(snapDegrees * Mathf.Deg2Rad));
+            get
+            {
+                if (_nudged == null) return -1;
+                for (int k = 0; k < _nudged.Length; k++) if (!_nudged[k]) return k;
+                return -1;
+            }
         }
 
         public bool IsNudged(int k) => _nudged != null && k >= 0 && k < _nudged.Length && _nudged[k];
@@ -117,13 +109,14 @@ namespace Convergence.Gameplay.Ride.Level1
         public static List<Wire> ComputeBlame(Level1Data data, out double loss)
         {
             NetworkModel net = data.CreateUntrained();
-            return ComputeBlame(net, data.File.hero.pixels7, out loss);
+            return ComputeBlame(net, data.File.hero.pixels7, out loss, out _);
         }
 
-        private static List<Wire> ComputeBlame(NetworkModel net, double[] pixels, out double loss)
+        private static List<Wire> ComputeBlame(NetworkModel net, double[] pixels, out double loss, out double probability)
         {
             double[] p = net.Forward(pixels);
             loss = LossFunctions.CategoricalCrossEntropy(p, Level1Data.HeroDigit);
+            probability = p[Level1Data.HeroDigit];
             var dLdp = new double[p.Length];
             LossFunctions.CategoricalCrossEntropyGradient(p, Level1Data.HeroDigit, dLdp);
             net.Backward(dLdp);
@@ -153,7 +146,7 @@ namespace Convergence.Gameplay.Ride.Level1
             return wires;
         }
 
-        /// <summary>The blame changed (the rider drew their digit): views re-aim the hunt's wires.</summary>
+        /// <summary>The blame changed (the rider drew their digit, or the hunt opened): views re-aim the hot wires.</summary>
         public event Action BlameChanged;
 
         /// <summary>Computes the blame so views can draw it before the moment opens.</summary>
@@ -161,9 +154,11 @@ namespace Convergence.Gameplay.Ride.Level1
         {
             if (_wires != null || source == null) return;
             _net = session != null ? session.Network.ToModel() : source.Data.CreateUntrained();
-            _wires = ComputeBlame(_net, Digit, out double loss);
+            _wires = ComputeBlame(_net, Digit, out double loss, out double probability);
             StartLoss = loss;
             HeroLoss = loss;
+            StartProbability = probability;
+            HeroProbability = probability;
             _nudged = new bool[Mathf.Min(topCount, _wires.Count)];
             BlameChanged?.Invoke();
         }
@@ -189,90 +184,28 @@ namespace Convergence.Gameplay.Ride.Level1
             Prepare();
         }
 
-        /// <summary>Connects top wire k to the 3 at once: one real gradient step on it. The desk and the tests use this.</summary>
-        public void Nudge(int k) => Connect(k, -1, true);
+        /// <summary>Cools top wire k at once, as if the rider shot it: one real gradient step. The desk and the tests use this.</summary>
+        public void Nudge(int k) => Cool(k, -1, true);
 
         /// <summary>
-        /// A hand picks up top wire k (a laser press on the wire or its glowing end). The wire's end then follows the laser
-        /// until it snaps onto the 3 or the hand lets go. Returns true when the wire was picked up.
+        /// A hand's laser hit top wire k (its glowing target, or the wire itself): one real gradient step on its weight.
+        /// Returns true when the shot did something (the hunt is live and the wire was still hot).
         /// </summary>
-        public bool Grab(int k, int hand)
+        public bool Shoot(int k, int hand)
         {
             if (!_live || _nudged == null || k < 0 || k >= _nudged.Length || _nudged[k]) return false;
             if (hand != RideHand.Left && hand != RideHand.Right) hand = RideHand.Right;
-            int other = 1 - hand;
-            if (_carrying[other] == k) Drop(other);
-            if (_carrying[hand] == k) return true;
-            if (_carrying[hand] >= 0) Drop(hand);
-            _carrying[hand] = k;
-            Grabbed?.Invoke(k, hand);
+            Cool(k, hand, true);
             return true;
         }
 
-        /// <summary>A hand lets go of the wire it carries; the wire goes back to where it hung.</summary>
-        public void Drop(int hand)
-        {
-            if (hand != RideHand.Left && hand != RideHand.Right) return;
-            int k = _carrying[hand];
-            if (k < 0) return;
-            _carrying[hand] = -1;
-            Dropped?.Invoke(k, hand);
-        }
-
         /// <summary>
-        /// Where the wire a hand carries ends this frame: the hand's laser projected onto the plane through the 3, square to
-        /// the line of sight, so the end slides over the network as the rider sweeps the laser. False when the hand has no laser.
+        /// Top wire k cools: one real gradient step on its weight, and points for the rider when the rider did it (the
+        /// hotter the wire, the more it scores; the "+N" bursts on the table, near enough to read).
         /// </summary>
-        public bool TryGetCursor(int hand, out Vector3 point) => TryGetCursor(hand, out point, out _);
-
-        private bool TryGetCursor(int hand, out Vector3 point, out Vector3 eye)
-        {
-            point = default;
-            eye = default;
-            if (socket == null || !RideAim.TryGet(hand, out Vector3 origin, out Vector3 aim)) return false;
-            Vector3 direction = aim - origin;
-            if (direction.sqrMagnitude < 1e-8f) return false;
-            direction.Normalize();
-            Vector3 centre = socket.position;
-            Vector3 toEye = origin - centre;
-            if (toEye.sqrMagnitude < 1e-8f) return false;
-            eye = origin;
-            var plane = new Plane(toEye.normalized, centre);
-            var ray = new Ray(origin, direction);
-            // Aiming away from the board: keep the end at the 3's distance along the laser, so it never jumps.
-            point = plane.Raycast(ray, out float enter) ? ray.GetPoint(enter) : ray.GetPoint(toEye.magnitude);
-            return true;
-        }
-
-        private void OnEnable() => RideAim.Released += OnReleased;
-
-        private void OnDisable()
-        {
-            RideAim.Released -= OnReleased;
-            _carrying[0] = _carrying[1] = -1;
-        }
-
-        private void OnReleased(int hand) => Drop(hand);
-
-        private void Update()
-        {
-            if (!_live || socket == null) return;
-            for (int hand = 0; hand < _carrying.Length; hand++)
-            {
-                int k = _carrying[hand];
-                if (k < 0 || !TryGetCursor(hand, out Vector3 cursor, out Vector3 eye)) continue;
-                if (Vector3.Distance(cursor, socket.position) <= SnapRadiusFrom(eye)) Connect(k, hand, true);
-            }
-        }
-
-        /// <summary>
-        /// Top wire k snaps onto the 3: one real gradient step on its weight, and points for the rider when the rider did it
-        /// (the hotter the wire, the more it scores).
-        /// </summary>
-        private void Connect(int k, int hand, bool byRider)
+        private void Cool(int k, int hand, bool byRider)
         {
             if (!_live || IsNudged(k)) return;
-            for (int h = 0; h < _carrying.Length; h++) if (_carrying[h] == k) _carrying[h] = -1;
             Apply(k);
             if (byRider)
             {
@@ -280,13 +213,13 @@ namespace Convergence.Gameplay.Ride.Level1
                 AddScore(10 + 10 * (_nudged.Length - k), Vector3.zero);
             }
 
-            Connected?.Invoke(k, hand, _connections++);
+            Connected?.Invoke(k, hand, _cooled++);
         }
 
         /// <summary>Seconds left in the hunt.</summary>
         public override float SecondsLeft => _live ? Mathf.Max(0f, timeout - (Time.time - _opened)) : -1f;
 
-        /// <summary>How hot the hunt's wires still are: 1 when it opens, 0 when its time is up.</summary>
+        /// <summary>How much of the hunt's time is left: 1 when it opens, 0 when its time is up.</summary>
         public float Heat => _live ? Mathf.Clamp01(1f - (Time.time - _opened) / timeout) : 0f;
 
         protected override int StarsEarned()
@@ -301,14 +234,14 @@ namespace Convergence.Gameplay.Ride.Level1
 
         protected override IEnumerator Play()
         {
-            // The rider's network as it is now (nothing has trained it yet), and their digit.
+            // The rider's network as it is now (nothing has trained it yet), and their digit. Prepare raises BlameChanged, so
+            // the views re-aim the hot wires and the board's meter starts from this digit's real "how sure".
             _wires = null;
             Prepare();
             _hurry = false;
             _byRider = true;
             _saidHurry = false;
-            _connections = 0;
-            _carrying[0] = _carrying[1] = -1;
+            _cooled = 0;
             _live = true;
             LiveChanged?.Invoke(true);
             _opened = Time.time;
@@ -318,7 +251,7 @@ namespace Convergence.Gameplay.Ride.Level1
             while (Count() < _nudged.Length)
             {
                 Progress = (float)Count() / _nudged.Length;
-                SetGoal("Drag glowing wires onto the 3:  " + Count() + " of " + _nudged.Length);
+                SetGoal("Shoot the hot wires to fix them:  " + Count() + " of " + _nudged.Length);
                 if (!_saidHurry && Time.time - opened > timeout * 0.6f && Count() * 2 < _nudged.Length)
                 {
                     _saidHurry = true;
@@ -329,19 +262,14 @@ namespace Convergence.Gameplay.Ride.Level1
                 {
                     if (Count() * 2 < _nudged.Length) _byRider = false;
                     nextAuto = Time.time + (_hurry ? autoStepSeconds * 0.3f : autoStepSeconds);
-                    for (int k = 0; k < _nudged.Length; k++)
-                    {
-                        if (_nudged[k]) continue;
-                        Connect(k, -1, false);
-                        break;
-                    }
+                    int k = HottestLeft;
+                    if (k >= 0) Cool(k, -1, false);
                 }
 
                 yield return null;
             }
 
             _live = false;
-            _carrying[0] = _carrying[1] = -1;
             LiveChanged?.Invoke(false);
         }
 
@@ -354,7 +282,9 @@ namespace Convergence.Gameplay.Ride.Level1
             double after = before - LearningRate * w.Gradient;
             neuron.SetWeight(w.Input, after);
             _nudged[k] = true;
-            HeroLoss = LossFunctions.CategoricalCrossEntropy(_net.Forward(Digit), Level1Data.HeroDigit);
+            double[] p = _net.Forward(Digit);
+            HeroLoss = LossFunctions.CategoricalCrossEntropy(p, Level1Data.HeroDigit);
+            HeroProbability = p[Level1Data.HeroDigit];
             if (session != null)
             {
                 session.Network.CopyFrom(_net);

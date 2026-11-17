@@ -298,23 +298,22 @@ namespace Convergence.Tests.PlayMode.Gameplay
             yield return WaitFor(() => thrown && send.Guess >= 0 && send.Progress >= 1f, "the race through the network", 60f);
             Assert.AreEqual(session.Read(out _, out _), send.Guess, "the guess is Core's, on the rider's digit");
 
-            // The hot-wire hunt on the rider's digit: each wire dragged to the 3 is a real step on the rider's network.
+            // Cool the hot wires (2026-11-17) on the rider's digit: each wire shot is a real step on the rider's network.
             yield return WaitFor(() => blame.IsLive, "the hunt to open", 150f);
             UnityEngine.Object.FindAnyObjectByType<DesktopSeat>().enabled = false;
             UnityEngine.Object.FindAnyObjectByType<RideHandLasers>().enabled = false;
             double before = blame.HeroLoss;
-            Vector3 eye = Camera.main.transform.position;
             BlameMoment.Wire top = blame.Wires[0];
             double weightBefore = top.Layer == 0 ? session.Network.W1[top.Neuron * 49 + top.Input] : session.Network.W2[top.Neuron * 16 + top.Input];
-            Assert.IsTrue(blame.Grab(0, RideHand.Left));
-            RideAim.Set(RideHand.Left, eye, blame.Socket.position, true);
+            Assert.IsTrue(blame.Shoot(0, RideHand.Left));
             yield return null;
-            Assert.IsTrue(blame.IsNudged(0), "a wire dragged to the 3 snaps on, as one real gradient step");
+            Assert.IsTrue(blame.IsNudged(0), "a hot wire shot cools, as one real gradient step");
+            Assert.IsFalse(blame.Shoot(0, RideHand.Left), "a cooled wire cannot be shot again");
             double weightAfter = top.Layer == 0 ? session.Network.W1[top.Neuron * 49 + top.Input] : session.Network.W2[top.Neuron * 16 + top.Input];
             Assert.AreEqual(weightBefore - blame.LearningRate * top.Gradient, weightAfter, 1e-9, "the step is kept in the rider's network");
-            RideAim.Set(RideHand.Left, Vector3.zero, Vector3.zero, false);
             for (int k = 0; k < blame.TopCount; k++) blame.Nudge(k);
             Assert.Less(blame.HeroLoss, before, "the real gradient steps lower the loss of the rider's 3");
+            Assert.Greater(blame.HeroProbability, blame.StartProbability, "and the board's meter: Pixel is surer it is a 3");
             yield return WonThenPullGo(blame);
             UnityEngine.Object.FindAnyObjectByType<DesktopSeat>().enabled = true;
             UnityEngine.Object.FindAnyObjectByType<RideHandLasers>().enabled = true;

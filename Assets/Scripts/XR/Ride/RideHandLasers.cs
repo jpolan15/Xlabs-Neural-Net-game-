@@ -365,7 +365,7 @@ namespace Convergence.XR.Ride
             if (cell != null && cell.isActiveAndEnabled) return cell.Press(hand);
 
             BlameWireInteractable wire = c.GetComponentInParent<BlameWireInteractable>();
-            if (wire != null && wire.isActiveAndEnabled) return wire.Grab(hand);
+            if (wire != null && wire.isActiveAndEnabled) return wire.Shoot(hand);
 
             PodLeverInteractable lever = c.GetComponentInParent<PodLeverInteractable>();
             if (lever != null && lever.isActiveAndEnabled && lever.Channel != null && !lever.Channel.Locked)

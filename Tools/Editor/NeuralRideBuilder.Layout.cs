@@ -80,7 +80,8 @@ namespace Convergence.EditorTools
                 L.NetViewStop = new Pose(new Vector3(12f, 0f, 145f), straight);
                 L.BlueNetwork = new Pose(new Vector3(12f, 0f, 145f + ViewDistance), straight);
                 L.WrongStop = L.NetViewStop;
-                L.BlameStop = new Pose(new Vector3(12f, 0f, 135f), straight);
+                // 2026-11-17: the backprop hunt is played right at the network view (30 m), not after rolling back to 40 m.
+                L.BlameStop = L.NetViewStop;
                 L.SpurEnd = new Pose(new Vector3(12f, 0f, 112f), straight);
 
                 // ----- Leg B: the straight through J, spur end to the stop in front of the network

@@ -54,10 +54,14 @@ namespace Convergence.Tests.EditMode.Ride
             return script;
         }
 
+        /// <summary>Lines cut from the script (2026-11-17, plain-words pass, ADR-025); their ids stay reserved.</summary>
+        private static readonly RideLine[] Retired = { RideLine.PixelsWhy49, RideLine.WeightPlain };
+
         private static IEnumerable<RideLine> Level1Lines()
         {
             foreach (RideLine line in Enum.GetValues(typeof(RideLine)))
             {
+                if (Array.IndexOf(Retired, line) >= 0) continue;
                 if ((int)line >= (int)FirstLine && (int)line < (int)RideLine.L2Hello) yield return line;
             }
         }

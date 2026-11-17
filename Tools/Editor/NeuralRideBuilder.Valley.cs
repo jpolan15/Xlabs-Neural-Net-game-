@@ -30,13 +30,15 @@ namespace Convergence.EditorTools
             }
 
             m.shader = shader;
-            m.SetColor("_LowColor", Color.Lerp(_theme.valleyViolet, Color.black, 0.35f));
-            m.SetColor("_HighColor", _theme.valleyPink);
-            m.SetColor("_ContourColor", new Color(1f, 0.86f, 0.95f));
-            m.SetColor("_RimColor", new Color(1f, 0.6f, 0.85f));
+            // 2026-11-17, the festival night: a dark hillside of lantern-lit terraces. Low (less wrong) is cool night blue,
+            // high (more wrong) a warm ember; the contour lines are lantern gold, so height still reads at a glance.
+            m.SetColor("_LowColor", new Color(0.05f, 0.08f, 0.16f));
+            m.SetColor("_HighColor", new Color(0.62f, 0.22f, 0.24f));
+            m.SetColor("_ContourColor", new Color(1f, 0.78f, 0.42f));
+            m.SetColor("_RimColor", new Color(1f, 0.55f, 0.6f));
             EditorUtility.SetDirty(m);
             Mats["LossTerrain"] = m;
-            LinkMaterial("ValleyTrail", Color.Lerp(_theme.valleyPink, Color.white, 0.5f), _theme.valleyPink, 0.18f, 1f, 2f, 8f);
+            LinkMaterial("ValleyTrail", new Color(1f, 0.86f, 0.55f), _theme.gold, 0.18f, 1f, 2f, 8f);
         }
 
         private static GameObject BuildValleyRegion(Layout layout, RideDirector director, DashScreenView dash, ValleyRunMoment moment)
@@ -145,7 +147,7 @@ namespace Convergence.EditorTools
                 Vector3 at = Local(hop.row, mid);
                 foreach (float side in new[] { -2.2f, 2.2f })
                 {
-                    posts.Box(at + new Vector3(side, -0.2f, 0f), new Vector3(0.18f, 1.6f, 0.18f), _theme.valleyPink);
+                    posts.Box(at + new Vector3(side, -0.2f, 0f), new Vector3(0.18f, 1.6f, 0.18f), new Color(0.35f, 0.2f, 0.14f, 0f)); // lanterns on top: NeuralRideBuilder.Festival
                 }
             }
 
@@ -156,17 +158,23 @@ namespace Convergence.EditorTools
 
             // What the height means hangs over the track partway down, where the rider looks on the way down.
             Transform sign = Make("Sign", root.transform, new Vector3(0f, -2f, 60f)).transform;
-            TextMeshPro text = Text("Text", sign, Vector3.zero, "HEIGHT = HOW WRONG\nLOWER = BETTER", 1.6f, Color.Lerp(_theme.valleyPink, Color.white, 0.6f), 24f, bold: true);
+            TextMeshPro text = Text("Text", sign, Vector3.zero, "HEIGHT = HOW WRONG\nLOWER = BETTER", 1.6f, new Color(1f, 0.88f, 0.7f), 24f, bold: true);
             text.rectTransform.sizeDelta = new Vector2(24f, 4f);
             LabelBacking(text, "HEIGHT = HOW WRONG", 0.3f);
             FaceToward(sign, layout.MidDrop + Vector3.up * 1.3f);
 
-            // The sun over the far end of the valley: pink, never orange. High enough to show over the overshoot hill
-            // from the rim, so the rider sees where the ride is going before the climb.
+            // The festival's great lantern over the far end of the valley (it was a pink sun before the festival): high enough to
+            // show over the overshoot hill from the rim, so the rider sees where the ride is going before the climb.
             Transform sun = Make("Sun", root.transform, new Vector3(-16f, 30f, 115f)).transform;
-            Prim(PrimitiveType.Sphere, "Disc", sun, Vector3.zero, Vector3.one * 18f, "Sun");
-            var halo = Quad("Halo", sun, Vector3.zero, new Vector2(70f, 70f), "GlowPink");
-            halo.AddComponent<FaceCamera>();
+            FestivalMaterial("Festival", "Convergence/Festival");
+            FestivalMaterial("FestivalGlow", "Convergence/FestivalGlow");
+            var great = new FestivalMesh();
+            great.Lantern(Vector3.zero, 6f, 11f, new Color(1f, 0.5f, 0.42f));
+            great.CordMesh(Vector3.up * 5.6f, Vector3.up * 40f, 0f, new Color(0.05f, 0.04f, 0.04f, 0f));
+            AddMeshObject("Disc", sun, SaveMesh(great.ToMesh("GreatLantern"), "L1_GreatLantern"), "Festival");
+            var glow = new GlowMesh();
+            glow.Halo(Vector3.zero, 26f, new Color(1f, 0.55f, 0.45f), 0.55f);
+            AddMeshObject("Halo", sun, SaveMesh(glow.ToMesh("GreatLanternGlow"), "L1_GreatLanternGlow"), "FestivalGlow");
 
             var view = root.AddComponent<ValleyView>();
             Ref(view, "director", director);

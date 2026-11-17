@@ -105,16 +105,19 @@ namespace Convergence.EditorTools
             // a grid floor far below, stars. Dark enough at eye level that white text and the explainers stay crisp.
             theme.regions = new[]
             {
-                Sky("MEET PIXEL", "#05081A", "#16224A", "#4A6FD0", 0.55f, "#4FB8FF", 0.35f, 1.0f, 0.010f),
-                Sky("PIXELS", "#02070E", "#072A3C", "#1497B8", 0.50f, "#2FE0FF", 0.40f, 0.6f, 0.016f),
-                Sky("NEURON", "#0B0603", "#2E1806", "#C2661A", 0.50f, "#FFB347", 0.30f, 0.5f, 0.018f),
-                Sky("NEURAL NETWORK", "#03051A", "#0D1C52", "#3D5FE0", 0.55f, "#4FC3FF", 0.30f, 1.2f, 0.010f),
-                Sky("LOSS", "#0C0205", "#33080E", "#C42532", 0.50f, "#FF4D5A", 0.30f, 0.4f, 0.013f),
-                Sky("BACKPROPAGATION", "#0B0316", "#2C0B40", "#9A2BC8", 0.55f, "#E04DFF", 0.30f, 0.8f, 0.012f),
-                Sky("GRADIENT DESCENT", "#1C0C36", "#7A3466", "#FF8A5C", 0.70f, "#000000", 0f, 0.4f, 0.008f),
-                Sky("TRAINING", "#0A0803", "#2E2408", "#C9922A", 0.55f, "#FFD166", 0.30f, 0.8f, 0.010f),
+                // 2026-11-17, the night festival: a deep indigo night over a warm, lantern-lit horizon in each stop's colour, a
+                // faint warm street grid (the town's paving is real geometry, NeuralRideBuilder.Festival) and thin fog so the town shows.
+                Sky("MEET PIXEL", "#070A24", "#3A2840", "#FF7A45", 0.55f, "#FFB070", 0.10f, 1.0f, 0.009f),
+                Sky("PIXELS", "#050C24", "#1F2F4C", "#3FD0FF", 0.45f, "#FFB070", 0.10f, 0.9f, 0.009f),
+                Sky("NEURON", "#0C0820", "#4A2A30", "#FF9A3A", 0.55f, "#FFB070", 0.10f, 0.8f, 0.009f),
+                Sky("NEURAL NETWORK", "#050A26", "#22305C", "#6A8CFF", 0.50f, "#FFB070", 0.08f, 1.0f, 0.008f),
+                Sky("LOSS", "#10071E", "#4A1E30", "#F04A55", 0.50f, "#FFB070", 0.08f, 0.8f, 0.008f),
+                Sky("BACKPROPAGATION", "#0E0624", "#3E1E58", "#C24DF0", 0.55f, "#FFB070", 0.08f, 0.9f, 0.008f),
+                Sky("GRADIENT DESCENT", "#0B0822", "#3E2240", "#FF7FA0", 0.55f, "#000000", 0f, 0.9f, 0.008f),
+                Sky("TRAINING", "#0C0A1E", "#4A3420", "#F2B33A", 0.55f, "#FFB070", 0.10f, 0.9f, 0.008f),
             };
             if (_level2) theme.regions = Level2Regions();
+            theme.moon = _level2 ? 0f : 1f;
             // Level 2's daylight only softens while a board explains (its boards carry their own dark plates); the meadow stays green.
             theme.blackboardDim = _level2 ? 0.9f : 0.78f;
             theme.blackboardFloor = _level2 ? 1f : 0.5f;
@@ -574,13 +577,15 @@ namespace Convergence.EditorTools
             regions[5] = BuildBlameRegion(layout, rd, dash, moments.Blame);
             regions[6] = BuildValleyRegion(layout, rd, dash, moments.Valley);
             regions[7] = BuildRightRegion(layout, rd, dash, moments.Right);
+            BuildFestival(layout, regions);
 
             WireDirector(rd, pod, layout, moments, regions);
             WirePod(pod, rd, moments, regions);
-            BuildPixel(pod, rd, dash, moments);
+            PixelBuddyView pixel = BuildPixel(pod, rd, dash, moments);
             Ref(rd.GetComponentInChildren<NeuronExplainer>(true), "paintGrid", pod.transform.Find("GameTable/WeightGrid"));
             WireGames(pod, rd, moments, rig);
             ConfigureGames(moments);
+            BuildCelebration(pod, rd, moments, pixel);
             BuildViewpoints(layout, regions);
             BuildBoot(pod, rd, regions);
 

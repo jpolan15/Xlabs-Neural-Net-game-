@@ -105,8 +105,10 @@ namespace Convergence.Gameplay.Ride
             }
         }
 
+        // Only while the cart really moves (2026-11-17: after a chapter jump the ride is "travelling" while it waits for the dock
+        // line to end, standing still at an explaining stop, and digits flew over the explanation).
         private bool Running => director.State == RideState.Traveling && director.ActiveMoment == null && director.SegmentIndex >= 0
-            && System.Array.IndexOf(quietSegments, director.SegmentIndex) < 0;
+            && Mathf.Abs(director.Speed) > 0.3f && System.Array.IndexOf(quietSegments, director.SegmentIndex) < 0;
 
         private void Update()
         {
